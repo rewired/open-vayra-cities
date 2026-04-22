@@ -59,4 +59,8 @@ All notable changes to this project will be documented in this file.
 - Keep click handling deterministic by limiting stop placement to `place-stop` mode and preventing placement behavior while `build-line` is active.
 - Add shell-owned line-build draft selection state and pass it to map workspace and inspector surfaces.
 - Add ADR 0020 documenting explicit mode controls and build-line placeholder boundaries.
-
+- Add typed local build-line draft state in `MapWorkspaceSurface` with ordered stop-id capture and draft metadata.
+- Make build-line marker clicks append existing stop ids in click order while keeping inspect and place-stop interactions isolated by mode.
+- Add minimal draft lifecycle actions (`Cancel draft`, `Complete line`) and gate completion with centralized `MINIMUM_STOPS_PER_LINE` (2).
+- Persist completed build-line drafts only in local in-memory session line state.
+- Add ADR 0021 documenting local build-line drafting and completion boundaries.

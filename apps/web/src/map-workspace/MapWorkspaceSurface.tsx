@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 
+import { MINIMUM_STOPS_PER_LINE } from '../domain/constants/lineBuild';
+import type { Line } from '../domain/types/line';
+import { createLineId } from '../domain/types/line';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
 import type { LineBuildSelectionState, WorkspaceToolMode } from '../App';
@@ -52,6 +55,10 @@ interface PlacementGameplayContracts {
   readonly onValidPlacement: (lng: number, lat: number) => Stop;
 }
 
+interface BuildLineModeMapClickContracts {
+  readonly onInspectModeMapClick: () => void;
+}
+
 interface MapWorkspaceSurfaceInteractionsContracts {
   readonly map: MapLibreMap;
   readonly activeToolMode: WorkspaceToolMode;
@@ -59,6 +66,7 @@ interface MapWorkspaceSurfaceInteractionsContracts {
   readonly setPlacementAttemptResult: (nextState: PlacementAttemptResult) => void;
   readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
   readonly onValidPlacement: (lng: number, lat: number) => Stop;
+  readonly buildLineContracts: BuildLineModeMapClickContracts;
 }
 
 interface MapWorkspaceResizeBinding {
@@ -73,10 +81,21 @@ interface MapWorkspaceSurfaceProps {
   readonly onLineBuildSelectionChange: (nextSelection: LineBuildSelectionState) => void;
 }
 
+interface DraftLineMetadata {
+  readonly draftOrdinal: number;
+  readonly startedAtIsoUtc: string;
+}
+
+interface DraftLineState {
+  readonly stopIds: readonly StopId[];
+  readonly metadata: DraftLineMetadata | null;
+}
+
 const STREET_LAYER_HINTS = ['road', 'street', 'highway', 'bridge', 'tunnel', 'transport', 'path'] as const;
 const STREET_SOURCE_HINTS = ['road', 'street', 'transport', 'highway'] as const;
 const STOP_LABEL_PREFIX = 'Stop';
 const PLACEMENT_MODE_INDICATOR_LABEL = 'Placement mode active';
+const BUILD_LINE_MODE_INDICATOR_LABEL = 'Build-line mode active';
 const PLACEMENT_FEEDBACK_MESSAGES = {
   modeInstruction: 'Click a street segment to place a stop.',
   streetRuleHint: 'Placement rule: stops can only be placed on street line segments.',
@@ -84,6 +103,11 @@ const PLACEMENT_FEEDBACK_MESSAGES = {
   attemptPlaced: 'Last attempt: stop placed.',
   attemptInvalidTarget: 'Last attempt: blocked (street segment required).'
 } as const;
+const BUILD_LINE_FEEDBACK_MESSAGES = {
+  instruction: 'Click existing stop markers in order to draft a line.',
+  minimumStopRequirement: `Minimum stops to complete: ${MINIMUM_STOPS_PER_LINE}.`
+} as const;
+const INITIAL_DRAFT_LINE_STATE: DraftLineState = { stopIds: [], metadata: null };
 
 const toStopSelectionState = (stop: Stop): StopSelectionState => ({ selectedStopId: stop.id });
 
@@ -245,7 +269,8 @@ const setupMapWorkspaceInteractions = ({
   setInteractionState,
   setPlacementAttemptResult,
   onStopSelectionChange,
-  onValidPlacement
+  onValidPlacement,
+  buildLineContracts
 }: MapWorkspaceSurfaceInteractionsContracts): { readonly dispose: () => void } => {
   const neutralTelemetryHandlers = createNeutralMapTelemetryHandlers({ setInteractionState });
 
@@ -260,7 +285,7 @@ const setupMapWorkspaceInteractions = ({
     setPlacementAttemptResult('none');
 
     if (activeToolMode === 'inspect') {
-      onStopSelectionChange(resolveInspectModeMapClickSelection());
+      buildLineContracts.onInspectModeMapClick();
     }
   };
 
@@ -320,7 +345,7 @@ const createMapWorkspaceInstance = (containerElement: HTMLDivElement): MapLibreM
 
 const createStopMarker = (
   stop: Stop,
-  onStopSelectionChange: (nextSelection: StopSelectionState | null) => void
+  onMarkerClick: (stop: Stop) => void
 ): MapLibreMarker => {
   const markerElement = document.createElement('div');
   markerElement.className = 'map-workspace__stop-marker';
@@ -328,7 +353,7 @@ const createStopMarker = (
   markerElement.addEventListener('click', (event: MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    onStopSelectionChange(toStopSelectionState(stop));
+    onMarkerClick(stop);
   });
 
   return new window.maplibregl.Marker({ element: markerElement }).setLngLat([stop.position.lng, stop.position.lat]);
@@ -346,6 +371,14 @@ interface PlacementUiFeedbackContract {
   readonly showStreetRuleHint: boolean;
   readonly streetRuleHint: string | null;
   readonly lastAttemptMessage: string | null;
+}
+
+interface BuildLineUiFeedbackContract {
+  readonly showBuildLineModeIndicator: boolean;
+  readonly modeInstruction: string | null;
+  readonly minimumStopRequirement: string | null;
+  readonly draftStopCount: number;
+  readonly canCompleteDraft: boolean;
 }
 
 const buildPlacementUiFeedback = (
@@ -380,17 +413,37 @@ const buildPlacementUiFeedback = (
   };
 };
 
+const buildLineModeUiFeedback = (activeToolMode: WorkspaceToolMode, draftStopIds: readonly StopId[]): BuildLineUiFeedbackContract => {
+  if (activeToolMode !== 'build-line') {
+    return {
+      showBuildLineModeIndicator: false,
+      modeInstruction: null,
+      minimumStopRequirement: null,
+      draftStopCount: 0,
+      canCompleteDraft: false
+    };
+  }
+
+  return {
+    showBuildLineModeIndicator: true,
+    modeInstruction: BUILD_LINE_FEEDBACK_MESSAGES.instruction,
+    minimumStopRequirement: BUILD_LINE_FEEDBACK_MESSAGES.minimumStopRequirement,
+    draftStopCount: draftStopIds.length,
+    canCompleteDraft: draftStopIds.length >= MINIMUM_STOPS_PER_LINE
+  };
+};
+
 const syncStopMarkers = ({
   map,
   stops,
   markerByStopId,
-  onStopSelectionChange,
+  onStopMarkerClick,
   selectedStopId
 }: {
   readonly map: MapLibreMap;
   readonly stops: readonly Stop[];
   readonly markerByStopId: Map<Stop['id'], MapLibreMarker>;
-  readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
+  readonly onStopMarkerClick: (stop: Stop) => void;
   readonly selectedStopId: StopId | null;
 }): void => {
   const activeStopIds = new Set(stops.map((stop) => stop.id));
@@ -400,7 +453,7 @@ const syncStopMarkers = ({
       return;
     }
 
-    const marker = createStopMarker(stop, onStopSelectionChange).addTo(map);
+    const marker = createStopMarker(stop, onStopMarkerClick).addTo(map);
     markerByStopId.set(stop.id, marker);
   });
 
@@ -426,7 +479,6 @@ const syncStopMarkers = ({
 export function MapWorkspaceSurface({
   activeToolMode,
   selectedStopId,
-  lineBuildSelection,
   onStopSelectionChange,
   onLineBuildSelectionChange
 }: MapWorkspaceSurfaceProps): ReactElement {
@@ -439,6 +491,8 @@ export function MapWorkspaceSurface({
   });
   const [placementAttemptResult, setPlacementAttemptResult] = useState<PlacementAttemptResult>('none');
   const [placedStops, setPlacedStops] = useState<readonly Stop[]>([]);
+  const [sessionLines, setSessionLines] = useState<readonly Line[]>([]);
+  const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
 
   useEffect(() => {
     const containerElement = mapContainerRef.current;
@@ -461,12 +515,16 @@ export function MapWorkspaceSurface({
   }, []);
 
   useEffect(() => {
-    if (activeToolMode === 'build-line' || lineBuildSelection.selectedStopIds.length === 0) {
+    onLineBuildSelectionChange({ selectedStopIds: draftLineState.stopIds });
+  }, [draftLineState.stopIds, onLineBuildSelectionChange]);
+
+  useEffect(() => {
+    if (activeToolMode === 'build-line') {
       return;
     }
 
-    onLineBuildSelectionChange({ selectedStopIds: [] });
-  }, [activeToolMode, lineBuildSelection.selectedStopIds.length, onLineBuildSelectionChange]);
+    setDraftLineState(INITIAL_DRAFT_LINE_STATE);
+  }, [activeToolMode]);
 
   useEffect(() => {
     const mapInstance = mapInstanceRef.current;
@@ -481,6 +539,11 @@ export function MapWorkspaceSurface({
       setInteractionState,
       setPlacementAttemptResult,
       onStopSelectionChange,
+      buildLineContracts: {
+        onInspectModeMapClick: () => {
+          onStopSelectionChange(resolveInspectModeMapClickSelection());
+        }
+      },
       onValidPlacement: (lng, lat) => {
         let createdStop!: Stop;
         setPlacedStops((currentStops) => {
@@ -510,10 +573,29 @@ export function MapWorkspaceSurface({
       map: mapInstance,
       stops: placedStops,
       markerByStopId: stopMarkerRef.current,
-      onStopSelectionChange,
-      selectedStopId
+      selectedStopId,
+      onStopMarkerClick: (stop) => {
+        if (activeToolMode === 'build-line') {
+          setDraftLineState((currentDraft) => {
+            const nextMetadata =
+              currentDraft.metadata ??
+              ({
+                draftOrdinal: sessionLines.length + 1,
+                startedAtIsoUtc: new Date().toISOString()
+              } as const);
+
+            return {
+              stopIds: [...currentDraft.stopIds, stop.id],
+              metadata: nextMetadata
+            };
+          });
+          return;
+        }
+
+        onStopSelectionChange(toStopSelectionState(stop));
+      }
     });
-  }, [onStopSelectionChange, placedStops, selectedStopId]);
+  }, [activeToolMode, onStopSelectionChange, placedStops, selectedStopId, sessionLines.length]);
 
   const pointerSummary = interactionState.pointer
     ? `x:${interactionState.pointer.screenX.toFixed(1)} y:${interactionState.pointer.screenY.toFixed(1)}`
@@ -524,6 +606,31 @@ export function MapWorkspaceSurface({
       : 'lng/lat unavailable';
   const stopSelectionSummary = selectedStopId ? `Selected stop: ${selectedStopId}` : 'Selected stop: none';
   const placementUiFeedback = buildPlacementUiFeedback(activeToolMode, placementAttemptResult);
+  const buildLineUiFeedback = buildLineModeUiFeedback(activeToolMode, draftLineState.stopIds);
+  const draftMetadataSummary = draftLineState.metadata
+    ? `Draft #${draftLineState.metadata.draftOrdinal} @ ${draftLineState.metadata.startedAtIsoUtc}`
+    : 'Draft inactive';
+
+  const handleDraftCancel = (): void => {
+    setDraftLineState(INITIAL_DRAFT_LINE_STATE);
+  };
+
+  const handleDraftComplete = (): void => {
+    if (draftLineState.stopIds.length < MINIMUM_STOPS_PER_LINE) {
+      return;
+    }
+
+    const nextLineOrdinal = sessionLines.length + 1;
+    setSessionLines((currentLines) => [
+      ...currentLines,
+      {
+        id: createLineId(`line-${nextLineOrdinal}`),
+        label: `Line ${nextLineOrdinal}`,
+        stopIds: draftLineState.stopIds
+      }
+    ]);
+    setDraftLineState(INITIAL_DRAFT_LINE_STATE);
+  };
 
   return (
     <section className="map-workspace" aria-label="Map workspace surface">
@@ -531,7 +638,7 @@ export function MapWorkspaceSurface({
 
       <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
         Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
-        {` | Placed stops: ${placedStops.length} | ${stopSelectionSummary} | Line draft stops: ${lineBuildSelection.selectedStopIds.length}`}
+        {` | Placed stops: ${placedStops.length} | ${stopSelectionSummary} | Line draft stops: ${draftLineState.stopIds.length} | Session lines: ${sessionLines.length} | ${draftMetadataSummary}`}
       </div>
 
       {placementUiFeedback.showPlacementModeIndicator ? (
@@ -540,6 +647,21 @@ export function MapWorkspaceSurface({
           <span> · {placementUiFeedback.modeInstruction}</span>
           {placementUiFeedback.showStreetRuleHint ? <span> · {placementUiFeedback.streetRuleHint}</span> : null}
           <span> · {placementUiFeedback.lastAttemptMessage}</span>
+        </div>
+      ) : null}
+
+      {buildLineUiFeedback.showBuildLineModeIndicator ? (
+        <div className="map-workspace__overlay map-workspace__overlay--mode" aria-live="polite" aria-label="Build line mode status">
+          <strong>{BUILD_LINE_MODE_INDICATOR_LABEL}</strong>
+          <span> · {buildLineUiFeedback.modeInstruction}</span>
+          <span> · {buildLineUiFeedback.minimumStopRequirement}</span>
+          <span>{` · Draft stops: ${buildLineUiFeedback.draftStopCount}`}</span>
+          <button type="button" onClick={handleDraftCancel}>
+            Cancel draft
+          </button>
+          <button type="button" onClick={handleDraftComplete} disabled={!buildLineUiFeedback.canCompleteDraft}>
+            Complete line
+          </button>
         </div>
       ) : null}
     </section>
