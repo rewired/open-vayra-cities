@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactElement } from 'react';
 
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
-import type { WorkspaceToolMode } from '../App';
+import type { LineBuildSelectionState, WorkspaceToolMode } from '../App';
 import { MAP_WORKSPACE_BOOTSTRAP_CONFIG } from './mapBootstrapConfig';
 import {
   getSourceRefsForLayerIds,
@@ -68,7 +68,9 @@ interface MapWorkspaceResizeBinding {
 interface MapWorkspaceSurfaceProps {
   readonly activeToolMode: WorkspaceToolMode;
   readonly selectedStopId: StopId | null;
+  readonly lineBuildSelection: LineBuildSelectionState;
   readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
+  readonly onLineBuildSelectionChange: (nextSelection: LineBuildSelectionState) => void;
 }
 
 const STREET_LAYER_HINTS = ['road', 'street', 'highway', 'bridge', 'tunnel', 'transport', 'path'] as const;
@@ -250,13 +252,16 @@ const setupMapWorkspaceInteractions = ({
   const onMapClick = (event: MapLibreInteractionEvent): void => {
     neutralTelemetryHandlers.onMapClick(event);
 
-    if (activeToolMode !== 'place-stop') {
-      setPlacementAttemptResult('none');
-      onStopSelectionChange(resolveInspectModeMapClickSelection());
+    if (activeToolMode === 'place-stop') {
+      handleStopPlacementClick({ map, setInteractionState, setPlacementAttemptResult, onStopSelectionChange, onValidPlacement }, event);
       return;
     }
 
-    handleStopPlacementClick({ map, setInteractionState, setPlacementAttemptResult, onStopSelectionChange, onValidPlacement }, event);
+    setPlacementAttemptResult('none');
+
+    if (activeToolMode === 'inspect') {
+      onStopSelectionChange(resolveInspectModeMapClickSelection());
+    }
   };
 
   map.on('mousemove', neutralTelemetryHandlers.onPointerMove);
@@ -421,7 +426,9 @@ const syncStopMarkers = ({
 export function MapWorkspaceSurface({
   activeToolMode,
   selectedStopId,
-  onStopSelectionChange
+  lineBuildSelection,
+  onStopSelectionChange,
+  onLineBuildSelectionChange
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -452,6 +459,14 @@ export function MapWorkspaceSurface({
       mapInstanceRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (activeToolMode === 'build-line' || lineBuildSelection.selectedStopIds.length === 0) {
+      return;
+    }
+
+    onLineBuildSelectionChange({ selectedStopIds: [] });
+  }, [activeToolMode, lineBuildSelection.selectedStopIds.length, onLineBuildSelectionChange]);
 
   useEffect(() => {
     const mapInstance = mapInstanceRef.current;
@@ -516,7 +531,7 @@ export function MapWorkspaceSurface({
 
       <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
         Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
-        {` | Placed stops: ${placedStops.length} | ${stopSelectionSummary}`}
+        {` | Placed stops: ${placedStops.length} | ${stopSelectionSummary} | Line draft stops: ${lineBuildSelection.selectedStopIds.length}`}
       </div>
 
       {placementUiFeedback.showPlacementModeIndicator ? (

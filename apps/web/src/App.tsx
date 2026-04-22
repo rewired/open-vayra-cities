@@ -11,7 +11,18 @@ import './App.css';
 /**
  * Defines the workspace tool modes available in the desktop shell.
  */
-export type WorkspaceToolMode = 'inspect' | 'place-stop';
+export type WorkspaceToolMode = 'inspect' | 'place-stop' | 'build-line';
+
+/**
+ * Carries the active line-building draft selection as an ordered stop-id list.
+ */
+export interface LineBuildSelectionState {
+  readonly selectedStopIds: readonly StopId[];
+}
+
+const INITIAL_LINE_BUILD_SELECTION_STATE: LineBuildSelectionState = {
+  selectedStopIds: []
+};
 
 /**
  * Renders the initial desktop-only CityOps application shell layout.
@@ -19,10 +30,15 @@ export type WorkspaceToolMode = 'inspect' | 'place-stop';
 export default function App(): ReactElement {
   const [activeToolMode, setActiveToolMode] = useState<WorkspaceToolMode>('inspect');
   const [selectedStop, setSelectedStop] = useState<StopSelectionState | null>(null);
-  const isStopPlacementModeActive = activeToolMode === 'place-stop';
+  const [lineBuildSelection, setLineBuildSelection] =
+    useState<LineBuildSelectionState>(INITIAL_LINE_BUILD_SELECTION_STATE);
 
-  const handleStopPlacementModeToggle = (): void => {
-    setActiveToolMode((currentMode) => (currentMode === 'place-stop' ? 'inspect' : 'place-stop'));
+  const handleToolModeSelection = (nextMode: WorkspaceToolMode): void => {
+    setActiveToolMode(nextMode);
+
+    if (nextMode !== 'build-line') {
+      setLineBuildSelection(INITIAL_LINE_BUILD_SELECTION_STATE);
+    }
   };
 
   const selectedStopId: StopId | null = selectedStop?.selectedStopId ?? null;
@@ -38,14 +54,38 @@ export default function App(): ReactElement {
         <h2>Tools</h2>
         <div className="tool-mode-control" aria-label="Active workspace tool">
           <p>Current mode: {activeToolMode}</p>
-          <button
-            type="button"
-            className="tool-mode-control__button"
-            aria-pressed={isStopPlacementModeActive}
-            onClick={handleStopPlacementModeToggle}
-          >
-            {isStopPlacementModeActive ? 'Exit stop placement' : 'Enter stop placement'}
-          </button>
+          <div className="tool-mode-control__button-row" role="group" aria-label="Workspace mode selection">
+            <button
+              type="button"
+              className="tool-mode-control__button"
+              aria-pressed={activeToolMode === 'inspect'}
+              onClick={() => {
+                handleToolModeSelection('inspect');
+              }}
+            >
+              Inspect
+            </button>
+            <button
+              type="button"
+              className="tool-mode-control__button"
+              aria-pressed={activeToolMode === 'place-stop'}
+              onClick={() => {
+                handleToolModeSelection('place-stop');
+              }}
+            >
+              Place stop
+            </button>
+            <button
+              type="button"
+              className="tool-mode-control__button"
+              aria-pressed={activeToolMode === 'build-line'}
+              onClick={() => {
+                handleToolModeSelection('build-line');
+              }}
+            >
+              Build line
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -53,12 +93,15 @@ export default function App(): ReactElement {
         <MapWorkspaceSurface
           activeToolMode={activeToolMode}
           selectedStopId={selectedStopId}
+          lineBuildSelection={lineBuildSelection}
           onStopSelectionChange={setSelectedStop}
+          onLineBuildSelectionChange={setLineBuildSelection}
         />
       </main>
 
       <aside className="right-panel" aria-label="Inspector panel">
         <h2>Inspector</h2>
+        <p>Active mode: {activeToolMode}</p>
         {selectedStop ? (
           <div>
             <p>Selected stop</p>
@@ -67,6 +110,8 @@ export default function App(): ReactElement {
         ) : (
           <p>No stop selected.</p>
         )}
+
+        <p>Line draft stops: {lineBuildSelection.selectedStopIds.length}</p>
       </aside>
 
       <footer className="status-bar" aria-label="Status bar">

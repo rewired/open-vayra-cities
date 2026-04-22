@@ -55,4 +55,8 @@ All notable changes to this project will be documented in this file.
 - Correct the bootstrap basemap to a street-legible MapLibre-compatible style for stop-placement readability.
 - Preserve street-based stop-placement constraints while updating only map bootstrap style/viewport baseline values.
 - Add ADR 0018 documenting Hamburg-focused map bootstrap centralization and city-scale readability constraints.
+- Extend workspace tool modes with an explicit `build-line` literal and replace the mode toggle with dedicated inspect/place-stop/build-line buttons.
+- Keep click handling deterministic by limiting stop placement to `place-stop` mode and preventing placement behavior while `build-line` is active.
+- Add shell-owned line-build draft selection state and pass it to map workspace and inspector surfaces.
+- Add ADR 0020 documenting explicit mode controls and build-line placeholder boundaries.
 

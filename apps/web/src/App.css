@@ -72,6 +72,13 @@ body {
   text-transform: capitalize;
 }
 
+
+.tool-mode-control__button-row {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
 .tool-mode-control__button {
   width: fit-content;
   padding: 8px 10px;
