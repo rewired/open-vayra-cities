@@ -20,3 +20,5 @@ All notable changes to this project will be documented in this file.
 - Add explicit map workspace resize handling with `ResizeObserver`-first wiring, window resize fallback, and cleanup-safe registration lifecycle.
 - Extend the typed MapLibre global surface with `resize(): void` to keep map runtime contracts explicit.
 - Add ADR 0007 documenting explicit map workspace resize handling decisions and constraints.
+- Refactor map workspace internals into lightweight local helpers that separate map instance lifecycle setup, neutral interaction subscriptions, and resize bindings with explicit typed contracts.
+- Add ADR 0008 documenting map workspace internal lifecycle separation and lightweight boundary constraints.

@@ -17,6 +17,109 @@ interface MapSurfaceInteractionState {
   readonly pointer: MapSurfacePointerState | null;
 }
 
+interface NeutralMapInteractionHandlers {
+  readonly onPointerMove: (event: {
+    readonly point: { readonly x: number; readonly y: number };
+    readonly lngLat?: { readonly lng: number; readonly lat: number };
+  }) => void;
+  readonly onMapClick: (event: {
+    readonly point: { readonly x: number; readonly y: number };
+    readonly lngLat?: { readonly lng: number; readonly lat: number };
+  }) => void;
+}
+
+interface NeutralMapInteractionContracts {
+  readonly map: MapLibreMap;
+  readonly setInteractionState: (nextState: MapSurfaceInteractionState) => void;
+}
+
+interface MapWorkspaceResizeBinding {
+  readonly dispose: () => void;
+}
+
+const createPointerState = (screenX: number, screenY: number, lng?: number, lat?: number): MapSurfacePointerState => {
+  const baseState: MapSurfacePointerState = { screenX, screenY };
+
+  if (lng !== undefined && lat !== undefined) {
+    return { ...baseState, lng, lat };
+  }
+
+  return baseState;
+};
+
+const setupNeutralMapInteractions = ({
+  map,
+  setInteractionState
+}: NeutralMapInteractionContracts): { readonly dispose: () => void } => {
+  const handlers: NeutralMapInteractionHandlers = {
+    onPointerMove: (event) => {
+      setInteractionState({
+        status: 'pointer-active',
+        pointer: createPointerState(event.point.x, event.point.y, event.lngLat?.lng, event.lngLat?.lat)
+      });
+    },
+    onMapClick: (event) => {
+      setInteractionState({
+        status: 'click-captured',
+        pointer: createPointerState(event.point.x, event.point.y, event.lngLat?.lng, event.lngLat?.lat)
+      });
+    }
+  };
+
+  map.on('mousemove', handlers.onPointerMove);
+  map.on('click', handlers.onMapClick);
+
+  return {
+    dispose: () => {
+      map.off('mousemove', handlers.onPointerMove);
+      map.off('click', handlers.onMapClick);
+    }
+  };
+};
+
+const setupMapResizeBinding = (containerElement: HTMLDivElement, mapRef: { readonly current: MapLibreMap | null }): MapWorkspaceResizeBinding => {
+  const handleMapResize = (): void => {
+    mapRef.current?.resize();
+  };
+  const resizeObserver =
+    typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(() => {
+          handleMapResize();
+        })
+      : null;
+
+  if (resizeObserver) {
+    resizeObserver.observe(containerElement);
+  } else {
+    window.addEventListener('resize', handleMapResize);
+  }
+
+  return {
+    dispose: () => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      } else {
+        window.removeEventListener('resize', handleMapResize);
+      }
+    }
+  };
+};
+
+const createMapWorkspaceInstance = (containerElement: HTMLDivElement): MapLibreMap => {
+  const mapInstance = new window.maplibregl.Map({
+    container: containerElement,
+    style: MAP_WORKSPACE_BOOTSTRAP_CONFIG.styleUrl,
+    center: MAP_WORKSPACE_BOOTSTRAP_CONFIG.center,
+    zoom: MAP_WORKSPACE_BOOTSTRAP_CONFIG.zoom,
+    minZoom: MAP_WORKSPACE_BOOTSTRAP_CONFIG.minZoom,
+    maxZoom: MAP_WORKSPACE_BOOTSTRAP_CONFIG.maxZoom,
+    attributionControl: true
+  });
+
+  mapInstance.addControl(new window.maplibregl.NavigationControl({ visualizePitch: false }), 'top-left');
+  return mapInstance;
+};
+
 /**
  * Renders the CityOps workspace as a real MapLibre map surface without gameplay semantics.
  */
@@ -35,74 +138,14 @@ export function MapWorkspaceSurface(): ReactElement {
       return;
     }
 
-    const mapInstance = new window.maplibregl.Map({
-      container: containerElement,
-      style: MAP_WORKSPACE_BOOTSTRAP_CONFIG.styleUrl,
-      center: MAP_WORKSPACE_BOOTSTRAP_CONFIG.center,
-      zoom: MAP_WORKSPACE_BOOTSTRAP_CONFIG.zoom,
-      minZoom: MAP_WORKSPACE_BOOTSTRAP_CONFIG.minZoom,
-      maxZoom: MAP_WORKSPACE_BOOTSTRAP_CONFIG.maxZoom,
-      attributionControl: true
-    });
-
-    mapInstance.addControl(new window.maplibregl.NavigationControl({ visualizePitch: false }), 'top-left');
-    const toPointerState = (screenX: number, screenY: number, lng?: number, lat?: number): MapSurfacePointerState => {
-      const baseState: MapSurfacePointerState = { screenX, screenY };
-
-      if (lng !== undefined && lat !== undefined) {
-        return { ...baseState, lng, lat };
-      }
-
-      return baseState;
-    };
-    const handlePointerMove = (event: {
-      readonly point: { readonly x: number; readonly y: number };
-      readonly lngLat?: { readonly lng: number; readonly lat: number };
-    }): void => {
-      setInteractionState({
-        status: 'pointer-active',
-        pointer: toPointerState(event.point.x, event.point.y, event.lngLat?.lng, event.lngLat?.lat)
-      });
-    };
-    const handleMapClick = (event: {
-      readonly point: { readonly x: number; readonly y: number };
-      readonly lngLat?: { readonly lng: number; readonly lat: number };
-    }): void => {
-      setInteractionState({
-        status: 'click-captured',
-        pointer: toPointerState(event.point.x, event.point.y, event.lngLat?.lng, event.lngLat?.lat)
-      });
-    };
-
-    mapInstance.on('mousemove', handlePointerMove);
-    mapInstance.on('click', handleMapClick);
+    const mapInstance = createMapWorkspaceInstance(containerElement);
     mapInstanceRef.current = mapInstance;
-
-    const handleMapResize = (): void => {
-      mapInstanceRef.current?.resize();
-    };
-    const resizeObserver =
-      typeof ResizeObserver !== 'undefined'
-        ? new ResizeObserver(() => {
-            handleMapResize();
-          })
-        : null;
-
-    if (resizeObserver) {
-      resizeObserver.observe(containerElement);
-    } else {
-      window.addEventListener('resize', handleMapResize);
-    }
+    const neutralInteractions = setupNeutralMapInteractions({ map: mapInstance, setInteractionState });
+    const mapResizeBinding = setupMapResizeBinding(containerElement, mapInstanceRef);
 
     return () => {
-      if (resizeObserver) {
-        resizeObserver.disconnect();
-      } else {
-        window.removeEventListener('resize', handleMapResize);
-      }
-
-      mapInstance.off('mousemove', handlePointerMove);
-      mapInstance.off('click', handleMapClick);
+      neutralInteractions.dispose();
+      mapResizeBinding.dispose();
       mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
     };
