@@ -141,12 +141,21 @@ body {
 .map-workspace__line-segment--completed {
   stroke: rgb(127 176 245 / 85%);
   stroke-width: 4;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.map-workspace__line-segment--completed-selected {
+  stroke: rgb(172 206 255 / 95%);
+  stroke-width: 5;
+  pointer-events: stroke;
 }
 
 .map-workspace__line-segment--draft {
   stroke: rgb(246 212 110 / 92%);
   stroke-width: 3;
   stroke-dasharray: 6 5;
+  pointer-events: none;
 }
 
 .map-workspace__overlay {
