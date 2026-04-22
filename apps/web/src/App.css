@@ -145,9 +145,10 @@ body {
   cursor: pointer;
 }
 
-.map-workspace__line-segment--completed-selected {
-  stroke: rgb(172 206 255 / 95%);
-  stroke-width: 5;
+.map-workspace__line-segment--selected {
+  stroke: rgb(245 195 88 / 98%);
+  stroke-width: 6;
+  filter: drop-shadow(0 0 8px rgb(245 195 88 / 70%));
   pointer-events: stroke;
 }
 
