@@ -13,7 +13,7 @@ import {
 
 type MapSurfaceInteractionStatus = 'idle' | 'pointer-active' | 'click-captured' | 'placement-rejected';
 
-type PlacementFeedbackState = 'none' | 'invalid-target';
+type PlacementAttemptResult = 'none' | 'placed' | 'invalid-target';
 
 /**
  * Canonical single-stop selection contract shared by marker highlighting and shell inspector state.
@@ -46,7 +46,7 @@ interface NeutralMapTelemetryContracts {
 interface PlacementGameplayContracts {
   readonly map: MapLibreMap;
   readonly setInteractionState: (nextState: MapSurfaceInteractionState) => void;
-  readonly setPlacementFeedback: (nextState: PlacementFeedbackState) => void;
+  readonly setPlacementAttemptResult: (nextState: PlacementAttemptResult) => void;
   readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
   readonly onValidPlacement: (lng: number, lat: number) => Stop;
 }
@@ -55,7 +55,7 @@ interface MapWorkspaceSurfaceInteractionsContracts {
   readonly map: MapLibreMap;
   readonly activeToolMode: WorkspaceToolMode;
   readonly setInteractionState: (nextState: MapSurfaceInteractionState) => void;
-  readonly setPlacementFeedback: (nextState: PlacementFeedbackState) => void;
+  readonly setPlacementAttemptResult: (nextState: PlacementAttemptResult) => void;
   readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
   readonly onValidPlacement: (lng: number, lat: number) => Stop;
 }
@@ -73,6 +73,14 @@ interface MapWorkspaceSurfaceProps {
 const STREET_LAYER_HINTS = ['road', 'street', 'highway', 'bridge', 'tunnel', 'transport', 'path'] as const;
 const STREET_SOURCE_HINTS = ['road', 'street', 'transport', 'highway'] as const;
 const STOP_LABEL_PREFIX = 'Stop';
+const PLACEMENT_MODE_INDICATOR_LABEL = 'Placement mode active';
+const PLACEMENT_FEEDBACK_MESSAGES = {
+  modeInstruction: 'Click a street segment to place a stop.',
+  streetRuleHint: 'Placement rule: stops can only be placed on street line segments.',
+  attemptReady: 'Last attempt: waiting for placement input.',
+  attemptPlaced: 'Last attempt: stop placed.',
+  attemptInvalidTarget: 'Last attempt: blocked (street segment required).'
+} as const;
 
 const toStopSelectionState = (stop: Stop): StopSelectionState => ({ selectedStopId: stop.id });
 
@@ -151,11 +159,11 @@ const createNeutralMapTelemetryHandlers = ({ setInteractionState }: NeutralMapTe
 const resolveInspectModeMapClickSelection = (): StopSelectionState | null => null;
 
 const handleStopPlacementClick = (
-  { map, setInteractionState, setPlacementFeedback, onStopSelectionChange, onValidPlacement }: PlacementGameplayContracts,
+  { map, setInteractionState, setPlacementAttemptResult, onStopSelectionChange, onValidPlacement }: PlacementGameplayContracts,
   event: MapLibreInteractionEvent
 ): void => {
   if (!event.lngLat || !isEligibleStopPlacementClick(map, event)) {
-    setPlacementFeedback('invalid-target');
+    setPlacementAttemptResult('invalid-target');
     setInteractionState({
       status: 'placement-rejected',
       pointer: createPointerState(event.point.x, event.point.y, event.lngLat?.lng, event.lngLat?.lat)
@@ -167,7 +175,7 @@ const handleStopPlacementClick = (
 
   const placedStop = onValidPlacement(event.lngLat.lng, event.lngLat.lat);
   onStopSelectionChange(toStopSelectionState(placedStop));
-  setPlacementFeedback('none');
+  setPlacementAttemptResult('placed');
   setInteractionState({
     status: 'click-captured',
     pointer: createPointerState(event.point.x, event.point.y, event.lngLat.lng, event.lngLat.lat)
@@ -178,7 +186,7 @@ const setupMapWorkspaceInteractions = ({
   map,
   activeToolMode,
   setInteractionState,
-  setPlacementFeedback,
+  setPlacementAttemptResult,
   onStopSelectionChange,
   onValidPlacement
 }: MapWorkspaceSurfaceInteractionsContracts): { readonly dispose: () => void } => {
@@ -188,12 +196,12 @@ const setupMapWorkspaceInteractions = ({
     neutralTelemetryHandlers.onMapClick(event);
 
     if (activeToolMode !== 'place-stop') {
-      setPlacementFeedback('none');
+      setPlacementAttemptResult('none');
       onStopSelectionChange(resolveInspectModeMapClickSelection());
       return;
     }
 
-    handleStopPlacementClick({ map, setInteractionState, setPlacementFeedback, onStopSelectionChange, onValidPlacement }, event);
+    handleStopPlacementClick({ map, setInteractionState, setPlacementAttemptResult, onStopSelectionChange, onValidPlacement }, event);
   };
 
   map.on('mousemove', neutralTelemetryHandlers.onPointerMove);
@@ -272,6 +280,46 @@ const buildDeterministicStop = (nextOrdinal: number, lng: number, lat: number): 
   label: `${STOP_LABEL_PREFIX} ${nextOrdinal}`
 });
 
+interface PlacementUiFeedbackContract {
+  readonly showPlacementModeIndicator: boolean;
+  readonly modeInstruction: string | null;
+  readonly showStreetRuleHint: boolean;
+  readonly streetRuleHint: string | null;
+  readonly lastAttemptMessage: string | null;
+}
+
+const buildPlacementUiFeedback = (
+  activeToolMode: WorkspaceToolMode,
+  placementAttemptResult: PlacementAttemptResult
+): PlacementUiFeedbackContract => {
+  const isPlacementModeActive = activeToolMode === 'place-stop';
+
+  if (!isPlacementModeActive) {
+    return {
+      showPlacementModeIndicator: false,
+      modeInstruction: null,
+      showStreetRuleHint: false,
+      streetRuleHint: null,
+      lastAttemptMessage: null
+    };
+  }
+
+  const lastAttemptMessage =
+    placementAttemptResult === 'placed'
+      ? PLACEMENT_FEEDBACK_MESSAGES.attemptPlaced
+      : placementAttemptResult === 'invalid-target'
+        ? PLACEMENT_FEEDBACK_MESSAGES.attemptInvalidTarget
+        : PLACEMENT_FEEDBACK_MESSAGES.attemptReady;
+
+  return {
+    showPlacementModeIndicator: true,
+    modeInstruction: PLACEMENT_FEEDBACK_MESSAGES.modeInstruction,
+    showStreetRuleHint: true,
+    streetRuleHint: PLACEMENT_FEEDBACK_MESSAGES.streetRuleHint,
+    lastAttemptMessage
+  };
+};
+
 const syncStopMarkers = ({
   map,
   stops,
@@ -327,7 +375,7 @@ export function MapWorkspaceSurface({
     status: 'idle',
     pointer: null
   });
-  const [placementFeedback, setPlacementFeedback] = useState<PlacementFeedbackState>('none');
+  const [placementAttemptResult, setPlacementAttemptResult] = useState<PlacementAttemptResult>('none');
   const [placedStops, setPlacedStops] = useState<readonly Stop[]>([]);
 
   useEffect(() => {
@@ -361,7 +409,7 @@ export function MapWorkspaceSurface({
       map: mapInstance,
       activeToolMode,
       setInteractionState,
-      setPlacementFeedback,
+      setPlacementAttemptResult,
       onStopSelectionChange,
       onValidPlacement: (lng, lat) => {
         let createdStop!: Stop;
@@ -404,9 +452,8 @@ export function MapWorkspaceSurface({
     interactionState.pointer?.lng !== undefined && interactionState.pointer.lat !== undefined
       ? `lng:${interactionState.pointer.lng.toFixed(5)} lat:${interactionState.pointer.lat.toFixed(5)}`
       : 'lng/lat unavailable';
-  const placementFeedbackSummary =
-    placementFeedback === 'invalid-target' ? 'Stop placement blocked: choose a street segment.' : 'Stop placement target: ready.';
   const stopSelectionSummary = selectedStopId ? `Selected stop: ${selectedStopId}` : 'Selected stop: none';
+  const placementUiFeedback = buildPlacementUiFeedback(activeToolMode, placementAttemptResult);
 
   return (
     <section className="map-workspace" aria-label="Map workspace surface">
@@ -414,9 +461,17 @@ export function MapWorkspaceSurface({
 
       <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
         Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
-        {activeToolMode === 'place-stop' ? ` | ${placementFeedbackSummary}` : ''}
         {` | Placed stops: ${placedStops.length} | ${stopSelectionSummary}`}
       </div>
+
+      {placementUiFeedback.showPlacementModeIndicator ? (
+        <div className="map-workspace__overlay map-workspace__overlay--mode" aria-live="polite" aria-label="Placement mode status">
+          <strong>{PLACEMENT_MODE_INDICATOR_LABEL}</strong>
+          <span> · {placementUiFeedback.modeInstruction}</span>
+          {placementUiFeedback.showStreetRuleHint ? <span> · {placementUiFeedback.streetRuleHint}</span> : null}
+          <span> · {placementUiFeedback.lastAttemptMessage}</span>
+        </div>
+      ) : null}
     </section>
   );
 }
