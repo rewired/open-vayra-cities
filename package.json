@@ -1,0 +1,10 @@
+{
+  "name": "city-ops",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev:web": "pnpm --filter @city-ops/web dev",
+    "build:web": "pnpm --filter @city-ops/web build",
+    "typecheck:web": "pnpm --filter @city-ops/web typecheck"
+  }
+}
