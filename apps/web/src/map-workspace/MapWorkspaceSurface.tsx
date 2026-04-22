@@ -5,12 +5,10 @@ import { createStopId } from '../domain/types/stop';
 import type { WorkspaceToolMode } from '../App';
 import { MAP_WORKSPACE_BOOTSTRAP_CONFIG } from './mapBootstrapConfig';
 import {
-  getSourceRefsForLayerIds,
   type MapLibreFeatureGeometry,
   type MapLibreInteractionEvent,
   type MapLibreMap,
-  type MapLibreMarker,
-  type MapLibreSourceFeature
+  type MapLibreMarker
 } from './maplibreGlobal';
 
 type MapSurfaceInteractionStatus = 'idle' | 'pointer-active' | 'click-captured' | 'placement-rejected';
@@ -120,21 +118,6 @@ const resolveStreetLayerIdsFromStyle = (map: MapLibreMap): readonly string[] => 
 const isLineGeometry = (geometry: MapLibreFeatureGeometry | undefined): boolean =>
   geometry?.type === 'LineString' || geometry?.type === 'MultiLineString';
 
-const hasEligibleSourceFeatureAtClick = (
-  map: MapLibreMap,
-  streetLayerIds: readonly string[]
-): boolean => {
-  const sourceRefs = getSourceRefsForLayerIds(map.getStyle(), streetLayerIds);
-
-  return sourceRefs.some((sourceRef) => {
-    const sourceFeatures = sourceRef.sourceLayer
-      ? map.querySourceFeatures(sourceRef.source, { sourceLayer: sourceRef.sourceLayer })
-      : map.querySourceFeatures(sourceRef.source);
-
-    return sourceFeatures.some((feature: MapLibreSourceFeature) => isLineGeometry(feature.geometry));
-  });
-};
-
 const isEligibleStopPlacementClick = (map: MapLibreMap, event: MapLibreInteractionEvent): boolean => {
   const streetLayerIds = resolveStreetLayerIdsFromStyle(map);
 
@@ -142,12 +125,9 @@ const isEligibleStopPlacementClick = (map: MapLibreMap, event: MapLibreInteracti
     return false;
   }
 
+  // Stop placement is valid only when a rendered street line exists exactly at the clicked screen point.
   const renderedFeatures = map.queryRenderedFeatures(event.point, { layers: streetLayerIds });
-  if (renderedFeatures.some((feature) => isLineGeometry(feature.geometry))) {
-    return true;
-  }
-
-  return hasEligibleSourceFeatureAtClick(map, streetLayerIds);
+  return renderedFeatures.some((feature) => isLineGeometry(feature.geometry));
 };
 
 const createNeutralMapTelemetryHandlers = ({ setInteractionState }: NeutralMapTelemetryContracts): NeutralMapTelemetryHandlers => ({
