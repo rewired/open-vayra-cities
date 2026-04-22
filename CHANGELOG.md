@@ -64,3 +64,7 @@ All notable changes to this project will be documented in this file.
 - Add minimal draft lifecycle actions (`Cancel draft`, `Complete line`) and gate completion with centralized `MINIMUM_STOPS_PER_LINE` (2).
 - Persist completed build-line drafts only in local in-memory session line state.
 - Add ADR 0021 documenting local build-line drafting and completion boundaries.
+- Replace line-build magic values with canonical `lineBuilding` domain constants for minimum-stop completion and deterministic placeholder label prefix.
+- Add minimal selected-line projection to the shell inspector, including id/label, stop count, and ordered stop-id summary.
+- Keep the selected-line inspector strictly structural, without demand/economy/service fields.
+- Add ADR 0022 documenting line-building constants centralization and minimal selected-line inspector boundaries.

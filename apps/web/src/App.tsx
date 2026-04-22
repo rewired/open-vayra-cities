@@ -1,5 +1,6 @@
 import { useState, type ReactElement } from 'react';
 
+import type { Line } from './domain/types/line';
 import type { StopId } from './domain/types/stop';
 import {
   MapWorkspaceSurface,
@@ -20,9 +21,17 @@ export interface LineBuildSelectionState {
   readonly selectedStopIds: readonly StopId[];
 }
 
+/**
+ * Carries the currently selected completed line for structural inspector rendering.
+ */
+export interface LineSelectionState {
+  readonly selectedLine: Line | null;
+}
+
 const INITIAL_LINE_BUILD_SELECTION_STATE: LineBuildSelectionState = {
   selectedStopIds: []
 };
+const INITIAL_LINE_SELECTION_STATE: LineSelectionState = { selectedLine: null };
 
 /**
  * Renders the initial desktop-only CityOps application shell layout.
@@ -32,6 +41,7 @@ export default function App(): ReactElement {
   const [selectedStop, setSelectedStop] = useState<StopSelectionState | null>(null);
   const [lineBuildSelection, setLineBuildSelection] =
     useState<LineBuildSelectionState>(INITIAL_LINE_BUILD_SELECTION_STATE);
+  const [lineSelection, setLineSelection] = useState<LineSelectionState>(INITIAL_LINE_SELECTION_STATE);
 
   const handleToolModeSelection = (nextMode: WorkspaceToolMode): void => {
     setActiveToolMode(nextMode);
@@ -42,6 +52,7 @@ export default function App(): ReactElement {
   };
 
   const selectedStopId: StopId | null = selectedStop?.selectedStopId ?? null;
+  const selectedLine = lineSelection.selectedLine;
 
   return (
     <div className="app-shell" data-app-surface="desktop-shell">
@@ -96,6 +107,7 @@ export default function App(): ReactElement {
           lineBuildSelection={lineBuildSelection}
           onStopSelectionChange={setSelectedStop}
           onLineBuildSelectionChange={setLineBuildSelection}
+          onLineSelectionChange={setLineSelection}
         />
       </main>
 
@@ -112,6 +124,16 @@ export default function App(): ReactElement {
         )}
 
         <p>Line draft stops: {lineBuildSelection.selectedStopIds.length}</p>
+        {selectedLine ? (
+          <div>
+            <p>Selected line</p>
+            <p>ID/Label: {`${selectedLine.id} / ${selectedLine.label}`}</p>
+            <p>Stop count: {selectedLine.stopIds.length}</p>
+            <p>Ordered stops: {selectedLine.stopIds.join(' → ')}</p>
+          </div>
+        ) : (
+          <p>No line selected.</p>
+        )}
       </aside>
 
       <footer className="status-bar" aria-label="Status bar">

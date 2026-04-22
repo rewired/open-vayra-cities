@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 
-import { MINIMUM_STOPS_PER_LINE } from '../domain/constants/lineBuild';
+import {
+  LINE_BUILD_PLACEHOLDER_LABEL_PREFIX,
+  MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE
+} from '../domain/constants/lineBuilding';
 import type { Line } from '../domain/types/line';
 import { createLineId } from '../domain/types/line';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
-import type { LineBuildSelectionState, WorkspaceToolMode } from '../App';
+import type { LineBuildSelectionState, LineSelectionState, WorkspaceToolMode } from '../App';
 import { MAP_WORKSPACE_BOOTSTRAP_CONFIG } from './mapBootstrapConfig';
 import {
   getSourceRefsForLayerIds,
@@ -79,6 +82,7 @@ interface MapWorkspaceSurfaceProps {
   readonly lineBuildSelection: LineBuildSelectionState;
   readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
   readonly onLineBuildSelectionChange: (nextSelection: LineBuildSelectionState) => void;
+  readonly onLineSelectionChange: (nextSelection: LineSelectionState) => void;
 }
 
 interface DraftLineMetadata {
@@ -110,7 +114,7 @@ const PLACEMENT_FEEDBACK_MESSAGES = {
 } as const;
 const BUILD_LINE_FEEDBACK_MESSAGES = {
   instruction: 'Click existing stop markers in order to draft a line.',
-  minimumStopRequirement: `Minimum stops to complete: ${MINIMUM_STOPS_PER_LINE}.`
+  minimumStopRequirement: `Minimum stops to complete: ${MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE}.`
 } as const;
 const INITIAL_DRAFT_LINE_STATE: DraftLineState = { stopIds: [], metadata: null };
 
@@ -434,7 +438,7 @@ const buildLineModeUiFeedback = (activeToolMode: WorkspaceToolMode, draftStopIds
     modeInstruction: BUILD_LINE_FEEDBACK_MESSAGES.instruction,
     minimumStopRequirement: BUILD_LINE_FEEDBACK_MESSAGES.minimumStopRequirement,
     draftStopCount: draftStopIds.length,
-    canCompleteDraft: draftStopIds.length >= MINIMUM_STOPS_PER_LINE
+    canCompleteDraft: draftStopIds.length >= MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE
   };
 };
 
@@ -513,7 +517,8 @@ export function MapWorkspaceSurface({
   activeToolMode,
   selectedStopId,
   onStopSelectionChange,
-  onLineBuildSelectionChange
+  onLineBuildSelectionChange,
+  onLineSelectionChange
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -525,6 +530,7 @@ export function MapWorkspaceSurface({
   const [placementAttemptResult, setPlacementAttemptResult] = useState<PlacementAttemptResult>('none');
   const [placedStops, setPlacedStops] = useState<readonly Stop[]>([]);
   const [sessionLines, setSessionLines] = useState<readonly Line[]>([]);
+  const [selectedLineId, setSelectedLineId] = useState<Line['id'] | null>(null);
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
   const [projectionRefreshTick, setProjectionRefreshTick] = useState(0);
 
@@ -551,6 +557,11 @@ export function MapWorkspaceSurface({
   useEffect(() => {
     onLineBuildSelectionChange({ selectedStopIds: draftLineState.stopIds });
   }, [draftLineState.stopIds, onLineBuildSelectionChange]);
+
+  useEffect(() => {
+    const selectedLine = sessionLines.find((line) => line.id === selectedLineId) ?? null;
+    onLineSelectionChange({ selectedLine });
+  }, [onLineSelectionChange, selectedLineId, sessionLines]);
 
   useEffect(() => {
     if (activeToolMode === 'build-line') {
@@ -668,19 +679,18 @@ export function MapWorkspaceSurface({
   };
 
   const handleDraftComplete = (): void => {
-    if (draftLineState.stopIds.length < MINIMUM_STOPS_PER_LINE) {
+    if (draftLineState.stopIds.length < MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE) {
       return;
     }
 
     const nextLineOrdinal = sessionLines.length + 1;
-    setSessionLines((currentLines) => [
-      ...currentLines,
-      {
-        id: createLineId(`line-${nextLineOrdinal}`),
-        label: `Line ${nextLineOrdinal}`,
-        stopIds: draftLineState.stopIds
-      }
-    ]);
+    const nextLine: Line = {
+      id: createLineId(`line-${nextLineOrdinal}`),
+      label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${nextLineOrdinal}`,
+      stopIds: draftLineState.stopIds
+    };
+    setSessionLines((currentLines) => [...currentLines, nextLine]);
+    setSelectedLineId(nextLine.id);
     setDraftLineState(INITIAL_DRAFT_LINE_STATE);
   };
 
@@ -707,7 +717,14 @@ export function MapWorkspaceSurface({
       <div ref={mapContainerRef} className="map-workspace__map" aria-label="CityOps baseline map" />
       <svg className="map-workspace__line-overlay" aria-hidden="true" key={projectionRefreshTick}>
         {projectedCompletedSegments.map((segment) => (
-          <polyline key={segment.key} className="map-workspace__line-segment map-workspace__line-segment--completed" points={segment.points} />
+          <polyline
+            key={segment.key}
+            className="map-workspace__line-segment map-workspace__line-segment--completed"
+            points={segment.points}
+            onClick={() => {
+              setSelectedLineId(createLineId(segment.key));
+            }}
+          />
         ))}
         {projectedDraftSegments.map((segment) => (
           <polyline key={segment.key} className="map-workspace__line-segment map-workspace__line-segment--draft" points={segment.points} />
