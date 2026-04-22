@@ -13,4 +13,6 @@ All notable changes to this project will be documented in this file.
 - Add ADR 0003 documenting the initial desktop shell layout decision and scope boundaries.
 - Prepare a dedicated map workspace surface scaffold with explicit empty-state and structural overlay regions, without map logic or dependencies.
 - Add ADR 0004 documenting the map workspace surface scaffold decision and constraints.
+- Integrate a real MapLibre-powered workspace baseline in the central shell area with lifecycle-safe React map setup/cleanup and neutral map-ready overlay status.
+- Add ADR 0005 documenting the initial MapLibre workspace baseline decision and runtime-source constraints.
 
