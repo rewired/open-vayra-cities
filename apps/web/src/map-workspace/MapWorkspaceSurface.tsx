@@ -719,7 +719,11 @@ export function MapWorkspaceSurface({
         {projectedCompletedSegments.map((segment) => (
           <polyline
             key={segment.key}
-            className="map-workspace__line-segment map-workspace__line-segment--completed"
+            className={
+              selectedLineId === createLineId(segment.key)
+                ? 'map-workspace__line-segment map-workspace__line-segment--completed map-workspace__line-segment--completed-selected'
+                : 'map-workspace__line-segment map-workspace__line-segment--completed'
+            }
             points={segment.points}
             onClick={() => {
               setSelectedLineId(createLineId(segment.key));

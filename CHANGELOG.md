@@ -75,3 +75,7 @@ All notable changes to this project will be documented in this file.
 - Slice 011a: establish Google Material Symbols Outlined as the canonical icon baseline via `@fontsource/material-symbols-outlined`.
 - Slice 011a: add a typed minimal Material icon mapping/renderer and apply it to workspace mode buttons only.
 - Add ADR 0024 documenting the font-loading and Material icon baseline correction scope and non-goals.
+- Slice 011b: keep the map line overlay globally non-blocking while enabling stroke-only click targeting for completed line polylines.
+- Slice 011b: keep draft line polylines non-interactive so only completed lines can capture click selection.
+- Slice 011b: add a selected completed-line visual variant without changing inspect/placement map click-through behavior.
+- Add ADR 0025 documenting the line-overlay pointer-event contract for completed-line selection.
