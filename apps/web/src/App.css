@@ -80,6 +80,9 @@ body {
 }
 
 .tool-mode-control__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   width: fit-content;
   padding: 8px 10px;
   border: 1px solid #425b83;
@@ -93,6 +96,11 @@ body {
 .tool-mode-control__button[aria-pressed='true'] {
   border-color: #7aa2e0;
   background: #26406a;
+}
+
+.app-material-icon {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .workspace {

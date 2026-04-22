@@ -71,3 +71,7 @@ All notable changes to this project will be documented in this file.
 - Slice 011: add first `build-line` mode with explicit ordered existing-stop drafting and completion flow.
 - Slice 011: render minimal map lines for local structural feedback only, without routing or service simulation semantics.
 - Slice 011: keep line draft and completed line state in-memory only (no persistence or backend sync).
+- Slice 011a: load Inter at runtime via `@fontsource/inter` so shell typography no longer relies on fallback-only references.
+- Slice 011a: establish Google Material Symbols Outlined as the canonical icon baseline via `@fontsource/material-symbols-outlined`.
+- Slice 011a: add a typed minimal Material icon mapping/renderer and apply it to workspace mode buttons only.
+- Add ADR 0024 documenting the font-loading and Material icon baseline correction scope and non-goals.

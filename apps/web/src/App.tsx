@@ -6,6 +6,8 @@ import {
   MapWorkspaceSurface,
   type StopSelectionState
 } from './map-workspace/MapWorkspaceSurface';
+import { MaterialIcon } from './ui/icons/MaterialIcon';
+import { WORKSPACE_MODE_ICONS } from './ui/icons/materialIcons';
 
 import './App.css';
 
@@ -74,7 +76,8 @@ export default function App(): ReactElement {
                 handleToolModeSelection('inspect');
               }}
             >
-              Inspect
+              <MaterialIcon name={WORKSPACE_MODE_ICONS.inspect} />
+              <span>Inspect</span>
             </button>
             <button
               type="button"
@@ -84,7 +87,8 @@ export default function App(): ReactElement {
                 handleToolModeSelection('place-stop');
               }}
             >
-              Place stop
+              <MaterialIcon name={WORKSPACE_MODE_ICONS['place-stop']} />
+              <span>Place stop</span>
             </button>
             <button
               type="button"
@@ -94,7 +98,8 @@ export default function App(): ReactElement {
                 handleToolModeSelection('build-line');
               }}
             >
-              Build line
+              <MaterialIcon name={WORKSPACE_MODE_ICONS['build-line']} />
+              <span>Build line</span>
             </button>
           </div>
         </div>
