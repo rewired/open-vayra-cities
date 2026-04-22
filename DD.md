@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the domain and architecture boundaries for the project.
+This document defines the domain and architecture boundaries for CityOps.
 
 The goal is to preserve a clean separation between city/map representation, demand generation, transit network logic, simulation behavior, routing support, economy, and UI projection.
 

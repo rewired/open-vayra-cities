@@ -4,7 +4,7 @@
 
 This document defines mandatory working rules for coding agents contributing to this project.
 
-The project is a desktop-only, browser-based transit network simulation game focused on a bus-first MVP. The goal is to preserve a sharply scoped, implementation-friendly foundation and prevent scope drift, accidental architecture sprawl, and weakly typed shortcuts.
+CityOps is a desktop-only, browser-based transit network simulation game focused on a bus-first MVP. The goal is to preserve a sharply scoped, implementation-friendly foundation and prevent scope drift, accidental architecture sprawl, and weakly typed shortcuts.
 
 ---
 
@@ -74,7 +74,7 @@ Examples include:
 
 It should explain:
 
-* what the project is
+* what CityOps is
 * how to run it
 * where canonical documentation lives
 * where to find design authority once available

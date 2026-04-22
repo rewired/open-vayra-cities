@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This document defines practical security, safety, and operational integrity rules for the project.
+This document defines practical security, safety, and operational integrity rules for CityOps.
 
-The project is a desktop-only browser-based simulation game, but it still requires disciplined handling of dependencies, data ingestion, configuration, and deterministic simulation behavior.
+CityOps is a desktop-only browser-based simulation game, but it still requires disciplined handling of dependencies, data ingestion, configuration, and deterministic simulation behavior.
 
 ---
 
@@ -12,7 +12,7 @@ The project is a desktop-only browser-based simulation game, but it still requir
 
 This is not a high-trust enterprise backend system, but security and integrity still matter.
 
-The project must avoid:
+CityOps must avoid:
 
 * careless dependency sprawl
 * unsafe data ingestion assumptions
@@ -40,7 +40,7 @@ Validation should occur at boundary layers, not deep inside arbitrary feature co
 
 ## Type safety as safety control
 
-Strong type safety is part of the project’s safety posture.
+Strong type safety is part of CityOps’s safety posture.
 
 Why:
 

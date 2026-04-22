@@ -187,7 +187,7 @@ The following are explicitly forbidden in the initial project phase unless separ
 * adding full pedestrian street-network access routing as a requirement for MVP
 * adding city growth simulation as core MVP behavior
 * adding multiplayer or online service architecture
-* turning the project into a real-world transit reconstruction tool
+* turning CityOps into a real-world transit reconstruction tool
 
 ---
 

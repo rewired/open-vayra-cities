@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This document defines the technical implementation rules for the project.
+This document defines the technical implementation rules for CityOps.
 
-The project targets a desktop-only browser-based game using TypeScript and a React/Vite frontend, with strong emphasis on type safety, centralized constants, clear package boundaries, and realistic-enough street-based stop-to-stop travel times.
+CityOps targets a desktop-only browser-based game using TypeScript and a React/Vite frontend, with strong emphasis on type safety, centralized constants, clear package boundaries, and realistic-enough street-based stop-to-stop travel times.
 
 ---
 

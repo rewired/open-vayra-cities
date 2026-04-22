@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the first playable product slice of the project in practical, implementation-facing terms.
+This document defines the first playable product slice of CityOps in practical, implementation-facing terms.
 
 It exists to prevent scope drift, vague feature inflation, and accidental conversion of the MVP into a full transport-planning platform.
 
@@ -12,7 +12,7 @@ This document is the product-level source of truth for the initial bus-first des
 
 ## Product statement
 
-The project is a desktop-only, browser-based transit network simulation game in which the player designs and operates a custom public transport network inside a believable urban environment.
+CityOps is a desktop-only, browser-based transit network simulation game in which the player designs and operates a custom public transport network inside a believable urban environment.
 
 The first playable MVP focuses exclusively on bus network planning and operation.
 
@@ -234,7 +234,7 @@ Chat discussion may be in German, but repository artifacts must remain English-o
 
 All exported public code surfaces must include concise inline documentation.
 
-This is mandatory because the project is expected to interact with coding agents, and undocumented exports create drift, misuse, and duplication.
+This is mandatory because CityOps is expected to interact with coding agents, and undocumented exports create drift, misuse, and duplication.
 
 ---
 
@@ -242,7 +242,7 @@ This is mandatory because the project is expected to interact with coding agents
 
 Strong type safety is part of the MVP foundation.
 
-The project must not rely on loosely typed domain truth, duplicated ad-hoc unions, or scattered informal constants.
+CityOps must not rely on loosely typed domain truth, duplicated ad-hoc unions, or scattered informal constants.
 
 Important domain concepts must remain canonically typed.
 
@@ -260,7 +260,7 @@ This is a product stability rule as much as a technical one.
 
 ## No-abyss rules
 
-The first phase of the project must not drift into any of the following:
+The first phase of CityOps must not drift into any of the following:
 
 * multimodal gameplay expansion
 * rail construction systems
