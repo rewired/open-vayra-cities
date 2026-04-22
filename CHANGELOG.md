@@ -40,3 +40,6 @@ All notable changes to this project will be documented in this file.
 - Add ADR 0012 documenting the minimal MapLibre feature-query contract decision for stop-placement validation.
 - Slice 008: finalize stop placement with explicit mode gating, street-based click validation, and minimal local stop creation boundaries.
 - Slice 008 constraints: no line editing, routing/pathfinding, simulation/economy behavior, or persistence introduced in this slice.
+- Add a narrow stop-only selection state (`none` or one `StopId`) in `MapWorkspaceSurface` and keep it independent from pointer telemetry and placement feedback state.
+- Keep stop selection slice-local to placement interactions, selecting newly placed stops and clearing selection on invalid placement attempts.
+- Add ADR 0014 documenting local stop-only selection boundaries and explicit non-goals against generalized entity-selection frameworks.

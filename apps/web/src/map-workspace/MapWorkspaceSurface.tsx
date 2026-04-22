@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 
-import type { Stop } from '../domain/types/stop';
+import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
 import type { WorkspaceToolMode } from '../App';
 import { MAP_WORKSPACE_BOOTSTRAP_CONFIG } from './mapBootstrapConfig';
@@ -16,6 +16,7 @@ import {
 type MapSurfaceInteractionStatus = 'idle' | 'pointer-active' | 'click-captured' | 'placement-rejected';
 
 type PlacementFeedbackState = 'none' | 'invalid-target';
+type StopSelectionState = { readonly selectedStopId: StopId } | null;
 
 interface MapSurfacePointerState {
   readonly screenX: number;
@@ -42,7 +43,8 @@ interface PlacementGameplayContracts {
   readonly map: MapLibreMap;
   readonly setInteractionState: (nextState: MapSurfaceInteractionState) => void;
   readonly setPlacementFeedback: (nextState: PlacementFeedbackState) => void;
-  readonly onValidPlacement: (event: MapLibreInteractionEvent) => void;
+  readonly setStopSelection: (nextState: StopSelectionState) => void;
+  readonly onValidPlacement: (lng: number, lat: number) => StopId;
 }
 
 interface MapWorkspaceSurfaceInteractionsContracts {
@@ -50,7 +52,8 @@ interface MapWorkspaceSurfaceInteractionsContracts {
   readonly activeToolMode: WorkspaceToolMode;
   readonly setInteractionState: (nextState: MapSurfaceInteractionState) => void;
   readonly setPlacementFeedback: (nextState: PlacementFeedbackState) => void;
-  readonly onValidPlacement: (event: MapLibreInteractionEvent) => void;
+  readonly setStopSelection: (nextState: StopSelectionState) => void;
+  readonly onValidPlacement: (lng: number, lat: number) => StopId;
 }
 
 interface MapWorkspaceResizeBinding {
@@ -153,7 +156,7 @@ const createNeutralMapTelemetryHandlers = ({ setInteractionState }: NeutralMapTe
 });
 
 const handleStopPlacementClick = (
-  { map, setInteractionState, setPlacementFeedback, onValidPlacement }: PlacementGameplayContracts,
+  { map, setInteractionState, setPlacementFeedback, setStopSelection, onValidPlacement }: PlacementGameplayContracts,
   event: MapLibreInteractionEvent
 ): void => {
   if (!event.lngLat || !isEligibleStopPlacementClick(map, event)) {
@@ -162,11 +165,13 @@ const handleStopPlacementClick = (
       status: 'placement-rejected',
       pointer: createPointerState(event.point.x, event.point.y, event.lngLat?.lng, event.lngLat?.lat)
     });
+    setStopSelection(null);
 
     return;
   }
 
-  onValidPlacement(event);
+  const placedStopId = onValidPlacement(event.lngLat.lng, event.lngLat.lat);
+  setStopSelection({ selectedStopId: placedStopId });
   setPlacementFeedback('none');
   setInteractionState({
     status: 'click-captured',
@@ -179,6 +184,7 @@ const setupMapWorkspaceInteractions = ({
   activeToolMode,
   setInteractionState,
   setPlacementFeedback,
+  setStopSelection,
   onValidPlacement
 }: MapWorkspaceSurfaceInteractionsContracts): { readonly dispose: () => void } => {
   const neutralTelemetryHandlers = createNeutralMapTelemetryHandlers({ setInteractionState });
@@ -191,7 +197,7 @@ const setupMapWorkspaceInteractions = ({
       return;
     }
 
-    handleStopPlacementClick({ map, setInteractionState, setPlacementFeedback, onValidPlacement }, event);
+    handleStopPlacementClick({ map, setInteractionState, setPlacementFeedback, setStopSelection, onValidPlacement }, event);
   };
 
   map.on('mousemove', neutralTelemetryHandlers.onPointerMove);
@@ -304,6 +310,7 @@ export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps
     pointer: null
   });
   const [placementFeedback, setPlacementFeedback] = useState<PlacementFeedbackState>('none');
+  const [stopSelection, setStopSelection] = useState<StopSelectionState>(null);
   const [placedStops, setPlacedStops] = useState<readonly Stop[]>([]);
 
   useEffect(() => {
@@ -338,17 +345,17 @@ export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps
       activeToolMode,
       setInteractionState,
       setPlacementFeedback,
-      onValidPlacement: (event) => {
-        if (!event.lngLat) {
-          return;
-        }
-
-        const { lng, lat } = event.lngLat;
+      setStopSelection,
+      onValidPlacement: (lng, lat) => {
+        let createdStopId!: StopId;
         setPlacedStops((currentStops) => {
           const nextOrdinal = currentStops.length + 1;
           const nextStop = buildDeterministicStop(nextOrdinal, lng, lat);
+          createdStopId = nextStop.id;
           return [...currentStops, nextStop];
         });
+
+        return createdStopId;
       }
     });
 
@@ -376,6 +383,7 @@ export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps
       : 'lng/lat unavailable';
   const placementFeedbackSummary =
     placementFeedback === 'invalid-target' ? 'Stop placement blocked: choose a street segment.' : 'Stop placement target: ready.';
+  const stopSelectionSummary = stopSelection ? `Selected stop: ${stopSelection.selectedStopId}` : 'Selected stop: none';
 
   return (
     <section className="map-workspace" aria-label="Map workspace surface">
@@ -384,7 +392,7 @@ export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps
       <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
         Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
         {activeToolMode === 'place-stop' ? ` | ${placementFeedbackSummary}` : ''}
-        {` | Placed stops: ${placedStops.length}`}
+        {` | Placed stops: ${placedStops.length} | ${stopSelectionSummary}`}
       </div>
     </section>
   );
