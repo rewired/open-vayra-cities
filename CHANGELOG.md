@@ -49,3 +49,5 @@ All notable changes to this project will be documented in this file.
 - Refine stop selection transitions to a strict single-source contract (`null | { selectedStopId }`) shared by marker highlighting and inspector state.
 - Clear stop selection when clicking non-stop map area in inspect mode, while keeping marker-click stop selection deterministic.
 - Simplify the right-panel inspector to the stop-id contract and add ADR 0016 documenting the updated selection transition rules.
+- Refine map placement-mode feedback with a typed UI contract, centralized feedback copy constants, and an always-visible placement-mode indicator while `place-stop` is active.
+- Add ADR 0017 documenting placement-feedback UI contract boundaries and explicit non-goals.

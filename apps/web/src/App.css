@@ -126,6 +126,13 @@ body {
   left: 14px;
 }
 
+.map-workspace__overlay--mode {
+  right: 14px;
+  bottom: 14px;
+  max-width: min(52ch, calc(100% - 28px));
+  text-transform: none;
+}
+
 
 .map-workspace__stop-marker {
   width: 12px;
