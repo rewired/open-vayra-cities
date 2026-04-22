@@ -38,3 +38,5 @@ All notable changes to this project will be documented in this file.
 - Add a typed source-reference helper for style-layer-derived source queries used by stop-placement validation.
 - Update stop-placement eligibility checks to use line-geometry-aware rendered query checks with typed source-feature fallback.
 - Add ADR 0012 documenting the minimal MapLibre feature-query contract decision for stop-placement validation.
+- Slice 008: finalize stop placement with explicit mode gating, street-based click validation, and minimal local stop creation boundaries.
+- Slice 008 constraints: no line editing, routing/pathfinding, simulation/economy behavior, or persistence introduced in this slice.
