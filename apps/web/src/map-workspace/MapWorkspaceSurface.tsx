@@ -254,10 +254,18 @@ const createMapWorkspaceInstance = (containerElement: HTMLDivElement): MapLibreM
   return mapInstance;
 };
 
-const createStopMarker = (stop: Stop): MapLibreMarker => {
+const createStopMarker = (
+  stop: Stop,
+  setStopSelection: (nextState: StopSelectionState) => void
+): MapLibreMarker => {
   const markerElement = document.createElement('div');
   markerElement.className = 'map-workspace__stop-marker';
   markerElement.title = stop.label ?? stop.id;
+  markerElement.addEventListener('click', (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setStopSelection({ selectedStopId: stop.id });
+  });
 
   return new window.maplibregl.Marker({ element: markerElement }).setLngLat([stop.position.lng, stop.position.lat]);
 };
@@ -271,11 +279,13 @@ const buildDeterministicStop = (nextOrdinal: number, lng: number, lat: number): 
 const syncStopMarkers = ({
   map,
   stops,
-  markerByStopId
+  markerByStopId,
+  setStopSelection
 }: {
   readonly map: MapLibreMap;
   readonly stops: readonly Stop[];
   readonly markerByStopId: Map<Stop['id'], MapLibreMarker>;
+  readonly setStopSelection: (nextState: StopSelectionState) => void;
 }): void => {
   const activeStopIds = new Set(stops.map((stop) => stop.id));
 
@@ -284,7 +294,7 @@ const syncStopMarkers = ({
       return;
     }
 
-    const marker = createStopMarker(stop).addTo(map);
+    const marker = createStopMarker(stop, setStopSelection).addTo(map);
     markerByStopId.set(stop.id, marker);
   });
 
@@ -371,7 +381,7 @@ export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps
       return;
     }
 
-    syncStopMarkers({ map: mapInstance, stops: placedStops, markerByStopId: stopMarkerRef.current });
+    syncStopMarkers({ map: mapInstance, stops: placedStops, markerByStopId: stopMarkerRef.current, setStopSelection });
   }, [placedStops]);
 
   const pointerSummary = interactionState.pointer
