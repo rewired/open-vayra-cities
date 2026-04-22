@@ -175,6 +175,8 @@ export interface MapLibreMarker {
   setLngLat(lngLat: readonly [number, number]): MapLibreMarker;
   /** Mounts the marker into the provided map instance. */
   addTo(map: MapLibreMap): MapLibreMarker;
+  /** Returns the marker root element for class-based state styling. */
+  getElement(): HTMLElement;
   /** Removes the marker from its current map. */
   remove(): void;
 }

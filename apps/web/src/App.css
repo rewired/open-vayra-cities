@@ -136,6 +136,12 @@ body {
   box-shadow: 0 0 0 2px rgb(15 23 35 / 45%);
 }
 
+.map-workspace__stop-marker--selected {
+  border-color: #f3f8ff;
+  background: #4f85d6;
+  box-shadow: 0 0 0 2px rgb(15 23 35 / 45%), 0 0 0 4px rgb(122 162 224 / 60%);
+}
+
 .maplibregl-ctrl-group {
   border-radius: 8px;
   overflow: hidden;

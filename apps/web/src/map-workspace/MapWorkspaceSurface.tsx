@@ -280,12 +280,14 @@ const syncStopMarkers = ({
   map,
   stops,
   markerByStopId,
-  setStopSelection
+  setStopSelection,
+  stopSelection
 }: {
   readonly map: MapLibreMap;
   readonly stops: readonly Stop[];
   readonly markerByStopId: Map<Stop['id'], MapLibreMarker>;
   readonly setStopSelection: (nextState: StopSelectionState) => void;
+  readonly stopSelection: StopSelectionState;
 }): void => {
   const activeStopIds = new Set(stops.map((stop) => stop.id));
 
@@ -305,6 +307,12 @@ const syncStopMarkers = ({
 
     marker.remove();
     markerByStopId.delete(stopId);
+  });
+
+  markerByStopId.forEach((marker, stopId) => {
+    const markerElement = marker.getElement();
+    const isSelected = stopSelection?.selectedStopId === stopId;
+    markerElement.classList.toggle('map-workspace__stop-marker--selected', isSelected);
   });
 };
 
@@ -381,8 +389,14 @@ export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps
       return;
     }
 
-    syncStopMarkers({ map: mapInstance, stops: placedStops, markerByStopId: stopMarkerRef.current, setStopSelection });
-  }, [placedStops]);
+    syncStopMarkers({
+      map: mapInstance,
+      stops: placedStops,
+      markerByStopId: stopMarkerRef.current,
+      setStopSelection,
+      stopSelection
+    });
+  }, [placedStops, stopSelection]);
 
   const pointerSummary = interactionState.pointer
     ? `x:${interactionState.pointer.screenX.toFixed(1)} y:${interactionState.pointer.screenY.toFixed(1)}`
