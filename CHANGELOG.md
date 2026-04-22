@@ -46,3 +46,6 @@ All notable changes to this project will be documented in this file.
 - Lift stop selection ownership to `App.tsx` via a typed map-to-shell callback contract for inspector rendering.
 - Add a minimal selected-stop inspector view in the right panel with empty state and stop id/label/lng-lat details only.
 - Add ADR 0015 documenting stop selection projection boundaries from map workspace to shell inspector.
+- Refine stop selection transitions to a strict single-source contract (`null | { selectedStopId }`) shared by marker highlighting and inspector state.
+- Clear stop selection when clicking non-stop map area in inspect mode, while keeping marker-click stop selection deterministic.
+- Simplify the right-panel inspector to the stop-id contract and add ADR 0016 documenting the updated selection transition rules.
