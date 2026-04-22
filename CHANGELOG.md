@@ -68,3 +68,6 @@ All notable changes to this project will be documented in this file.
 - Add minimal selected-line projection to the shell inspector, including id/label, stop count, and ordered stop-id summary.
 - Keep the selected-line inspector strictly structural, without demand/economy/service fields.
 - Add ADR 0022 documenting line-building constants centralization and minimal selected-line inspector boundaries.
+- Slice 011: add first `build-line` mode with explicit ordered existing-stop drafting and completion flow.
+- Slice 011: render minimal map lines for local structural feedback only, without routing or service simulation semantics.
+- Slice 011: keep line draft and completed line state in-memory only (no persistence or backend sync).
