@@ -9,3 +9,6 @@ All notable changes to this project will be documented in this file.
 - Add initial repository structural directories for docs and data partitions.
 - Add onboarding-focused `README.md` that points contributors to canonical root docs and ADR location.
 - Add ADR 0002 documenting documentation governance and `docs/adr/` as the ADR location.
+- Add the initial desktop shell UI with header, left tools panel, workspace, right inspector panel, and bottom status bar placeholders.
+- Add ADR 0003 documenting the initial desktop shell layout decision and scope boundaries.
+
