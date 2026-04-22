@@ -79,3 +79,7 @@ All notable changes to this project will be documented in this file.
 - Slice 011b: keep draft line polylines non-interactive so only completed lines can capture click selection.
 - Slice 011b: add a selected completed-line visual variant without changing inspect/placement map click-through behavior.
 - Add ADR 0025 documenting the line-overlay pointer-event contract for completed-line selection.
+- Slice 011c: enforce explicit mutual exclusivity between stop and completed-line selection in inspect interactions.
+- Slice 011c: clear selected line on inspect stop selection and clear both selections on inspect empty-map click.
+- Slice 011c: prevent build-line mode from selecting completed lines via overlay clicks and keep draft/completed selection states separate.
+- Add ADR 0026 documenting stop/line mutual-exclusivity selection rules and mode-aware constraints.

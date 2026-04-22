@@ -62,6 +62,7 @@ interface BuildLineModeMapClickContracts {
   readonly onInspectModeMapClick: () => void;
 }
 
+
 interface MapWorkspaceSurfaceInteractionsContracts {
   readonly map: MapLibreMap;
   readonly activeToolMode: WorkspaceToolMode;
@@ -534,6 +535,10 @@ export function MapWorkspaceSurface({
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
   const [projectionRefreshTick, setProjectionRefreshTick] = useState(0);
 
+  const clearSelectedCompletedLine = (): void => {
+    setSelectedLineId(null);
+  };
+
   useEffect(() => {
     const containerElement = mapContainerRef.current;
 
@@ -587,6 +592,7 @@ export function MapWorkspaceSurface({
       buildLineContracts: {
         onInspectModeMapClick: () => {
           onStopSelectionChange(resolveInspectModeMapClickSelection());
+          clearSelectedCompletedLine();
         }
       },
       onValidPlacement: (lng, lat) => {
@@ -653,6 +659,10 @@ export function MapWorkspaceSurface({
             };
           });
           return;
+        }
+
+        if (activeToolMode === 'inspect') {
+          clearSelectedCompletedLine();
         }
 
         onStopSelectionChange(toStopSelectionState(stop));
@@ -728,6 +738,11 @@ export function MapWorkspaceSurface({
               .join(' ')}
             points={segment.points}
             onClick={() => {
+              if (activeToolMode === 'build-line') {
+                return;
+              }
+
+              onStopSelectionChange(null);
               setSelectedLineId(createLineId(segment.key));
             }}
           />
