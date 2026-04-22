@@ -3,7 +3,7 @@ import { useState, type ReactElement } from 'react';
 import type { StopId } from './domain/types/stop';
 import {
   MapWorkspaceSurface,
-  type SelectedStopInspectorPayload
+  type StopSelectionState
 } from './map-workspace/MapWorkspaceSurface';
 
 import './App.css';
@@ -18,7 +18,7 @@ export type WorkspaceToolMode = 'inspect' | 'place-stop';
  */
 export default function App(): ReactElement {
   const [activeToolMode, setActiveToolMode] = useState<WorkspaceToolMode>('inspect');
-  const [selectedStop, setSelectedStop] = useState<SelectedStopInspectorPayload | null>(null);
+  const [selectedStop, setSelectedStop] = useState<StopSelectionState | null>(null);
   const isStopPlacementModeActive = activeToolMode === 'place-stop';
 
   const handleStopPlacementModeToggle = (): void => {
@@ -63,10 +63,6 @@ export default function App(): ReactElement {
           <div>
             <p>Selected stop</p>
             <p>ID: {selectedStop.selectedStopId}</p>
-            <p>Label: {selectedStop.label ?? '—'}</p>
-            <p>
-              Position: {selectedStop.lng.toFixed(5)}, {selectedStop.lat.toFixed(5)}
-            </p>
           </div>
         ) : (
           <p>No stop selected.</p>
