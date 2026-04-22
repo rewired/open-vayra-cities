@@ -25,3 +25,7 @@ All notable changes to this project will be documented in this file.
 - Add typed workspace tool mode state (`inspect` / `place-stop`) in the shell and replace the static tool list with a minimal stop-placement toggle control.
 - Pass active workspace tool mode into the map workspace and gate click capture behavior by mode to support explicit placement-intent interactions.
 - Add ADR 0009 documenting workspace tool mode gating at the shell-to-map boundary and associated scope constraints.
+- Split map workspace click telemetry from stop-placement click handling so neutral click state remains independent from gameplay mode.
+- Add local stop-placement click eligibility validation using street-related style layer/source hints with rendered-feature checks, and block invalid non-street targets with minimal HUD feedback.
+- Extend the typed MapLibre workspace contract with `getStyle()` and `queryRenderedFeatures(...)` to keep placement-validation boundaries explicit.
+- Add ADR 0010 documenting the telemetry/placement split and local validation guardrails.
