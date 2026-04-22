@@ -83,3 +83,6 @@ All notable changes to this project will be documented in this file.
 - Slice 011c: clear selected line on inspect stop selection and clear both selections on inspect empty-map click.
 - Slice 011c: prevent build-line mode from selecting completed lines via overlay clicks and keep draft/completed selection states separate.
 - Add ADR 0026 documenting stop/line mutual-exclusivity selection rules and mode-aware constraints.
+- Replace additive right-panel inspector sections with an explicit selection-priority state machine (line first, then stop, else neutral empty state).
+- Keep selected-line inspector output minimal and structural-only (`id/label`, stop count, ordered stop summary).
+- Add ADR 0027 documenting the inspector selection-priority state machine and explicit non-goals.

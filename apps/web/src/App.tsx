@@ -30,10 +30,73 @@ export interface LineSelectionState {
   readonly selectedLine: Line | null;
 }
 
+/**
+ * Enumerates the inspector's mutually exclusive visual states.
+ */
+export type InspectorPanelMode = 'line-selected' | 'stop-selected' | 'empty';
+
+/**
+ * Carries inspector data when a completed line is the active selection context.
+ */
+export interface LineSelectedInspectorPanelState {
+  readonly mode: 'line-selected';
+  readonly selectedLine: Line;
+}
+
+/**
+ * Carries inspector data when a stop is the active selection context.
+ */
+export interface StopSelectedInspectorPanelState {
+  readonly mode: 'stop-selected';
+  readonly selectedStop: StopSelectionState;
+}
+
+/**
+ * Carries inspector data when neither a line nor stop is selected.
+ */
+export interface EmptyInspectorPanelState {
+  readonly mode: 'empty';
+}
+
+/**
+ * Represents the resolved inspector view model after applying selection priority rules.
+ */
+export type InspectorPanelState =
+  | LineSelectedInspectorPanelState
+  | StopSelectedInspectorPanelState
+  | EmptyInspectorPanelState;
+
 const INITIAL_LINE_BUILD_SELECTION_STATE: LineBuildSelectionState = {
   selectedStopIds: []
 };
 const INITIAL_LINE_SELECTION_STATE: LineSelectionState = { selectedLine: null };
+
+/**
+ * Resolves the inspector panel state with explicit selection priority:
+ * selected line first, then selected stop, else neutral empty state.
+ */
+function resolveInspectorPanelState(
+  selectedLine: Line | null,
+  selectedStop: StopSelectionState | null
+): InspectorPanelState {
+  if (selectedLine) {
+    return {
+      mode: 'line-selected',
+      selectedLine
+    };
+  }
+
+  if (selectedStop) {
+    return {
+      mode: 'stop-selected',
+      selectedStop
+    };
+  }
+
+  return {
+    mode: 'empty'
+  };
+}
 
 /**
  * Renders the initial desktop-only CityOps application shell layout.
@@ -54,7 +117,7 @@ export default function App(): ReactElement {
   };
 
   const selectedStopId: StopId | null = selectedStop?.selectedStopId ?? null;
-  const selectedLine = lineSelection.selectedLine;
+  const inspectorPanelState = resolveInspectorPanelState(lineSelection.selectedLine, selectedStop);
 
   return (
     <div className="app-shell" data-app-surface="desktop-shell">
@@ -119,26 +182,23 @@ export default function App(): ReactElement {
       <aside className="right-panel" aria-label="Inspector panel">
         <h2>Inspector</h2>
         <p>Active mode: {activeToolMode}</p>
-        {selectedStop ? (
-          <div>
-            <p>Selected stop</p>
-            <p>ID: {selectedStop.selectedStopId}</p>
-          </div>
-        ) : (
-          <p>No stop selected.</p>
-        )}
-
-        <p>Line draft stops: {lineBuildSelection.selectedStopIds.length}</p>
-        {selectedLine ? (
+        {inspectorPanelState.mode === 'line-selected' ? (
           <div>
             <p>Selected line</p>
-            <p>ID/Label: {`${selectedLine.id} / ${selectedLine.label}`}</p>
-            <p>Stop count: {selectedLine.stopIds.length}</p>
-            <p>Ordered stops: {selectedLine.stopIds.join(' → ')}</p>
+            <p>ID/Label: {`${inspectorPanelState.selectedLine.id} / ${inspectorPanelState.selectedLine.label}`}</p>
+            <p>Stop count: {inspectorPanelState.selectedLine.stopIds.length}</p>
+            <p>Ordered stops: {inspectorPanelState.selectedLine.stopIds.join(' → ')}</p>
           </div>
-        ) : (
-          <p>No line selected.</p>
-        )}
+        ) : null}
+
+        {inspectorPanelState.mode === 'stop-selected' ? (
+          <div>
+            <p>Selected stop</p>
+            <p>ID: {inspectorPanelState.selectedStop.selectedStopId}</p>
+          </div>
+        ) : null}
+
+        {inspectorPanelState.mode === 'empty' ? <p>No stop or line selected.</p> : null}
       </aside>
 
       <footer className="status-bar" aria-label="Status bar">
