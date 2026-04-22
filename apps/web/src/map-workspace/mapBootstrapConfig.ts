@@ -1,26 +1,26 @@
 /**
- * Defines the minimal bootstrap configuration used to initialize the CityOps map workspace surface.
+ * Defines the centralized bootstrap values used to initialize the CityOps Hamburg map workspace surface.
  */
 export interface MapBootstrapConfig {
-  /** MapLibre style URL used for non-authoritative development basemap rendering. */
+  /** MapLibre style URL for a street-legible Hamburg startup basemap suitable for stop placement. */
   readonly styleUrl: string;
-  /** Neutral initial map center as `[longitude, latitude]` for the desktop workspace. */
+  /** Initial Hamburg startup center as `[longitude, latitude]` for immediate city gameplay context. */
   readonly center: readonly [number, number];
-  /** Initial zoom level for the baseline workspace view. */
+  /** Initial city-scale zoom tuned for practical street readability during stop placement. */
   readonly zoom: number;
-  /** Lower zoom bound to keep workspace navigation practical during baseline integration. */
+  /** Lower zoom bound that keeps desktop MVP navigation intentionally city-focused. */
   readonly minZoom: number;
-  /** Upper zoom bound to avoid extreme zoom levels in the baseline workspace setup. */
+  /** Upper zoom bound that still supports close street inspection without excessive granularity. */
   readonly maxZoom: number;
 }
 
 /**
- * Centralized baseline map bootstrap settings for the initial desktop MapLibre workspace integration.
+ * Centralized Hamburg startup map bootstrap settings for desktop MVP stop-placement readability.
  */
 export const MAP_WORKSPACE_BOOTSTRAP_CONFIG: MapBootstrapConfig = {
-  styleUrl: 'https://demotiles.maplibre.org/style.json',
-  center: [0, 20],
-  zoom: 1.6,
-  minZoom: 1,
-  maxZoom: 17
+  styleUrl: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+  center: [9.993682, 53.551086],
+  zoom: 12,
+  minZoom: 10,
+  maxZoom: 18
 };
