@@ -30,7 +30,7 @@ interface MapEventLngLat {
 /**
  * Minimal interaction event shape consumed by the map workspace surface.
  */
-interface MapLibreInteractionEvent {
+export interface MapLibreInteractionEvent {
   readonly point: MapEventPoint;
   readonly lngLat?: MapEventLngLat;
 }
@@ -39,6 +39,38 @@ interface MapLibreInteractionEvent {
  * Interaction event names used by the workspace baseline.
  */
 type MapLibreInteractionEventType = 'mousemove' | 'click';
+
+/**
+ * Minimal style-layer shape required for local stop-placement eligibility checks.
+ */
+interface MapLibreStyleLayer {
+  readonly id: string;
+  readonly type: string;
+  readonly source?: string;
+  readonly sourceLayer?: string;
+  readonly 'source-layer'?: string;
+}
+
+/**
+ * Minimal style document shape used for runtime layer/source inspection.
+ */
+interface MapLibreStyleDefinition {
+  readonly layers?: readonly MapLibreStyleLayer[];
+}
+
+/**
+ * Minimal rendered feature shape used by local click eligibility validation.
+ */
+interface MapLibreRenderedFeature {
+  readonly layer?: { readonly id: string };
+}
+
+/**
+ * Query options for filtering rendered features to specific style layers.
+ */
+interface MapLibreRenderedFeatureQueryOptions {
+  readonly layers?: readonly string[];
+}
 
 /**
  * Minimal MapLibre map API surface required by this slice for lifecycle-safe map rendering.
@@ -54,6 +86,13 @@ export interface MapLibreMap {
   on(type: MapLibreInteractionEventType, listener: (event: MapLibreInteractionEvent) => void): void;
   /** Removes a previously registered interaction listener for the provided baseline event type. */
   off(type: MapLibreInteractionEventType, listener: (event: MapLibreInteractionEvent) => void): void;
+  /** Returns the active style document for layer/source-level click validation. */
+  getStyle(): MapLibreStyleDefinition | undefined;
+  /** Queries rendered features at a clicked screen point, optionally filtered by style layer ids. */
+  queryRenderedFeatures(
+    point: MapEventPoint,
+    options?: MapLibreRenderedFeatureQueryOptions
+  ): readonly MapLibreRenderedFeature[];
 }
 
 /**
