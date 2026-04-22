@@ -22,3 +22,6 @@ All notable changes to this project will be documented in this file.
 - Add ADR 0007 documenting explicit map workspace resize handling decisions and constraints.
 - Refactor map workspace internals into lightweight local helpers that separate map instance lifecycle setup, neutral interaction subscriptions, and resize bindings with explicit typed contracts.
 - Add ADR 0008 documenting map workspace internal lifecycle separation and lightweight boundary constraints.
+- Add typed workspace tool mode state (`inspect` / `place-stop`) in the shell and replace the static tool list with a minimal stop-placement toggle control.
+- Pass active workspace tool mode into the map workspace and gate click capture behavior by mode to support explicit placement-intent interactions.
+- Add ADR 0009 documenting workspace tool mode gating at the shell-to-map boundary and associated scope constraints.

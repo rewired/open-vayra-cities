@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 
+import type { WorkspaceToolMode } from '../App';
 import { MAP_WORKSPACE_BOOTSTRAP_CONFIG } from './mapBootstrapConfig';
 import type { MapLibreMap } from './maplibreGlobal';
 
@@ -30,11 +31,16 @@ interface NeutralMapInteractionHandlers {
 
 interface NeutralMapInteractionContracts {
   readonly map: MapLibreMap;
+  readonly activeToolMode: WorkspaceToolMode;
   readonly setInteractionState: (nextState: MapSurfaceInteractionState) => void;
 }
 
 interface MapWorkspaceResizeBinding {
   readonly dispose: () => void;
+}
+
+interface MapWorkspaceSurfaceProps {
+  readonly activeToolMode: WorkspaceToolMode;
 }
 
 const createPointerState = (screenX: number, screenY: number, lng?: number, lat?: number): MapSurfacePointerState => {
@@ -49,6 +55,7 @@ const createPointerState = (screenX: number, screenY: number, lng?: number, lat?
 
 const setupNeutralMapInteractions = ({
   map,
+  activeToolMode,
   setInteractionState
 }: NeutralMapInteractionContracts): { readonly dispose: () => void } => {
   const handlers: NeutralMapInteractionHandlers = {
@@ -59,6 +66,15 @@ const setupNeutralMapInteractions = ({
       });
     },
     onMapClick: (event) => {
+      if (activeToolMode !== 'place-stop') {
+        setInteractionState({
+          status: 'idle',
+          pointer: createPointerState(event.point.x, event.point.y, event.lngLat?.lng, event.lngLat?.lat)
+        });
+
+        return;
+      }
+
       setInteractionState({
         status: 'click-captured',
         pointer: createPointerState(event.point.x, event.point.y, event.lngLat?.lng, event.lngLat?.lat)
@@ -123,7 +139,7 @@ const createMapWorkspaceInstance = (containerElement: HTMLDivElement): MapLibreM
 /**
  * Renders the CityOps workspace as a real MapLibre map surface without gameplay semantics.
  */
-export function MapWorkspaceSurface(): ReactElement {
+export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
   const [interactionState, setInteractionState] = useState<MapSurfaceInteractionState>({
@@ -140,16 +156,28 @@ export function MapWorkspaceSurface(): ReactElement {
 
     const mapInstance = createMapWorkspaceInstance(containerElement);
     mapInstanceRef.current = mapInstance;
-    const neutralInteractions = setupNeutralMapInteractions({ map: mapInstance, setInteractionState });
     const mapResizeBinding = setupMapResizeBinding(containerElement, mapInstanceRef);
 
     return () => {
-      neutralInteractions.dispose();
       mapResizeBinding.dispose();
       mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const mapInstance = mapInstanceRef.current;
+
+    if (!mapInstance) {
+      return;
+    }
+
+    const neutralInteractions = setupNeutralMapInteractions({ map: mapInstance, activeToolMode, setInteractionState });
+
+    return () => {
+      neutralInteractions.dispose();
+    };
+  }, [activeToolMode]);
 
   const pointerSummary = interactionState.pointer
     ? `x:${interactionState.pointer.screenX.toFixed(1)} y:${interactionState.pointer.screenY.toFixed(1)}`
@@ -164,7 +192,7 @@ export function MapWorkspaceSurface(): ReactElement {
       <div ref={mapContainerRef} className="map-workspace__map" aria-label="CityOps baseline map" />
 
       <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
-        Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
+        Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
       </div>
     </section>
   );

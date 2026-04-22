@@ -1,13 +1,25 @@
-import type { ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 
 import { MapWorkspaceSurface } from './map-workspace/MapWorkspaceSurface';
 
 import './App.css';
 
 /**
+ * Defines the workspace tool modes available in the desktop shell.
+ */
+export type WorkspaceToolMode = 'inspect' | 'place-stop';
+
+/**
  * Renders the initial desktop-only CityOps application shell layout.
  */
 export default function App(): ReactElement {
+  const [activeToolMode, setActiveToolMode] = useState<WorkspaceToolMode>('inspect');
+  const isStopPlacementModeActive = activeToolMode === 'place-stop';
+
+  const handleStopPlacementModeToggle = (): void => {
+    setActiveToolMode((currentMode) => (currentMode === 'place-stop' ? 'inspect' : 'place-stop'));
+  };
+
   return (
     <div className="app-shell" data-app-surface="desktop-shell">
       <header className="app-header" aria-label="Application header">
@@ -17,15 +29,21 @@ export default function App(): ReactElement {
 
       <aside className="left-panel" aria-label="Tools and navigation panel">
         <h2>Tools</h2>
-        <ul>
-          <li>Build</li>
-          <li>Lines</li>
-          <li>Inspect</li>
-        </ul>
+        <div className="tool-mode-control" aria-label="Active workspace tool">
+          <p>Current mode: {activeToolMode}</p>
+          <button
+            type="button"
+            className="tool-mode-control__button"
+            aria-pressed={isStopPlacementModeActive}
+            onClick={handleStopPlacementModeToggle}
+          >
+            {isStopPlacementModeActive ? 'Exit stop placement' : 'Enter stop placement'}
+          </button>
+        </div>
       </aside>
 
       <main className="workspace" aria-label="Main workspace">
-        <MapWorkspaceSurface />
+        <MapWorkspaceSurface activeToolMode={activeToolMode} />
       </main>
 
       <aside className="right-panel" aria-label="Inspector panel">
