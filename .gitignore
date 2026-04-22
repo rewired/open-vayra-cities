@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+
+# Package manager
+.pnpm-store/
+
+# Build output
+dist/
+build/
+coverage/
+.vite/
+
+# TypeScript
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Runtime and generated data
+data/generated/
+data/runtime/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite-journal
+*.sqlite3-journal
+
+# Local save / cache / temp artifacts
+*.tmp
+*.temp
+.cache/
+tmp/
+temp/
+
+# Optional map or import artifacts that should stay local unless explicitly curated
+*.mbtiles
+*.gpkg
+*.pbf
