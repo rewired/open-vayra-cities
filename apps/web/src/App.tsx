@@ -1,5 +1,7 @@
 import type { ReactElement } from 'react';
 
+import { MapWorkspaceSurface } from './map-workspace/MapWorkspaceSurface';
+
 import './App.css';
 
 /**
@@ -23,8 +25,7 @@ export default function App(): ReactElement {
       </aside>
 
       <main className="workspace" aria-label="Main workspace">
-        <h2>Workspace</h2>
-        <p>Future map and planning surface will be integrated here in later slices.</p>
+        <MapWorkspaceSurface />
       </main>
 
       <aside className="right-panel" aria-label="Inspector panel">

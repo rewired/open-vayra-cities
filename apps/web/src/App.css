@@ -36,9 +36,9 @@ body {
 
 .app-header h1,
 .app-header h2,
-.workspace h2,
 .left-panel h2,
-.right-panel h2 {
+.right-panel h2,
+.map-workspace__empty-state h2 {
   margin: 0;
 }
 
@@ -68,11 +68,68 @@ body {
 
 .workspace {
   grid-area: workspace;
+  display: flex;
   background: #0f1723;
 }
 
-.workspace p,
+.map-workspace {
+  position: relative;
+  flex: 1;
+  border: 1px solid #2a3a53;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #0b1320 0%, #0c1624 100%);
+  overflow: hidden;
+}
+
+.map-workspace__surface {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 3%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 3%) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+.map-workspace__overlay {
+  position: absolute;
+  z-index: 2;
+  padding: 6px 10px;
+  border: 1px dashed #425b83;
+  border-radius: 8px;
+  background: rgb(13 23 38 / 75%);
+  color: #8ea4c6;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.map-workspace__overlay--hud {
+  top: 14px;
+  left: 14px;
+}
+
+.map-workspace__overlay--info {
+  right: 14px;
+  bottom: 14px;
+}
+
+.map-workspace__empty-state {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: min(520px, calc(100% - 48px));
+  transform: translate(-50%, -50%);
+  padding: 24px;
+  border: 1px solid #2f415e;
+  border-radius: 12px;
+  background: rgb(16 27 44 / 92%);
+  text-align: center;
+}
+
+.map-workspace__empty-state p,
 .right-panel p {
+  margin: 8px 0 0;
   color: #9fb0cb;
 }
 

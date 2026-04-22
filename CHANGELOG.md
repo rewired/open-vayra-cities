@@ -11,4 +11,6 @@ All notable changes to this project will be documented in this file.
 - Add ADR 0002 documenting documentation governance and `docs/adr/` as the ADR location.
 - Add the initial desktop shell UI with header, left tools panel, workspace, right inspector panel, and bottom status bar placeholders.
 - Add ADR 0003 documenting the initial desktop shell layout decision and scope boundaries.
+- Prepare a dedicated map workspace surface scaffold with explicit empty-state and structural overlay regions, without map logic or dependencies.
+- Add ADR 0004 documenting the map workspace surface scaffold decision and constraints.
 
