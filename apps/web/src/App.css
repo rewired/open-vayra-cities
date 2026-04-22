@@ -114,6 +114,33 @@ body {
   inset: 0;
 }
 
+.map-workspace__line-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.map-workspace__line-segment {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.map-workspace__line-segment--completed {
+  stroke: rgb(127 176 245 / 85%);
+  stroke-width: 4;
+}
+
+.map-workspace__line-segment--draft {
+  stroke: rgb(246 212 110 / 92%);
+  stroke-width: 3;
+  stroke-dasharray: 6 5;
+}
+
 .map-workspace__overlay {
   position: absolute;
   z-index: 2;

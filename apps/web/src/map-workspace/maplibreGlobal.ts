@@ -38,7 +38,7 @@ export interface MapLibreInteractionEvent {
 /**
  * Interaction event names used by the workspace baseline.
  */
-type MapLibreInteractionEventType = 'mousemove' | 'click';
+type MapLibreInteractionEventType = 'mousemove' | 'click' | 'move';
 
 /**
  * Minimal style-layer shape required for local stop-placement eligibility checks.
@@ -131,6 +131,8 @@ export interface MapLibreMap {
   ): readonly MapLibreRenderedFeature[];
   /** Queries source features for a known source id and optional source-layer constraint. */
   querySourceFeatures(sourceId: string, options?: MapLibreSourceFeatureQueryOptions): readonly MapLibreSourceFeature[];
+  /** Projects geographic coordinates into current map viewport screen-space coordinates. */
+  project(lngLat: readonly [number, number]): MapEventPoint;
 }
 
 /**

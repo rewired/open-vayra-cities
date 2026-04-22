@@ -91,6 +91,11 @@ interface DraftLineState {
   readonly metadata: DraftLineMetadata | null;
 }
 
+interface ProjectedLineSegment {
+  readonly key: string;
+  readonly points: string;
+}
+
 const STREET_LAYER_HINTS = ['road', 'street', 'highway', 'bridge', 'tunnel', 'transport', 'path'] as const;
 const STREET_SOURCE_HINTS = ['road', 'street', 'transport', 'highway'] as const;
 const STOP_LABEL_PREFIX = 'Stop';
@@ -433,6 +438,34 @@ const buildLineModeUiFeedback = (activeToolMode: WorkspaceToolMode, draftStopIds
   };
 };
 
+const toProjectedLineSegments = ({
+  lines,
+  stopsById,
+  map
+}: {
+  readonly lines: readonly { readonly id: string; readonly stopIds: readonly StopId[] }[];
+  readonly stopsById: ReadonlyMap<StopId, Stop>;
+  readonly map: MapLibreMap;
+}): readonly ProjectedLineSegment[] =>
+  lines
+    .map((line) => {
+      const coordinatePairs = line.stopIds
+        .map((stopId) => stopsById.get(stopId))
+        .filter((stop): stop is Stop => stop !== undefined)
+        .map((stop) => map.project([stop.position.lng, stop.position.lat]))
+        .map((projectedPoint) => `${projectedPoint.x},${projectedPoint.y}`);
+
+      if (coordinatePairs.length < 2) {
+        return null;
+      }
+
+      return {
+        key: line.id,
+        points: coordinatePairs.join(' ')
+      };
+    })
+    .filter((segment): segment is ProjectedLineSegment => segment !== null);
+
 const syncStopMarkers = ({
   map,
   stops,
@@ -493,6 +526,7 @@ export function MapWorkspaceSurface({
   const [placedStops, setPlacedStops] = useState<readonly Stop[]>([]);
   const [sessionLines, setSessionLines] = useState<readonly Line[]>([]);
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
+  const [projectionRefreshTick, setProjectionRefreshTick] = useState(0);
 
   useEffect(() => {
     const containerElement = mapContainerRef.current;
@@ -569,6 +603,24 @@ export function MapWorkspaceSurface({
       return;
     }
 
+    const onMapMove = (): void => {
+      setProjectionRefreshTick((currentTick) => currentTick + 1);
+    };
+
+    mapInstance.on('move', onMapMove);
+
+    return () => {
+      mapInstance.off('move', onMapMove);
+    };
+  }, []);
+
+  useEffect(() => {
+    const mapInstance = mapInstanceRef.current;
+
+    if (!mapInstance) {
+      return;
+    }
+
     syncStopMarkers({
       map: mapInstance,
       stops: placedStops,
@@ -632,9 +684,35 @@ export function MapWorkspaceSurface({
     setDraftLineState(INITIAL_DRAFT_LINE_STATE);
   };
 
+  const stopsById = new Map(placedStops.map((stop) => [stop.id, stop] as const));
+  const projectedCompletedSegments =
+    mapInstanceRef.current === null
+      ? []
+      : toProjectedLineSegments({
+          lines: sessionLines,
+          stopsById,
+          map: mapInstanceRef.current
+        });
+  const projectedDraftSegments =
+    mapInstanceRef.current === null
+      ? []
+      : toProjectedLineSegments({
+          lines: [{ id: 'draft-line', stopIds: draftLineState.stopIds }],
+          stopsById,
+          map: mapInstanceRef.current
+        });
+
   return (
     <section className="map-workspace" aria-label="Map workspace surface">
       <div ref={mapContainerRef} className="map-workspace__map" aria-label="CityOps baseline map" />
+      <svg className="map-workspace__line-overlay" aria-hidden="true" key={projectionRefreshTick}>
+        {projectedCompletedSegments.map((segment) => (
+          <polyline key={segment.key} className="map-workspace__line-segment map-workspace__line-segment--completed" points={segment.points} />
+        ))}
+        {projectedDraftSegments.map((segment) => (
+          <polyline key={segment.key} className="map-workspace__line-segment map-workspace__line-segment--draft" points={segment.points} />
+        ))}
+      </svg>
 
       <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
         Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
