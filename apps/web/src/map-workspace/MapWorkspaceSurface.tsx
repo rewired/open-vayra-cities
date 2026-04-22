@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 
+import type { Stop } from '../domain/types/stop';
+import { createStopId } from '../domain/types/stop';
 import type { WorkspaceToolMode } from '../App';
 import { MAP_WORKSPACE_BOOTSTRAP_CONFIG } from './mapBootstrapConfig';
-import type { MapLibreInteractionEvent, MapLibreMap } from './maplibreGlobal';
+import type { MapLibreInteractionEvent, MapLibreMap, MapLibreMarker } from './maplibreGlobal';
 
 type MapSurfaceInteractionStatus = 'idle' | 'pointer-active' | 'click-captured' | 'placement-rejected';
 
@@ -33,6 +35,7 @@ interface PlacementGameplayContracts {
   readonly map: MapLibreMap;
   readonly setInteractionState: (nextState: MapSurfaceInteractionState) => void;
   readonly setPlacementFeedback: (nextState: PlacementFeedbackState) => void;
+  readonly onValidPlacement: (event: MapLibreInteractionEvent) => void;
 }
 
 interface MapWorkspaceSurfaceInteractionsContracts {
@@ -40,6 +43,7 @@ interface MapWorkspaceSurfaceInteractionsContracts {
   readonly activeToolMode: WorkspaceToolMode;
   readonly setInteractionState: (nextState: MapSurfaceInteractionState) => void;
   readonly setPlacementFeedback: (nextState: PlacementFeedbackState) => void;
+  readonly onValidPlacement: (event: MapLibreInteractionEvent) => void;
 }
 
 interface MapWorkspaceResizeBinding {
@@ -52,6 +56,7 @@ interface MapWorkspaceSurfaceProps {
 
 const STREET_LAYER_HINTS = ['road', 'street', 'highway', 'bridge', 'tunnel', 'transport', 'path'] as const;
 const STREET_SOURCE_HINTS = ['road', 'street', 'transport', 'highway'] as const;
+const STOP_LABEL_PREFIX = 'Stop';
 
 const createPointerState = (screenX: number, screenY: number, lng?: number, lat?: number): MapSurfacePointerState => {
   const baseState: MapSurfacePointerState = { screenX, screenY };
@@ -118,7 +123,10 @@ const createNeutralMapTelemetryHandlers = ({ setInteractionState }: NeutralMapTe
   }
 });
 
-const handleStopPlacementClick = ({ map, setInteractionState, setPlacementFeedback }: PlacementGameplayContracts, event: MapLibreInteractionEvent): void => {
+const handleStopPlacementClick = (
+  { map, setInteractionState, setPlacementFeedback, onValidPlacement }: PlacementGameplayContracts,
+  event: MapLibreInteractionEvent
+): void => {
   if (!event.lngLat || !isEligibleStopPlacementClick(map, event)) {
     setPlacementFeedback('invalid-target');
     setInteractionState({
@@ -129,6 +137,7 @@ const handleStopPlacementClick = ({ map, setInteractionState, setPlacementFeedba
     return;
   }
 
+  onValidPlacement(event);
   setPlacementFeedback('none');
   setInteractionState({
     status: 'click-captured',
@@ -140,7 +149,8 @@ const setupMapWorkspaceInteractions = ({
   map,
   activeToolMode,
   setInteractionState,
-  setPlacementFeedback
+  setPlacementFeedback,
+  onValidPlacement
 }: MapWorkspaceSurfaceInteractionsContracts): { readonly dispose: () => void } => {
   const neutralTelemetryHandlers = createNeutralMapTelemetryHandlers({ setInteractionState });
 
@@ -152,7 +162,7 @@ const setupMapWorkspaceInteractions = ({
       return;
     }
 
-    handleStopPlacementClick({ map, setInteractionState, setPlacementFeedback }, event);
+    handleStopPlacementClick({ map, setInteractionState, setPlacementFeedback, onValidPlacement }, event);
   };
 
   map.on('mousemove', neutralTelemetryHandlers.onPointerMove);
@@ -209,17 +219,63 @@ const createMapWorkspaceInstance = (containerElement: HTMLDivElement): MapLibreM
   return mapInstance;
 };
 
+const createStopMarker = (stop: Stop): MapLibreMarker => {
+  const markerElement = document.createElement('div');
+  markerElement.className = 'map-workspace__stop-marker';
+  markerElement.title = stop.label ?? stop.id;
+
+  return new window.maplibregl.Marker({ element: markerElement }).setLngLat([stop.position.lng, stop.position.lat]);
+};
+
+const buildDeterministicStop = (nextOrdinal: number, lng: number, lat: number): Stop => ({
+  id: createStopId(`stop-${nextOrdinal}`),
+  position: { lng, lat },
+  label: `${STOP_LABEL_PREFIX} ${nextOrdinal}`
+});
+
+const syncStopMarkers = ({
+  map,
+  stops,
+  markerByStopId
+}: {
+  readonly map: MapLibreMap;
+  readonly stops: readonly Stop[];
+  readonly markerByStopId: Map<Stop['id'], MapLibreMarker>;
+}): void => {
+  const activeStopIds = new Set(stops.map((stop) => stop.id));
+
+  stops.forEach((stop) => {
+    if (markerByStopId.has(stop.id)) {
+      return;
+    }
+
+    const marker = createStopMarker(stop).addTo(map);
+    markerByStopId.set(stop.id, marker);
+  });
+
+  markerByStopId.forEach((marker, stopId) => {
+    if (activeStopIds.has(stopId)) {
+      return;
+    }
+
+    marker.remove();
+    markerByStopId.delete(stopId);
+  });
+};
+
 /**
  * Renders the CityOps workspace as a real MapLibre map surface with local click telemetry and minimal stop-placement validation.
  */
 export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
+  const stopMarkerRef = useRef<Map<Stop['id'], MapLibreMarker>>(new Map());
   const [interactionState, setInteractionState] = useState<MapSurfaceInteractionState>({
     status: 'idle',
     pointer: null
   });
   const [placementFeedback, setPlacementFeedback] = useState<PlacementFeedbackState>('none');
+  const [placedStops, setPlacedStops] = useState<readonly Stop[]>([]);
 
   useEffect(() => {
     const containerElement = mapContainerRef.current;
@@ -234,6 +290,8 @@ export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps
 
     return () => {
       mapResizeBinding.dispose();
+      stopMarkerRef.current.forEach((marker) => marker.remove());
+      stopMarkerRef.current.clear();
       mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
     };
@@ -250,13 +308,35 @@ export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps
       map: mapInstance,
       activeToolMode,
       setInteractionState,
-      setPlacementFeedback
+      setPlacementFeedback,
+      onValidPlacement: (event) => {
+        if (!event.lngLat) {
+          return;
+        }
+
+        const { lng, lat } = event.lngLat;
+        setPlacedStops((currentStops) => {
+          const nextOrdinal = currentStops.length + 1;
+          const nextStop = buildDeterministicStop(nextOrdinal, lng, lat);
+          return [...currentStops, nextStop];
+        });
+      }
     });
 
     return () => {
       interactions.dispose();
     };
   }, [activeToolMode]);
+
+  useEffect(() => {
+    const mapInstance = mapInstanceRef.current;
+
+    if (!mapInstance) {
+      return;
+    }
+
+    syncStopMarkers({ map: mapInstance, stops: placedStops, markerByStopId: stopMarkerRef.current });
+  }, [placedStops]);
 
   const pointerSummary = interactionState.pointer
     ? `x:${interactionState.pointer.screenX.toFixed(1)} y:${interactionState.pointer.screenY.toFixed(1)}`
@@ -275,6 +355,7 @@ export function MapWorkspaceSurface({ activeToolMode }: MapWorkspaceSurfaceProps
       <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
         Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
         {activeToolMode === 'place-stop' ? ` | ${placementFeedbackSummary}` : ''}
+        {` | Placed stops: ${placedStops.length}`}
       </div>
     </section>
   );

@@ -96,11 +96,24 @@ export interface MapLibreMap {
 }
 
 /**
+ * Minimal marker API used to render lightweight stop markers on top of the map.
+ */
+export interface MapLibreMarker {
+  /** Sets marker coordinates in longitude/latitude order. */
+  setLngLat(lngLat: readonly [number, number]): MapLibreMarker;
+  /** Mounts the marker into the provided map instance. */
+  addTo(map: MapLibreMap): MapLibreMarker;
+  /** Removes the marker from its current map. */
+  remove(): void;
+}
+
+/**
  * Minimal constructor API for `window.maplibregl` consumed by the workspace map component.
  */
 interface MapLibreGlobal {
   readonly Map: new (options: MapConstructorOptions) => MapLibreMap;
   readonly NavigationControl: new (options: { readonly visualizePitch: boolean }) => unknown;
+  readonly Marker: new (options?: { readonly element?: HTMLElement }) => MapLibreMarker;
 }
 
 declare global {

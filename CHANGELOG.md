@@ -29,3 +29,8 @@ All notable changes to this project will be documented in this file.
 - Add local stop-placement click eligibility validation using street-related style layer/source hints with rendered-feature checks, and block invalid non-street targets with minimal HUD feedback.
 - Extend the typed MapLibre workspace contract with `getStyle()` and `queryRenderedFeatures(...)` to keep placement-validation boundaries explicit.
 - Add ADR 0010 documenting the telemetry/placement split and local validation guardrails.
+- Add canonical minimal stop domain types (`StopId`, `StopPosition`, `Stop`) and a `createStopId` helper under `apps/web/src/domain/types/stop.ts`.
+- Extend the local MapLibre type surface with marker contracts to support lightweight in-memory stop marker rendering.
+- Persist valid stop placements in local `MapWorkspaceSurface` state with deterministic placeholder naming (`Stop 1`, `Stop 2`, ...).
+- Render visible map stop markers from local state and clean them up safely with map lifecycle teardown.
+- Add ADR 0011 documenting local stop state and marker rendering boundaries.
