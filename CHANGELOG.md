@@ -51,6 +51,8 @@ All notable changes to this project will be documented in this file.
 - Simplify the right-panel inspector to the stop-id contract and add ADR 0016 documenting the updated selection transition rules.
 - Refine map placement-mode feedback with a typed UI contract, centralized feedback copy constants, and an always-visible placement-mode indicator while `place-stop` is active.
 - Add ADR 0017 documenting placement-feedback UI contract boundaries and explicit non-goals.
-- Replace the map workspace bootstrap demo basemap with a street-legible MapLibre-compatible style and Hamburg-centered city-scale viewport defaults.
+- Set the startup viewport baseline to Hamburg so the map opens in a city-scale planning context.
+- Correct the bootstrap basemap to a street-legible MapLibre-compatible style for stop-placement readability.
+- Preserve street-based stop-placement constraints while updating only map bootstrap style/viewport baseline values.
 - Add ADR 0018 documenting Hamburg-focused map bootstrap centralization and city-scale readability constraints.
 
