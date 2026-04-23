@@ -60,7 +60,7 @@ type MapLibreInteractionEventType =
 /**
  * Render-lifecycle event names used to track per-frame map draw updates.
  */
-export type MapLibreRenderLifecycleEventType = 'render' | 'idle' | 'load';
+export type MapLibreRenderLifecycleEventType = 'render' | 'idle' | 'load' | 'styledata';
 
 /**
  * Minimal style-layer shape required for local stop-placement eligibility checks.
@@ -252,6 +252,8 @@ export interface MapLibreMap {
   getLayer(layerId: string): MapLibreLayerSpecification | undefined;
   /** Registers a style layer bound to an existing source id. */
   addLayer(layer: MapLibreLayerSpecification): void;
+  /** Returns whether the current style is fully loaded and ready for source/layer mutations. */
+  isStyleLoaded(): boolean;
   /** Registers a listener for feature interactions constrained to one style layer id. */
   on(type: 'click', layerId: string, listener: (event: MapLibreInteractionEvent) => void): void;
   /** Removes a feature interaction listener constrained to one style layer id. */

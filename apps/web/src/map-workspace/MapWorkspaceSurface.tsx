@@ -699,6 +699,28 @@ const ensureStopRenderSourceAndLayers = (map: MapLibreMap): void => {
   }
 };
 
+const runWhenMapStyleReady = (map: MapLibreMap, callback: () => void): (() => void) | void => {
+  if (map.isStyleLoaded()) {
+    callback();
+    return;
+  }
+
+  const onStyleData = (): void => {
+    if (!map.isStyleLoaded()) {
+      return;
+    }
+
+    map.off('styledata', onStyleData);
+    callback();
+  };
+
+  map.on('styledata', onStyleData);
+
+  return () => {
+    map.off('styledata', onStyleData);
+  };
+};
+
 const syncStopSourceData = ({
   map,
   stops,
@@ -1042,13 +1064,15 @@ export function MapWorkspaceSurface({
       return;
     }
 
-    ensureStopRenderSourceAndLayers(mapInstance);
-    syncStopSourceData({
-      map: mapInstance,
-      stops: placedStops,
-      selectedStopId,
-      draftStopIds: draftStopIdSet,
-      isBuildLineModeActive: activeToolMode === 'build-line'
+    return runWhenMapStyleReady(mapInstance, () => {
+      ensureStopRenderSourceAndLayers(mapInstance);
+      syncStopSourceData({
+        map: mapInstance,
+        stops: placedStops,
+        selectedStopId,
+        draftStopIds: draftStopIdSet,
+        isBuildLineModeActive: activeToolMode === 'build-line'
+      });
     });
   }, [activeToolMode, draftStopIdSet, placedStops, selectedStopId]);
 
@@ -1059,13 +1083,15 @@ export function MapWorkspaceSurface({
       return;
     }
 
-    ensureLineRenderSourcesAndLayers(mapInstance);
-    syncLineSourceData({
-      map: mapInstance,
-      sessionLines,
-      selectedLineId,
-      draftStopIds: draftLineState.stopIds,
-      stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
+    return runWhenMapStyleReady(mapInstance, () => {
+      ensureLineRenderSourcesAndLayers(mapInstance);
+      syncLineSourceData({
+        map: mapInstance,
+        sessionLines,
+        selectedLineId,
+        draftStopIds: draftLineState.stopIds,
+        stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
+      });
     });
   }, [draftLineState.stopIds, placedStops, selectedLineId, sessionLines]);
 
