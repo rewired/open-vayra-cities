@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Slice 014h: switch map overlay projection refresh binding from interaction-only (`move`/`zoom`/`rotate`) triggers to render-lifecycle (`render` + `idle`) subscriptions so projection recomputation tracks active map animation frames.
+- Slice 014h: preserve lightweight single-`requestAnimationFrame` refresh coalescing while keeping stop-order schematic polyline projection semantics unchanged.
+- Add ADR 0040 documenting render-lifecycle-driven projection refresh boundaries and explicit non-goals.
+
 - Slice 014g: extend the local MapLibre marker constructor typing with explicit stop-marker `anchor` and `offset` options to preserve strict typed API usage.
 - Slice 014g: centralize stop-marker visual anchor/offset constants in the map-workspace constants layer and consume them in marker creation.
 - Slice 014g: align stop-marker CSS box/affordance transform centering with explicit centered-anchor semantics for trustworthy stop-position perception.
