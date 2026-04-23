@@ -173,6 +173,10 @@ body {
   pointer-events: none;
 }
 
+.map-workspace__overlay--interactive-controls {
+  pointer-events: auto;
+}
+
 .map-workspace__overlay--hud {
   top: 14px;
   left: 14px;
@@ -183,6 +187,13 @@ body {
   bottom: 14px;
   max-width: min(52ch, calc(100% - 28px));
   text-transform: none;
+}
+
+.map-workspace__overlay-button-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
 }
 
 
