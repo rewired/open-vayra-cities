@@ -16,13 +16,24 @@ import {
   STREET_SNAP_MAX_PIXEL_TOLERANCE
 } from './mapWorkspacePlacementConstants';
 import {
+  MAP_COMPLETED_LINE_LAYER_FILTER,
+  MAP_COMPLETED_LINE_LAYER_PAINT,
+  MAP_COMPLETED_LINE_SELECTED_LAYER_FILTER,
+  MAP_COMPLETED_LINE_SELECTED_LAYER_PAINT,
+  MAP_DRAFT_LINE_LAYER_PAINT,
+  MAP_LAYER_ID_COMPLETED_LINES,
+  MAP_LAYER_ID_COMPLETED_LINES_SELECTED,
+  MAP_LAYER_ID_DRAFT_LINE,
   MAP_LAYER_ID_STOPS_CIRCLE,
   MAP_LAYER_ID_STOPS_LABEL,
+  MAP_SOURCE_ID_COMPLETED_LINES,
+  MAP_SOURCE_ID_DRAFT_LINE,
   MAP_SOURCE_ID_STOPS,
   MAP_STOP_CIRCLE_LAYER_STYLE,
   MAP_STOP_LABEL_LAYER_LAYOUT,
   MAP_STOP_LABEL_LAYER_PAINT
 } from './mapRenderConstants';
+import { buildCompletedLineFeatureCollection, buildDraftLineFeatureCollection } from './lineGeoJson';
 import { buildStopFeatureCollection } from './stopGeoJson';
 import {
   getSourceRefsForLayerIds,
@@ -91,11 +102,11 @@ interface MapWorkspaceResizeBinding {
   readonly dispose: () => void;
 }
 
-interface MapProjectionRefreshBinding {
+interface StopFeatureInteractionBinding {
   readonly dispose: () => void;
 }
 
-interface StopFeatureInteractionBinding {
+interface CompletedLineFeatureInteractionBinding {
   readonly dispose: () => void;
 }
 
@@ -120,11 +131,6 @@ interface DraftLineMetadata {
 interface DraftLineState {
   readonly stopIds: readonly StopId[];
   readonly metadata: DraftLineMetadata | null;
-}
-
-interface ProjectedLineSegment {
-  readonly key: string;
-  readonly points: string;
 }
 
 interface ScreenPoint {
@@ -162,7 +168,6 @@ const LINE_OVERLAY_COPY = {
   completed: 'Completed lines: schematic stop-order connections (not street-routed yet).',
   draft: 'Draft line: schematic stop-order preview (not street-routed yet).'
 } as const;
-const MAP_PROJECTION_REFRESH_EVENTS = ['render', 'idle'] as const;
 const INITIAL_DRAFT_LINE_STATE: DraftLineState = { stopIds: [], metadata: null };
 
 const toStopSelectionState = (stop: Stop): StopSelectionState => ({ selectedStopId: stop.id });
@@ -563,43 +568,6 @@ const setupMapResizeBinding = (containerElement: HTMLDivElement, mapRef: { reado
   };
 };
 
-const setupMapProjectionRefreshBinding = (
-  map: MapLibreMap,
-  onRefreshRequested: () => void
-): MapProjectionRefreshBinding => {
-  let isRefreshQueued = false;
-  let animationFrameId: number | null = null;
-
-  const queueProjectionRefresh = (): void => {
-    if (isRefreshQueued) {
-      return;
-    }
-
-    isRefreshQueued = true;
-    animationFrameId = window.requestAnimationFrame(() => {
-      isRefreshQueued = false;
-      animationFrameId = null;
-      onRefreshRequested();
-    });
-  };
-
-  MAP_PROJECTION_REFRESH_EVENTS.forEach((eventName) => {
-    map.on(eventName, queueProjectionRefresh);
-  });
-
-  return {
-    dispose: () => {
-      MAP_PROJECTION_REFRESH_EVENTS.forEach((eventName) => {
-        map.off(eventName, queueProjectionRefresh);
-      });
-
-      if (animationFrameId !== null) {
-        window.cancelAnimationFrame(animationFrameId);
-      }
-    }
-  };
-};
-
 const createMapWorkspaceInstance = (containerElement: HTMLDivElement): MapLibreMap => {
   const mapInstance = new window.maplibregl.Map({
     container: containerElement,
@@ -613,6 +581,58 @@ const createMapWorkspaceInstance = (containerElement: HTMLDivElement): MapLibreM
 
   mapInstance.addControl(new window.maplibregl.NavigationControl({ visualizePitch: false }), 'top-left');
   return mapInstance;
+};
+
+const ensureLineRenderSourcesAndLayers = (map: MapLibreMap): void => {
+  if (!map.getSource(MAP_SOURCE_ID_COMPLETED_LINES)) {
+    map.addSource(MAP_SOURCE_ID_COMPLETED_LINES, {
+      type: 'geojson',
+      data: buildCompletedLineFeatureCollection({
+        lines: [],
+        stopsById: new Map(),
+        selectedLineId: null
+      })
+    });
+  }
+
+  if (!map.getSource(MAP_SOURCE_ID_DRAFT_LINE)) {
+    map.addSource(MAP_SOURCE_ID_DRAFT_LINE, {
+      type: 'geojson',
+      data: buildDraftLineFeatureCollection({
+        draftStopIds: [],
+        stopsById: new Map()
+      })
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_COMPLETED_LINES)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_COMPLETED_LINES,
+      type: 'line',
+      source: MAP_SOURCE_ID_COMPLETED_LINES,
+      filter: MAP_COMPLETED_LINE_LAYER_FILTER,
+      paint: MAP_COMPLETED_LINE_LAYER_PAINT
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_COMPLETED_LINES_SELECTED)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_COMPLETED_LINES_SELECTED,
+      type: 'line',
+      source: MAP_SOURCE_ID_COMPLETED_LINES,
+      filter: MAP_COMPLETED_LINE_SELECTED_LAYER_FILTER,
+      paint: MAP_COMPLETED_LINE_SELECTED_LAYER_PAINT
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_DRAFT_LINE)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_DRAFT_LINE,
+      type: 'line',
+      source: MAP_SOURCE_ID_DRAFT_LINE,
+      paint: MAP_DRAFT_LINE_LAYER_PAINT
+    });
+  }
 };
 
 const ensureStopRenderSourceAndLayers = (map: MapLibreMap): void => {
@@ -677,6 +697,38 @@ const syncStopSourceData = ({
   );
 };
 
+const syncLineSourceData = ({
+  map,
+  sessionLines,
+  selectedLineId,
+  draftStopIds,
+  stopsById
+}: {
+  readonly map: MapLibreMap;
+  readonly sessionLines: readonly Line[];
+  readonly selectedLineId: Line['id'] | null;
+  readonly draftStopIds: readonly StopId[];
+  readonly stopsById: ReadonlyMap<StopId, Stop>;
+}): void => {
+  const completedLineSource = map.getSource(MAP_SOURCE_ID_COMPLETED_LINES) as MapLibreGeoJsonSource | undefined;
+  const draftLineSource = map.getSource(MAP_SOURCE_ID_DRAFT_LINE) as MapLibreGeoJsonSource | undefined;
+
+  completedLineSource?.setData(
+    buildCompletedLineFeatureCollection({
+      lines: sessionLines,
+      stopsById,
+      selectedLineId
+    })
+  );
+
+  draftLineSource?.setData(
+    buildDraftLineFeatureCollection({
+      draftStopIds,
+      stopsById
+    })
+  );
+};
+
 interface StopFeatureInteractionContext {
   readonly activeToolMode: WorkspaceToolMode;
   readonly sessionLineCount: number;
@@ -714,6 +766,21 @@ const bindStopFeatureInteractions = (
   return {
     dispose: () => {
       map.off('click', MAP_LAYER_ID_STOPS_CIRCLE, onStopFeatureClick);
+    }
+  };
+};
+
+const bindCompletedLineFeatureInteractions = (
+  map: MapLibreMap,
+  onCompletedLineClick: (event: MapLibreInteractionEvent) => void
+): CompletedLineFeatureInteractionBinding => {
+  map.on('click', MAP_LAYER_ID_COMPLETED_LINES, onCompletedLineClick);
+  map.on('click', MAP_LAYER_ID_COMPLETED_LINES_SELECTED, onCompletedLineClick);
+
+  return {
+    dispose: () => {
+      map.off('click', MAP_LAYER_ID_COMPLETED_LINES, onCompletedLineClick);
+      map.off('click', MAP_LAYER_ID_COMPLETED_LINES_SELECTED, onCompletedLineClick);
     }
   };
 };
@@ -792,34 +859,6 @@ const buildLineModeUiFeedback = (activeToolMode: WorkspaceToolMode, draftStopIds
   };
 };
 
-const toProjectedLineSegments = ({
-  lines,
-  stopsById,
-  map
-}: {
-  readonly lines: readonly { readonly id: string; readonly stopIds: readonly StopId[] }[];
-  readonly stopsById: ReadonlyMap<StopId, Stop>;
-  readonly map: MapLibreMap;
-}): readonly ProjectedLineSegment[] =>
-  lines
-    .map((line) => {
-      const coordinatePairs = line.stopIds
-        .map((stopId) => stopsById.get(stopId))
-        .filter((stop): stop is Stop => stop !== undefined)
-        .map((stop) => map.project([stop.position.lng, stop.position.lat]))
-        .map((projectedPoint) => `${projectedPoint.x},${projectedPoint.y}`);
-
-      if (coordinatePairs.length < 2) {
-        return null;
-      }
-
-      return {
-        key: line.id,
-        points: coordinatePairs.join(' ')
-      };
-    })
-    .filter((segment): segment is ProjectedLineSegment => segment !== null);
-
 /**
  * Renders the CityOps workspace as a real MapLibre map surface with local click telemetry and minimal stop-placement validation.
  */
@@ -843,7 +882,6 @@ export function MapWorkspaceSurface({
   const [placementAttemptResult, setPlacementAttemptResult] = useState<PlacementAttemptResult>('none');
   const [placedStops, setPlacedStops] = useState<readonly Stop[]>([]);
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
-  const [projectionRefreshTick, setProjectionRefreshTick] = useState(0);
   const activeToolModeRef = useRef<WorkspaceToolMode>(activeToolMode);
   const sessionLineCountRef = useRef(sessionLines.length);
   const onStopSelectionChangeRef = useRef(onStopSelectionChange);
@@ -892,6 +930,7 @@ export function MapWorkspaceSurface({
     const mapInstance = createMapWorkspaceInstance(containerElement);
     mapInstanceRef.current = mapInstance;
     const onMapLoad = (): void => {
+      ensureLineRenderSourcesAndLayers(mapInstance);
       ensureStopRenderSourceAndLayers(mapInstance);
       syncStopSourceData({
         map: mapInstance,
@@ -972,22 +1011,6 @@ export function MapWorkspaceSurface({
       return;
     }
 
-    const projectionBinding = setupMapProjectionRefreshBinding(mapInstance, () => {
-      setProjectionRefreshTick((currentTick) => currentTick + 1);
-    });
-
-    return () => {
-      projectionBinding.dispose();
-    };
-  }, []);
-
-  useEffect(() => {
-    const mapInstance = mapInstanceRef.current;
-
-    if (!mapInstance) {
-      return;
-    }
-
     ensureStopRenderSourceAndLayers(mapInstance);
     syncStopSourceData({
       map: mapInstance,
@@ -997,6 +1020,23 @@ export function MapWorkspaceSurface({
       isBuildLineModeActive: activeToolMode === 'build-line'
     });
   }, [activeToolMode, draftStopIdSet, placedStops, selectedStopId]);
+
+  useEffect(() => {
+    const mapInstance = mapInstanceRef.current;
+
+    if (!mapInstance) {
+      return;
+    }
+
+    ensureLineRenderSourcesAndLayers(mapInstance);
+    syncLineSourceData({
+      map: mapInstance,
+      sessionLines,
+      selectedLineId,
+      draftStopIds: draftLineState.stopIds,
+      stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
+    });
+  }, [draftLineState.stopIds, placedStops, selectedLineId, sessionLines]);
 
   useEffect(() => {
     const mapInstance = mapInstanceRef.current;
@@ -1041,6 +1081,34 @@ export function MapWorkspaceSurface({
       stopInteractionBinding.dispose();
     };
   }, []);
+
+  useEffect(() => {
+    const mapInstance = mapInstanceRef.current;
+
+    if (!mapInstance) {
+      return;
+    }
+
+    const completedLineInteractionBinding = bindCompletedLineFeatureInteractions(mapInstance, (event) => {
+      if (activeToolModeRef.current === 'build-line') {
+        return;
+      }
+
+      const clickedFeature = event.features?.[0];
+      const clickedLineId = clickedFeature?.properties?.lineId;
+
+      if (typeof clickedLineId !== 'string') {
+        return;
+      }
+
+      onStopSelectionChangeRef.current(null);
+      onSelectedLineIdChange(createLineId(clickedLineId));
+    });
+
+    return () => {
+      completedLineInteractionBinding.dispose();
+    };
+  }, [onSelectedLineIdChange]);
 
   const pointerSummary = interactionState.pointer
     ? `x:${interactionState.pointer.screenX.toFixed(1)} y:${interactionState.pointer.screenY.toFixed(1)}`
@@ -1093,53 +1161,9 @@ export function MapWorkspaceSurface({
     setDraftLineState(INITIAL_DRAFT_LINE_STATE);
   };
 
-  const stopsById = new Map(placedStops.map((stop) => [stop.id, stop] as const));
-  const projectedCompletedSegments =
-    mapInstanceRef.current === null
-      ? []
-      : toProjectedLineSegments({
-          lines: sessionLines,
-          stopsById,
-          map: mapInstanceRef.current
-        });
-  const projectedDraftSegments =
-    mapInstanceRef.current === null
-      ? []
-      : toProjectedLineSegments({
-          lines: [{ id: 'draft-line', stopIds: draftLineState.stopIds }],
-          stopsById,
-          map: mapInstanceRef.current
-        });
-
   return (
     <section className="map-workspace" aria-label="Map workspace surface">
       <div ref={mapContainerRef} className="map-workspace__map" aria-label="CityOps baseline map" />
-      <svg className="map-workspace__line-overlay" aria-hidden="true" data-projection-refresh-tick={projectionRefreshTick}>
-        {projectedCompletedSegments.map((segment) => (
-          <polyline
-            key={segment.key}
-            className={[
-              'map-workspace__line-segment',
-              'map-workspace__line-segment--completed',
-              segment.key === selectedLineId ? 'map-workspace__line-segment--selected' : ''
-            ]
-              .filter((className) => className.length > 0)
-              .join(' ')}
-            points={segment.points}
-            onClick={() => {
-              if (activeToolMode === 'build-line') {
-                return;
-              }
-
-              onStopSelectionChange(null);
-              onSelectedLineIdChange(createLineId(segment.key));
-            }}
-          />
-        ))}
-        {projectedDraftSegments.map((segment) => (
-          <polyline key={segment.key} className="map-workspace__line-segment map-workspace__line-segment--draft" points={segment.points} />
-        ))}
-      </svg>
 
       <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
         Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}

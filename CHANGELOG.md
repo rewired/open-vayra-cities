@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Slice 014j: remove SVG polyline overlay projection (`toProjectedLineSegments`, `projectionRefreshTick`, and render-lifecycle projection refresh binding) as active line rendering in `MapWorkspaceSurface`.
+- Slice 014j: add typed GeoJSON LineString builders for completed session lines and active draft preview under `apps/web/src/map-workspace/lineGeoJson.ts`.
+- Slice 014j: centralize completed/draft line source and layer identifiers plus paint/filter style constants in `mapRenderConstants.ts`, including selected-line filter split.
+- Slice 014j: register MapLibre completed/draft line sources and line layers, refresh source data reactively from `sessionLines`, `selectedLineId`, `draftLineState.stopIds`, and placed stop coordinates.
+- Slice 014j: wire completed-line selection through layer-constrained feature click handlers (`map.on('click', completed-line-layer-id, ...)`) while preserving inspect/build-line stop interaction semantics.
+- Add ADR 0042 documenting map-native line rendering and line-feature interaction ownership.
+
 - Slice 014i: remove DOM stop-marker rendering (`createStopMarker`/`syncStopMarkers`) as active map truth and migrate stop rendering to one map-native GeoJSON source with circle/symbol layers.
 - Slice 014i: add a typed stop GeoJSON builder with explicit stop feature properties (`stopId`, `selected`, `draftMember`, `buildLineInteractive`) and refresh source data from reactive stop/tool state.
 - Slice 014i: replace marker-element click handling with layer-constrained feature clicks (`map.on('click', stop-layer-id, ...)`) for inspect/build-line stop interaction flow.

@@ -141,20 +141,39 @@ interface MapLibreGeoJsonPointGeometry {
 }
 
 /**
+ * Minimal GeoJSON LineString geometry used by source data updates.
+ */
+interface MapLibreGeoJsonLineStringGeometry {
+  readonly type: 'LineString';
+  readonly coordinates: readonly MapLibreLngLatTuple[];
+}
+
+/**
+ * Minimal GeoJSON geometry union used by typed source updates.
+ */
+type MapLibreGeoJsonGeometry = MapLibreGeoJsonPointGeometry | MapLibreGeoJsonLineStringGeometry;
+
+/**
  * Minimal GeoJSON feature shape used by typed source updates.
  */
-export interface MapLibreGeoJsonFeature<TProperties extends object = object> {
+export interface MapLibreGeoJsonFeature<
+  TProperties extends object = object,
+  TGeometry extends MapLibreGeoJsonGeometry = MapLibreGeoJsonGeometry
+> {
   readonly type: 'Feature';
-  readonly geometry: MapLibreGeoJsonPointGeometry;
+  readonly geometry: TGeometry;
   readonly properties: TProperties;
 }
 
 /**
  * Minimal GeoJSON collection shape used by typed source updates.
  */
-export interface MapLibreGeoJsonFeatureCollection<TProperties extends object = object> {
+export interface MapLibreGeoJsonFeatureCollection<
+  TProperties extends object = object,
+  TGeometry extends MapLibreGeoJsonGeometry = MapLibreGeoJsonGeometry
+> {
   readonly type: 'FeatureCollection';
-  readonly features: readonly MapLibreGeoJsonFeature<TProperties>[];
+  readonly features: readonly MapLibreGeoJsonFeature<TProperties, TGeometry>[];
 }
 
 /**
@@ -165,17 +184,23 @@ type MapLibreExpressionValue = string | number | boolean | readonly unknown[];
 /**
  * Minimal map source specification for GeoJSON-backed source registration.
  */
-interface MapLibreGeoJsonSourceSpecification<TProperties extends object = object> {
+interface MapLibreGeoJsonSourceSpecification<
+  TProperties extends object = object,
+  TGeometry extends MapLibreGeoJsonGeometry = MapLibreGeoJsonGeometry
+> {
   readonly type: 'geojson';
-  readonly data: MapLibreGeoJsonFeatureCollection<TProperties>;
+  readonly data: MapLibreGeoJsonFeatureCollection<TProperties, TGeometry>;
 }
 
 /**
  * Runtime GeoJSON source handle used for in-place data refresh.
  */
-export interface MapLibreGeoJsonSource<TProperties extends object = object> {
+export interface MapLibreGeoJsonSource<
+  TProperties extends object = object,
+  TGeometry extends MapLibreGeoJsonGeometry = MapLibreGeoJsonGeometry
+> {
   /** Replaces source data while preserving source identity and bound layers. */
-  setData(data: MapLibreGeoJsonFeatureCollection<TProperties>): void;
+  setData(data: MapLibreGeoJsonFeatureCollection<TProperties, TGeometry>): void;
 }
 
 /**
@@ -183,10 +208,11 @@ export interface MapLibreGeoJsonSource<TProperties extends object = object> {
  */
 export interface MapLibreLayerSpecification {
   readonly id: string;
-  readonly type: 'circle' | 'symbol';
+  readonly type: 'circle' | 'symbol' | 'line';
   readonly source: string;
   readonly paint?: Readonly<Record<string, MapLibreExpressionValue>>;
   readonly layout?: Readonly<Record<string, MapLibreExpressionValue>>;
+  readonly filter?: readonly unknown[];
 }
 
 /**
