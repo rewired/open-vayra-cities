@@ -5,7 +5,7 @@ import {
   MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE
 } from '../domain/constants/lineBuilding';
 import type { Line } from '../domain/types/line';
-import { createLineId } from '../domain/types/line';
+import { createLineId, createUnsetLineFrequencyByTimeBand } from '../domain/types/line';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
 import type { LineBuildSelectionState, LineSelectionState, WorkspaceToolMode } from '../App';
@@ -697,7 +697,8 @@ export function MapWorkspaceSurface({
     const nextLine: Line = {
       id: createLineId(`line-${nextLineOrdinal}`),
       label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${nextLineOrdinal}`,
-      stopIds: draftLineState.stopIds
+      stopIds: draftLineState.stopIds,
+      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
     };
     setSessionLines((currentLines) => [...currentLines, nextLine]);
     setSelectedLineId(nextLine.id);

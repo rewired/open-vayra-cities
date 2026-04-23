@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Add branded line-frequency domain typing (`LineFrequencyMinutes`) and canonical per-time-band line frequency mapping (`LineFrequencyByTimeBand`) on `Line`.
+- Initialize newly completed build-line session lines with explicit per-band unset frequency state keyed by canonical MVP time bands.
+- Add ADR 0029 documenting completed-line frequency initialization boundaries and non-goals.
 - Add canonical `TimeBandId` domain type for MVP service-planning time-band identifiers.
 - Add canonical ordered `MVP_TIME_BAND_IDS` and `TIME_BAND_DISPLAY_LABELS` domain constants for UI-safe reuse.
 - Update inspector rendering to consume canonical time-band constants instead of local literals.
