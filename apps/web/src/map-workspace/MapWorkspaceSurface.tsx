@@ -385,6 +385,27 @@ const createStopMarker = (
   return new window.maplibregl.Marker({ element: markerElement }).setLngLat([stop.position.lng, stop.position.lat]);
 };
 
+interface StopMarkerInteractionContext {
+  readonly activeToolMode: WorkspaceToolMode;
+  readonly sessionLineCount: number;
+  readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
+  readonly clearSelectedCompletedLine: () => void;
+  readonly appendStopToDraftLine: (stopId: StopId, sessionLineCount: number) => void;
+}
+
+const handleStopMarkerInteraction = (stop: Stop, context: StopMarkerInteractionContext): void => {
+  if (context.activeToolMode === 'build-line') {
+    context.appendStopToDraftLine(stop.id, context.sessionLineCount);
+    return;
+  }
+
+  if (context.activeToolMode === 'inspect') {
+    context.clearSelectedCompletedLine();
+  }
+
+  context.onStopSelectionChange(toStopSelectionState(stop));
+};
+
 const buildDeterministicStop = (nextOrdinal: number, lng: number, lat: number): Stop => ({
   id: createStopId(`stop-${nextOrdinal}`),
   position: { lng, lat },
@@ -559,11 +580,26 @@ export function MapWorkspaceSurface({
   const [placedStops, setPlacedStops] = useState<readonly Stop[]>([]);
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
   const [projectionRefreshTick, setProjectionRefreshTick] = useState(0);
+  const activeToolModeRef = useRef<WorkspaceToolMode>(activeToolMode);
+  const sessionLineCountRef = useRef(sessionLines.length);
+  const onStopSelectionChangeRef = useRef(onStopSelectionChange);
   const draftStopIdSet: ReadonlySet<StopId> = new Set(draftLineState.stopIds);
 
   const clearSelectedCompletedLine = (): void => {
     onSelectedLineIdChange(null);
   };
+
+  useEffect(() => {
+    activeToolModeRef.current = activeToolMode;
+  }, [activeToolMode]);
+
+  useEffect(() => {
+    sessionLineCountRef.current = sessionLines.length;
+  }, [sessionLines.length]);
+
+  useEffect(() => {
+    onStopSelectionChangeRef.current = onStopSelectionChange;
+  }, [onStopSelectionChange]);
 
   useEffect(() => {
     const containerElement = mapContainerRef.current;
@@ -671,31 +707,30 @@ export function MapWorkspaceSurface({
       draftStopIds: draftStopIdSet,
       isBuildLineModeActive: activeToolMode === 'build-line',
       onStopMarkerClick: (stop) => {
-        if (activeToolMode === 'build-line') {
-          setDraftLineState((currentDraft) => {
-            const nextMetadata =
-              currentDraft.metadata ??
-              ({
-                draftOrdinal: sessionLines.length + 1,
-                startedAtIsoUtc: new Date().toISOString()
-              } as const);
+        handleStopMarkerInteraction(stop, {
+          activeToolMode: activeToolModeRef.current,
+          sessionLineCount: sessionLineCountRef.current,
+          onStopSelectionChange: onStopSelectionChangeRef.current,
+          clearSelectedCompletedLine,
+          appendStopToDraftLine: (stopId, sessionLineCount) => {
+            setDraftLineState((currentDraft) => {
+              const nextMetadata =
+                currentDraft.metadata ??
+                ({
+                  draftOrdinal: sessionLineCount + 1,
+                  startedAtIsoUtc: new Date().toISOString()
+                } as const);
 
-            return {
-              stopIds: [...currentDraft.stopIds, stop.id],
-              metadata: nextMetadata
-            };
-          });
-          return;
-        }
-
-        if (activeToolMode === 'inspect') {
-          clearSelectedCompletedLine();
-        }
-
-        onStopSelectionChange(toStopSelectionState(stop));
+              return {
+                stopIds: [...currentDraft.stopIds, stopId],
+                metadata: nextMetadata
+              };
+            });
+          }
+        });
       }
     });
-  }, [activeToolMode, draftStopIdSet, onStopSelectionChange, placedStops, selectedStopId, sessionLines.length]);
+  }, [activeToolMode, draftStopIdSet, placedStops, selectedStopId]);
 
   const pointerSummary = interactionState.pointer
     ? `x:${interactionState.pointer.screenX.toFixed(1)} y:${interactionState.pointer.screenY.toFixed(1)}`
