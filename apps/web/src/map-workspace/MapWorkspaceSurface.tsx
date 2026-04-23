@@ -15,13 +15,21 @@ import {
   STREET_SNAP_FALLBACK_QUERY_OFFSETS,
   STREET_SNAP_MAX_PIXEL_TOLERANCE
 } from './mapWorkspacePlacementConstants';
-import { STOP_MARKER_ANCHOR, STOP_MARKER_OFFSET } from './mapWorkspaceMarkerConstants';
+import {
+  MAP_LAYER_ID_STOPS_CIRCLE,
+  MAP_LAYER_ID_STOPS_LABEL,
+  MAP_SOURCE_ID_STOPS,
+  MAP_STOP_CIRCLE_LAYER_STYLE,
+  MAP_STOP_LABEL_LAYER_LAYOUT,
+  MAP_STOP_LABEL_LAYER_PAINT
+} from './mapRenderConstants';
+import { buildStopFeatureCollection } from './stopGeoJson';
 import {
   getSourceRefsForLayerIds,
   type MapLibreFeatureGeometry,
+  type MapLibreGeoJsonSource,
   type MapLibreInteractionEvent,
-  type MapLibreMap,
-  type MapLibreMarker
+  type MapLibreMap
 } from './maplibreGlobal';
 
 type MapSurfaceInteractionStatus = 'idle' | 'pointer-active' | 'click-captured' | 'placement-rejected';
@@ -84,6 +92,10 @@ interface MapWorkspaceResizeBinding {
 }
 
 interface MapProjectionRefreshBinding {
+  readonly dispose: () => void;
+}
+
+interface StopFeatureInteractionBinding {
   readonly dispose: () => void;
 }
 
@@ -603,47 +615,84 @@ const createMapWorkspaceInstance = (containerElement: HTMLDivElement): MapLibreM
   return mapInstance;
 };
 
-const createStopMarker = (
-  stop: Stop,
-  onMarkerClick: (stop: Stop) => void
-): MapLibreMarker => {
-  const markerElement = document.createElement('div');
-  markerElement.className = 'map-workspace__stop-marker';
-  markerElement.title = stop.label ?? stop.id;
-  markerElement.tabIndex = 0;
-  markerElement.setAttribute('role', 'button');
-  markerElement.setAttribute('aria-label', `Select ${stop.label ?? stop.id}`);
-  markerElement.addEventListener('click', (event: MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    onMarkerClick(stop);
-  });
-  markerElement.addEventListener('keydown', (event: KeyboardEvent) => {
-    if (event.key !== 'Enter' && event.key !== ' ') {
-      return;
-    }
+const ensureStopRenderSourceAndLayers = (map: MapLibreMap): void => {
+  if (!map.getSource(MAP_SOURCE_ID_STOPS)) {
+    map.addSource(MAP_SOURCE_ID_STOPS, {
+      type: 'geojson',
+      data: buildStopFeatureCollection({
+        stops: [],
+        selectedStopId: null,
+        draftStopIds: new Set(),
+        buildLineInteractive: false
+      })
+    });
+  }
 
-    event.preventDefault();
-    event.stopPropagation();
-    onMarkerClick(stop);
-  });
+  if (!map.getLayer(MAP_LAYER_ID_STOPS_CIRCLE)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_STOPS_CIRCLE,
+      type: 'circle',
+      source: MAP_SOURCE_ID_STOPS,
+      paint: MAP_STOP_CIRCLE_LAYER_STYLE
+    });
+  }
 
-  return new window.maplibregl.Marker({
-    element: markerElement,
-    anchor: STOP_MARKER_ANCHOR,
-    offset: STOP_MARKER_OFFSET
-  }).setLngLat([stop.position.lng, stop.position.lat]);
+  if (!map.getLayer(MAP_LAYER_ID_STOPS_LABEL)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_STOPS_LABEL,
+      type: 'symbol',
+      source: MAP_SOURCE_ID_STOPS,
+      layout: MAP_STOP_LABEL_LAYER_LAYOUT,
+      paint: MAP_STOP_LABEL_LAYER_PAINT
+    });
+  }
 };
 
-interface StopMarkerInteractionContext {
+const syncStopSourceData = ({
+  map,
+  stops,
+  selectedStopId,
+  draftStopIds,
+  isBuildLineModeActive
+}: {
+  readonly map: MapLibreMap;
+  readonly stops: readonly Stop[];
+  readonly selectedStopId: StopId | null;
+  readonly draftStopIds: ReadonlySet<StopId>;
+  readonly isBuildLineModeActive: boolean;
+}): void => {
+  const stopSource = map.getSource(MAP_SOURCE_ID_STOPS) as MapLibreGeoJsonSource | undefined;
+
+  if (!stopSource) {
+    return;
+  }
+
+  stopSource.setData(
+    buildStopFeatureCollection({
+      stops,
+      selectedStopId,
+      draftStopIds,
+      buildLineInteractive: isBuildLineModeActive
+    })
+  );
+};
+
+interface StopFeatureInteractionContext {
   readonly activeToolMode: WorkspaceToolMode;
   readonly sessionLineCount: number;
+  readonly stopsById: ReadonlyMap<StopId, Stop>;
   readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
   readonly clearSelectedCompletedLine: () => void;
   readonly appendStopToDraftLine: (stopId: StopId, sessionLineCount: number) => void;
 }
 
-const handleStopMarkerInteraction = (stop: Stop, context: StopMarkerInteractionContext): void => {
+const handleStopFeatureInteraction = (stopId: StopId, context: StopFeatureInteractionContext): void => {
+  const stop = context.stopsById.get(stopId);
+
+  if (!stop) {
+    return;
+  }
+
   if (context.activeToolMode === 'build-line') {
     context.appendStopToDraftLine(stop.id, context.sessionLineCount);
     return;
@@ -654,6 +703,19 @@ const handleStopMarkerInteraction = (stop: Stop, context: StopMarkerInteractionC
   }
 
   context.onStopSelectionChange(toStopSelectionState(stop));
+};
+
+const bindStopFeatureInteractions = (
+  map: MapLibreMap,
+  onStopFeatureClick: (event: MapLibreInteractionEvent) => void
+): StopFeatureInteractionBinding => {
+  map.on('click', MAP_LAYER_ID_STOPS_CIRCLE, onStopFeatureClick);
+
+  return {
+    dispose: () => {
+      map.off('click', MAP_LAYER_ID_STOPS_CIRCLE, onStopFeatureClick);
+    }
+  };
 };
 
 const buildDeterministicStop = (nextOrdinal: number, lng: number, lat: number): Stop => ({
@@ -758,53 +820,6 @@ const toProjectedLineSegments = ({
     })
     .filter((segment): segment is ProjectedLineSegment => segment !== null);
 
-const syncStopMarkers = ({
-  map,
-  stops,
-  markerByStopId,
-  onStopMarkerClick,
-  selectedStopId,
-  draftStopIds,
-  isBuildLineModeActive
-}: {
-  readonly map: MapLibreMap;
-  readonly stops: readonly Stop[];
-  readonly markerByStopId: Map<Stop['id'], MapLibreMarker>;
-  readonly onStopMarkerClick: (stop: Stop) => void;
-  readonly selectedStopId: StopId | null;
-  readonly draftStopIds: ReadonlySet<StopId>;
-  readonly isBuildLineModeActive: boolean;
-}): void => {
-  const activeStopIds = new Set(stops.map((stop) => stop.id));
-
-  stops.forEach((stop) => {
-    if (markerByStopId.has(stop.id)) {
-      return;
-    }
-
-    const marker = createStopMarker(stop, onStopMarkerClick).addTo(map);
-    markerByStopId.set(stop.id, marker);
-  });
-
-  markerByStopId.forEach((marker, stopId) => {
-    if (activeStopIds.has(stopId)) {
-      return;
-    }
-
-    marker.remove();
-    markerByStopId.delete(stopId);
-  });
-
-  markerByStopId.forEach((marker, stopId) => {
-    const markerElement = marker.getElement();
-    const isSelected = selectedStopId === stopId;
-    const isDraftMember = draftStopIds.has(stopId);
-    markerElement.classList.toggle('map-workspace__stop-marker--selected', isSelected);
-    markerElement.classList.toggle('map-workspace__stop-marker--draft-member', isDraftMember);
-    markerElement.classList.toggle('map-workspace__stop-marker--build-line-interactive', isBuildLineModeActive);
-  });
-};
-
 /**
  * Renders the CityOps workspace as a real MapLibre map surface with local click telemetry and minimal stop-placement validation.
  */
@@ -821,7 +836,6 @@ export function MapWorkspaceSurface({
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
-  const stopMarkerRef = useRef<Map<Stop['id'], MapLibreMarker>>(new Map());
   const [interactionState, setInteractionState] = useState<MapSurfaceInteractionState>({
     status: 'idle',
     pointer: null
@@ -833,7 +847,11 @@ export function MapWorkspaceSurface({
   const activeToolModeRef = useRef<WorkspaceToolMode>(activeToolMode);
   const sessionLineCountRef = useRef(sessionLines.length);
   const onStopSelectionChangeRef = useRef(onStopSelectionChange);
+  const selectedStopIdRef = useRef<StopId | null>(selectedStopId);
+  const placedStopsRef = useRef<readonly Stop[]>(placedStops);
   const draftStopIdSet: ReadonlySet<StopId> = new Set(draftLineState.stopIds);
+  const draftStopIdSetRef = useRef<ReadonlySet<StopId>>(draftStopIdSet);
+  const stopsByIdRef = useRef<ReadonlyMap<StopId, Stop>>(new Map());
 
   const clearSelectedCompletedLine = (): void => {
     onSelectedLineIdChange(null);
@@ -852,6 +870,19 @@ export function MapWorkspaceSurface({
   }, [onStopSelectionChange]);
 
   useEffect(() => {
+    selectedStopIdRef.current = selectedStopId;
+  }, [selectedStopId]);
+
+  useEffect(() => {
+    placedStopsRef.current = placedStops;
+    stopsByIdRef.current = new Map(placedStops.map((stop) => [stop.id, stop] as const));
+  }, [placedStops]);
+
+  useEffect(() => {
+    draftStopIdSetRef.current = draftStopIdSet;
+  }, [draftStopIdSet]);
+
+  useEffect(() => {
     const containerElement = mapContainerRef.current;
 
     if (!containerElement || mapInstanceRef.current) {
@@ -860,12 +891,22 @@ export function MapWorkspaceSurface({
 
     const mapInstance = createMapWorkspaceInstance(containerElement);
     mapInstanceRef.current = mapInstance;
+    const onMapLoad = (): void => {
+      ensureStopRenderSourceAndLayers(mapInstance);
+      syncStopSourceData({
+        map: mapInstance,
+        stops: placedStopsRef.current,
+        selectedStopId: selectedStopIdRef.current,
+        draftStopIds: draftStopIdSetRef.current,
+        isBuildLineModeActive: activeToolModeRef.current === 'build-line'
+      });
+    };
+    mapInstance.on('load', onMapLoad);
     const mapResizeBinding = setupMapResizeBinding(containerElement, mapInstanceRef);
 
     return () => {
+      mapInstance.off('load', onMapLoad);
       mapResizeBinding.dispose();
-      stopMarkerRef.current.forEach((marker) => marker.remove());
-      stopMarkerRef.current.clear();
       mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
     };
@@ -947,38 +988,59 @@ export function MapWorkspaceSurface({
       return;
     }
 
-    syncStopMarkers({
+    ensureStopRenderSourceAndLayers(mapInstance);
+    syncStopSourceData({
       map: mapInstance,
       stops: placedStops,
-      markerByStopId: stopMarkerRef.current,
       selectedStopId,
       draftStopIds: draftStopIdSet,
-      isBuildLineModeActive: activeToolMode === 'build-line',
-      onStopMarkerClick: (stop) => {
-        handleStopMarkerInteraction(stop, {
-          activeToolMode: activeToolModeRef.current,
-          sessionLineCount: sessionLineCountRef.current,
-          onStopSelectionChange: onStopSelectionChangeRef.current,
-          clearSelectedCompletedLine,
-          appendStopToDraftLine: (stopId, sessionLineCount) => {
-            setDraftLineState((currentDraft) => {
-              const nextMetadata =
-                currentDraft.metadata ??
-                ({
-                  draftOrdinal: sessionLineCount + 1,
-                  startedAtIsoUtc: new Date().toISOString()
-                } as const);
-
-              return {
-                stopIds: [...currentDraft.stopIds, stopId],
-                metadata: nextMetadata
-              };
-            });
-          }
-        });
-      }
+      isBuildLineModeActive: activeToolMode === 'build-line'
     });
   }, [activeToolMode, draftStopIdSet, placedStops, selectedStopId]);
+
+  useEffect(() => {
+    const mapInstance = mapInstanceRef.current;
+
+    if (!mapInstance) {
+      return;
+    }
+
+    const stopInteractionBinding = bindStopFeatureInteractions(mapInstance, (event) => {
+      const clickedFeature = event.features?.[0];
+      const stopId = clickedFeature?.properties?.stopId;
+
+      if (typeof stopId !== 'string') {
+        return;
+      }
+
+      handleStopFeatureInteraction(createStopId(stopId), {
+        activeToolMode: activeToolModeRef.current,
+        sessionLineCount: sessionLineCountRef.current,
+        stopsById: stopsByIdRef.current,
+        onStopSelectionChange: onStopSelectionChangeRef.current,
+        clearSelectedCompletedLine,
+        appendStopToDraftLine: (nextStopId, sessionLineCount) => {
+          setDraftLineState((currentDraft) => {
+            const nextMetadata =
+              currentDraft.metadata ??
+              ({
+                draftOrdinal: sessionLineCount + 1,
+                startedAtIsoUtc: new Date().toISOString()
+              } as const);
+
+            return {
+              stopIds: [...currentDraft.stopIds, nextStopId],
+              metadata: nextMetadata
+            };
+          });
+        }
+      });
+    });
+
+    return () => {
+      stopInteractionBinding.dispose();
+    };
+  }, []);
 
   const pointerSummary = interactionState.pointer
     ? `x:${interactionState.pointer.screenX.toFixed(1)} y:${interactionState.pointer.screenY.toFixed(1)}`

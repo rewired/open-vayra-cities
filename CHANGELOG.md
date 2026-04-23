@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Slice 014i: remove DOM stop-marker rendering (`createStopMarker`/`syncStopMarkers`) as active map truth and migrate stop rendering to one map-native GeoJSON source with circle/symbol layers.
+- Slice 014i: add a typed stop GeoJSON builder with explicit stop feature properties (`stopId`, `selected`, `draftMember`, `buildLineInteractive`) and refresh source data from reactive stop/tool state.
+- Slice 014i: replace marker-element click handling with layer-constrained feature clicks (`map.on('click', stop-layer-id, ...)`) for inspect/build-line stop interaction flow.
+- Add ADR 0041 documenting map-native stop source/layer rendering and feature interaction boundaries.
+
 - Slice 014h: switch map overlay projection refresh binding from interaction-only (`move`/`zoom`/`rotate`) triggers to render-lifecycle (`render` + `idle`) subscriptions so projection recomputation tracks active map animation frames.
 - Slice 014h: preserve lightweight single-`requestAnimationFrame` refresh coalescing while keeping stop-order schematic polyline projection semantics unchanged.
 - Add ADR 0040 documenting render-lifecycle-driven projection refresh boundaries and explicit non-goals.
