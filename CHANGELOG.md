@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Slice 014c: fix stale stop-marker mode closures so existing markers always resolve click behavior from the current active tool mode.
+- Slice 014c: restore completed-line overlay clickability for practical line selection via rendered completed polylines.
+- Slice 014c: fix Material Symbols rendering baseline so ligature names render as icons instead of raw text.
+- Add ADR 0035 documenting stale marker interaction ownership, completed-line overlay clickability, and icon rendering corrections.
+
 - Slice 014b: enlarge stop marker hit targets and add stronger pointer/hover/active/focus-visible affordances so desktop build-line marker interaction no longer requires pixel-precise clicks.
 - Slice 014b: add build-line draft marker membership styling so stop markers already appended to the current draft line are visually confirmed immediately.
 - Slice 014b: thread typed draft stop-id membership (`ReadonlySet<StopId>`) into marker synchronization without weakening line-build state contracts.
