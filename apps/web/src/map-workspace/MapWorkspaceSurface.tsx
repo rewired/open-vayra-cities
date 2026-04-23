@@ -146,6 +146,14 @@ interface GeographicPoint {
 interface SnapCandidate {
   readonly snappedPosition: GeographicPoint;
   readonly pixelDistance: number;
+  readonly ranking: SnapCandidateRankingMetadata;
+}
+
+type SnapCandidateProvenance = 'direct-hit' | 'fallback';
+
+interface SnapCandidateRankingMetadata {
+  readonly provenance: SnapCandidateProvenance;
+  readonly featureLayerMatchStrength: number;
 }
 
 const STREET_LAYER_HINTS = ['road', 'street', 'highway', 'bridge', 'tunnel', 'transport', 'path'] as const;
@@ -331,10 +339,74 @@ const resolveNearestPointOnSegment = (
   return { ratio: clampedRatio, distance };
 };
 
+const toProvenanceRank = (provenance: SnapCandidateProvenance): number => (provenance === 'direct-hit' ? 0 : 1);
+
+const compareSnapCandidates = (left: SnapCandidate, right: SnapCandidate): number => {
+  const provenanceDelta = toProvenanceRank(left.ranking.provenance) - toProvenanceRank(right.ranking.provenance);
+  if (provenanceDelta !== 0) {
+    return provenanceDelta;
+  }
+
+  const featureMatchStrengthDelta = left.ranking.featureLayerMatchStrength - right.ranking.featureLayerMatchStrength;
+  if (featureMatchStrengthDelta !== 0) {
+    return featureMatchStrengthDelta;
+  }
+
+  const pixelDistanceDelta = left.pixelDistance - right.pixelDistance;
+  if (pixelDistanceDelta !== 0) {
+    return pixelDistanceDelta;
+  }
+
+  const lngDelta = left.snappedPosition.lng - right.snappedPosition.lng;
+  if (lngDelta !== 0) {
+    return lngDelta;
+  }
+
+  return left.snappedPosition.lat - right.snappedPosition.lat;
+};
+
+const resolvePreferredSnapCandidate = (
+  currentBest: SnapCandidate | null,
+  nextCandidate: SnapCandidate
+): SnapCandidate => {
+  if (!currentBest) {
+    return nextCandidate;
+  }
+
+  return compareSnapCandidates(nextCandidate, currentBest) < 0 ? nextCandidate : currentBest;
+};
+
+const resolveFeatureLayerMatchStrength = (
+  feature: {
+    readonly layer?: { readonly id?: string };
+    readonly source?: string;
+    readonly sourceLayer?: string;
+    readonly 'source-layer'?: string;
+  },
+  streetLayerIds: readonly string[]
+): number => {
+  const isStreetLayerIdMatch = typeof feature.layer?.id === 'string' && streetLayerIds.includes(feature.layer.id);
+  const hasStreetLayerHint = includesHint(feature.layer?.id, STREET_LAYER_HINTS);
+  const hasStreetSourceHint =
+    includesHint(feature.source, STREET_SOURCE_HINTS) ||
+    includesHint(feature.sourceLayer ?? feature['source-layer'], STREET_SOURCE_HINTS);
+
+  if (isStreetLayerIdMatch && (hasStreetLayerHint || hasStreetSourceHint)) {
+    return 0;
+  }
+
+  if (isStreetLayerIdMatch || hasStreetLayerHint || hasStreetSourceHint) {
+    return 1;
+  }
+
+  return 2;
+};
+
 const resolveSnapCandidateForLineCoordinates = (
   map: MapLibreMap,
   clickPoint: ScreenPoint,
-  coordinates: readonly (readonly [number, number])[]
+  coordinates: readonly (readonly [number, number])[],
+  ranking: SnapCandidateRankingMetadata
 ): SnapCandidate | null => {
   if (coordinates.length < 2) {
     return null;
@@ -362,11 +434,9 @@ const resolveSnapCandidateForLineCoordinates = (
       lng: segmentStartCoordinate[0] + (segmentEndCoordinate[0] - segmentStartCoordinate[0]) * nearestOnSegment.ratio,
       lat: segmentStartCoordinate[1] + (segmentEndCoordinate[1] - segmentStartCoordinate[1]) * nearestOnSegment.ratio
     };
-    const nextCandidate: SnapCandidate = { snappedPosition, pixelDistance: nearestOnSegment.distance };
+    const nextCandidate: SnapCandidate = { snappedPosition, pixelDistance: nearestOnSegment.distance, ranking };
 
-    if (!nearestCandidate || nextCandidate.pixelDistance < nearestCandidate.pixelDistance) {
-      nearestCandidate = nextCandidate;
-    }
+    nearestCandidate = resolvePreferredSnapCandidate(nearestCandidate, nextCandidate);
   }
 
   return nearestCandidate;
@@ -375,7 +445,15 @@ const resolveSnapCandidateForLineCoordinates = (
 const resolveBestSnapCandidateFromFeatures = (
   map: MapLibreMap,
   clickPoint: ScreenPoint,
-  features: readonly { readonly geometry?: MapLibreFeatureGeometry }[]
+  features: readonly {
+    readonly geometry?: MapLibreFeatureGeometry;
+    readonly layer?: { readonly id?: string };
+    readonly source?: string;
+    readonly sourceLayer?: string;
+    readonly 'source-layer'?: string;
+  }[],
+  streetLayerIds: readonly string[],
+  provenance: SnapCandidateProvenance
 ): SnapCandidate | null => {
   let bestCandidate: SnapCandidate | null = null;
 
@@ -384,17 +462,19 @@ const resolveBestSnapCandidateFromFeatures = (
       continue;
     }
 
+    const ranking: SnapCandidateRankingMetadata = {
+      provenance,
+      featureLayerMatchStrength: resolveFeatureLayerMatchStrength(feature, streetLayerIds)
+    };
     const lineCollections = toLineCoordinateCollections(feature.geometry);
     for (const lineCoordinates of lineCollections) {
-      const candidate = resolveSnapCandidateForLineCoordinates(map, clickPoint, lineCoordinates);
+      const candidate = resolveSnapCandidateForLineCoordinates(map, clickPoint, lineCoordinates, ranking);
 
       if (!candidate) {
         continue;
       }
 
-      if (!bestCandidate || candidate.pixelDistance < bestCandidate.pixelDistance) {
-        bestCandidate = candidate;
-      }
+      bestCandidate = resolvePreferredSnapCandidate(bestCandidate, candidate);
     }
   }
 
@@ -416,7 +496,7 @@ const resolveDirectHitSnapCandidate = (
         ] as const);
 
   const directHitFeatures = map.queryRenderedFeatures(directHitQueryPointOrBox, { layers: streetLayerIds });
-  return resolveBestSnapCandidateFromFeatures(map, event.point, directHitFeatures);
+  return resolveBestSnapCandidateFromFeatures(map, event.point, directHitFeatures, streetLayerIds, 'direct-hit');
 };
 
 const resolveFallbackSnapCandidate = (
@@ -429,15 +509,13 @@ const resolveFallbackSnapCandidate = (
   for (const offset of STREET_SNAP_FALLBACK_QUERY_OFFSETS) {
     const queryPoint: ScreenPoint = { x: event.point.x + offset.deltaX, y: event.point.y + offset.deltaY };
     const fallbackFeatures = map.queryRenderedFeatures(queryPoint, { layers: streetLayerIds });
-    const candidate = resolveBestSnapCandidateFromFeatures(map, event.point, fallbackFeatures);
+    const candidate = resolveBestSnapCandidateFromFeatures(map, event.point, fallbackFeatures, streetLayerIds, 'fallback');
 
     if (!candidate) {
       continue;
     }
 
-    if (!bestCandidate || candidate.pixelDistance < bestCandidate.pixelDistance) {
-      bestCandidate = candidate;
-    }
+    bestCandidate = resolvePreferredSnapCandidate(bestCandidate, candidate);
   }
 
   return bestCandidate;
@@ -453,12 +531,12 @@ const resolveSnappedStreetPosition = (
   }
 
   const directHitCandidate = resolveDirectHitSnapCandidate(map, event, streetLayerIds);
-  if (directHitCandidate) {
-    return directHitCandidate.snappedPosition;
-  }
-
   const fallbackCandidate = resolveFallbackSnapCandidate(map, event, streetLayerIds);
-  return fallbackCandidate?.snappedPosition ?? null;
+  const bestCandidate =
+    directHitCandidate && fallbackCandidate
+      ? resolvePreferredSnapCandidate(directHitCandidate, fallbackCandidate)
+      : directHitCandidate ?? fallbackCandidate;
+  return bestCandidate?.snappedPosition ?? null;
 };
 
 const createNeutralMapTelemetryHandlers = ({ setInteractionState }: NeutralMapTelemetryContracts): NeutralMapTelemetryHandlers => ({

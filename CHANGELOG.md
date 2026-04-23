@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Slice 014m: extend street snap candidate ranking with deterministic metadata precedence (direct-hit provenance, then feature/layer match strength, then pixel distance).
+- Slice 014m: centralize snap candidate ordering in one compare helper and reuse it across line-segment, direct-hit, fallback, and final candidate resolution paths for consistent selection behavior.
+- Add ADR 0045 documenting deterministic street snap ranking and shared compare semantics.
+
 - Slice 014l: add a map style-readiness guard for reactive stop/line source-layer sync so source and layer registration only runs after MapLibre style load completion.
 - Slice 014l: extend local MapLibre typing with `isStyleLoaded()` and `'styledata'` lifecycle event support for strict typed readiness gating.
 - Add ADR 0044 documenting style-readiness gating for map source/layer synchronization and crash prevention boundaries.
