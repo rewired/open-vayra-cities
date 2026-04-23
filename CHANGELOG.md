@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Slice 014d: align `.app-material-icon` with Material Symbols ligature rendering expectations (`display`, `normal` style/weight, and WebKit ligature feature setting) while preserving the existing Material icon baseline and typed icon name flow.
+- Add ADR 0036 documenting Material Symbols ligature rendering contract alignment and accessibility non-goals.
+
 - Slice 014c: fix stale stop-marker mode closures so existing markers always resolve click behavior from the current active tool mode.
 - Slice 014c: restore completed-line overlay clickability for practical line selection via rendered completed polylines.
 - Slice 014c: fix Material Symbols rendering baseline so ligature names render as icons instead of raw text.
