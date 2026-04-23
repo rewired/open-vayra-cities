@@ -694,19 +694,35 @@ export function MapWorkspaceSurface({
   };
 
   const handleDraftComplete = (): void => {
-    if (draftLineState.stopIds.length < MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE) {
+    const draftStopIds = draftLineState.stopIds;
+
+    if (draftStopIds.length < MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE) {
       return;
     }
 
-    const nextLineOrdinal = sessionLines.length + 1;
+    let createdLineId: Line['id'] | null = null;
     const nextLine: Line = {
-      id: createLineId(`line-${nextLineOrdinal}`),
-      label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${nextLineOrdinal}`,
-      stopIds: draftLineState.stopIds,
+      id: createLineId(`line-${sessionLines.length + 1}`),
+      label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${sessionLines.length + 1}`,
+      stopIds: draftStopIds,
       frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
     };
-    onSessionLinesChange((currentLines) => [...currentLines, nextLine]);
-    onSelectedLineIdChange(nextLine.id);
+
+    onSessionLinesChange((currentLines) => {
+      const createdLineOrdinal = currentLines.length + 1;
+      const createdLine: Line = {
+        ...nextLine,
+        id: createLineId(`line-${createdLineOrdinal}`),
+        label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${createdLineOrdinal}`
+      };
+      createdLineId = createdLine.id;
+      return [...currentLines, createdLine];
+    });
+
+    if (createdLineId !== null) {
+      onSelectedLineIdChange(createdLineId);
+    }
+
     setDraftLineState(INITIAL_DRAFT_LINE_STATE);
   };
 

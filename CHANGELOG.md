@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Slice 014a: keep build-line completion strictly user-triggered via `Complete line`, preserving the explicit minimum-stop guard and ordered completion transition (append session line, select it, then reset draft).
+- Add ADR 0033 documenting explicit user-triggered line completion boundaries and non-goals against auto-complete side effects.
+
 - Slice 014: add a compact static network summary in the inspector with structural-only KPI counts for total stops and completed lines.
 - Slice 014: add selected completed-line structural KPI details (stop count plus configured/unconfigured canonical time-band counts) with explicit empty-state messaging.
 - Slice 014: expose placed-stop count from map workspace to shell through a minimal callback boundary to support truthful shell-level structural summaries.
