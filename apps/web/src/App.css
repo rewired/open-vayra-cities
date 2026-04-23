@@ -209,30 +209,54 @@ body {
 
 
 .map-workspace__stop-marker {
+  position: relative;
   width: 18px;
   height: 18px;
+  --stop-marker-affordance-scale: 1;
   border: 2px solid #dbe7f8;
   border-radius: 999px;
   background: #3c73c0;
   box-shadow: 0 0 0 3px rgb(15 23 35 / 50%), 0 0 0 7px rgb(60 115 192 / 24%);
   cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease, border-color 120ms ease;
+  transition: box-shadow 120ms ease, background-color 120ms ease, border-color 120ms ease;
+}
+
+.map-workspace__stop-marker::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 1px solid rgb(240 246 255 / 58%);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(var(--stop-marker-affordance-scale));
+  transition: transform 120ms ease, opacity 120ms ease;
 }
 
 .map-workspace__stop-marker:hover,
 .map-workspace__stop-marker--build-line-interactive:hover {
+  --stop-marker-affordance-scale: 1.05;
   border-color: #f0f6ff;
   background: #4d88d8;
   box-shadow: 0 0 0 3px rgb(15 23 35 / 55%), 0 0 0 9px rgb(122 162 224 / 42%);
-  transform: scale(1.05);
+}
+
+.map-workspace__stop-marker:hover::after,
+.map-workspace__stop-marker--build-line-interactive:hover::after {
+  opacity: 1;
 }
 
 .map-workspace__stop-marker:active,
 .map-workspace__stop-marker--build-line-interactive:active {
+  --stop-marker-affordance-scale: 0.97;
   border-color: #ffffff;
   background: #5a94e2;
   box-shadow: 0 0 0 3px rgb(15 23 35 / 60%), 0 0 0 10px rgb(122 162 224 / 55%);
-  transform: scale(0.97);
+}
+
+.map-workspace__stop-marker:active::after,
+.map-workspace__stop-marker--build-line-interactive:active::after {
+  opacity: 1;
 }
 
 .map-workspace__stop-marker:focus-visible {
