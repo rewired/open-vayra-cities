@@ -11,8 +11,9 @@ import { createStopId } from '../domain/types/stop';
 import type { LineBuildSelectionState, WorkspaceToolMode } from '../App';
 import { MAP_WORKSPACE_BOOTSTRAP_CONFIG } from './mapBootstrapConfig';
 import {
-  STREET_SNAP_MAX_PIXEL_TOLERANCE,
-  STREET_SNAP_QUERY_WINDOW_PIXELS
+  STREET_SNAP_DIRECT_HIT_QUERY_RADIUS_PIXELS,
+  STREET_SNAP_FALLBACK_QUERY_OFFSETS,
+  STREET_SNAP_MAX_PIXEL_TOLERANCE
 } from './mapWorkspacePlacementConstants';
 import { STOP_MARKER_ANCHOR, STOP_MARKER_OFFSET } from './mapWorkspaceMarkerConstants';
 import {
@@ -299,22 +300,6 @@ const isEligibleStopPlacementClickForLayers = (
   return hasStreetLineGeometryInSourceFallback(map, event, streetLayerIds);
 };
 
-const toNearbyQueryPoints = (point: ScreenPoint): readonly ScreenPoint[] => {
-  const queryPoints: ScreenPoint[] = [point];
-
-  for (let deltaX = -STREET_SNAP_QUERY_WINDOW_PIXELS; deltaX <= STREET_SNAP_QUERY_WINDOW_PIXELS; deltaX += STREET_SNAP_QUERY_WINDOW_PIXELS) {
-    for (let deltaY = -STREET_SNAP_QUERY_WINDOW_PIXELS; deltaY <= STREET_SNAP_QUERY_WINDOW_PIXELS; deltaY += STREET_SNAP_QUERY_WINDOW_PIXELS) {
-      if (deltaX === 0 && deltaY === 0) {
-        continue;
-      }
-
-      queryPoints.push({ x: point.x + deltaX, y: point.y + deltaY });
-    }
-  }
-
-  return queryPoints;
-};
-
 const resolveNearestPointOnSegment = (
   point: ScreenPoint,
   segmentStart: ScreenPoint,
@@ -380,24 +365,21 @@ const resolveSnapCandidateForLineCoordinates = (
   return nearestCandidate;
 };
 
-const resolveSnappedStreetPosition = (
+const resolveBestSnapCandidateFromFeatures = (
   map: MapLibreMap,
-  event: MapLibreInteractionEvent,
-  streetLayerIds: readonly string[]
-): Readonly<{ lng: number; lat: number }> | null => {
-  if (streetLayerIds.length === 0) {
-    return null;
-  }
-
-  const candidateFeatures = toNearbyQueryPoints(event.point).flatMap((queryPoint) =>
-    map.queryRenderedFeatures(queryPoint, { layers: streetLayerIds })
-  );
+  clickPoint: ScreenPoint,
+  features: readonly { readonly geometry?: MapLibreFeatureGeometry }[]
+): SnapCandidate | null => {
   let bestCandidate: SnapCandidate | null = null;
 
-  for (const feature of candidateFeatures) {
+  for (const feature of features) {
+    if (!isLineGeometry(feature.geometry)) {
+      continue;
+    }
+
     const lineCollections = toLineCoordinateCollections(feature.geometry);
     for (const lineCoordinates of lineCollections) {
-      const candidate = resolveSnapCandidateForLineCoordinates(map, event.point, lineCoordinates);
+      const candidate = resolveSnapCandidateForLineCoordinates(map, clickPoint, lineCoordinates);
 
       if (!candidate) {
         continue;
@@ -409,7 +391,62 @@ const resolveSnappedStreetPosition = (
     }
   }
 
-  return bestCandidate?.snappedPosition ?? null;
+  return bestCandidate;
+};
+
+const resolveDirectHitSnapCandidate = (
+  map: MapLibreMap,
+  event: MapLibreInteractionEvent,
+  streetLayerIds: readonly string[]
+): SnapCandidate | null => {
+  if (STREET_SNAP_DIRECT_HIT_QUERY_RADIUS_PIXELS !== 0) {
+    return null;
+  }
+
+  const directHitFeatures = map.queryRenderedFeatures(event.point, { layers: streetLayerIds });
+  return resolveBestSnapCandidateFromFeatures(map, event.point, directHitFeatures);
+};
+
+const resolveFallbackSnapCandidate = (
+  map: MapLibreMap,
+  event: MapLibreInteractionEvent,
+  streetLayerIds: readonly string[]
+): SnapCandidate | null => {
+  let bestCandidate: SnapCandidate | null = null;
+
+  for (const offset of STREET_SNAP_FALLBACK_QUERY_OFFSETS) {
+    const queryPoint: ScreenPoint = { x: event.point.x + offset.deltaX, y: event.point.y + offset.deltaY };
+    const fallbackFeatures = map.queryRenderedFeatures(queryPoint, { layers: streetLayerIds });
+    const candidate = resolveBestSnapCandidateFromFeatures(map, event.point, fallbackFeatures);
+
+    if (!candidate) {
+      continue;
+    }
+
+    if (!bestCandidate || candidate.pixelDistance < bestCandidate.pixelDistance) {
+      bestCandidate = candidate;
+    }
+  }
+
+  return bestCandidate;
+};
+
+const resolveSnappedStreetPosition = (
+  map: MapLibreMap,
+  event: MapLibreInteractionEvent,
+  streetLayerIds: readonly string[]
+): Readonly<{ lng: number; lat: number }> | null => {
+  if (streetLayerIds.length === 0) {
+    return null;
+  }
+
+  const directHitCandidate = resolveDirectHitSnapCandidate(map, event, streetLayerIds);
+  if (directHitCandidate) {
+    return directHitCandidate.snappedPosition;
+  }
+
+  const fallbackCandidate = resolveFallbackSnapCandidate(map, event, streetLayerIds);
+  return fallbackCandidate?.snappedPosition ?? null;
 };
 
 const createNeutralMapTelemetryHandlers = ({ setInteractionState }: NeutralMapTelemetryContracts): NeutralMapTelemetryHandlers => ({
