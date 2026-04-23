@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Slice 014k: move inspect selection entry to MapLibre feature-first interactions so stop/line layer clicks own selection transitions, while empty-map inspect clicks clear both selections.
+- Slice 014k: add narrow typed feature-property decoders for `stopId` and `lineId` in `MapWorkspaceSurface` to keep stop/line click payload parsing explicit and local.
+- Slice 014k: gate inspect-mode map click clearing behind a rendered-feature check for interactive stop/line layers to preserve current feature-priority semantics.
+- Add ADR 0043 documenting feature-first interaction entry and inspect empty-map clear boundaries.
+
 - Slice 014j: remove SVG polyline overlay projection (`toProjectedLineSegments`, `projectionRefreshTick`, and render-lifecycle projection refresh binding) as active line rendering in `MapWorkspaceSurface`.
 - Slice 014j: add typed GeoJSON LineString builders for completed session lines and active draft preview under `apps/web/src/map-workspace/lineGeoJson.ts`.
 - Slice 014j: centralize completed/draft line source and layer identifiers plus paint/filter style constants in `mapRenderConstants.ts`, including selected-line filter split.

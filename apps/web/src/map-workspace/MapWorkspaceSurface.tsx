@@ -84,7 +84,7 @@ interface PlacementGameplayContracts {
 }
 
 interface BuildLineModeMapClickContracts {
-  readonly onInspectModeMapClick: () => void;
+  readonly onInspectModeNonFeatureMapClick: () => void;
 }
 
 
@@ -476,6 +476,37 @@ const createNeutralMapTelemetryHandlers = ({ setInteractionState }: NeutralMapTe
  */
 const resolveInspectModeMapClickSelection = (): StopSelectionState | null => null;
 
+const decodeStopIdFromFeatureProperties = (properties: Record<string, unknown> | undefined): StopId | null => {
+  const stopIdValue = properties?.stopId;
+
+  if (typeof stopIdValue !== 'string') {
+    return null;
+  }
+
+  return createStopId(stopIdValue);
+};
+
+const decodeLineIdFromFeatureProperties = (properties: Record<string, unknown> | undefined): Line['id'] | null => {
+  const lineIdValue = properties?.lineId;
+
+  if (typeof lineIdValue !== 'string') {
+    return null;
+  }
+
+  return createLineId(lineIdValue);
+};
+
+const hasInteractiveSelectionFeatureAtPoint = (map: MapLibreMap, event: MapLibreInteractionEvent): boolean => {
+  const interactiveSelectionLayers: readonly string[] = [
+    MAP_LAYER_ID_STOPS_CIRCLE,
+    MAP_LAYER_ID_COMPLETED_LINES,
+    MAP_LAYER_ID_COMPLETED_LINES_SELECTED
+  ];
+  const renderedFeatures = map.queryRenderedFeatures(event.point, { layers: interactiveSelectionLayers });
+
+  return renderedFeatures.length > 0;
+};
+
 const handleStopPlacementClick = (
   { map, setInteractionState, setPlacementAttemptResult, onStopSelectionChange, onValidPlacement }: PlacementGameplayContracts,
   event: MapLibreInteractionEvent
@@ -524,8 +555,8 @@ const setupMapWorkspaceInteractions = ({
 
     setPlacementAttemptResult('none');
 
-    if (activeToolMode === 'inspect') {
-      buildLineContracts.onInspectModeMapClick();
+    if (activeToolMode === 'inspect' && !hasInteractiveSelectionFeatureAtPoint(map, event)) {
+      buildLineContracts.onInspectModeNonFeatureMapClick();
     }
   };
 
@@ -981,7 +1012,7 @@ export function MapWorkspaceSurface({
       setPlacementAttemptResult,
       onStopSelectionChange,
       buildLineContracts: {
-        onInspectModeMapClick: () => {
+        onInspectModeNonFeatureMapClick: () => {
           onStopSelectionChange(resolveInspectModeMapClickSelection());
           clearSelectedCompletedLine();
         }
@@ -1047,13 +1078,13 @@ export function MapWorkspaceSurface({
 
     const stopInteractionBinding = bindStopFeatureInteractions(mapInstance, (event) => {
       const clickedFeature = event.features?.[0];
-      const stopId = clickedFeature?.properties?.stopId;
+      const stopId = decodeStopIdFromFeatureProperties(clickedFeature?.properties);
 
-      if (typeof stopId !== 'string') {
+      if (!stopId) {
         return;
       }
 
-      handleStopFeatureInteraction(createStopId(stopId), {
+      handleStopFeatureInteraction(stopId, {
         activeToolMode: activeToolModeRef.current,
         sessionLineCount: sessionLineCountRef.current,
         stopsById: stopsByIdRef.current,
@@ -1095,14 +1126,14 @@ export function MapWorkspaceSurface({
       }
 
       const clickedFeature = event.features?.[0];
-      const clickedLineId = clickedFeature?.properties?.lineId;
+      const clickedLineId = decodeLineIdFromFeatureProperties(clickedFeature?.properties);
 
-      if (typeof clickedLineId !== 'string') {
+      if (!clickedLineId) {
         return;
       }
 
       onStopSelectionChangeRef.current(null);
-      onSelectedLineIdChange(createLineId(clickedLineId));
+      onSelectedLineIdChange(clickedLineId);
     });
 
     return () => {
