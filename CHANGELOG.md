@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Slice 014b: enlarge stop marker hit targets and add stronger pointer/hover/active/focus-visible affordances so desktop build-line marker interaction no longer requires pixel-precise clicks.
+- Slice 014b: add build-line draft marker membership styling so stop markers already appended to the current draft line are visually confirmed immediately.
+- Slice 014b: thread typed draft stop-id membership (`ReadonlySet<StopId>`) into marker synchronization without weakening line-build state contracts.
+- Add ADR 0034 documenting stop-marker interaction affordance boundaries and draft-membership marker-state projection.
+
 - Slice 014a: keep build-line completion strictly user-triggered via `Complete line`, preserving the explicit minimum-stop guard and ordered completion transition (append session line, select it, then reset draft).
 - Add ADR 0033 documenting explicit user-triggered line completion boundaries and non-goals against auto-complete side effects.
 

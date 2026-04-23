@@ -364,7 +364,19 @@ const createStopMarker = (
   const markerElement = document.createElement('div');
   markerElement.className = 'map-workspace__stop-marker';
   markerElement.title = stop.label ?? stop.id;
+  markerElement.tabIndex = 0;
+  markerElement.setAttribute('role', 'button');
+  markerElement.setAttribute('aria-label', `Select ${stop.label ?? stop.id}`);
   markerElement.addEventListener('click', (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onMarkerClick(stop);
+  });
+  markerElement.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+
     event.preventDefault();
     event.stopPropagation();
     onMarkerClick(stop);
@@ -480,13 +492,17 @@ const syncStopMarkers = ({
   stops,
   markerByStopId,
   onStopMarkerClick,
-  selectedStopId
+  selectedStopId,
+  draftStopIds,
+  isBuildLineModeActive
 }: {
   readonly map: MapLibreMap;
   readonly stops: readonly Stop[];
   readonly markerByStopId: Map<Stop['id'], MapLibreMarker>;
   readonly onStopMarkerClick: (stop: Stop) => void;
   readonly selectedStopId: StopId | null;
+  readonly draftStopIds: ReadonlySet<StopId>;
+  readonly isBuildLineModeActive: boolean;
 }): void => {
   const activeStopIds = new Set(stops.map((stop) => stop.id));
 
@@ -511,7 +527,10 @@ const syncStopMarkers = ({
   markerByStopId.forEach((marker, stopId) => {
     const markerElement = marker.getElement();
     const isSelected = selectedStopId === stopId;
+    const isDraftMember = draftStopIds.has(stopId);
     markerElement.classList.toggle('map-workspace__stop-marker--selected', isSelected);
+    markerElement.classList.toggle('map-workspace__stop-marker--draft-member', isDraftMember);
+    markerElement.classList.toggle('map-workspace__stop-marker--build-line-interactive', isBuildLineModeActive);
   });
 };
 
@@ -540,6 +559,7 @@ export function MapWorkspaceSurface({
   const [placedStops, setPlacedStops] = useState<readonly Stop[]>([]);
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
   const [projectionRefreshTick, setProjectionRefreshTick] = useState(0);
+  const draftStopIdSet: ReadonlySet<StopId> = new Set(draftLineState.stopIds);
 
   const clearSelectedCompletedLine = (): void => {
     onSelectedLineIdChange(null);
@@ -648,6 +668,8 @@ export function MapWorkspaceSurface({
       stops: placedStops,
       markerByStopId: stopMarkerRef.current,
       selectedStopId,
+      draftStopIds: draftStopIdSet,
+      isBuildLineModeActive: activeToolMode === 'build-line',
       onStopMarkerClick: (stop) => {
         if (activeToolMode === 'build-line') {
           setDraftLineState((currentDraft) => {
@@ -673,7 +695,7 @@ export function MapWorkspaceSurface({
         onStopSelectionChange(toStopSelectionState(stop));
       }
     });
-  }, [activeToolMode, onStopSelectionChange, placedStops, selectedStopId, sessionLines.length]);
+  }, [activeToolMode, draftStopIdSet, onStopSelectionChange, placedStops, selectedStopId, sessionLines.length]);
 
   const pointerSummary = interactionState.pointer
     ? `x:${interactionState.pointer.screenX.toFixed(1)} y:${interactionState.pointer.screenY.toFixed(1)}`

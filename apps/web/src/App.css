@@ -198,18 +198,52 @@ body {
 
 
 .map-workspace__stop-marker {
-  width: 12px;
-  height: 12px;
-  border: 2px solid #d7e4f7;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #dbe7f8;
   border-radius: 999px;
-  background: #2d63ad;
-  box-shadow: 0 0 0 2px rgb(15 23 35 / 45%);
+  background: #3c73c0;
+  box-shadow: 0 0 0 3px rgb(15 23 35 / 50%), 0 0 0 7px rgb(60 115 192 / 24%);
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease, border-color 120ms ease;
+}
+
+.map-workspace__stop-marker:hover,
+.map-workspace__stop-marker--build-line-interactive:hover {
+  border-color: #f0f6ff;
+  background: #4d88d8;
+  box-shadow: 0 0 0 3px rgb(15 23 35 / 55%), 0 0 0 9px rgb(122 162 224 / 42%);
+  transform: scale(1.05);
+}
+
+.map-workspace__stop-marker:active,
+.map-workspace__stop-marker--build-line-interactive:active {
+  border-color: #ffffff;
+  background: #5a94e2;
+  box-shadow: 0 0 0 3px rgb(15 23 35 / 60%), 0 0 0 10px rgb(122 162 224 / 55%);
+  transform: scale(0.97);
+}
+
+.map-workspace__stop-marker:focus-visible {
+  outline: none;
+  border-color: #f7fbff;
+  box-shadow: 0 0 0 3px rgb(15 23 35 / 55%), 0 0 0 10px rgb(245 195 88 / 65%);
+}
+
+.map-workspace__stop-marker--build-line-interactive {
+  box-shadow: 0 0 0 3px rgb(15 23 35 / 52%), 0 0 0 8px rgb(246 212 110 / 42%);
+}
+
+.map-workspace__stop-marker--draft-member {
+  border-color: #ffe9ac;
+  background: #e4b145;
+  box-shadow: 0 0 0 3px rgb(15 23 35 / 55%), 0 0 0 9px rgb(246 212 110 / 62%);
 }
 
 .map-workspace__stop-marker--selected {
   border-color: #f3f8ff;
-  background: #4f85d6;
-  box-shadow: 0 0 0 2px rgb(15 23 35 / 45%), 0 0 0 4px rgb(122 162 224 / 60%);
+  background: #6598e2;
+  box-shadow: 0 0 0 3px rgb(15 23 35 / 55%), 0 0 0 9px rgb(122 162 224 / 70%);
 }
 
 .maplibregl-ctrl-group {
