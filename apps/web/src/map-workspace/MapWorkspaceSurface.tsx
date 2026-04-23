@@ -150,17 +150,7 @@ const LINE_OVERLAY_COPY = {
   completed: 'Completed lines: schematic stop-order connections (not street-routed yet).',
   draft: 'Draft line: schematic stop-order preview (not street-routed yet).'
 } as const;
-const MAP_PROJECTION_REFRESH_EVENTS = [
-  'movestart',
-  'move',
-  'moveend',
-  'zoomstart',
-  'zoom',
-  'zoomend',
-  'rotatestart',
-  'rotate',
-  'rotateend'
-] as const;
+const MAP_PROJECTION_REFRESH_EVENTS = ['render', 'idle'] as const;
 const INITIAL_DRAFT_LINE_STATE: DraftLineState = { stopIds: [], metadata: null };
 
 const toStopSelectionState = (stop: Stop): StopSelectionState => ({ selectedStopId: stop.id });

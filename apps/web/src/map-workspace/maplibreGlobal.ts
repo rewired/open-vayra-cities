@@ -52,6 +52,11 @@ type MapLibreInteractionEventType =
   | 'rotateend';
 
 /**
+ * Render-lifecycle event names used to track per-frame map draw updates.
+ */
+export type MapLibreRenderLifecycleEventType = 'render' | 'idle';
+
+/**
  * Minimal style-layer shape required for local stop-placement eligibility checks.
  */
 interface MapLibreStyleLayer {
@@ -132,8 +137,12 @@ export interface MapLibreMap {
   addControl(control: unknown, position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'): void;
   /** Registers an interaction listener for the provided baseline event type. */
   on(type: MapLibreInteractionEventType, listener: (event: MapLibreInteractionEvent) => void): void;
+  /** Registers a render-lifecycle listener for per-frame or post-animation update hooks. */
+  on(type: MapLibreRenderLifecycleEventType, listener: () => void): void;
   /** Removes a previously registered interaction listener for the provided baseline event type. */
   off(type: MapLibreInteractionEventType, listener: (event: MapLibreInteractionEvent) => void): void;
+  /** Removes a previously registered render-lifecycle listener. */
+  off(type: MapLibreRenderLifecycleEventType, listener: () => void): void;
   /** Returns the active style document for layer/source-level click validation. */
   getStyle(): MapLibreStyleDefinition | undefined;
   /** Queries rendered features at a clicked screen point, optionally filtered by style layer ids. */
