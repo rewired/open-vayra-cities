@@ -211,6 +211,34 @@ body {
   color: #9fb0cb;
 }
 
+.inspector-frequency-editor {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.inspector-frequency-editor__row {
+  display: grid;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: #c8d6ee;
+}
+
+.inspector-frequency-editor__row input {
+  width: 100%;
+  max-width: 130px;
+  padding: 6px 8px;
+  border: 1px solid #425b83;
+  border-radius: 6px;
+  background: #182338;
+  color: #e8eef9;
+}
+
+.inspector-frequency-editor__error {
+  color: #ff9f98;
+  font-size: 0.75rem;
+}
+
 .right-panel {
   grid-area: right;
   border-left: 1px solid #263142;

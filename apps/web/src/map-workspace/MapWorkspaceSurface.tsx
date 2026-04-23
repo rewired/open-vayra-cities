@@ -8,7 +8,7 @@ import type { Line } from '../domain/types/line';
 import { createLineId, createUnsetLineFrequencyByTimeBand } from '../domain/types/line';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
-import type { LineBuildSelectionState, LineSelectionState, WorkspaceToolMode } from '../App';
+import type { LineBuildSelectionState, WorkspaceToolMode } from '../App';
 import { MAP_WORKSPACE_BOOTSTRAP_CONFIG } from './mapBootstrapConfig';
 import {
   getSourceRefsForLayerIds,
@@ -81,9 +81,12 @@ interface MapWorkspaceSurfaceProps {
   readonly activeToolMode: WorkspaceToolMode;
   readonly selectedStopId: StopId | null;
   readonly lineBuildSelection: LineBuildSelectionState;
+  readonly sessionLines: readonly Line[];
+  readonly selectedLineId: Line['id'] | null;
   readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
   readonly onLineBuildSelectionChange: (nextSelection: LineBuildSelectionState) => void;
-  readonly onLineSelectionChange: (nextSelection: LineSelectionState) => void;
+  readonly onSessionLinesChange: (updater: (currentLines: readonly Line[]) => readonly Line[]) => void;
+  readonly onSelectedLineIdChange: (nextSelectedLineId: Line['id'] | null) => void;
 }
 
 interface DraftLineMetadata {
@@ -517,9 +520,12 @@ const syncStopMarkers = ({
 export function MapWorkspaceSurface({
   activeToolMode,
   selectedStopId,
+  sessionLines,
+  selectedLineId,
   onStopSelectionChange,
   onLineBuildSelectionChange,
-  onLineSelectionChange
+  onSessionLinesChange,
+  onSelectedLineIdChange
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -530,13 +536,11 @@ export function MapWorkspaceSurface({
   });
   const [placementAttemptResult, setPlacementAttemptResult] = useState<PlacementAttemptResult>('none');
   const [placedStops, setPlacedStops] = useState<readonly Stop[]>([]);
-  const [sessionLines, setSessionLines] = useState<readonly Line[]>([]);
-  const [selectedLineId, setSelectedLineId] = useState<Line['id'] | null>(null);
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
   const [projectionRefreshTick, setProjectionRefreshTick] = useState(0);
 
   const clearSelectedCompletedLine = (): void => {
-    setSelectedLineId(null);
+    onSelectedLineIdChange(null);
   };
 
   useEffect(() => {
@@ -562,11 +566,6 @@ export function MapWorkspaceSurface({
   useEffect(() => {
     onLineBuildSelectionChange({ selectedStopIds: draftLineState.stopIds });
   }, [draftLineState.stopIds, onLineBuildSelectionChange]);
-
-  useEffect(() => {
-    const selectedLine = sessionLines.find((line) => line.id === selectedLineId) ?? null;
-    onLineSelectionChange({ selectedLine });
-  }, [onLineSelectionChange, selectedLineId, sessionLines]);
 
   useEffect(() => {
     if (activeToolMode === 'build-line') {
@@ -700,8 +699,8 @@ export function MapWorkspaceSurface({
       stopIds: draftLineState.stopIds,
       frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
     };
-    setSessionLines((currentLines) => [...currentLines, nextLine]);
-    setSelectedLineId(nextLine.id);
+    onSessionLinesChange((currentLines) => [...currentLines, nextLine]);
+    onSelectedLineIdChange(nextLine.id);
     setDraftLineState(INITIAL_DRAFT_LINE_STATE);
   };
 
@@ -744,7 +743,7 @@ export function MapWorkspaceSurface({
               }
 
               onStopSelectionChange(null);
-              setSelectedLineId(createLineId(segment.key));
+              onSelectedLineIdChange(createLineId(segment.key));
             }}
           />
         ))}

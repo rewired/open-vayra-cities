@@ -1,8 +1,9 @@
-import { useState, type ReactElement } from 'react';
+import { useEffect, useState, type ReactElement } from 'react';
 
 import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
-import type { Line } from './domain/types/line';
+import { createLineFrequencyMinutes, type Line } from './domain/types/line';
 import type { StopId } from './domain/types/stop';
+import type { TimeBandId } from './domain/types/timeBand';
 import {
   MapWorkspaceSurface,
   type StopSelectionState
@@ -30,6 +31,10 @@ export interface LineBuildSelectionState {
 export interface LineSelectionState {
   readonly selectedLine: Line | null;
 }
+
+type LineFrequencyInputByTimeBand = Readonly<Record<TimeBandId, string>>;
+
+type LineFrequencyValidationByTimeBand = Readonly<Record<TimeBandId, string | null>>;
 
 /**
  * Enumerates the inspector's mutually exclusive visual states.
@@ -70,7 +75,12 @@ export type InspectorPanelState =
 const INITIAL_LINE_BUILD_SELECTION_STATE: LineBuildSelectionState = {
   selectedStopIds: []
 };
-const INITIAL_LINE_SELECTION_STATE: LineSelectionState = { selectedLine: null };
+
+const createEmptyLineFrequencyInputByTimeBand = (): LineFrequencyInputByTimeBand =>
+  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, ''])) as LineFrequencyInputByTimeBand;
+
+const createEmptyLineFrequencyValidationByTimeBand = (): LineFrequencyValidationByTimeBand =>
+  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, null])) as LineFrequencyValidationByTimeBand;
 
 /**
  * Resolves the inspector panel state with explicit selection priority:
@@ -107,7 +117,12 @@ export default function App(): ReactElement {
   const [selectedStop, setSelectedStop] = useState<StopSelectionState | null>(null);
   const [lineBuildSelection, setLineBuildSelection] =
     useState<LineBuildSelectionState>(INITIAL_LINE_BUILD_SELECTION_STATE);
-  const [lineSelection, setLineSelection] = useState<LineSelectionState>(INITIAL_LINE_SELECTION_STATE);
+  const [sessionLines, setSessionLines] = useState<readonly Line[]>([]);
+  const [selectedLineId, setSelectedLineId] = useState<Line['id'] | null>(null);
+  const [lineFrequencyInputByTimeBand, setLineFrequencyInputByTimeBand] =
+    useState<LineFrequencyInputByTimeBand>(createEmptyLineFrequencyInputByTimeBand);
+  const [lineFrequencyValidationByTimeBand, setLineFrequencyValidationByTimeBand] =
+    useState<LineFrequencyValidationByTimeBand>(createEmptyLineFrequencyValidationByTimeBand);
 
   const handleToolModeSelection = (nextMode: WorkspaceToolMode): void => {
     setActiveToolMode(nextMode);
@@ -117,8 +132,93 @@ export default function App(): ReactElement {
     }
   };
 
+  const selectedLine = sessionLines.find((line) => line.id === selectedLineId) ?? null;
   const selectedStopId: StopId | null = selectedStop?.selectedStopId ?? null;
-  const inspectorPanelState = resolveInspectorPanelState(lineSelection.selectedLine, selectedStop);
+  const inspectorPanelState = resolveInspectorPanelState(selectedLine, selectedStop);
+
+  useEffect(() => {
+    if (!selectedLine) {
+      setLineFrequencyInputByTimeBand(createEmptyLineFrequencyInputByTimeBand());
+      setLineFrequencyValidationByTimeBand(createEmptyLineFrequencyValidationByTimeBand());
+      return;
+    }
+
+    setLineFrequencyInputByTimeBand(
+      Object.fromEntries(
+        MVP_TIME_BAND_IDS.map((timeBandId) => [
+          timeBandId,
+          selectedLine.frequencyByTimeBand[timeBandId] === null ||
+          selectedLine.frequencyByTimeBand[timeBandId] === undefined
+            ? ''
+            : String(selectedLine.frequencyByTimeBand[timeBandId])
+        ])
+      ) as LineFrequencyInputByTimeBand
+    );
+    setLineFrequencyValidationByTimeBand(createEmptyLineFrequencyValidationByTimeBand());
+  }, [selectedLine]);
+
+  const updateSelectedCompletedLineFrequency = (
+    timeBandId: TimeBandId,
+    rawInputValue: string
+  ): void => {
+    setLineFrequencyInputByTimeBand((currentInputs) => ({
+      ...currentInputs,
+      [timeBandId]: rawInputValue
+    }));
+
+    if (!selectedLine) {
+      return;
+    }
+
+    const trimmedValue = rawInputValue.trim();
+    if (trimmedValue.length === 0) {
+      setLineFrequencyValidationByTimeBand((currentValidation) => ({
+        ...currentValidation,
+        [timeBandId]: null
+      }));
+      setSessionLines((currentLines) =>
+        currentLines.map((line) =>
+          line.id === selectedLine.id
+            ? {
+                ...line,
+                frequencyByTimeBand: {
+                  ...line.frequencyByTimeBand,
+                  [timeBandId]: null
+                }
+              }
+            : line
+        )
+      );
+      return;
+    }
+
+    const parsedFrequencyMinutes = Number(trimmedValue);
+    if (!Number.isFinite(parsedFrequencyMinutes) || parsedFrequencyMinutes <= 0) {
+      setLineFrequencyValidationByTimeBand((currentValidation) => ({
+        ...currentValidation,
+        [timeBandId]: 'Enter a positive minute interval.'
+      }));
+      return;
+    }
+
+    setLineFrequencyValidationByTimeBand((currentValidation) => ({
+      ...currentValidation,
+      [timeBandId]: null
+    }));
+    setSessionLines((currentLines) =>
+      currentLines.map((line) =>
+        line.id === selectedLine.id
+          ? {
+              ...line,
+              frequencyByTimeBand: {
+                ...line.frequencyByTimeBand,
+                [timeBandId]: createLineFrequencyMinutes(parsedFrequencyMinutes)
+              }
+            }
+          : line
+      )
+    );
+  };
 
   return (
     <div className="app-shell" data-app-surface="desktop-shell">
@@ -174,9 +274,12 @@ export default function App(): ReactElement {
           activeToolMode={activeToolMode}
           selectedStopId={selectedStopId}
           lineBuildSelection={lineBuildSelection}
+          sessionLines={sessionLines}
+          selectedLineId={selectedLineId}
           onStopSelectionChange={setSelectedStop}
           onLineBuildSelectionChange={setLineBuildSelection}
-          onLineSelectionChange={setLineSelection}
+          onSessionLinesChange={setSessionLines}
+          onSelectedLineIdChange={setSelectedLineId}
         />
       </main>
 
@@ -190,6 +293,26 @@ export default function App(): ReactElement {
             <p>ID/Label: {`${inspectorPanelState.selectedLine.id} / ${inspectorPanelState.selectedLine.label}`}</p>
             <p>Stop count: {inspectorPanelState.selectedLine.stopIds.length}</p>
             <p>Ordered stops: {inspectorPanelState.selectedLine.stopIds.join(' → ')}</p>
+            <div className="inspector-frequency-editor">
+              {MVP_TIME_BAND_IDS.map((timeBandId) => (
+                <label key={timeBandId} className="inspector-frequency-editor__row">
+                  <span>{TIME_BAND_DISPLAY_LABELS[timeBandId]} interval (minutes)</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={lineFrequencyInputByTimeBand[timeBandId] ?? ''}
+                    onChange={(event) => {
+                      updateSelectedCompletedLineFrequency(timeBandId, event.currentTarget.value);
+                    }}
+                  />
+                  {lineFrequencyValidationByTimeBand[timeBandId] ? (
+                    <span className="inspector-frequency-editor__error">
+                      {lineFrequencyValidationByTimeBand[timeBandId]}
+                    </span>
+                  ) : null}
+                </label>
+              ))}
+            </div>
           </div>
         ) : null}
 

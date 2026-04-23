@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Lift completed line session state ownership to `App.tsx` and expose map-surface callbacks for session line and selected-line mutation.
+- Extend the `line-selected` inspector with one editable minute-interval input per canonical MVP time band.
+- Add minimal frequency validation in inspector editing: empty values remain unset, while zero/negative values show inline feedback and are rejected from session state updates.
+- Add ADR 0030 documenting line-selected frequency editing boundaries and the shell-owned session line state decision.
 - Add branded line-frequency domain typing (`LineFrequencyMinutes`) and canonical per-time-band line frequency mapping (`LineFrequencyByTimeBand`) on `Line`.
 - Initialize newly completed build-line session lines with explicit per-band unset frequency state keyed by canonical MVP time bands.
 - Add ADR 0029 documenting completed-line frequency initialization boundaries and non-goals.
