@@ -126,6 +126,11 @@ interface MapLibreRenderedFeatureQueryOptions {
 }
 
 /**
+ * Bounding-box query window defined by top-left and bottom-right screen points.
+ */
+type MapLibreRenderedFeatureQueryBox = readonly [MapEventPoint, MapEventPoint];
+
+/**
  * Query options for filtering source features to a specific source layer.
  */
 interface MapLibreSourceFeatureQueryOptions {
@@ -237,7 +242,7 @@ export interface MapLibreMap {
   getStyle(): MapLibreStyleDefinition | undefined;
   /** Queries rendered features at a clicked screen point, optionally filtered by style layer ids. */
   queryRenderedFeatures(
-    point: MapEventPoint,
+    pointOrBox: MapEventPoint | MapLibreRenderedFeatureQueryBox,
     options?: MapLibreRenderedFeatureQueryOptions
   ): readonly MapLibreRenderedFeature[];
   /** Queries source features for a known source id and optional source-layer constraint. */

@@ -406,11 +406,16 @@ const resolveDirectHitSnapCandidate = (
   event: MapLibreInteractionEvent,
   streetLayerIds: readonly string[]
 ): SnapCandidate | null => {
-  if (STREET_SNAP_DIRECT_HIT_QUERY_RADIUS_PIXELS !== 0) {
-    return null;
-  }
+  const directHitQueryRadiusPixels = STREET_SNAP_DIRECT_HIT_QUERY_RADIUS_PIXELS;
+  const directHitQueryPointOrBox =
+    directHitQueryRadiusPixels === 0
+      ? event.point
+      : ([
+          { x: event.point.x - directHitQueryRadiusPixels, y: event.point.y - directHitQueryRadiusPixels },
+          { x: event.point.x + directHitQueryRadiusPixels, y: event.point.y + directHitQueryRadiusPixels }
+        ] as const);
 
-  const directHitFeatures = map.queryRenderedFeatures(event.point, { layers: streetLayerIds });
+  const directHitFeatures = map.queryRenderedFeatures(directHitQueryPointOrBox, { layers: streetLayerIds });
   return resolveBestSnapCandidateFromFeatures(map, event.point, directHitFeatures);
 };
 
