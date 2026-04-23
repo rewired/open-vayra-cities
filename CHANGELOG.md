@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-23
 
+- Slice 014l: add a map style-readiness guard for reactive stop/line source-layer sync so source and layer registration only runs after MapLibre style load completion.
+- Slice 014l: extend local MapLibre typing with `isStyleLoaded()` and `'styledata'` lifecycle event support for strict typed readiness gating.
+- Add ADR 0044 documenting style-readiness gating for map source/layer synchronization and crash prevention boundaries.
+
 - Slice 014k: move inspect selection entry to MapLibre feature-first interactions so stop/line layer clicks own selection transitions, while empty-map inspect clicks clear both selections.
 - Slice 014k: add narrow typed feature-property decoders for `stopId` and `lineId` in `MapWorkspaceSurface` to keep stop/line click payload parsing explicit and local.
 - Slice 014k: gate inspect-mode map click clearing behind a rendered-feature check for interactive stop/line layers to preserve current feature-priority semantics.
