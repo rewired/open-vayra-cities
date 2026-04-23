@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2026-04-23
+
+- Add canonical `TimeBandId` domain type for MVP service-planning time-band identifiers.
+- Add canonical ordered `MVP_TIME_BAND_IDS` and `TIME_BAND_DISPLAY_LABELS` domain constants for UI-safe reuse.
+- Update inspector rendering to consume canonical time-band constants instead of local literals.
+- Add ADR 0028 documenting the canonical time-band module decision and non-goals.
+
 ## 2026-04-22
 
 - Bootstrap pnpm workspace configuration and strict TypeScript base settings.

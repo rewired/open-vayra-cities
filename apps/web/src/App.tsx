@@ -1,5 +1,6 @@
 import { useState, type ReactElement } from 'react';
 
+import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
 import type { Line } from './domain/types/line';
 import type { StopId } from './domain/types/stop';
 import {
@@ -182,6 +183,7 @@ export default function App(): ReactElement {
       <aside className="right-panel" aria-label="Inspector panel">
         <h2>Inspector</h2>
         <p>Active mode: {activeToolMode}</p>
+        <p>MVP time bands: {MVP_TIME_BAND_IDS.map((timeBandId) => TIME_BAND_DISPLAY_LABELS[timeBandId]).join(', ')}</p>
         {inspectorPanelState.mode === 'line-selected' ? (
           <div>
             <p>Selected line</p>
