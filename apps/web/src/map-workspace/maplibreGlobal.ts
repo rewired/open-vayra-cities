@@ -28,11 +28,17 @@ interface MapEventLngLat {
 }
 
 /**
+ * Minimal geometric point tuple in `[longitude, latitude]` order.
+ */
+type MapLibreLngLatTuple = readonly [number, number];
+
+/**
  * Minimal interaction event shape consumed by the map workspace surface.
  */
 export interface MapLibreInteractionEvent {
   readonly point: MapEventPoint;
   readonly lngLat?: MapEventLngLat;
+  readonly features?: readonly MapLibreRenderedFeature[];
 }
 
 /**
@@ -54,7 +60,7 @@ type MapLibreInteractionEventType =
 /**
  * Render-lifecycle event names used to track per-frame map draw updates.
  */
-export type MapLibreRenderLifecycleEventType = 'render' | 'idle';
+export type MapLibreRenderLifecycleEventType = 'render' | 'idle' | 'load';
 
 /**
  * Minimal style-layer shape required for local stop-placement eligibility checks.
@@ -98,6 +104,7 @@ export interface MapLibreRenderedFeature {
   readonly source?: string;
   readonly sourceLayer?: string;
   readonly 'source-layer'?: string;
+  readonly properties?: Record<string, unknown>;
   readonly geometry?: MapLibreFeatureGeometry;
 }
 
@@ -123,6 +130,63 @@ interface MapLibreRenderedFeatureQueryOptions {
  */
 interface MapLibreSourceFeatureQueryOptions {
   readonly sourceLayer?: string;
+}
+
+/**
+ * Minimal GeoJSON point geometry used by source data updates.
+ */
+interface MapLibreGeoJsonPointGeometry {
+  readonly type: 'Point';
+  readonly coordinates: MapLibreLngLatTuple;
+}
+
+/**
+ * Minimal GeoJSON feature shape used by typed source updates.
+ */
+export interface MapLibreGeoJsonFeature<TProperties extends object = object> {
+  readonly type: 'Feature';
+  readonly geometry: MapLibreGeoJsonPointGeometry;
+  readonly properties: TProperties;
+}
+
+/**
+ * Minimal GeoJSON collection shape used by typed source updates.
+ */
+export interface MapLibreGeoJsonFeatureCollection<TProperties extends object = object> {
+  readonly type: 'FeatureCollection';
+  readonly features: readonly MapLibreGeoJsonFeature<TProperties>[];
+}
+
+/**
+ * Expression-like paint/layout value supported by this minimal layer typing.
+ */
+type MapLibreExpressionValue = string | number | boolean | readonly unknown[];
+
+/**
+ * Minimal map source specification for GeoJSON-backed source registration.
+ */
+interface MapLibreGeoJsonSourceSpecification<TProperties extends object = object> {
+  readonly type: 'geojson';
+  readonly data: MapLibreGeoJsonFeatureCollection<TProperties>;
+}
+
+/**
+ * Runtime GeoJSON source handle used for in-place data refresh.
+ */
+export interface MapLibreGeoJsonSource<TProperties extends object = object> {
+  /** Replaces source data while preserving source identity and bound layers. */
+  setData(data: MapLibreGeoJsonFeatureCollection<TProperties>): void;
+}
+
+/**
+ * Minimal style layer definition used for stop circle/symbol rendering.
+ */
+export interface MapLibreLayerSpecification {
+  readonly id: string;
+  readonly type: 'circle' | 'symbol';
+  readonly source: string;
+  readonly paint?: Readonly<Record<string, MapLibreExpressionValue>>;
+  readonly layout?: Readonly<Record<string, MapLibreExpressionValue>>;
 }
 
 /**
@@ -153,7 +217,19 @@ export interface MapLibreMap {
   /** Queries source features for a known source id and optional source-layer constraint. */
   querySourceFeatures(sourceId: string, options?: MapLibreSourceFeatureQueryOptions): readonly MapLibreSourceFeature[];
   /** Projects geographic coordinates into current map viewport screen-space coordinates. */
-  project(lngLat: readonly [number, number]): MapEventPoint;
+  project(lngLat: MapLibreLngLatTuple): MapEventPoint;
+  /** Returns whether the provided source id exists in the current style. */
+  getSource(sourceId: string): MapLibreGeoJsonSource | undefined;
+  /** Registers a GeoJSON source for subsequent style-layer rendering. */
+  addSource(sourceId: string, source: MapLibreGeoJsonSourceSpecification): void;
+  /** Returns whether the provided layer id exists in the current style. */
+  getLayer(layerId: string): MapLibreLayerSpecification | undefined;
+  /** Registers a style layer bound to an existing source id. */
+  addLayer(layer: MapLibreLayerSpecification): void;
+  /** Registers a listener for feature interactions constrained to one style layer id. */
+  on(type: 'click', layerId: string, listener: (event: MapLibreInteractionEvent) => void): void;
+  /** Removes a feature interaction listener constrained to one style layer id. */
+  off(type: 'click', layerId: string, listener: (event: MapLibreInteractionEvent) => void): void;
 }
 
 /**
