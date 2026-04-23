@@ -773,17 +773,23 @@ export function MapWorkspaceSurface({
       ) : null}
 
       {buildLineUiFeedback.showBuildLineModeIndicator ? (
-        <div className="map-workspace__overlay map-workspace__overlay--mode" aria-live="polite" aria-label="Build line mode status">
+        <div
+          className="map-workspace__overlay map-workspace__overlay--mode map-workspace__overlay--interactive-controls"
+          aria-live="polite"
+          aria-label="Build line mode status"
+        >
           <strong>{BUILD_LINE_MODE_INDICATOR_LABEL}</strong>
           <span> · {buildLineUiFeedback.modeInstruction}</span>
           <span> · {buildLineUiFeedback.minimumStopRequirement}</span>
           <span>{` · Draft stops: ${buildLineUiFeedback.draftStopCount}`}</span>
-          <button type="button" onClick={handleDraftCancel}>
-            Cancel draft
-          </button>
-          <button type="button" onClick={handleDraftComplete} disabled={!buildLineUiFeedback.canCompleteDraft}>
-            Complete line
-          </button>
+          <div className="map-workspace__overlay-button-row">
+            <button type="button" onClick={handleDraftCancel}>
+              Cancel draft
+            </button>
+            <button type="button" onClick={handleDraftComplete} disabled={!buildLineUiFeedback.canCompleteDraft}>
+              Complete line
+            </button>
+          </div>
         </div>
       ) : null}
     </section>
