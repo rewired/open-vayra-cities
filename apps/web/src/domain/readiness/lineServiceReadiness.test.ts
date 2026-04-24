@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createLineFrequencyMinutes, createLineId, createUnsetLineFrequencyByTimeBand, type Line } from '../types/line';
 import { createLineSegmentId, createRouteDistanceMeters, createRouteTravelMinutes, type RouteStatus } from '../types/lineRoute';
 import { createStopId, type Stop } from '../types/stop';
+import { LINE_SERVICE_READINESS_ISSUE_CODES } from '../constants/lineServiceReadiness';
 import { evaluateLineServiceReadiness } from './lineServiceReadiness';
 
 const lineId = createLineId('line-1');
@@ -83,12 +84,12 @@ describe('evaluateLineServiceReadiness', () => {
 
     expect(result.status).toBe('blocked');
     expect(result.summary.errorIssueCount).toBeGreaterThan(0);
-    expect(result.issues.some((issue) => issue.code === 'invalid-line-label')).toBe(true);
-    expect(result.issues.some((issue) => issue.code === 'missing-placed-stop-reference')).toBe(true);
-    expect(result.issues.some((issue) => issue.code === 'route-segment-adjacency-mismatch')).toBe(true);
-    expect(result.issues.some((issue) => issue.code === 'route-segment-timing-unusable')).toBe(true);
-    expect(result.issues.some((issue) => issue.code === 'unknown-route-status')).toBe(true);
-    expect(result.issues.some((issue) => issue.code === 'missing-configured-frequency')).toBe(true);
+    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.INVALID_LINE_LABEL)).toBe(true);
+    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_PLACED_STOP_REFERENCE)).toBe(true);
+    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.ROUTE_SEGMENT_ADJACENCY_MISMATCH)).toBe(true);
+    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.ROUTE_SEGMENT_TIMING_UNUSABLE)).toBe(true);
+    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.UNKNOWN_ROUTE_STATUS)).toBe(true);
+    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY)).toBe(true);
   });
 
   it('returns partially-ready when only warnings are present', () => {
@@ -112,7 +113,7 @@ describe('evaluateLineServiceReadiness', () => {
     expect(result.summary.errorIssueCount).toBe(0);
     expect(result.summary.warningIssueCount).toBeGreaterThanOrEqual(1);
     expect(result.summary.hasFallbackOnlyRouting).toBe(true);
-    expect(result.issues.some((issue) => issue.code === 'fallback-only-routing')).toBe(true);
-    expect(result.issues.some((issue) => issue.code === 'missing-complete-time-band-configuration')).toBe(true);
+    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.FALLBACK_ONLY_ROUTING)).toBe(true);
+    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION)).toBe(true);
   });
 });

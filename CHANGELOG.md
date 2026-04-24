@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 018a: add canonical line-service readiness diagnostic constants (`LINE_SERVICE_READINESS_ISSUE_CODES`, `LINE_SERVICE_READINESS_ISSUE_SEVERITIES`) under `apps/web/src/domain/constants/lineServiceReadiness.ts`.
+- Slice 018a: move readiness domain contracts to `apps/web/src/domain/types/lineServiceReadiness.ts` and derive issue-code/severity unions from canonical constants.
+- Slice 018a: refactor readiness evaluator/tests to consume canonical readiness constants, removing ad-hoc diagnostic string literals from readiness paths.
+- Add ADR 0060 documenting readiness diagnostic code/severity constant ownership and readiness-only scope.
+
 - Slice 018: add a pure domain line-service readiness evaluator (`evaluateLineServiceReadiness`) for one completed in-memory line against placed stops and canonical time bands.
 - Slice 018: export strongly typed readiness contracts (status union, issue severity/code/shape, and summary/result structures with counts and flags).
 - Slice 018: enforce structural checks for line identity/label, stop-chain coherence, placed-stop references, route-segment existence/count/adjacency/line-id coherence, timing usability, and route-status validity.
