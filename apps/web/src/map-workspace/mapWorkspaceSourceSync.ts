@@ -21,7 +21,7 @@ import {
   MAP_STOP_LABEL_LAYER_PAINT,
   MAP_VEHICLE_CIRCLE_LAYER_PAINT
 } from './mapRenderConstants';
-import type { MapLibreGeoJsonSource, MapLibreMap } from './maplibreGlobal';
+import type { MapLibreMap } from './maplibreGlobal';
 import { buildStopFeatureCollection } from './stopGeoJson';
 import { buildVehicleFeatureCollection } from './vehicleGeoJson';
 
@@ -104,7 +104,10 @@ const countSourceFeatures = (map: MapLibreMap, sourceId: string): number => {
   return map.querySourceFeatures(sourceId).length;
 };
 
-const enforceCustomLayerOrder = (map: MapLibreMap): void => {
+/**
+ * Reapplies deterministic ordering for all workspace-owned custom layers.
+ */
+export const enforceMapWorkspaceCustomLayerOrder = (map: MapLibreMap): void => {
   for (let index = CUSTOM_LAYER_ORDER.length - 1; index >= 0; index -= 1) {
     const layerId = CUSTOM_LAYER_ORDER[index];
     if (!layerId) {
@@ -221,7 +224,6 @@ const ensureAllMapWorkspaceRenderSourcesAndLayers = (map: MapLibreMap): void => 
     });
   }
 
-  enforceCustomLayerOrder(map);
 };
 
 const syncMapWorkspaceSourceData = ({
@@ -243,7 +245,7 @@ const syncMapWorkspaceSourceData = ({
     });
     stopBuilderFeatureCount = stopFeatureCollection.features.length;
 
-    const stopSource = map.getSource(MAP_SOURCE_ID_STOPS) as MapLibreGeoJsonSource | undefined;
+    const stopSource = map.getSource(MAP_SOURCE_ID_STOPS);
     stopSource?.setData(stopFeatureCollection);
   }
 
@@ -260,8 +262,8 @@ const syncMapWorkspaceSourceData = ({
 
     lineBuilderFeatureCount = completedLineFeatureCollection.features.length + draftLineFeatureCollection.features.length;
 
-    const completedLineSource = map.getSource(MAP_SOURCE_ID_COMPLETED_LINES) as MapLibreGeoJsonSource | undefined;
-    const draftLineSource = map.getSource(MAP_SOURCE_ID_DRAFT_LINE) as MapLibreGeoJsonSource | undefined;
+    const completedLineSource = map.getSource(MAP_SOURCE_ID_COMPLETED_LINES);
+    const draftLineSource = map.getSource(MAP_SOURCE_ID_DRAFT_LINE);
 
     completedLineSource?.setData(completedLineFeatureCollection);
     draftLineSource?.setData(draftLineFeatureCollection);
@@ -274,9 +276,11 @@ const syncMapWorkspaceSourceData = ({
 
     vehicleBuilderFeatureCount = vehicleFeatureCollection.features.length;
 
-    const vehicleSource = map.getSource(MAP_SOURCE_ID_VEHICLES) as MapLibreGeoJsonSource | undefined;
+    const vehicleSource = map.getSource(MAP_SOURCE_ID_VEHICLES);
     vehicleSource?.setData(vehicleFeatureCollection);
   }
+
+  enforceMapWorkspaceCustomLayerOrder(map);
 
   return {
     ...(stopBuilderFeatureCount === undefined ? {} : { stopBuilderFeatureCount }),

@@ -252,15 +252,18 @@ export interface MapLibreMap {
   /** Projects geographic coordinates into current map viewport screen-space coordinates. */
   project(lngLat: MapLibreLngLatTuple): MapEventPoint;
   /** Returns whether the provided source id exists in the current style. */
-  getSource(sourceId: string): MapLibreGeoJsonSource | undefined;
+  getSource<
+    TProperties extends object = object,
+    TGeometry extends MapLibreGeoJsonGeometry = MapLibreGeoJsonGeometry
+  >(sourceId: string): MapLibreGeoJsonSource<TProperties, TGeometry> | undefined;
   /** Registers a GeoJSON source for subsequent style-layer rendering. */
   addSource(sourceId: string, source: MapLibreGeoJsonSourceSpecification): void;
   /** Returns whether the provided layer id exists in the current style. */
   getLayer(layerId: string): MapLibreLayerSpecification | undefined;
   /** Registers a style layer bound to an existing source id. */
   addLayer(layer: MapLibreLayerSpecification): void;
-  /** Reorders an existing layer before another layer id, or to the top when `beforeLayerId` is omitted. */
-  moveLayer(layerId: string, beforeLayerId?: string): void;
+  /** Reorders an existing layer before another layer id, or to the top when `beforeId` is omitted. */
+  moveLayer(layerId: string, beforeId?: string): void;
   /** Returns whether the current style is fully loaded and ready for source/layer mutations. */
   isStyleLoaded(): boolean;
   /** Registers a listener for feature interactions constrained to one style layer id. */

@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 030: add a dedicated deterministic map workspace custom-layer ordering helper that reapplies the canonical CityOps stack through typed `moveLayer(...)` calls.
+- Slice 030: invoke custom-layer order reapplication from the centralized source synchronization path so ordering is restored consistently after style/layer readiness transitions.
+- Slice 030: tighten local MapLibre typing with a narrow `moveLayer(layerId, beforeId?)` contract and generic typed GeoJSON source lookup to remove source-sync type casts.
+- Add ADR 0080 documenting deterministic custom-layer ordering reapplication in centralized sync flow and typed `moveLayer` boundary.
+
 - Slice 029b: replace split selected/non-selected completed-line foreground layers with one unfiltered completed-line foreground layer using data-driven `selected` paint expressions.
 - Slice 029b: add a completed-line casing layer beneath the foreground layer for map-contrast readability while preserving completed-line selection emphasis.
 - Slice 029b: preserve completed-line click selection semantics by binding interactions to the unified foreground layer and removing duplicate selected-layer handlers.
