@@ -350,6 +350,38 @@ body {
   font-size: 0.75rem;
 }
 
+.inspector-line-readiness {
+  margin-top: 12px;
+  padding: 8px;
+  border: 1px solid #2f415f;
+  border-radius: 8px;
+  background: #131f31;
+}
+
+.inspector-line-readiness h3 {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.inspector-line-readiness p {
+  margin-top: 4px;
+  font-size: 0.8rem;
+}
+
+.inspector-line-readiness__issues {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 0.75rem;
+}
+
+.inspector-line-readiness__issues li {
+  margin-top: 4px;
+}
+
+.inspector-line-readiness__code {
+  color: #cfe0fb;
+}
+
 .inspector-route-baseline__segment-table {
   width: 100%;
   margin-top: 8px;

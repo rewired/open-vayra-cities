@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 018b: project selected-line readiness in `App.tsx` via the pure domain `evaluateLineServiceReadiness(selectedLine, placedStops)` evaluator instead of component-local readiness semantics.
+- Slice 018b: add a compact line-selected readiness inspector section covering status, configured/missing time-band counts, route-segment count, blocker/warning counts, and a short issue list with code tags.
+- Slice 018b non-goals: no simulation/demand/economy/revenue/satisfaction/vehicle KPIs added to inspector output.
+- Add ADR 0061 documenting selected-line readiness projection boundaries and evaluator ownership in the domain layer.
+
 - Slice 018a: add canonical line-service readiness diagnostic constants (`LINE_SERVICE_READINESS_ISSUE_CODES`, `LINE_SERVICE_READINESS_ISSUE_SEVERITIES`) under `apps/web/src/domain/constants/lineServiceReadiness.ts`.
 - Slice 018a: move readiness domain contracts to `apps/web/src/domain/types/lineServiceReadiness.ts` and derive issue-code/severity unions from canonical constants.
 - Slice 018a: refactor readiness evaluator/tests to consume canonical readiness constants, removing ad-hoc diagnostic string literals from readiness paths.

@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactElement } from 'react';
 
 import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
+import { evaluateLineServiceReadiness } from './domain/readiness/lineServiceReadiness';
 import { createLineFrequencyMinutes, type Line } from './domain/types/line';
 import type { LineRouteSegment, RouteStatus } from './domain/types/lineRoute';
 import { buildSelectedLineExportPayload } from './domain/types/selectedLineExport';
@@ -58,6 +59,8 @@ interface RouteBaselineAggregateMetrics {
   readonly totalLineMinutes: number;
   readonly hasFallbackSegments: boolean;
 }
+
+const MAX_READINESS_ISSUES_VISIBLE = 5;
 
 /**
  * Enumerates the inspector's mutually exclusive visual states.
@@ -234,6 +237,9 @@ export default function App(): ReactElement {
   );
   const selectedLineRouteBaselineMetrics = selectedLine
     ? projectRouteBaselineAggregateMetrics(selectedLine.routeSegments)
+    : null;
+  const selectedLineReadiness = selectedLine
+    ? evaluateLineServiceReadiness(selectedLine, sessionStops)
     : null;
   const selectedCompletedLineForExport =
     inspectorPanelState.mode === 'line-selected'
@@ -433,6 +439,33 @@ export default function App(): ReactElement {
             <p>ID/Label: {`${inspectorPanelState.selectedLine.id} / ${inspectorPanelState.selectedLine.label}`}</p>
             <p>Stop count: {inspectorPanelState.selectedLine.stopIds.length}</p>
             <p>Ordered stops: {inspectorPanelState.selectedLine.stopIds.join(' → ')}</p>
+            {selectedLineReadiness ? (
+              <section className="inspector-line-readiness" aria-label="Line readiness">
+                <h3>Line readiness</h3>
+                <p>Status: {selectedLineReadiness.status}</p>
+                <p>Configured time bands: {selectedLineReadiness.summary.configuredTimeBandCount}</p>
+                <p>
+                  Missing/unset time bands:{' '}
+                  {selectedLineReadiness.summary.canonicalTimeBandCount -
+                    selectedLineReadiness.summary.configuredTimeBandCount}
+                </p>
+                <p>Route segments: {selectedLineReadiness.summary.routeSegmentCount}</p>
+                <p>Blocker issues: {selectedLineReadiness.summary.errorIssueCount}</p>
+                <p>Warning issues: {selectedLineReadiness.summary.warningIssueCount}</p>
+                {selectedLineReadiness.issues.length > 0 ? (
+                  <ul className="inspector-line-readiness__issues">
+                    {selectedLineReadiness.issues.slice(0, MAX_READINESS_ISSUES_VISIBLE).map((issue, index) => (
+                      <li key={`${issue.code}-${index}`}>
+                        <span>{issue.message}</span>{' '}
+                        {issue.code ? <code className="inspector-line-readiness__code">{issue.code}</code> : null}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No readiness issues.</p>
+                )}
+              </section>
+            ) : null}
             {selectedCompletedLineForExport ? (
               <button type="button" onClick={handleSelectedLineExport}>
                 Export line JSON
