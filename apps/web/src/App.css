@@ -434,8 +434,55 @@ body {
   grid-area: status;
   display: flex;
   align-items: center;
+  gap: 14px;
   justify-content: space-between;
   border-top: 1px solid #263142;
   background: #141c29;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
+}
+
+.status-bar__clock-readout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #cfe0fb;
+}
+
+.status-bar__clock-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-bar__speed-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-bar__button {
+  border: 1px solid #425b83;
+  border-radius: 6px;
+  background: #1d2a3f;
+  color: #e8eef9;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.status-bar__button[aria-pressed='true'] {
+  border-color: #f5c358;
+  background: #2f466f;
+}
+
+.status-bar__button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.status-bar__line-frequency-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #9fb0cb;
 }

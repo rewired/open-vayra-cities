@@ -1,12 +1,22 @@
-import { useEffect, useState, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 
 import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
 import { evaluateLineServiceReadiness } from './domain/readiness/lineServiceReadiness';
+import {
+  applySimulationClockCommand,
+  createInitialSimulationClockState,
+  deriveTimeBandIdFromMinuteOfDay,
+  formatSimulationMinuteOfDay,
+  formatSimulationRunningStateLabel,
+  parseSimulationSpeedId
+} from './domain/simulation/simulationClock';
 import { createLineFrequencyMinutes, type Line } from './domain/types/line';
 import type { LineRouteSegment, RouteStatus } from './domain/types/lineRoute';
 import { buildSelectedLineExportPayload } from './domain/types/selectedLineExport';
+import type { SimulationSpeedId } from './domain/types/simulationClock';
 import type { Stop, StopId } from './domain/types/stop';
 import type { TimeBandId } from './domain/types/timeBand';
+import { SIMULATION_SPEED_DEFINITIONS } from './domain/constants/simulationClock';
 import {
   MapWorkspaceSurface,
   type StopSelectionState
@@ -218,6 +228,8 @@ export default function App(): ReactElement {
     useState<LineFrequencyInputByTimeBand>(createEmptyLineFrequencyInputByTimeBand);
   const [lineFrequencyValidationByTimeBand, setLineFrequencyValidationByTimeBand] =
     useState<LineFrequencyValidationByTimeBand>(createEmptyLineFrequencyValidationByTimeBand);
+  const [simulationClockState, setSimulationClockState] = useState(createInitialSimulationClockState);
+  const lastClockTickRealMillisecondsRef = useRef<number | null>(null);
 
   const handleToolModeSelection = (nextMode: WorkspaceToolMode): void => {
     setActiveToolMode(nextMode);
@@ -228,6 +240,9 @@ export default function App(): ReactElement {
   };
 
   const selectedLine = sessionLines.find((line) => line.id === selectedLineId) ?? null;
+  const activeSimulationTimeBandId = deriveTimeBandIdFromMinuteOfDay(
+    simulationClockState.timestamp.minuteOfDay
+  );
   const selectedStopId: StopId | null = selectedStop?.selectedStopId ?? null;
   const inspectorPanelState = resolveInspectorPanelState(selectedLine, selectedStop);
   const staticNetworkSummaryKpis = projectStaticNetworkSummaryKpis(
@@ -245,6 +260,9 @@ export default function App(): ReactElement {
     inspectorPanelState.mode === 'line-selected'
       ? sessionLines.find((line) => line.id === inspectorPanelState.selectedLine.id) ?? null
       : null;
+  const selectedLineCurrentTimeBandFrequency = selectedLine
+    ? selectedLine.frequencyByTimeBand[activeSimulationTimeBandId] ?? null
+    : null;
 
   useEffect(() => {
     if (!selectedLine) {
@@ -266,6 +284,30 @@ export default function App(): ReactElement {
     );
     setLineFrequencyValidationByTimeBand(createEmptyLineFrequencyValidationByTimeBand());
   }, [selectedLine]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      const nowMilliseconds = performance.now();
+      const previousTick = lastClockTickRealMillisecondsRef.current;
+      lastClockTickRealMillisecondsRef.current = nowMilliseconds;
+
+      if (previousTick === null) {
+        return;
+      }
+
+      const elapsedRealMilliseconds = nowMilliseconds - previousTick;
+      setSimulationClockState((currentClockState) =>
+        applySimulationClockCommand(currentClockState, {
+          type: 'advance-elapsed',
+          elapsedRealMilliseconds
+        }).nextState
+      );
+    }, 250);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   const updateSelectedCompletedLineFrequency = (
     timeBandId: TimeBandId,
@@ -347,6 +389,33 @@ export default function App(): ReactElement {
     downloadJsonFile(
       buildSelectedLineExportFilename(selectedCompletedLineForExport.id),
       exportPayload
+    );
+  };
+
+  const handlePauseClock = (): void => {
+    setSimulationClockState((currentClockState) =>
+      applySimulationClockCommand(currentClockState, { type: 'pause' }).nextState
+    );
+  };
+
+  const handleResumeClock = (): void => {
+    setSimulationClockState((currentClockState) =>
+      applySimulationClockCommand(currentClockState, { type: 'resume' }).nextState
+    );
+  };
+
+  const handleResetClock = (): void => {
+    setSimulationClockState((currentClockState) =>
+      applySimulationClockCommand(currentClockState, { type: 'reset' }).nextState
+    );
+  };
+
+  const handleSpeedSelection = (speedId: SimulationSpeedId): void => {
+    setSimulationClockState((currentClockState) =>
+      applySimulationClockCommand(currentClockState, {
+        type: 'set-speed',
+        speedId
+      }).nextState
     );
   };
 
@@ -560,9 +629,63 @@ export default function App(): ReactElement {
       </aside>
 
       <footer className="status-bar" aria-label="Status bar">
-        <span>Status: Shell initialized</span>
-        <span>Time: --:--</span>
-        <span>Speed: 1x</span>
+        <div className="status-bar__clock-readout">
+          <span>Status: {formatSimulationRunningStateLabel(simulationClockState.runningState)}</span>
+          <span>Day {simulationClockState.timestamp.dayIndex}</span>
+          <span>Time {formatSimulationMinuteOfDay(simulationClockState.timestamp.minuteOfDay)}</span>
+          <span>Band {TIME_BAND_DISPLAY_LABELS[activeSimulationTimeBandId]}</span>
+        </div>
+        <div className="status-bar__clock-controls" role="group" aria-label="Simulation clock controls">
+          <button
+            type="button"
+            className="status-bar__button"
+            onClick={handlePauseClock}
+            disabled={simulationClockState.runningState === 'paused'}
+          >
+            Pause
+          </button>
+          <button
+            type="button"
+            className="status-bar__button"
+            onClick={handleResumeClock}
+            disabled={simulationClockState.runningState === 'running'}
+          >
+            Resume
+          </button>
+          <div className="status-bar__speed-group" role="group" aria-label="Simulation speed selection">
+            {SIMULATION_SPEED_DEFINITIONS.map((speedDefinition) => (
+              <button
+                key={speedDefinition.id}
+                type="button"
+                className="status-bar__button"
+                aria-pressed={simulationClockState.speedId === speedDefinition.id}
+                onClick={() => {
+                  const parsedSpeedId = parseSimulationSpeedId(speedDefinition.id);
+                  if (!parsedSpeedId) {
+                    return;
+                  }
+
+                  handleSpeedSelection(parsedSpeedId);
+                }}
+              >
+                {speedDefinition.label}
+              </button>
+            ))}
+          </div>
+          <button type="button" className="status-bar__button" onClick={handleResetClock}>
+            Reset
+          </button>
+        </div>
+        {selectedLine ? (
+          <div className="status-bar__line-frequency-hint">
+            <span>Selected line band interval:</span>
+            <span>
+              {selectedLineCurrentTimeBandFrequency === null
+                ? 'Unset'
+                : `${selectedLineCurrentTimeBandFrequency} min`}
+            </span>
+          </div>
+        ) : null}
       </footer>
     </div>
   );
