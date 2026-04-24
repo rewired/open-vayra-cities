@@ -37,6 +37,16 @@ describe('projectCoordinateAlongRouteGeometry', () => {
     expect(projectCoordinateAlongRouteGeometry(geometry, 0.5)).toEqual([3, 0.5]);
   });
 
+
+  it('hits the intermediate anchor exactly when progress lands on a leg boundary', () => {
+    const geometry: readonly RouteGeometryCoordinate[] = [
+      [0, 0],
+      [3, 0],
+      [3, 4]
+    ];
+
+    expect(projectCoordinateAlongRouteGeometry(geometry, 3 / 7)).toEqual([3, 0]);
+  });
   it('clamps out-of-range progress ratios to terminal geometry coordinates', () => {
     const geometry: readonly RouteGeometryCoordinate[] = [
       [5, 6],
