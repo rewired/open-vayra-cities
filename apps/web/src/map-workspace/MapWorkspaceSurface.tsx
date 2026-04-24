@@ -1351,6 +1351,7 @@ export function MapWorkspaceSurface({
       ? `lng:${interactionState.pointer.lng.toFixed(5)} lat:${interactionState.pointer.lat.toFixed(5)}`
       : 'lng/lat unavailable';
   const stopSelectionSummary = selectedStopId ? `Selected stop: ${selectedStopId}` : 'Selected stop: none';
+  const vehicleFeatureCount = buildVehicleFeatureCollection({ vehicleNetworkProjection }).features.length;
   const placementUiFeedback = buildPlacementUiFeedback(activeToolMode, placementAttemptResult);
   const buildLineUiFeedback = buildLineModeUiFeedback(activeToolMode, draftLineState.stopIds);
   const draftMetadataSummary = draftLineState.metadata
@@ -1407,7 +1408,7 @@ export function MapWorkspaceSurface({
 
       <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
         Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
-        {` | Placed stops: ${placedStops.length} | ${stopSelectionSummary} | Line draft stops: ${draftLineState.stopIds.length} | Session lines: ${sessionLines.length} | ${draftMetadataSummary}`}
+        {` | Placed stops: ${placedStops.length} | Vehicle features: ${vehicleFeatureCount} | ${stopSelectionSummary} | Line draft stops: ${draftLineState.stopIds.length} | Session lines: ${sessionLines.length} | ${draftMetadataSummary}`}
       </div>
 
       {placementUiFeedback.showPlacementModeIndicator ? (
