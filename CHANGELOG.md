@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 017: add a pure selected-line export fixture validator for committed fixture verification workflows.
+- Slice 017: add typed validation results with machine-readable issue codes for deterministic failure classification.
+- Slice 017: add validation tests against the committed Hamburg fixture plus required negative validation cases.
+- Slice 017 non-goals: no import flow, no persistence changes, and no simulation-scope expansion.
+- Slice 017: reference ADR 0057 for validator boundaries, invariants, and constant ownership context.
+
 - Slice 016j: add a pure selected-line export payload validator (`validateSelectedLineExportPayload`) that accepts unknown input and returns a discriminated typed success/failure result with multi-issue collection.
 - Slice 016j: enforce schema/kind/timestamp/source checks plus line/stop/route-segment/metadata coherence rules, including canonical time-band and route-status validation.
 - Slice 016j: centralize geometry-endpoint and travel-time validation tolerances in canonical domain constants for export parsing boundaries.
