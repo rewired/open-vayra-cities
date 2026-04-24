@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 027: apply a UI-only post-slice density/declutter pass that keeps planning summaries foregrounded while moving lower-priority diagnostics behind collapsed disclosure blocks in the inspector/map overlays.
+- Slice 027 non-goals preserved: no simulation/routing/projection/loader/export semantics changes, no persistence/backends/scenario/replay/etc., and no mobile/multimodal expansion.
+- Add ADR 0085 documenting dev UI density/disclosure rationale (including intentional non-use of browser zoom detection) and explicit non-goals.
+
 - Slice 034: keep static network summary essentials (stops, completed lines, projected vehicles, active service band, and service-status counts) always visible in the inspector.
 - Slice 034: move lower-priority static network diagnostic counts (degraded projected vehicles and configured service lines) into a collapsed `Debug details` subsection in the inspector summary.
 - Slice 034: add compact summary/disclosure styling for the inspector summary block while preserving existing projection/service semantics.
