@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { createLineId } from '../domain/types/line';
 import { createLineVehicleProjectionId, type LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
+import type { SelectedLineExportPayload } from '../domain/types/selectedLineExport';
 import { buildVehicleFeatureCollection } from './vehicleGeoJson';
 
 const lineId = createLineId('line-1');
+const currentDirPath = path.dirname(fileURLToPath(import.meta.url));
 
 const createVehicleNetworkProjection = (
   status: 'projected' | 'degraded-projected' | 'unavailable',
@@ -108,5 +113,161 @@ describe('buildVehicleFeatureCollection', () => {
     });
 
     expect(result.features[0]?.geometry.coordinates).toEqual([11.5761, 48.1371]);
+  });
+
+  it('returns deterministic filtered vehicle feature counts for mixed statuses and missing coordinates', () => {
+    const result = buildVehicleFeatureCollection({
+      vehicleNetworkProjection: {
+        lines: [
+          {
+            lineId,
+            lineLabel: 'Line 1',
+            activeTimeBandId: 'morning-rush',
+            departureScheduleStatus: 'configured',
+            vehicles: [
+              {
+                id: createLineVehicleProjectionId('line-1:420'),
+                lineId,
+                lineLabel: 'Line 1',
+                activeTimeBandId: 'morning-rush',
+                departureMinute: 420,
+                elapsedMinutes: 2,
+                routeProgressRatio: 0.2,
+                segmentProgressRatio: 0.5,
+                currentSegmentId: null,
+                coordinate: [13.4, 52.5],
+                status: 'projected'
+              },
+              {
+                id: createLineVehicleProjectionId('line-1:430'),
+                lineId,
+                lineLabel: 'Line 1',
+                activeTimeBandId: 'morning-rush',
+                departureMinute: 430,
+                elapsedMinutes: 1,
+                routeProgressRatio: 0.1,
+                segmentProgressRatio: 0.25,
+                currentSegmentId: null,
+                coordinate: [13.45, 52.55],
+                status: 'degraded-projected'
+              },
+              {
+                id: createLineVehicleProjectionId('line-1:440'),
+                lineId,
+                lineLabel: 'Line 1',
+                activeTimeBandId: 'morning-rush',
+                departureMinute: 440,
+                elapsedMinutes: 0,
+                routeProgressRatio: 0,
+                segmentProgressRatio: 0,
+                currentSegmentId: null,
+                coordinate: [13.5, 52.6],
+                status: 'unavailable'
+              },
+              {
+                id: createLineVehicleProjectionId('line-1:450'),
+                lineId,
+                lineLabel: 'Line 1',
+                activeTimeBandId: 'morning-rush',
+                departureMinute: 450,
+                elapsedMinutes: 0,
+                routeProgressRatio: 0,
+                segmentProgressRatio: 0,
+                currentSegmentId: null,
+                coordinate: null,
+                status: 'projected'
+              }
+            ]
+          }
+        ],
+        summary: {
+          totalProjectedVehicleCount: 1,
+          totalDegradedProjectedVehicleCount: 1,
+          linesWithProjectedVehiclesCount: 1,
+          activeTimeBandId: 'morning-rush'
+        }
+      }
+    });
+
+    expect(result.features).toHaveLength(2);
+    expect(result.features.map((feature) => feature.properties.projectionStatus)).toEqual([
+      'projected',
+      'degraded-projected'
+    ]);
+  });
+
+  it('keeps fixture-backed vehicle rendering behavior explicit for projected/degraded and unavailable statuses', () => {
+    const fixturePath = path.resolve(
+      currentDirPath,
+      '../../../../data/fixtures/selected-line-exports/hamburg-line-1.v2.json'
+    );
+    const payload = JSON.parse(readFileSync(fixturePath, 'utf8')) as SelectedLineExportPayload;
+    const fixtureLineId = createLineId(payload.line.id);
+
+    const result = buildVehicleFeatureCollection({
+      vehicleNetworkProjection: {
+        lines: [
+          {
+            lineId: fixtureLineId,
+            lineLabel: payload.line.label,
+            activeTimeBandId: 'morning-rush',
+            departureScheduleStatus: 'degraded',
+            vehicles: [
+              {
+                id: createLineVehicleProjectionId(`${payload.line.id}:projected`),
+                lineId: fixtureLineId,
+                lineLabel: payload.line.label,
+                activeTimeBandId: 'morning-rush',
+                departureMinute: 420,
+                elapsedMinutes: 1,
+                routeProgressRatio: 0.1,
+                segmentProgressRatio: 0.5,
+                currentSegmentId: null,
+                coordinate: [payload.stops[0]!.position.lng, payload.stops[0]!.position.lat],
+                status: 'projected'
+              },
+              {
+                id: createLineVehicleProjectionId(`${payload.line.id}:degraded`),
+                lineId: fixtureLineId,
+                lineLabel: payload.line.label,
+                activeTimeBandId: 'morning-rush',
+                departureMinute: 430,
+                elapsedMinutes: 2,
+                routeProgressRatio: 0.2,
+                segmentProgressRatio: 0.75,
+                currentSegmentId: null,
+                coordinate: [payload.stops[1]!.position.lng, payload.stops[1]!.position.lat],
+                status: 'degraded-projected'
+              },
+              {
+                id: createLineVehicleProjectionId(`${payload.line.id}:unavailable`),
+                lineId: fixtureLineId,
+                lineLabel: payload.line.label,
+                activeTimeBandId: 'morning-rush',
+                departureMinute: 440,
+                elapsedMinutes: 3,
+                routeProgressRatio: 0.3,
+                segmentProgressRatio: 0,
+                currentSegmentId: null,
+                coordinate: [payload.stops[2]!.position.lng, payload.stops[2]!.position.lat],
+                status: 'unavailable'
+              }
+            ]
+          }
+        ],
+        summary: {
+          totalProjectedVehicleCount: 1,
+          totalDegradedProjectedVehicleCount: 1,
+          linesWithProjectedVehiclesCount: 1,
+          activeTimeBandId: 'morning-rush'
+        }
+      }
+    });
+
+    expect(result.features).toHaveLength(2);
+    expect(result.features.map((feature) => feature.properties.projectionStatus)).toEqual([
+      'projected',
+      'degraded-projected'
+    ]);
   });
 });

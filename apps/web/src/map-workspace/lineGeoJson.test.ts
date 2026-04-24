@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { createUnsetLineFrequencyByTimeBand, createLineId, type Line } from '../domain/types/line';
 import {
@@ -8,6 +11,8 @@ import {
   type LineRouteSegment
 } from '../domain/types/lineRoute';
 import { createStopId, type Stop } from '../domain/types/stop';
+import { convertSelectedLineExportPayloadToSession } from '../domain/export/selectedLineExportSessionLoader';
+import type { SelectedLineExportPayload } from '../domain/types/selectedLineExport';
 import { buildCompletedLineFeatureCollection } from './lineGeoJson';
 
 const stopAId = createStopId('stop-a');
@@ -22,6 +27,7 @@ const stops: readonly Stop[] = [
 ];
 
 const stopsById = new Map(stops.map((stop) => [stop.id, stop] as const));
+const currentDirPath = path.dirname(fileURLToPath(import.meta.url));
 
 const buildRouteSegment = ({
   id,
@@ -156,5 +162,43 @@ describe('buildCompletedLineFeatureCollection', () => {
     });
 
     expect(featureCollection.features).toHaveLength(0);
+  });
+
+  it('returns deterministic feature counts across repeated calls and filters invalid line geometry', () => {
+    const invalidLine = buildLine({ routeSegments: [], stopIds: [stopAId] });
+
+    const buildCollection = () =>
+      buildCompletedLineFeatureCollection({
+        lines: [buildLine(), invalidLine],
+        stopsById,
+        selectedLineId: null
+      });
+
+    expect(buildCollection().features).toHaveLength(1);
+    expect(buildCollection().features).toHaveLength(1);
+  });
+
+  it('builds one completed LineString feature from the Hamburg selected-line export fixture', () => {
+    const fixturePath = path.resolve(
+      currentDirPath,
+      '../../../../data/fixtures/selected-line-exports/hamburg-line-1.v2.json'
+    );
+    const payload = JSON.parse(readFileSync(fixturePath, 'utf8')) as SelectedLineExportPayload;
+    const loadResult = convertSelectedLineExportPayloadToSession(payload);
+
+    expect(loadResult.ok).toBe(true);
+    if (!loadResult.ok) {
+      throw new Error(`Expected fixture conversion to succeed but got ${loadResult.issue.code}.`);
+    }
+
+    const loadedStopsById = new Map(loadResult.session.placedStops.map((stop) => [stop.id, stop] as const));
+    const featureCollection = buildCompletedLineFeatureCollection({
+      lines: loadResult.session.sessionLines,
+      stopsById: loadedStopsById,
+      selectedLineId: loadResult.session.selectedLineId
+    });
+
+    expect(featureCollection.features).toHaveLength(1);
+    expect(featureCollection.features[0]?.geometry.type).toBe('LineString');
   });
 });

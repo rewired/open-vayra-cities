@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 023b: document builder-vs-source-vs-rendered diagnostics rationale, source `setData(...)` versus style-readiness lifecycle distinction, completed-line rendering hardening, and explicit custom-layer ordering helpers/coverage.
+- Slice 023b: add focused deterministic tests for completed-line and vehicle GeoJSON builder counts/filtering, custom-layer order/id-list helpers, and fixture-backed Hamburg line behavior for completed lines and projected/degraded vs unavailable vehicle rendering.
+- Add ADR 0081 documenting Slice 023b diagnostics boundaries, lifecycle separation, deterministic layer-order enforcement, and explicit non-goals.
+
 - Slice 030: add a dedicated deterministic map workspace custom-layer ordering helper that reapplies the canonical CityOps stack through typed `moveLayer(...)` calls.
 - Slice 030: invoke custom-layer order reapplication from the centralized source synchronization path so ordering is restored consistently after style/layer readiness transitions.
 - Slice 030: tighten local MapLibre typing with a narrow `moveLayer(layerId, beforeId?)` contract and generic typed GeoJSON source lookup to remove source-sync type casts.

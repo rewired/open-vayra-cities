@@ -83,6 +83,17 @@ const CUSTOM_LAYER_ORDER = [
   MAP_LAYER_ID_VEHICLES
 ] as const;
 
+/**
+ * Returns the canonical deterministic custom-layer order used by the map workspace.
+ */
+export const getMapWorkspaceCustomLayerOrder = (): readonly string[] => [...CUSTOM_LAYER_ORDER];
+
+/**
+ * Returns existing workspace custom-layer ids in canonical deterministic order.
+ */
+export const listPresentMapWorkspaceCustomLayerIds = (map: MapLibreMap): readonly string[] =>
+  getMapWorkspaceCustomLayerOrder().filter((layerId) => map.getLayer(layerId) !== undefined);
+
 const WORKSPACE_SOURCE_IDS = [
   MAP_SOURCE_ID_COMPLETED_LINES,
   MAP_SOURCE_ID_DRAFT_LINE,
@@ -108,8 +119,10 @@ const countSourceFeatures = (map: MapLibreMap, sourceId: string): number => {
  * Reapplies deterministic ordering for all workspace-owned custom layers.
  */
 export const enforceMapWorkspaceCustomLayerOrder = (map: MapLibreMap): void => {
-  for (let index = CUSTOM_LAYER_ORDER.length - 1; index >= 0; index -= 1) {
-    const layerId = CUSTOM_LAYER_ORDER[index];
+  const customLayerOrder = getMapWorkspaceCustomLayerOrder();
+
+  for (let index = customLayerOrder.length - 1; index >= 0; index -= 1) {
+    const layerId = customLayerOrder[index];
     if (!layerId) {
       continue;
     }
@@ -118,7 +131,7 @@ export const enforceMapWorkspaceCustomLayerOrder = (map: MapLibreMap): void => {
       continue;
     }
 
-    const beforeLayerId = index < CUSTOM_LAYER_ORDER.length - 1 ? CUSTOM_LAYER_ORDER[index + 1] : undefined;
+    const beforeLayerId = index < customLayerOrder.length - 1 ? customLayerOrder[index + 1] : undefined;
     const existingBeforeLayer = typeof beforeLayerId === 'string' ? map.getLayer(beforeLayerId) : undefined;
 
     map.moveLayer(layerId, existingBeforeLayer ? beforeLayerId : undefined);
