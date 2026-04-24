@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 019: add a pure simulation clock baseline (deterministic day/minute timestamp, running-state transitions, canonical speed controls, reset support, and elapsed-time advancement helpers) outside React and map rendering modules.
+- Slice 019: add canonical clock constants and full-day minute-range-to-time-band mapping for deterministic active MVP time-band derivation.
+- Slice 019: add shell status-bar clock projection and controls for pause/resume/speed/reset, plus current day/time/time-band/running-state display.
+- Slice 019: add unit tests for deterministic clock initialization, pause/run behavior, speed semantics, day-wrap progression, reset, time-band coverage, formatting, and invalid-speed fallback.
+- Slice 019 non-goals preserved: no demand/economy/passenger/vehicle/service execution, no route recalculation, no fixture replay/import/persistence/backend scope expansion.
+- Add ADR 0063 documenting the simulation clock baseline decision, architecture boundaries, and explicit non-goals.
+
 - Slice 018c: introduce pure line-readiness diagnostics at the domain boundary to keep readiness evaluation deterministic and UI-agnostic.
 - Slice 018c: add typed readiness issue code/severity constants plus a typed status projection contract for selected-line readiness output.
 - Slice 018c: add a selected-line inspector readiness section that projects readiness status, issue summaries, and compact diagnostic details.
