@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 028: switch projected vehicle markers from symbol glyph contracts to canonical circle-based layer rendering while preserving existing vehicle source/layer ids.
+- Slice 028: formalize degraded-vs-normal marker distinction through canonical circle styling semantics keyed by projected feature properties.
+- Slice 028: expand vehicle GeoJSON builder test coverage to lock map-facing projected/degraded marker feature contracts.
+- Slice 028: add HUD diagnostic counts for projected vs degraded projected vehicle totals.
+- Add ADR 0074 documenting circle-layer semantics, map-native GeoJSON rendering boundary, and explicit non-goals.
+
 - Slice 027: replace projected vehicle map marker rendering from symbol/text contracts to a circle-layer contract in `mapRenderConstants.ts` and `MapWorkspaceSurface.tsx`.
 - Slice 027: remove vehicle text-field/glyph layout dependency and bind a canonical circle paint expression keyed by the `degraded` feature property.
 - Slice 027: add higher-visibility vehicle marker radius plus contrasting near-white circle stroke for legibility over streets and stop markers.
