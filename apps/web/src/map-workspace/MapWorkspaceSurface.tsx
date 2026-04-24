@@ -1310,6 +1310,7 @@ export function MapWorkspaceSurface({
       id: createLineId(`line-${sessionLines.length + 1}`),
       label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${sessionLines.length + 1}`,
       stopIds: draftStopIds,
+      routeSegments: [],
       frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
     };
 

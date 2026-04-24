@@ -1,5 +1,6 @@
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
 import type { TimeBandId } from './timeBand';
+import type { LineRouteSegment } from './lineRoute';
 import type { StopId } from './stop';
 
 /**
@@ -25,6 +26,7 @@ export interface Line {
   readonly id: LineId;
   readonly label: string;
   readonly stopIds: readonly StopId[];
+  readonly routeSegments: readonly LineRouteSegment[];
   readonly frequencyByTimeBand: LineFrequencyByTimeBand;
 }
 
