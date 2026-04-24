@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 023 (selected-line loader): add a user-facing `Load line JSON` action that reads one browser-selected JSON file, safely parses it, validates it through the existing selected-line export validator, and reports compact parse/validation failures.
+- Slice 023 (selected-line loader): add a pure validated selected-line export session conversion helper that maps payload stops/line into canonical in-memory session state while preserving ids, ordered stops, time-band frequencies, route segments, and stop labels.
+- Slice 023 (selected-line loader): apply replacement-only load semantics (replace current in-memory stops/lines, select loaded line, clear selected stop, clear draft-line state) without route recomputation.
+- Slice 023 (selected-line loader): add fixture-backed/unit coverage for deterministic conversion, validation boundary reuse, and all-null Hamburg fixture frequency preservation.
+- Add ADR 0075 documenting validated selected-line export session loading boundaries, replacement semantics rationale, fixture location decision, and explicit non-goals.
+
 - Slice 028: switch projected vehicle markers from symbol glyph contracts to canonical circle-based layer rendering while preserving existing vehicle source/layer ids.
 - Slice 028: formalize degraded-vs-normal marker distinction through canonical circle styling semantics keyed by projected feature properties.
 - Slice 028: expand vehicle GeoJSON builder test coverage to lock map-facing projected/degraded marker feature contracts.

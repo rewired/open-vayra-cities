@@ -218,6 +218,34 @@ body {
   margin-top: 8px;
 }
 
+.inspector-line-json-loader {
+  margin: 12px 0;
+}
+
+.inspector-line-json-loader p {
+  margin: 8px 0;
+}
+
+.inspector-line-json-loader__file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.inspector-line-json-loader__feedback {
+  font-size: 0.85rem;
+}
+
+.inspector-line-json-loader__feedback--success {
+  color: #9fe3ad;
+}
+
+.inspector-line-json-loader__feedback--error {
+  color: #ffb5b5;
+}
+
 
 .map-workspace__stop-marker {
   position: relative;

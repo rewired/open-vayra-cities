@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent, type ReactElement } from 'react';
 
 import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
 import {
@@ -27,6 +27,9 @@ import type { SimulationSpeedId } from './domain/types/simulationClock';
 import type { Stop, StopId } from './domain/types/stop';
 import type { TimeBandId } from './domain/types/timeBand';
 import { SIMULATION_SPEED_DEFINITIONS } from './domain/constants/simulationClock';
+import { parseSelectedLineExportFile } from './domain/export/selectedLineExportFileLoader';
+import { convertSelectedLineExportPayloadToSession } from './domain/export/selectedLineExportSessionLoader';
+import { validateSelectedLineExportPayload } from './domain/export/selectedLineExportValidation';
 import {
   MapWorkspaceSurface,
   type StopSelectionState
@@ -78,6 +81,12 @@ interface RouteBaselineAggregateMetrics {
   readonly totalDwellMinutes: number;
   readonly totalLineMinutes: number;
   readonly hasFallbackSegments: boolean;
+}
+
+interface SelectedLineImportFeedback {
+  readonly kind: 'success' | 'error';
+  readonly title: string;
+  readonly detail: string;
 }
 
 const MAX_READINESS_ISSUES_VISIBLE = 5;
@@ -249,6 +258,10 @@ export default function App(): ReactElement {
     useState<LineFrequencyValidationByTimeBand>(createEmptyLineFrequencyValidationByTimeBand);
   const [simulationClockState, setSimulationClockState] = useState(createInitialSimulationClockState);
   const lastClockTickRealMillisecondsRef = useRef<number | null>(null);
+  const lineJsonFileInputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedLineImportFeedback, setSelectedLineImportFeedback] = useState<SelectedLineImportFeedback | null>(
+    null
+  );
 
   const handleToolModeSelection = (nextMode: WorkspaceToolMode): void => {
     setActiveToolMode(nextMode);
@@ -445,6 +458,64 @@ export default function App(): ReactElement {
     );
   };
 
+  const handleLineJsonPickerOpen = (): void => {
+    setSelectedLineImportFeedback(null);
+    lineJsonFileInputRef.current?.click();
+  };
+
+  const handleLineJsonFileSelection = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const selectedFile = event.currentTarget.files?.[0];
+    event.currentTarget.value = '';
+
+    if (!selectedFile) {
+      return;
+    }
+
+    const parsedResult = await parseSelectedLineExportFile(selectedFile);
+    if (!parsedResult.ok) {
+      setSelectedLineImportFeedback({
+        kind: 'error',
+        title: 'Line JSON could not be loaded',
+        detail: parsedResult.issue.message
+      });
+      return;
+    }
+
+    const validationResult = validateSelectedLineExportPayload(parsedResult.parsed);
+    if (!validationResult.ok) {
+      const firstIssue = validationResult.issues[0];
+      setSelectedLineImportFeedback({
+        kind: 'error',
+        title: 'Line JSON could not be loaded',
+        detail: firstIssue
+          ? `${firstIssue.message}${validationResult.issues.length > 1 ? ` (${validationResult.issues.length} issues)` : ''}`
+          : 'The selected line JSON failed validation.'
+      });
+      return;
+    }
+
+    const conversionResult = convertSelectedLineExportPayloadToSession(validationResult.payload);
+    if (!conversionResult.ok) {
+      setSelectedLineImportFeedback({
+        kind: 'error',
+        title: 'Line JSON could not be loaded',
+        detail: conversionResult.issue.message
+      });
+      return;
+    }
+
+    setSessionStops(conversionResult.session.placedStops);
+    setSessionLines(conversionResult.session.sessionLines);
+    setSelectedLineId(conversionResult.session.selectedLineId);
+    setSelectedStop(null);
+    setLineBuildSelection(INITIAL_LINE_BUILD_SELECTION_STATE);
+    setSelectedLineImportFeedback({
+      kind: 'success',
+      title: 'Line JSON loaded',
+      detail: `Loaded line ${conversionResult.session.selectedLineId} and replaced the current in-memory network.`
+    });
+  };
+
   const handlePauseClock = (): void => {
     setSimulationClockState((currentClockState) =>
       applySimulationClockCommand(currentClockState, { type: 'pause' }).nextState
@@ -564,6 +635,33 @@ export default function App(): ReactElement {
           ) : (
             <p>Selected completed line: none</p>
           )}
+        </section>
+        <section className="inspector-line-json-loader" aria-label="Line JSON loader">
+          <h3>Session line loading</h3>
+          <p>Load replaces current in-memory stops and completed lines.</p>
+          <button type="button" onClick={handleLineJsonPickerOpen}>
+            Load line JSON
+          </button>
+          <input
+            ref={lineJsonFileInputRef}
+            type="file"
+            accept=".json,application/json"
+            className="inspector-line-json-loader__file-input"
+            onChange={(event) => {
+              void handleLineJsonFileSelection(event);
+            }}
+          />
+          {selectedLineImportFeedback ? (
+            <p
+              className={
+                selectedLineImportFeedback.kind === 'error'
+                  ? 'inspector-line-json-loader__feedback inspector-line-json-loader__feedback--error'
+                  : 'inspector-line-json-loader__feedback inspector-line-json-loader__feedback--success'
+              }
+            >
+              <strong>{selectedLineImportFeedback.title}:</strong> {selectedLineImportFeedback.detail}
+            </p>
+          ) : null}
         </section>
         <p>MVP time bands: {MVP_TIME_BAND_IDS.map((timeBandId) => TIME_BAND_DISPLAY_LABELS[timeBandId]).join(', ')}</p>
         {inspectorPanelState.mode === 'line-selected' ? (
