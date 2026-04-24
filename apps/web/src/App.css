@@ -197,6 +197,40 @@ body {
   left: 14px;
 }
 
+.map-workspace__overlay--debug {
+  top: 58px;
+  left: 14px;
+  max-width: min(44ch, calc(100% - 28px));
+  border-color: rgb(66 91 131 / 55%);
+  background: rgb(13 23 38 / 58%);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.debug-disclosure {
+  margin: 0;
+}
+
+.debug-disclosure > summary {
+  cursor: pointer;
+  color: #9fb0cb;
+  font-size: 0.72rem;
+  list-style: revert;
+}
+
+.debug-disclosure__content {
+  margin-top: 6px;
+  color: #bfd0e9;
+  font-size: 0.72rem;
+}
+
+.map-workspace__debug-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 2px;
+}
+
 .map-workspace__overlay--mode {
   right: 14px;
   bottom: 14px;

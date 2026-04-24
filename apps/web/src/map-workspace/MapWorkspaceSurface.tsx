@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 
+import { DebugDisclosure } from '../ui/DebugDisclosure';
 import {
   LINE_BUILD_PLACEHOLDER_LABEL_PREFIX,
   MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE
@@ -555,6 +556,9 @@ export function MapWorkspaceSurface({
   const draftMetadataSummary = draftLineState.metadata
     ? `Draft #${draftLineState.metadata.draftOrdinal} @ ${draftLineState.metadata.startedAtIsoUtc}`
     : 'Draft inactive';
+  const buildLineBlockerSummary = buildLineUiFeedback.canCompleteDraft
+    ? 'Ready to complete.'
+    : `Blocked: ${buildLineUiFeedback.minimumStopRequirement}`;
 
   const handleDraftCancel = (): void => {
     setDraftLineState(INITIAL_DRAFT_LINE_STATE);
@@ -604,16 +608,35 @@ export function MapWorkspaceSurface({
     <section className="map-workspace" aria-label="Map workspace surface">
       <div ref={mapContainerRef} className="map-workspace__map" aria-label="CityOps baseline map" />
 
-      <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
-        Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
-        {` | Placed stops: ${placedStops.length} | ${lineDiagnosticsSummary} | ${vehicleDiagnosticsSummary} | ${stopSelectionSummary} | Line draft stops: ${draftLineState.stopIds.length} | Session lines: ${sessionLines.length} | ${draftMetadataSummary}`}
+      <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace compact status">
+        <strong>Mode: {activeToolMode}</strong>
+        <span>{` · Placed stops: ${placedStops.length}`}</span>
+        <span>{` · Session lines: ${sessionLines.length}`}</span>
+        <span>{` · Draft stops: ${draftLineState.stopIds.length}`}</span>
+      </div>
+
+      <div className="map-workspace__overlay map-workspace__overlay--debug map-workspace__overlay--interactive-controls" aria-label="Map workspace debug diagnostics">
+        <DebugDisclosure>
+          <ul className="map-workspace__debug-list">
+            <li>{`Interaction status: ${interactionState.status}`}</li>
+            <li>{`Pointer: ${pointerSummary}`}</li>
+            <li>{`Geo: ${geographicSummary}`}</li>
+            <li>{lineDiagnosticsSummary}</li>
+            <li>{vehicleDiagnosticsSummary}</li>
+            <li>{stopSelectionSummary}</li>
+            <li>{`Placement instruction: ${placementUiFeedback.modeInstruction ?? 'n/a'}`}</li>
+            <li>{`Placement street rule hint: ${placementUiFeedback.streetRuleHint ?? 'n/a'}`}</li>
+            <li>{`Build-line instruction: ${buildLineUiFeedback.modeInstruction ?? 'n/a'}`}</li>
+            <li>{`Build-line minimum requirement: ${buildLineUiFeedback.minimumStopRequirement ?? 'n/a'}`}</li>
+            <li>{`Draft overlay note: ${LINE_OVERLAY_COPY.draft}`}</li>
+            <li>{draftMetadataSummary}</li>
+          </ul>
+        </DebugDisclosure>
       </div>
 
       {placementUiFeedback.showPlacementModeIndicator ? (
         <div className="map-workspace__overlay map-workspace__overlay--mode" aria-live="polite" aria-label="Placement mode status">
           <strong>{PLACEMENT_MODE_INDICATOR_LABEL}</strong>
-          <span> · {placementUiFeedback.modeInstruction}</span>
-          {placementUiFeedback.showStreetRuleHint ? <span> · {placementUiFeedback.streetRuleHint}</span> : null}
           <span> · {placementUiFeedback.lastAttemptMessage}</span>
         </div>
       ) : null}
@@ -625,10 +648,8 @@ export function MapWorkspaceSurface({
           aria-label="Build line mode status"
         >
           <strong>{BUILD_LINE_MODE_INDICATOR_LABEL}</strong>
-          <span> · {buildLineUiFeedback.modeInstruction}</span>
-          <span> · {buildLineUiFeedback.minimumStopRequirement}</span>
-          <span> · {LINE_OVERLAY_COPY.draft}</span>
           <span>{` · Draft stops: ${buildLineUiFeedback.draftStopCount}`}</span>
+          <span> · {buildLineBlockerSummary}</span>
           <div className="map-workspace__overlay-button-row">
             <button type="button" onClick={handleDraftCancel}>
               Cancel draft
