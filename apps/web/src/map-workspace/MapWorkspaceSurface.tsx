@@ -39,8 +39,7 @@ import {
   MAP_STOP_CIRCLE_LAYER_STYLE,
   MAP_STOP_LABEL_LAYER_LAYOUT,
   MAP_STOP_LABEL_LAYER_PAINT,
-  MAP_VEHICLE_LAYER_LAYOUT,
-  MAP_VEHICLE_LAYER_PAINT
+  MAP_VEHICLE_CIRCLE_LAYER_PAINT
 } from './mapRenderConstants';
 import { buildCompletedLineFeatureCollection, buildDraftLineFeatureCollection } from './lineGeoJson';
 import { buildStopFeatureCollection } from './stopGeoJson';
@@ -835,10 +834,9 @@ const ensureVehicleRenderSourceAndLayer = (map: MapLibreMap): void => {
   if (!map.getLayer(MAP_LAYER_ID_VEHICLES)) {
     map.addLayer({
       id: MAP_LAYER_ID_VEHICLES,
-      type: 'symbol',
+      type: 'circle',
       source: MAP_SOURCE_ID_VEHICLES,
-      layout: MAP_VEHICLE_LAYER_LAYOUT,
-      paint: MAP_VEHICLE_LAYER_PAINT
+      paint: MAP_VEHICLE_CIRCLE_LAYER_PAINT
     });
   }
 };
