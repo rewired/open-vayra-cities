@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 016j: add a pure selected-line export payload validator (`validateSelectedLineExportPayload`) that accepts unknown input and returns a discriminated typed success/failure result with multi-issue collection.
+- Slice 016j: enforce schema/kind/timestamp/source checks plus line/stop/route-segment/metadata coherence rules, including canonical time-band and route-status validation.
+- Slice 016j: centralize geometry-endpoint and travel-time validation tolerances in canonical domain constants for export parsing boundaries.
+- Add ADR 0057 documenting selected-line export payload validation boundaries and tolerance constant ownership.
+
 - Slice 016: add a selected-line JSON export action that emits one typed export payload for the currently selected completed in-memory line.
 - Slice 016: keep stop session truth shell-owned in `App.tsx` so export assembly and map/inspector projections resolve from one canonical stop list.
 - Slice 016: enforce export payload boundaries to only include the selected line plus stops referenced by that line, excluding unrelated session entities.

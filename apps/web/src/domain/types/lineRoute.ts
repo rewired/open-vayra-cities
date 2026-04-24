@@ -32,6 +32,11 @@ export type RouteTravelMinutes = number & { readonly __brand: 'RouteTravelMinute
 export type RouteStatus = 'not-routed' | 'routed' | 'fallback-routed' | 'routing-failed';
 
 /**
+ * Canonical runtime list of route-status values for parsing and validation boundaries.
+ */
+export const ROUTE_STATUSES = ['not-routed', 'routed', 'fallback-routed', 'routing-failed'] as const satisfies readonly RouteStatus[];
+
+/**
  * Canonical route segment model between two ordered stops on a line.
  */
 export interface LineRouteSegment {
