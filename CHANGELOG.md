@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 028: document the product-style map-centric shell rationale as a layout/presentation-only consolidation (integrated top bar, real-tool left rail, contextual inspector, selected-line bottom tray, and dark basemap decisions).
+- Slice 028 non-goals preserved: no simulation/routing/projection semantic changes, no fake KPIs or fabricated dashboard data, no out-of-scope feature surfacing, and no mobile/multimodal expansion.
+- Add ADR 0092 documenting map-centric shell presentation boundaries and explicit non-goals.
+
 - Slice 037: add a compact, read-only selected-line context tray near the map workspace bottom and render it only when a completed line is selected.
 - Slice 037: show existing selected-line/session/projection values only (line id/label, stop count + compact stop sequence, segment count, total route time, active-band headway, next departure, projected vehicle count).
 - Slice 037 non-goals preserved: no simulation/routing/projection behavior changes, no new interactive focusable controls, and no mobile/multimodal scope expansion.
