@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 016: add a selected-line JSON export action that emits one typed export payload for the currently selected completed in-memory line.
+- Slice 016: keep stop session truth shell-owned in `App.tsx` so export assembly and map/inspector projections resolve from one canonical stop list.
+- Slice 016: enforce export payload boundaries to only include the selected line plus stops referenced by that line, excluding unrelated session entities.
+- Slice 016 non-goals: no persistence, no import flow, no backend/API integration, and no simulation model changes.
+- Add ADR 0056 documenting selected-line in-memory export scope, route-segment serialization truth contract, shell-owned stop truth rationale, and schema/versioning fixture-stability intent.
+
 - Slice 015i: add canonical selected-line export payload types in `apps/web/src/domain/types/selectedLineExport.ts`, including schema-version and kind discriminators plus typed root/line/segment/stop/metadata blocks.
 - Slice 015i: keep exported route-segment fields directly aligned to `LineRouteSegment` field truth (id, line/from/to stop ids, ordered geometry, distance, in-motion/dwell/total minutes, and status) without recomputation semantics.
 - Add ADR 0055 documenting selected-line export schema typing boundaries and non-goals.
