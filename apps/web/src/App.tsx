@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactElement } from 'react';
 
 import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
 import { createLineFrequencyMinutes, type Line } from './domain/types/line';
+import type { LineRouteSegment, RouteStatus } from './domain/types/lineRoute';
 import type { StopId } from './domain/types/stop';
 import type { TimeBandId } from './domain/types/timeBand';
 import {
@@ -46,6 +47,15 @@ interface StaticNetworkSummaryKpis {
   readonly totalStopCount: number;
   readonly completedLineCount: number;
   readonly selectedCompletedLine: SelectedLineStructureSummary | null;
+}
+
+interface RouteBaselineAggregateMetrics {
+  readonly segmentCount: number;
+  readonly totalDistanceMeters: number;
+  readonly totalInMotionMinutes: number;
+  readonly totalDwellMinutes: number;
+  readonly totalLineMinutes: number;
+  readonly hasFallbackSegments: boolean;
 }
 
 /**
@@ -93,6 +103,28 @@ const createEmptyLineFrequencyInputByTimeBand = (): LineFrequencyInputByTimeBand
 
 const createEmptyLineFrequencyValidationByTimeBand = (): LineFrequencyValidationByTimeBand =>
   Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, null])) as LineFrequencyValidationByTimeBand;
+
+const ROUTE_STATUS_LABELS: Readonly<Record<RouteStatus, string>> = {
+  'not-routed': 'Not routed',
+  routed: 'Routed',
+  'fallback-routed': 'Fallback routed',
+  'routing-failed': 'Routing failed'
+};
+
+const formatDistanceMeters = (distanceMeters: number): string => `${distanceMeters.toFixed(0)} m`;
+
+const formatTravelMinutes = (travelMinutes: number): string => `${travelMinutes.toFixed(2)} min`;
+
+const projectRouteBaselineAggregateMetrics = (
+  routeSegments: readonly LineRouteSegment[]
+): RouteBaselineAggregateMetrics => ({
+  segmentCount: routeSegments.length,
+  totalDistanceMeters: routeSegments.reduce((sum, segment) => sum + segment.distanceMeters, 0),
+  totalInMotionMinutes: routeSegments.reduce((sum, segment) => sum + segment.inMotionTravelMinutes, 0),
+  totalDwellMinutes: routeSegments.reduce((sum, segment) => sum + segment.dwellMinutes, 0),
+  totalLineMinutes: routeSegments.reduce((sum, segment) => sum + segment.totalTravelMinutes, 0),
+  hasFallbackSegments: routeSegments.some((segment) => segment.status === 'fallback-routed')
+});
 
 /**
  * Resolves the inspector panel state with explicit selection priority:
@@ -185,6 +217,9 @@ export default function App(): ReactElement {
     sessionLines,
     selectedLine
   );
+  const selectedLineRouteBaselineMetrics = selectedLine
+    ? projectRouteBaselineAggregateMetrics(selectedLine.routeSegments)
+    : null;
 
   useEffect(() => {
     if (!selectedLine) {
@@ -358,6 +393,61 @@ export default function App(): ReactElement {
             <p>ID/Label: {`${inspectorPanelState.selectedLine.id} / ${inspectorPanelState.selectedLine.label}`}</p>
             <p>Stop count: {inspectorPanelState.selectedLine.stopIds.length}</p>
             <p>Ordered stops: {inspectorPanelState.selectedLine.stopIds.join(' → ')}</p>
+            <section className="inspector-route-baseline" aria-label="Route baseline">
+              <h3>Route baseline</h3>
+              <div className="inspector-route-baseline__totals">
+                <p>Segment count: {selectedLineRouteBaselineMetrics?.segmentCount ?? 0}</p>
+                <p>
+                  Total distance:{' '}
+                  {formatDistanceMeters(selectedLineRouteBaselineMetrics?.totalDistanceMeters ?? 0)}
+                </p>
+                <p>
+                  Total in-motion time:{' '}
+                  {formatTravelMinutes(selectedLineRouteBaselineMetrics?.totalInMotionMinutes ?? 0)}
+                </p>
+                <p>
+                  Total dwell time:{' '}
+                  {formatTravelMinutes(selectedLineRouteBaselineMetrics?.totalDwellMinutes ?? 0)}
+                </p>
+                <p>Total line time: {formatTravelMinutes(selectedLineRouteBaselineMetrics?.totalLineMinutes ?? 0)}</p>
+              </div>
+              {selectedLineRouteBaselineMetrics?.hasFallbackSegments ? (
+                <p className="inspector-route-baseline__fallback-note">
+                  Fallback routed segments detected. Values are baseline fallback outputs and are not accuracy
+                  claims.
+                </p>
+              ) : null}
+              {inspectorPanelState.selectedLine.routeSegments.length > 0 ? (
+                <table className="inspector-route-baseline__segment-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">From</th>
+                      <th scope="col">To</th>
+                      <th scope="col">Distance</th>
+                      <th scope="col">In-motion</th>
+                      <th scope="col">Dwell</th>
+                      <th scope="col">Line time</th>
+                      <th scope="col">Route status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inspectorPanelState.selectedLine.routeSegments.map((segment) => (
+                      <tr key={segment.id}>
+                        <td>{segment.fromStopId}</td>
+                        <td>{segment.toStopId}</td>
+                        <td>{formatDistanceMeters(segment.distanceMeters)}</td>
+                        <td>{formatTravelMinutes(segment.inMotionTravelMinutes)}</td>
+                        <td>{formatTravelMinutes(segment.dwellMinutes)}</td>
+                        <td>{formatTravelMinutes(segment.totalTravelMinutes)}</td>
+                        <td>{ROUTE_STATUS_LABELS[segment.status]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p>No route segments available.</p>
+              )}
+            </section>
             <div className="inspector-frequency-editor">
               {MVP_TIME_BAND_IDS.map((timeBandId) => (
                 <label key={timeBandId} className="inspector-frequency-editor__row">
