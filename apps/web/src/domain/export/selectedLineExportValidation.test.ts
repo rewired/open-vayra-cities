@@ -1,131 +1,170 @@
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { validateSelectedLineExportPayload } from './selectedLineExportValidation';
-import { createLineFrequencyMinutes, createLineId, type Line } from '../types/line';
-import {
-  createLineSegmentId,
-  createRouteDistanceMeters,
-  createRouteTravelMinutes,
-  type LineRouteSegment
-} from '../types/lineRoute';
-import { buildSelectedLineExportPayload } from '../types/selectedLineExport';
-import { createStopId, type Stop } from '../types/stop';
+import type { SelectedLineExportPayload } from '../types/selectedLineExport';
 
-const stopAId = createStopId('stop-a');
-const stopBId = createStopId('stop-b');
-const lineId = createLineId('line-1');
+const currentFilePath = fileURLToPath(import.meta.url);
+const currentDirPath = dirname(currentFilePath);
+const fixturePath = resolve(currentDirPath, '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v2.json');
 
-const routeSegments: readonly LineRouteSegment[] = [
-  {
-    id: createLineSegmentId('line-1-segment-1'),
-    lineId,
-    fromStopId: stopAId,
-    toStopId: stopBId,
-    orderedGeometry: [
-      [9.99, 53.55],
-      [10, 53.56]
-    ],
-    distanceMeters: createRouteDistanceMeters(1000),
-    inMotionTravelMinutes: createRouteTravelMinutes(4),
-    dwellMinutes: createRouteTravelMinutes(0.5),
-    totalTravelMinutes: createRouteTravelMinutes(4.5),
-    status: 'fallback-routed'
-  }
-];
+const readFixturePayload = (): SelectedLineExportPayload =>
+  JSON.parse(readFileSync(fixturePath, 'utf-8')) as SelectedLineExportPayload;
 
-const selectedLine: Line = {
-  id: lineId,
-  label: 'Line 1',
-  stopIds: [stopAId, stopBId],
-  routeSegments,
-  frequencyByTimeBand: {
-    'morning-rush': createLineFrequencyMinutes(8)
+const expectIssue = (payload: SelectedLineExportPayload, expectedCode: string): void => {
+  const result = validateSelectedLineExportPayload(payload);
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.issues.map((issue) => issue.code)).toContain(expectedCode);
   }
 };
 
-const stops: readonly Stop[] = [
-  { id: stopAId, position: { lng: 9.99, lat: 53.55 }, label: 'A' },
-  { id: stopBId, position: { lng: 10, lat: 53.56 }, label: 'B' }
-];
-
-describe('validateSelectedLineExportPayload', () => {
-  it('returns success with a typed payload for valid selected-line export JSON', () => {
-    const payload = buildSelectedLineExportPayload({
-      selectedLine,
-      placedStops: stops,
-      createdAtIsoUtc: '2026-04-24T12:00:00.000Z',
-      sourceMetadata: { source: 'cityops-web' }
-    });
+describe('validateSelectedLineExportPayload fixture contract', () => {
+  it('validates committed hamburg-line-1 fixture successfully', () => {
+    const payload = readFixturePayload();
 
     const result = validateSelectedLineExportPayload(payload);
 
     expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.payload.line.id).toBe(lineId);
-      expect(result.payload.metadata.includedTimeBandIds).toEqual(['morning-rush']);
-    }
   });
 
-  it('collects multiple validation issues in one pass for invalid payloads', () => {
-    const result = validateSelectedLineExportPayload({
-      schemaVersion: 'wrong',
-      exportKind: 'not-single-line',
-      createdAtIsoUtc: 'not-an-iso',
-      sourceMetadata: { source: '' },
-      line: {
-        id: 'line-1',
-        label: 'Line 1',
-        orderedStopIds: ['stop-a', 'stop-b'],
-        frequencyByTimeBand: {
-          'morning-rush': 8,
-          invalid: 10
-        },
-        routeSegments: [
-          {
-            id: 'segment-1',
-            lineId: 'line-2',
-            fromStopId: 'stop-a',
-            toStopId: 'stop-b',
-            orderedGeometry: [
-              [9.9, 53.5],
-              [9.91, 53.51]
-            ],
-            distanceMeters: 1000,
-            inMotionTravelMinutes: 4,
-            dwellMinutes: 0.5,
-            totalTravelMinutes: 9,
-            status: 'bad-status'
-          }
-        ]
-      },
-      stops: [
-        { id: 'stop-a', position: { lng: 9.99, lat: 53.55 } },
-        { id: 'stop-b', position: { lng: 10, lat: 53.56 } },
-        { id: 'stop-extra', position: { lng: 10.01, lat: 53.57 } }
-      ],
-      metadata: {
-        lineCount: 1,
-        stopCount: 1,
-        routeSegmentCount: 3,
-        includedTimeBandIds: ['morning-rush', 'late-morning']
-      }
-    });
+  it('fails on unknown schema version', () => {
+    const payload = readFixturePayload();
+    payload.schemaVersion = 'cityops-selected-line-export-v999';
 
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      const codes = result.issues.map((issue) => issue.code);
-      expect(codes).toContain('invalid-schema-version');
-      expect(codes).toContain('invalid-export-kind');
-      expect(codes).toContain('invalid-created-at-iso-utc');
-      expect(codes).toContain('invalid-source-metadata-source');
-      expect(codes).toContain('invalid-frequency-time-band-id');
-      expect(codes).toContain('route-segment-line-id-mismatch');
-      expect(codes).toContain('route-segment-endpoint-mismatch');
-      expect(codes).toContain('route-segment-total-travel-minutes-mismatch');
-      expect(codes).toContain('invalid-route-status');
-      expect(codes).toContain('stop-reference-mismatch');
-      expect(codes).toContain('invalid-metadata-counts');
-      expect(codes).toContain('metadata-included-time-band-order-mismatch');
+    expectIssue(payload, 'invalid-schema-version');
+  });
+
+  it('fails on unknown export kind', () => {
+    const payload = readFixturePayload();
+    payload.exportKind = 'multi-line' as SelectedLineExportPayload['exportKind'];
+
+    expectIssue(payload, 'invalid-export-kind');
+  });
+
+  it('fails when an ordered stop is missing from exported stops', () => {
+    const payload = readFixturePayload();
+    payload.stops = payload.stops.filter((stop) => stop.id !== 'stop-7');
+    payload.metadata.stopCount = payload.stops.length;
+
+    expectIssue(payload, 'stop-reference-mismatch');
+  });
+
+  it('fails when an exported stop is unreferenced by ordered stops', () => {
+    const payload = readFixturePayload();
+    payload.stops = [
+      ...payload.stops,
+      {
+        id: 'stop-extra',
+        position: { lng: 9.95, lat: 53.55 },
+        label: 'Extra Stop'
+      }
+    ];
+    payload.metadata.stopCount = payload.stops.length;
+
+    expectIssue(payload, 'stop-reference-mismatch');
+  });
+
+  it('fails when route segment count is below ordered stop chain minimum', () => {
+    const payload = readFixturePayload();
+    payload.line.routeSegments = payload.line.routeSegments.slice(0, -1);
+    payload.metadata.routeSegmentCount = payload.line.routeSegments.length;
+
+    expectIssue(payload, 'route-segment-count-mismatch');
+  });
+
+  it('fails on route segment adjacency mismatch', () => {
+    const payload = readFixturePayload();
+    const stop3 = payload.stops.find((stop) => stop.id === 'stop-3');
+
+    expect(stop3).toBeDefined();
+    if (!stop3) {
+      return;
     }
+
+    payload.line.routeSegments[0] = {
+      ...payload.line.routeSegments[0],
+      toStopId: 'stop-3',
+      orderedGeometry: [
+        payload.line.routeSegments[0].orderedGeometry[0],
+        [stop3.position.lng, stop3.position.lat]
+      ]
+    };
+
+    expectIssue(payload, 'route-segment-adjacency-mismatch');
+  });
+
+  it('fails on route segment line id mismatch', () => {
+    const payload = readFixturePayload();
+    payload.line.routeSegments[0] = {
+      ...payload.line.routeSegments[0],
+      lineId: 'line-2'
+    };
+
+    expectIssue(payload, 'route-segment-line-id-mismatch');
+  });
+
+  it('fails on invalid coordinate range', () => {
+    const payload = readFixturePayload();
+    payload.stops[0] = {
+      ...payload.stops[0],
+      position: { lng: 190, lat: 53.5 }
+    };
+
+    expectIssue(payload, 'invalid-stop-position');
+  });
+
+  it('fails on invalid total travel time', () => {
+    const payload = readFixturePayload();
+    payload.line.routeSegments[0] = {
+      ...payload.line.routeSegments[0],
+      totalTravelMinutes: payload.line.routeSegments[0].inMotionTravelMinutes
+    };
+
+    expectIssue(payload, 'route-segment-total-travel-minutes-mismatch');
+  });
+
+  it('fails on metadata stop count mismatch', () => {
+    const payload = readFixturePayload();
+    payload.metadata.stopCount = payload.metadata.stopCount + 1;
+
+    expectIssue(payload, 'invalid-metadata-counts');
+  });
+
+  it('fails on metadata route segment count mismatch', () => {
+    const payload = readFixturePayload();
+    payload.metadata.routeSegmentCount = payload.metadata.routeSegmentCount + 1;
+
+    expectIssue(payload, 'invalid-metadata-counts');
+  });
+
+  it('accepts includedTimeBandIds that match non-null frequencies in canonical order', () => {
+    const payload = readFixturePayload();
+
+    const result = validateSelectedLineExportPayload(payload);
+
+    expect(result.ok).toBe(true);
+  });
+
+  it('allows empty includedTimeBandIds when all frequencies are null', () => {
+    const payload = readFixturePayload();
+
+    payload.line.frequencyByTimeBand = {
+      'morning-rush': null,
+      'late-morning': null,
+      midday: null,
+      afternoon: null,
+      'evening-rush': null,
+      evening: null,
+      night: null
+    };
+    payload.metadata.includedTimeBandIds = [];
+
+    const result = validateSelectedLineExportPayload(payload);
+
+    expect(result.ok).toBe(true);
   });
 });

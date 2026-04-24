@@ -36,6 +36,7 @@ export type SelectedLineExportValidationIssueCode =
   | 'invalid-route-segment-line-id'
   | 'invalid-route-segment-stop-reference'
   | 'route-segment-line-id-mismatch'
+  | 'route-segment-count-mismatch'
   | 'route-segment-adjacency-mismatch'
   | 'route-segment-endpoint-mismatch'
   | 'route-segment-total-travel-minutes-mismatch'
@@ -430,6 +431,15 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
           addIssue('invalid-route-status', `${segmentPath}.status`, 'status must be a canonical RouteStatus value.');
         }
       }
+      const expectedRouteSegmentCount = Math.max(orderedStopIds.length - 1, 0);
+      if (line.routeSegments.length !== expectedRouteSegmentCount) {
+        addIssue(
+          'route-segment-count-mismatch',
+          '$.line.routeSegments',
+          'line.routeSegments length must equal orderedStopIds.length - 1.'
+        );
+      }
+
     }
   }
 
