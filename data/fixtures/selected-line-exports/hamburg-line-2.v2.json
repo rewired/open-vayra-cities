@@ -19,13 +19,13 @@
       "stop-1"
     ],
     "frequencyByTimeBand": {
-      "morning-rush": null,
-      "late-morning": null,
-      "midday": null,
-      "afternoon": null,
-      "evening-rush": null,
-      "evening": null,
-      "night": null
+      "morning-rush": 5,
+      "late-morning": 10,
+      "midday": 10,
+      "afternoon": 15,
+      "evening-rush": 5,
+      "evening": 15,
+      "night": 30
     },
     "routeSegments": [
       {
