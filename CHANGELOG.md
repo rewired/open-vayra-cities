@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 024: refactor `MapWorkspaceSurface.tsx` boundaries by extracting street snap resolution, interaction bindings, lifecycle utilities, and map workspace UI feedback projection helpers into focused map-workspace modules while preserving behavior.
+- Slice 024: keep React/session ownership in `MapWorkspaceSurface` with callback-driven helper contracts and no gameplay/UI semantics changes.
+- Add ADR 0082 documenting the Slice 024 boundary-refactor rationale, extracted responsibilities, behavior-preserving intent, and explicit non-goals.
+
 - Slice 023b: document builder-vs-source-vs-rendered diagnostics rationale, source `setData(...)` versus style-readiness lifecycle distinction, completed-line rendering hardening, and explicit custom-layer ordering helpers/coverage.
 - Slice 023b: add focused deterministic tests for completed-line and vehicle GeoJSON builder counts/filtering, custom-layer order/id-list helpers, and fixture-backed Hamburg line behavior for completed lines and projected/degraded vs unavailable vehicle rendering.
 - Add ADR 0081 documenting Slice 023b diagnostics boundaries, lifecycle separation, deterministic layer-order enforcement, and explicit non-goals.
