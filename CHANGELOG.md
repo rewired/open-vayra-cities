@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 023a: fix loaded-session MapLibre synchronization by ensuring stop, completed-line, draft-line, and vehicle sources/layers are synchronized during map load and style-ready updates.
+- Slice 023a: remove load-handler stale-closure risk by reading current placed-stop, selection, draft, session-line, and vehicle-projection values from lifecycle-safe refs.
+- Slice 023a: add compact HUD line GeoJSON diagnostic count (`Line features`) while preserving existing vehicle feature diagnostics.
+- Slice 023a: add focused unit coverage for completed-line GeoJSON feature generation (segment-first geometry preference, selection flag semantics, stop-order fallback, and insufficient-geometry exclusion).
+- Add ADR 0076 documenting loaded-session map source synchronization rationale, lifecycle-safe ref usage, diagnostics scope, and explicit non-goals.
+
 - Slice 023 (selected-line loader): add a user-facing `Load line JSON` action that reads one browser-selected JSON file, safely parses it, validates it through the existing selected-line export validator, and reports compact parse/validation failures.
 - Slice 023 (selected-line loader): add a pure validated selected-line export session conversion helper that maps payload stops/line into canonical in-memory session state while preserving ids, ordered stops, time-band frequencies, route segments, and stop labels.
 - Slice 023 (selected-line loader): apply replacement-only load semantics (replace current in-memory stops/lines, select loaded line, clear selected stop, clear draft-line state) without route recomputation.

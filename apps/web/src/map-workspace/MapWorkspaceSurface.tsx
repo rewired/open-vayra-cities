@@ -1099,7 +1099,11 @@ export function MapWorkspaceSurface({
   const onStopSelectionChangeRef = useRef(onStopSelectionChange);
   const selectedStopIdRef = useRef<StopId | null>(selectedStopId);
   const placedStopsRef = useRef<readonly Stop[]>(placedStops);
+  const sessionLinesRef = useRef<readonly Line[]>(sessionLines);
+  const selectedLineIdRef = useRef<Line['id'] | null>(selectedLineId);
+  const vehicleNetworkProjectionRef = useRef<LineVehicleNetworkProjection>(vehicleNetworkProjection);
   const draftStopIdSet: ReadonlySet<StopId> = new Set(draftLineState.stopIds);
+  const draftStopIdsRef = useRef<readonly StopId[]>(draftLineState.stopIds);
   const draftStopIdSetRef = useRef<ReadonlySet<StopId>>(draftStopIdSet);
   const stopsByIdRef = useRef<ReadonlyMap<StopId, Stop>>(new Map());
 
@@ -1129,6 +1133,22 @@ export function MapWorkspaceSurface({
   }, [placedStops]);
 
   useEffect(() => {
+    sessionLinesRef.current = sessionLines;
+  }, [sessionLines]);
+
+  useEffect(() => {
+    selectedLineIdRef.current = selectedLineId;
+  }, [selectedLineId]);
+
+  useEffect(() => {
+    vehicleNetworkProjectionRef.current = vehicleNetworkProjection;
+  }, [vehicleNetworkProjection]);
+
+  useEffect(() => {
+    draftStopIdsRef.current = draftLineState.stopIds;
+  }, [draftLineState.stopIds]);
+
+  useEffect(() => {
     draftStopIdSetRef.current = draftStopIdSet;
   }, [draftStopIdSet]);
 
@@ -1152,9 +1172,16 @@ export function MapWorkspaceSurface({
         draftStopIds: draftStopIdSetRef.current,
         isBuildLineModeActive: activeToolModeRef.current === 'build-line'
       });
+      syncLineSourceData({
+        map: mapInstance,
+        sessionLines: sessionLinesRef.current,
+        selectedLineId: selectedLineIdRef.current,
+        draftStopIds: draftStopIdsRef.current,
+        stopsById: stopsByIdRef.current
+      });
       syncVehicleSourceData({
         map: mapInstance,
-        vehicleNetworkProjection
+        vehicleNetworkProjection: vehicleNetworkProjectionRef.current
       });
     };
     mapInstance.on('load', onMapLoad);
@@ -1351,6 +1378,11 @@ export function MapWorkspaceSurface({
       ? `lng:${interactionState.pointer.lng.toFixed(5)} lat:${interactionState.pointer.lat.toFixed(5)}`
       : 'lng/lat unavailable';
   const stopSelectionSummary = selectedStopId ? `Selected stop: ${selectedStopId}` : 'Selected stop: none';
+  const lineFeatureCount = buildCompletedLineFeatureCollection({
+    lines: sessionLines,
+    stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const)),
+    selectedLineId
+  }).features.length;
   const vehicleFeatureCount = buildVehicleFeatureCollection({ vehicleNetworkProjection }).features.length;
   const placementUiFeedback = buildPlacementUiFeedback(activeToolMode, placementAttemptResult);
   const buildLineUiFeedback = buildLineModeUiFeedback(activeToolMode, draftLineState.stopIds);
@@ -1408,7 +1440,7 @@ export function MapWorkspaceSurface({
 
       <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace status">
         Mode: {activeToolMode} | Interaction status: {interactionState.status} | Pointer: {pointerSummary} | Geo: {geographicSummary}
-        {` | Placed stops: ${placedStops.length} | Vehicle features: ${vehicleFeatureCount} | ${stopSelectionSummary} | Line draft stops: ${draftLineState.stopIds.length} | Session lines: ${sessionLines.length} | ${draftMetadataSummary}`}
+        {` | Placed stops: ${placedStops.length} | Line features: ${lineFeatureCount} | Vehicle features: ${vehicleFeatureCount} | ${stopSelectionSummary} | Line draft stops: ${draftLineState.stopIds.length} | Session lines: ${sessionLines.length} | ${draftMetadataSummary}`}
       </div>
 
       {placementUiFeedback.showPlacementModeIndicator ? (
