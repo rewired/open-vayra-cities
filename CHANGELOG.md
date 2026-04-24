@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 025: add canonical vehicle map rendering contracts (source/layer ids plus symbol paint/layout) in `mapRenderConstants.ts`.
+- Slice 025: add typed `vehicleGeoJson` builder that maps derived line-vehicle projection output into marker features with projected-vehicle id, line id, projection status, and degraded flag properties.
+- Slice 025: wire `App.tsx` to project network departure schedules and current-minute vehicle projections, then inject derived output into `MapWorkspaceSurface` for render-only map consumption.
+- Slice 025: register/update vehicle source and layer via existing style-ready map lifecycle and render only active `projected`/`degraded-projected` entries (excluding `unavailable` markers).
+- Add ADR 0070 documenting vehicle map render contract ownership and projection-to-map boundary constraints.
+
 - Slice 024: add pure `routeGeometryInterpolation` domain helper to clamp segment progress ratios and project coordinates along ordered route geometry by walking leg distances (2-point and multi-point support).
 - Slice 024: reuse route-geometry interpolation in line-vehicle projection so marker coordinates follow intermediate geometry points instead of endpoint-only interpolation.
 - Slice 024: add focused unit coverage for ratio clamping, finite-ratio guarding, 2-point and multi-point interpolation, terminal clamping, and minimum-geometry validation.

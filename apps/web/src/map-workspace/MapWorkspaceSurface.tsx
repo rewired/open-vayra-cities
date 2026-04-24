@@ -6,6 +6,7 @@ import {
 } from '../domain/constants/lineBuilding';
 import type { Line } from '../domain/types/line';
 import { createLineId, createUnsetLineFrequencyByTimeBand } from '../domain/types/line';
+import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
 import { buildFallbackLineRouteSegments } from '../domain/routing/fallbackLineRouting';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
@@ -30,15 +31,20 @@ import {
   MAP_LAYER_ID_DRAFT_LINE,
   MAP_LAYER_ID_STOPS_CIRCLE,
   MAP_LAYER_ID_STOPS_LABEL,
+  MAP_LAYER_ID_VEHICLES,
   MAP_SOURCE_ID_COMPLETED_LINES,
   MAP_SOURCE_ID_DRAFT_LINE,
   MAP_SOURCE_ID_STOPS,
+  MAP_SOURCE_ID_VEHICLES,
   MAP_STOP_CIRCLE_LAYER_STYLE,
   MAP_STOP_LABEL_LAYER_LAYOUT,
-  MAP_STOP_LABEL_LAYER_PAINT
+  MAP_STOP_LABEL_LAYER_PAINT,
+  MAP_VEHICLE_LAYER_LAYOUT,
+  MAP_VEHICLE_LAYER_PAINT
 } from './mapRenderConstants';
 import { buildCompletedLineFeatureCollection, buildDraftLineFeatureCollection } from './lineGeoJson';
 import { buildStopFeatureCollection } from './stopGeoJson';
+import { buildVehicleFeatureCollection } from './vehicleGeoJson';
 import {
   getSourceRefsForLayerIds,
   type MapLibreFeatureGeometry,
@@ -121,6 +127,7 @@ interface MapWorkspaceSurfaceProps {
   readonly lineBuildSelection: LineBuildSelectionState;
   readonly sessionLines: readonly Line[];
   readonly selectedLineId: Line['id'] | null;
+  readonly vehicleNetworkProjection: LineVehicleNetworkProjection;
   readonly onPlacedStopsChange: (updater: (currentStops: readonly Stop[]) => readonly Stop[]) => void;
   readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
   readonly onLineBuildSelectionChange: (nextSelection: LineBuildSelectionState) => void;
@@ -814,6 +821,28 @@ const ensureStopRenderSourceAndLayers = (map: MapLibreMap): void => {
   }
 };
 
+const ensureVehicleRenderSourceAndLayer = (map: MapLibreMap): void => {
+  if (!map.getSource(MAP_SOURCE_ID_VEHICLES)) {
+    map.addSource(MAP_SOURCE_ID_VEHICLES, {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: []
+      }
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_VEHICLES)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_VEHICLES,
+      type: 'symbol',
+      source: MAP_SOURCE_ID_VEHICLES,
+      layout: MAP_VEHICLE_LAYER_LAYOUT,
+      paint: MAP_VEHICLE_LAYER_PAINT
+    });
+  }
+};
+
 const runWhenMapStyleReady = (map: MapLibreMap, callback: () => void): (() => void) | void => {
   if (map.isStyleLoaded()) {
     callback();
@@ -893,6 +922,22 @@ const syncLineSourceData = ({
     buildDraftLineFeatureCollection({
       draftStopIds,
       stopsById
+    })
+  );
+};
+
+const syncVehicleSourceData = ({
+  map,
+  vehicleNetworkProjection
+}: {
+  readonly map: MapLibreMap;
+  readonly vehicleNetworkProjection: LineVehicleNetworkProjection;
+}): void => {
+  const vehicleSource = map.getSource(MAP_SOURCE_ID_VEHICLES) as MapLibreGeoJsonSource | undefined;
+
+  vehicleSource?.setData(
+    buildVehicleFeatureCollection({
+      vehicleNetworkProjection
     })
   );
 };
@@ -1036,6 +1081,7 @@ export function MapWorkspaceSurface({
   placedStops,
   sessionLines,
   selectedLineId,
+  vehicleNetworkProjection,
   onPlacedStopsChange,
   onStopSelectionChange,
   onLineBuildSelectionChange,
@@ -1100,12 +1146,17 @@ export function MapWorkspaceSurface({
     const onMapLoad = (): void => {
       ensureLineRenderSourcesAndLayers(mapInstance);
       ensureStopRenderSourceAndLayers(mapInstance);
+      ensureVehicleRenderSourceAndLayer(mapInstance);
       syncStopSourceData({
         map: mapInstance,
         stops: placedStopsRef.current,
         selectedStopId: selectedStopIdRef.current,
         draftStopIds: draftStopIdSetRef.current,
         isBuildLineModeActive: activeToolModeRef.current === 'build-line'
+      });
+      syncVehicleSourceData({
+        map: mapInstance,
+        vehicleNetworkProjection
       });
     };
     mapInstance.on('load', onMapLoad);
@@ -1205,6 +1256,22 @@ export function MapWorkspaceSurface({
       });
     });
   }, [draftLineState.stopIds, placedStops, selectedLineId, sessionLines]);
+
+  useEffect(() => {
+    const mapInstance = mapInstanceRef.current;
+
+    if (!mapInstance) {
+      return;
+    }
+
+    return runWhenMapStyleReady(mapInstance, () => {
+      ensureVehicleRenderSourceAndLayer(mapInstance);
+      syncVehicleSourceData({
+        map: mapInstance,
+        vehicleNetworkProjection
+      });
+    });
+  }, [vehicleNetworkProjection]);
 
   useEffect(() => {
     const mapInstance = mapInstanceRef.current;

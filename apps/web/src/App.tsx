@@ -3,8 +3,10 @@ import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
 import {
   projectLineDepartureScheduleForLine,
+  projectLineDepartureScheduleNetwork,
   projectLineSelectedDepartureInspector
 } from './domain/projection/lineDepartureScheduleProjection';
+import { projectLineVehicleNetwork } from './domain/projection/lineVehicleProjection';
 import {
   projectLineSelectedServiceInspector,
   projectLineServicePlan,
@@ -273,6 +275,18 @@ export default function App(): ReactElement {
         simulationClockState.timestamp.minuteOfDay
       )
     : null;
+  const networkDepartureScheduleProjection = projectLineDepartureScheduleNetwork(
+    sessionLines,
+    sessionStops,
+    activeSimulationTimeBandId,
+    simulationClockState.timestamp.minuteOfDay
+  );
+  const vehicleNetworkProjection = projectLineVehicleNetwork(
+    sessionLines,
+    networkDepartureScheduleProjection,
+    simulationClockState.timestamp.minuteOfDay,
+    activeSimulationTimeBandId
+  );
   const networkServicePlanProjection = projectLineServicePlan(
     sessionLines,
     sessionStops,
@@ -505,6 +519,7 @@ export default function App(): ReactElement {
           lineBuildSelection={lineBuildSelection}
           sessionLines={sessionLines}
           selectedLineId={selectedLineId}
+          vehicleNetworkProjection={vehicleNetworkProjection}
           onPlacedStopsChange={setSessionStops}
           onStopSelectionChange={setSelectedStop}
           onLineBuildSelectionChange={setLineBuildSelection}
