@@ -140,6 +140,14 @@ const formatDistanceMeters = (distanceMeters: number): string => `${distanceMete
 
 const formatTravelMinutes = (travelMinutes: number): string => `${travelMinutes.toFixed(2)} min`;
 
+const formatMinuteOfDayNumber = (minuteOfDay: number): string => {
+  const normalizedMinute = ((Math.floor(minuteOfDay) % 1440) + 1440) % 1440;
+  const hours = Math.floor(normalizedMinute / 60);
+  const minutes = normalizedMinute % 60;
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+};
+
 const buildSelectedLineExportFilename = (lineId: Line['id']): string => `cityops-line-${lineId}.json`;
 
 const downloadJsonFile = (filename: string, payload: unknown): void => {
@@ -251,9 +259,8 @@ export default function App(): ReactElement {
   };
 
   const selectedLine = sessionLines.find((line) => line.id === selectedLineId) ?? null;
-  const activeSimulationTimeBandId = deriveTimeBandIdFromMinuteOfDay(
-    simulationClockState.timestamp.minuteOfDay
-  );
+  const currentSimulationMinuteOfDay = simulationClockState.timestamp.minuteOfDay;
+  const activeSimulationTimeBandId = deriveTimeBandIdFromMinuteOfDay(currentSimulationMinuteOfDay);
   const selectedStopId: StopId | null = selectedStop?.selectedStopId ?? null;
   const inspectorPanelState = resolveInspectorPanelState(selectedLine, selectedStop);
   const staticNetworkSummaryKpis = projectStaticNetworkSummaryKpis(
@@ -272,21 +279,24 @@ export default function App(): ReactElement {
         selectedLine,
         sessionStops,
         activeSimulationTimeBandId,
-        simulationClockState.timestamp.minuteOfDay
+        currentSimulationMinuteOfDay
       )
     : null;
   const networkDepartureScheduleProjection = projectLineDepartureScheduleNetwork(
     sessionLines,
     sessionStops,
     activeSimulationTimeBandId,
-    simulationClockState.timestamp.minuteOfDay
+    currentSimulationMinuteOfDay
   );
   const vehicleNetworkProjection = projectLineVehicleNetwork(
     sessionLines,
     networkDepartureScheduleProjection,
-    simulationClockState.timestamp.minuteOfDay,
+    currentSimulationMinuteOfDay,
     activeSimulationTimeBandId
   );
+  const selectedLineVehicleProjection = selectedLine
+    ? vehicleNetworkProjection.lines.find((lineProjection) => lineProjection.lineId === selectedLine.id) ?? null
+    : null;
   const networkServicePlanProjection = projectLineServicePlan(
     sessionLines,
     sessionStops,
@@ -542,6 +552,8 @@ export default function App(): ReactElement {
             <p>Degraded lines: {networkServicePlanProjection.summary.degradedLineCount}</p>
             <p>Not configured lines: {networkServicePlanProjection.summary.notConfiguredLineCount}</p>
             <p>Blocked lines: {networkServicePlanProjection.summary.blockedLineCount}</p>
+            <p>Projected vehicles: {vehicleNetworkProjection.summary.totalProjectedVehicleCount}</p>
+            <p>Degraded projected vehicles: {vehicleNetworkProjection.summary.totalDegradedProjectedVehicleCount}</p>
           </div>
           {staticNetworkSummaryKpis.selectedCompletedLine ? (
             <div>
@@ -616,6 +628,25 @@ export default function App(): ReactElement {
                 ) : (
                   <p>No departure raster available for the active time band.</p>
                 )}
+              </section>
+            ) : null}
+            {selectedLineVehicleProjection ? (
+              <section className="inspector-line-projected-vehicles" aria-label="Projected vehicles">
+                <h3>Projected vehicles</h3>
+                <p>Projected vehicle count: {selectedLineVehicleProjection.vehicles.length}</p>
+                {selectedLineVehicleProjection.vehicles.length > 0 ? (
+                  <p>
+                    Active departure minutes:{' '}
+                    {selectedLineVehicleProjection.vehicles
+                      .map((vehicle) => formatMinuteOfDayNumber(vehicle.departureMinute))
+                      .join(', ')}
+                  </p>
+                ) : (
+                  <p>No projected departures active in the current minute.</p>
+                )}
+                {selectedLineVehicleProjection.departureScheduleStatus === 'degraded' ? (
+                  <p>Degraded note: {selectedLineVehicleProjection.note ?? 'Degraded departure projection in active time band.'}</p>
+                ) : null}
               </section>
             ) : null}
             {selectedLineServiceProjection ? (
@@ -744,7 +775,7 @@ export default function App(): ReactElement {
         <div className="status-bar__clock-readout">
           <span>Status: {formatSimulationRunningStateLabel(simulationClockState.runningState)}</span>
           <span>Day {simulationClockState.timestamp.dayIndex}</span>
-          <span>Time {formatSimulationMinuteOfDay(simulationClockState.timestamp.minuteOfDay)}</span>
+          <span>Time {formatSimulationMinuteOfDay(currentSimulationMinuteOfDay)}</span>
           <span>Band {TIME_BAND_DISPLAY_LABELS[activeSimulationTimeBandId]}</span>
         </div>
         <div className="status-bar__clock-controls" role="group" aria-label="Simulation clock controls">

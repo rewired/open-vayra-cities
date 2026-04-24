@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 026: derive `currentSimulationMinuteOfDay` and active time band in `App.tsx`, then feed existing departure schedule projection plus completed lines/route segments into the vehicle projection module for one canonical current-minute projection pass.
+- Slice 026: add compact network projected-vehicle totals (projected and degraded projected counts) to the existing inspector summary area.
+- Slice 026: add a selected-line projected vehicles section showing count, active departure minutes, and degraded note when applicable using selected-line vehicle projection output.
+- Slice 026 non-goals preserved: no demand/economy/passenger/fleet/depot/layover/capacity KPIs, no authoritative vehicle state owner, and no mobile-specific behavior.
+- Add ADR 0071 documenting shell-level vehicle projection summary consumption and selected-line inspector boundaries.
+
 - Slice 025: add canonical vehicle map rendering contracts (source/layer ids plus symbol paint/layout) in `mapRenderConstants.ts`.
 - Slice 025: add typed `vehicleGeoJson` builder that maps derived line-vehicle projection output into marker features with projected-vehicle id, line id, projection status, and degraded flag properties.
 - Slice 025: wire `App.tsx` to project network departure schedules and current-minute vehicle projections, then inject derived output into `MapWorkspaceSurface` for render-only map consumption.
