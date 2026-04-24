@@ -1,7 +1,7 @@
 {
   "schemaVersion": "cityops-selected-line-export-v2",
   "exportKind": "single-line",
-  "createdAtIsoUtc": "2026-04-24T19:51:03.457Z",
+  "createdAtIsoUtc": "2026-04-24T19:53:57.730Z",
   "sourceMetadata": {
     "source": "cityops-web"
   },
@@ -20,7 +20,7 @@
     ],
     "frequencyByTimeBand": {
       "morning-rush": 5,
-      "late-morning": 10,
+      "late-morning": 15,
       "midday": 10,
       "afternoon": 15,
       "evening-rush": 5,
@@ -239,6 +239,14 @@
     "lineCount": 1,
     "stopCount": 7,
     "routeSegmentCount": 7,
-    "includedTimeBandIds": []
+    "includedTimeBandIds": [
+      "morning-rush",
+      "late-morning",
+      "midday",
+      "afternoon",
+      "evening-rush",
+      "evening",
+      "night"
+    ]
   }
 }
