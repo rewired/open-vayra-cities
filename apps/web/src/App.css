@@ -16,11 +16,11 @@ body {
 .app-shell {
   display: grid;
   grid-template-columns: 260px 1fr 300px;
-  grid-template-rows: 72px 1fr 44px;
+  grid-template-rows: 72px 64px 1fr;
   grid-template-areas:
     'header header header'
-    'left workspace right'
-    'status status status';
+    'controls controls controls'
+    'left workspace right';
   min-height: 100vh;
 }
 
@@ -513,4 +513,155 @@ body {
   align-items: center;
   gap: 6px;
   color: #9fb0cb;
+}
+
+.simulation-control-bar {
+  grid-area: controls;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid #263142;
+  background: #141c29;
+}
+
+.simulation-control-bar__clock-readout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #d9e7fd;
+}
+
+.simulation-control-bar__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.simulation-control-bar__icon-button,
+.session-actions__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #425b83;
+  border-radius: 8px;
+  background: #1d2a3f;
+  color: #e8eef9;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+}
+
+.simulation-control-bar__icon-button[aria-pressed='true'] {
+  border-color: #f5c358;
+  background: #2f466f;
+}
+
+.simulation-control-bar__speed-control {
+  display: grid;
+  gap: 2px;
+  min-width: 220px;
+}
+
+.simulation-control-bar__speed-label {
+  font-size: 0.75rem;
+  color: #cfe0fb;
+}
+
+.simulation-control-bar__speed-control input[type='range'] {
+  width: 100%;
+}
+
+.simulation-control-bar__speed-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #9fb0cb;
+}
+
+.session-actions {
+  display: grid;
+  gap: 6px;
+}
+
+.session-actions__buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.selected-line-inspector {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.inspector-card {
+  padding: 8px;
+  border: 1px solid #2f415f;
+  border-radius: 8px;
+  background: #131f31;
+}
+
+.inspector-card h3 {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.inspector-compact-table {
+  width: 100%;
+  margin-top: 6px;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.inspector-compact-table th,
+.inspector-compact-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 4px 6px;
+  border-top: 1px solid #2f415f;
+}
+
+.inspector-compact-table th {
+  width: 46%;
+  color: #cfe0fb;
+  font-weight: 600;
+}
+
+.inspector-status-badge {
+  display: inline-flex;
+  margin-top: 8px;
+  margin-bottom: 2px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #425b83;
+  background: #1b2b44;
+  color: #d7e7ff;
+  font-size: 0.74rem;
+}
+
+.inspector-simple-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 0.78rem;
+  color: #d7e4f7;
+}
+
+.inspector-details {
+  margin-top: 8px;
+}
+
+.inspector-details summary {
+  cursor: pointer;
+  color: #cfe0fb;
+  font-size: 0.78rem;
+}
+
+.inspector-line-readiness__status {
+  font-weight: 600;
+  color: #dbe8ff;
 }

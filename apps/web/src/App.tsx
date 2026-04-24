@@ -1,15 +1,13 @@
 import type { ReactElement } from 'react';
 
-import { TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
 import { buildSelectedLineExportPayload } from './domain/types/selectedLineExport';
-import { formatSimulationMinuteOfDay, formatSimulationRunningStateLabel, parseSimulationSpeedId } from './domain/simulation/simulationClock';
-import { SIMULATION_SPEED_DEFINITIONS } from './domain/constants/simulationClock';
 import { useNetworkPlanningProjections } from './domain/projection/useNetworkPlanningProjections';
 import { InspectorPanel } from './inspector/InspectorPanel';
 import type { InspectorPanelState } from './inspector/types';
 import { MapWorkspaceSurface } from './map-workspace/MapWorkspaceSurface';
 import { SessionActions } from './session/SessionActions';
 import { useNetworkSessionState } from './session/useNetworkSessionState';
+import { SimulationControlBar } from './simulation/SimulationControlBar';
 import { useSimulationClockController } from './simulation/useSimulationClockController';
 import { MaterialIcon } from './ui/icons/MaterialIcon';
 import { WORKSPACE_MODE_ICONS } from './ui/icons/materialIcons';
@@ -80,6 +78,37 @@ export default function App(): ReactElement {
         <h1>CityOps</h1>
         <p>Desktop transit planning shell (bus-first MVP).</p>
       </header>
+
+      <SimulationControlBar
+        clockController={clockController}
+        sessionActions={
+          <SessionActions
+            selectedLineImportFeedback={sessionController.selectedLineImportFeedback}
+            hasSelectedLineForExport={selectedCompletedLineForExport !== null}
+            onLoadStart={sessionController.clearSelectedLineImportFeedback}
+            onFileSelection={sessionController.handleLineJsonFileSelection}
+            onExportSelectedLine={() => {
+              if (!selectedCompletedLineForExport) {
+                return;
+              }
+
+              const exportPayload = buildSelectedLineExportPayload({
+                selectedLine: selectedCompletedLineForExport,
+                placedStops: sessionController.sessionStops,
+                createdAtIsoUtc: new Date().toISOString(),
+                sourceMetadata: {
+                  source: 'cityops-web'
+                }
+              });
+
+              downloadJsonFile(
+                buildSelectedLineExportFilename(selectedCompletedLineForExport.id),
+                exportPayload
+              );
+            }}
+          />
+        }
+      />
 
       <aside className="left-panel" aria-label="Tools and navigation panel">
         <h2>Tools</h2>
@@ -154,90 +183,7 @@ export default function App(): ReactElement {
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
         lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}
         onFrequencyChange={sessionController.updateSelectedCompletedLineFrequency}
-        sessionActions={
-          <SessionActions
-            selectedLineImportFeedback={sessionController.selectedLineImportFeedback}
-            hasSelectedLineForExport={selectedCompletedLineForExport !== null}
-            onLoadStart={sessionController.clearSelectedLineImportFeedback}
-            onFileSelection={sessionController.handleLineJsonFileSelection}
-            onExportSelectedLine={() => {
-              if (!selectedCompletedLineForExport) {
-                return;
-              }
-
-              const exportPayload = buildSelectedLineExportPayload({
-                selectedLine: selectedCompletedLineForExport,
-                placedStops: sessionController.sessionStops,
-                createdAtIsoUtc: new Date().toISOString(),
-                sourceMetadata: {
-                  source: 'cityops-web'
-                }
-              });
-
-              downloadJsonFile(
-                buildSelectedLineExportFilename(selectedCompletedLineForExport.id),
-                exportPayload
-              );
-            }}
-          />
-        }
       />
-
-      <footer className="status-bar" aria-label="Status bar">
-        <div className="status-bar__clock-readout">
-          <span>Status: {formatSimulationRunningStateLabel(clockController.simulationClockState.runningState)}</span>
-          <span>Day {clockController.simulationClockState.timestamp.dayIndex}</span>
-          <span>Time {formatSimulationMinuteOfDay(clockController.currentSimulationMinuteOfDay)}</span>
-          <span>Band {TIME_BAND_DISPLAY_LABELS[clockController.activeSimulationTimeBandId]}</span>
-        </div>
-        <div className="status-bar__clock-controls" role="group" aria-label="Simulation clock controls">
-          <button
-            type="button"
-            className="status-bar__button"
-            onClick={clockController.handlePauseClock}
-            disabled={clockController.simulationClockState.runningState === 'paused'}
-          >
-            Pause
-          </button>
-          <button
-            type="button"
-            className="status-bar__button"
-            onClick={clockController.handleResumeClock}
-            disabled={clockController.simulationClockState.runningState === 'running'}
-          >
-            Resume
-          </button>
-          <div className="status-bar__speed-group" role="group" aria-label="Simulation speed selection">
-            {SIMULATION_SPEED_DEFINITIONS.map((speedDefinition) => (
-              <button
-                key={speedDefinition.id}
-                type="button"
-                className="status-bar__button"
-                aria-pressed={clockController.simulationClockState.speedId === speedDefinition.id}
-                onClick={() => {
-                  const parsedSpeedId = parseSimulationSpeedId(speedDefinition.id);
-                  if (!parsedSpeedId) {
-                    return;
-                  }
-
-                  clockController.handleSpeedSelection(parsedSpeedId);
-                }}
-              >
-                {speedDefinition.label}
-              </button>
-            ))}
-          </div>
-          <button type="button" className="status-bar__button" onClick={clockController.handleResetClock}>
-            Reset
-          </button>
-        </div>
-        {sessionController.selectedLine ? (
-          <div className="status-bar__line-frequency-hint">
-            <span>Selected line service plan:</span>
-            <span>{projections.selectedLineServiceInspectorProjection?.headwayLabel ?? 'No line selected.'}</span>
-          </div>
-        ) : null}
-      </footer>
     </div>
   );
 }

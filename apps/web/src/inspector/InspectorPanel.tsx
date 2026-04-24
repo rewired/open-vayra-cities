@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 
-import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from '../domain/constants/timeBands';
+import { TIME_BAND_DISPLAY_LABELS } from '../domain/constants/timeBands';
 import { EmptyInspector } from './EmptyInspector';
 import { SelectedLineInspector } from './SelectedLineInspector';
 import { SelectedStopInspector } from './SelectedStopInspector';
@@ -22,7 +22,6 @@ interface InspectorPanelProps {
   readonly lineFrequencyInputByTimeBand: LineFrequencyInputByTimeBand;
   readonly lineFrequencyValidationByTimeBand: LineFrequencyValidationByTimeBand;
   readonly onFrequencyChange: (timeBandId: TimeBandId, rawInputValue: string) => void;
-  readonly sessionActions: ReactElement;
 }
 
 /** Renders the inspector panel layout while delegating selection-specific details to focused child components. */
@@ -39,8 +38,7 @@ export function InspectorPanel({
   selectedLineVehicleProjection,
   lineFrequencyInputByTimeBand,
   lineFrequencyValidationByTimeBand,
-  onFrequencyChange,
-  sessionActions
+  onFrequencyChange
 }: InspectorPanelProps): ReactElement {
   return (
     <aside className="right-panel" aria-label="Inspector panel">
@@ -48,30 +46,47 @@ export function InspectorPanel({
       <p>Active mode: {activeToolMode}</p>
       <section className="inspector-network-summary" aria-label="Static network summary">
         <h3>Static network summary</h3>
-        <p>Total stops: {staticNetworkSummaryKpis.totalStopCount}</p>
-        <p>Completed lines: {staticNetworkSummaryKpis.completedLineCount}</p>
-        <div>
-          <p>Active service time band: {TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}</p>
-          <p>Total completed lines (service): {networkServicePlanProjection.summary.totalCompletedLineCount}</p>
-          <p>Configured lines: {networkServicePlanProjection.summary.configuredLineCount}</p>
-          <p>Degraded lines: {networkServicePlanProjection.summary.degradedLineCount}</p>
-          <p>Not configured lines: {networkServicePlanProjection.summary.notConfiguredLineCount}</p>
-          <p>Blocked lines: {networkServicePlanProjection.summary.blockedLineCount}</p>
-          <p>Projected vehicles: {vehicleNetworkProjection.summary.totalProjectedVehicleCount}</p>
-          <p>Degraded projected vehicles: {vehicleNetworkProjection.summary.totalDegradedProjectedVehicleCount}</p>
-        </div>
-        {staticNetworkSummaryKpis.selectedCompletedLine ? (
-          <div>
-            <p>Selected line stops: {staticNetworkSummaryKpis.selectedCompletedLine.stopCount}</p>
-            <p>Configured time bands: {staticNetworkSummaryKpis.selectedCompletedLine.configuredTimeBandCount}</p>
-            <p>Unconfigured time bands: {staticNetworkSummaryKpis.selectedCompletedLine.unconfiguredTimeBandCount}</p>
-          </div>
-        ) : (
-          <p>Selected completed line: none</p>
-        )}
+        <table className="inspector-compact-table">
+          <tbody>
+            <tr>
+              <th scope="row">Stops</th>
+              <td>{staticNetworkSummaryKpis.totalStopCount}</td>
+            </tr>
+            <tr>
+              <th scope="row">Completed lines</th>
+              <td>{staticNetworkSummaryKpis.completedLineCount}</td>
+            </tr>
+            <tr>
+              <th scope="row">Projected vehicles</th>
+              <td>{vehicleNetworkProjection.summary.totalProjectedVehicleCount}</td>
+            </tr>
+            <tr>
+              <th scope="row">Degraded projected vehicles</th>
+              <td>{vehicleNetworkProjection.summary.totalDegradedProjectedVehicleCount}</td>
+            </tr>
+            <tr>
+              <th scope="row">Active service band</th>
+              <td>{TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}</td>
+            </tr>
+            <tr>
+              <th scope="row">Service completed lines</th>
+              <td>{networkServicePlanProjection.summary.totalCompletedLineCount}</td>
+            </tr>
+            <tr>
+              <th scope="row">Configured service lines</th>
+              <td>{networkServicePlanProjection.summary.configuredLineCount}</td>
+            </tr>
+            <tr>
+              <th scope="row">Degraded service lines</th>
+              <td>{networkServicePlanProjection.summary.degradedLineCount}</td>
+            </tr>
+            <tr>
+              <th scope="row">Blocked service lines</th>
+              <td>{networkServicePlanProjection.summary.blockedLineCount}</td>
+            </tr>
+          </tbody>
+        </table>
       </section>
-      {sessionActions}
-      <p>MVP time bands: {MVP_TIME_BAND_IDS.map((timeBandId) => TIME_BAND_DISPLAY_LABELS[timeBandId]).join(', ')}</p>
       {inspectorPanelState.mode === 'line-selected' ? (
         <SelectedLineInspector
           panelState={inspectorPanelState}

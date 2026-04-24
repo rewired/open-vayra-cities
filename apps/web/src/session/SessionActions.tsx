@@ -1,5 +1,6 @@
 import { useRef, type ChangeEvent, type ReactElement } from 'react';
 
+import { MaterialIcon } from '../ui/icons/MaterialIcon';
 import type { SelectedLineImportFeedback } from './useNetworkSessionState';
 
 interface SessionActionsProps {
@@ -10,7 +11,7 @@ interface SessionActionsProps {
   readonly onExportSelectedLine: () => void;
 }
 
-/** Renders session-level selected-line load/export actions as a thin shell interaction boundary. */
+/** Renders compact session-level selected-line load/export icon actions with accessible labels. */
 export function SessionActions({
   selectedLineImportFeedback,
   hasSelectedLineForExport,
@@ -21,45 +22,52 @@ export function SessionActions({
   const lineJsonFileInputRef = useRef<HTMLInputElement | null>(null);
 
   return (
-    <>
-      <section className="inspector-line-json-loader" aria-label="Line JSON loader">
-        <h3>Session line loading</h3>
-        <p>Load replaces current in-memory stops and completed lines.</p>
+    <section className="session-actions" aria-label="Session line actions">
+      <div className="session-actions__buttons" role="group" aria-label="Load and export selected line JSON">
         <button
           type="button"
+          className="session-actions__icon-button"
+          aria-label="Load selected-line JSON file"
+          title="Load selected-line JSON file"
           onClick={() => {
             onLoadStart();
             lineJsonFileInputRef.current?.click();
           }}
         >
-          Load line JSON
+          <MaterialIcon name="upload_file" />
         </button>
-        <input
-          ref={lineJsonFileInputRef}
-          type="file"
-          accept=".json,application/json"
-          className="inspector-line-json-loader__file-input"
-          onChange={(event) => {
-            void onFileSelection(event);
-          }}
-        />
-        {selectedLineImportFeedback ? (
-          <p
-            className={
-              selectedLineImportFeedback.kind === 'error'
-                ? 'inspector-line-json-loader__feedback inspector-line-json-loader__feedback--error'
-                : 'inspector-line-json-loader__feedback inspector-line-json-loader__feedback--success'
-            }
+        {hasSelectedLineForExport ? (
+          <button
+            type="button"
+            className="session-actions__icon-button"
+            aria-label="Export selected-line JSON file"
+            title="Export selected-line JSON file"
+            onClick={onExportSelectedLine}
           >
-            <strong>{selectedLineImportFeedback.title}:</strong> {selectedLineImportFeedback.detail}
-          </p>
+            <MaterialIcon name="download" />
+          </button>
         ) : null}
-      </section>
-      {hasSelectedLineForExport ? (
-        <button type="button" onClick={onExportSelectedLine}>
-          Export line JSON
-        </button>
+      </div>
+      <input
+        ref={lineJsonFileInputRef}
+        type="file"
+        accept=".json,application/json"
+        className="inspector-line-json-loader__file-input"
+        onChange={(event) => {
+          void onFileSelection(event);
+        }}
+      />
+      {selectedLineImportFeedback ? (
+        <p
+          className={
+            selectedLineImportFeedback.kind === 'error'
+              ? 'inspector-line-json-loader__feedback inspector-line-json-loader__feedback--error'
+              : 'inspector-line-json-loader__feedback inspector-line-json-loader__feedback--success'
+          }
+        >
+          <strong>{selectedLineImportFeedback.title}:</strong> {selectedLineImportFeedback.detail}
+        </p>
       ) : null}
-    </>
+    </section>
   );
 }

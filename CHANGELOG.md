@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 026: add a top simulation control bar near the header with prominent day/time/active-band readout, a single play/pause toggle icon button, reset icon button, and discrete slider-like speed selection for canonical `1x`/`5x`/`10x`/`20x`.
+- Slice 026: refactor session load/export actions into compact accessible icon buttons, convert static network summary and selected-line service/departure sections to compact tables, and move heavier debug diagnostics into collapsible details blocks.
+- Slice 026 non-goals preserved: no simulation/routing/projection semantics changes, no loader/export contract changes, no persistence/savegame/scenario/fixture replay, no demand/economy/passenger/fleet/depot/layover logic, no backend, no multimodal expansion, and no mobile behavior.
+- Add ADR 0084 documenting the Slice 026 dev UI declutter and control-bar reorganization rationale and explicit non-goals.
+
 - Slice 025: refactor `App.tsx` by extracting shell session state/commands, simulation clock lifecycle control, projection aggregation, inspector rendering boundaries, and session load/export UI actions into focused modules while preserving behavior.
 - Slice 025: keep planning session truth in-memory and shell-owned through hooks, keep inspector components presentational, and avoid test-suite reorganization beyond boundary fallout.
 - Add ADR 0083 documenting the Slice 025 App shell boundary refactor rationale, extracted responsibilities, behavior-preserving intent, and explicit non-goals.
