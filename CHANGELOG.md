@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 018: add a pure domain line-service readiness evaluator (`evaluateLineServiceReadiness`) for one completed in-memory line against placed stops and canonical time bands.
+- Slice 018: export strongly typed readiness contracts (status union, issue severity/code/shape, and summary/result structures with counts and flags).
+- Slice 018: enforce structural checks for line identity/label, stop-chain coherence, placed-stop references, route-segment existence/count/adjacency/line-id coherence, timing usability, and route-status validity.
+- Slice 018: enforce service-configuration checks for canonical time-band presence, frequency validity (unset or positive finite), at-least-one configured band, complete-band coverage, and fallback-only routing detection.
+- Slice 018: add unit tests covering ready, blocked, and partially-ready classification outcomes.
+- Add ADR 0059 documenting line-service readiness evaluator boundaries and non-goals.
+
 - Slice 017: add a pure selected-line export fixture validator for committed fixture verification workflows.
 - Slice 017: add typed validation results with machine-readable issue codes for deterministic failure classification.
 - Slice 017: add validation tests against the committed Hamburg fixture plus required negative validation cases.
