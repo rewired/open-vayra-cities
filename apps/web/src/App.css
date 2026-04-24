@@ -617,25 +617,36 @@ body {
 .simulation-control-bar__speed-control {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #314665;
+  border-radius: 10px;
+  background: #18253a;
 }
 
 .simulation-control-bar__speed-button {
-  border: 1px solid #425b83;
-  border-radius: 8px;
-  background: #1d2a3f;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
   color: #d9e7fd;
-  min-width: 42px;
-  height: 34px;
-  padding: 0 8px;
-  font-size: 0.75rem;
+  min-width: 40px;
+  height: 28px;
+  padding: 0 6px;
+  font-size: 0.72rem;
   font-weight: 600;
+  letter-spacing: 0.02em;
   cursor: pointer;
 }
 
 .simulation-control-bar__speed-button[aria-pressed='true'] {
   border-color: #f5c358;
   background: #2f466f;
+  color: #fdf4df;
+}
+
+.simulation-control-bar__speed-button:focus-visible {
+  outline: 2px solid #8eb6f6;
+  outline-offset: 1px;
 }
 
 .simulation-control-bar__session-actions {

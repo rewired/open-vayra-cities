@@ -11,6 +11,8 @@ interface SimulationControlBarProps {
   readonly sessionActions: ReactElement;
 }
 
+const CANONICAL_SIMULATION_SPEED_IDS = ['1x', '5x', '10x', '20x'] as const;
+
 /** Renders the integrated top bar with brand, simulation clock controls, speed controls, and compact session actions. */
 export function SimulationControlBar({ clockController, sessionActions }: SimulationControlBarProps): ReactElement {
   return (
@@ -57,12 +59,14 @@ export function SimulationControlBar({ clockController, sessionActions }: Simula
         </button>
 
         <div className="simulation-control-bar__speed-control" role="group" aria-label="Simulation speed">
-          {SIMULATION_SPEED_DEFINITIONS.map((definition) => (
+          {SIMULATION_SPEED_DEFINITIONS.filter((definition) => CANONICAL_SIMULATION_SPEED_IDS.includes(definition.id)).map((definition) => (
             <button
               key={definition.id}
               type="button"
               className="simulation-control-bar__speed-button"
               aria-pressed={clockController.simulationClockState.speedId === definition.id}
+              aria-label={`Set simulation speed to ${definition.label}`}
+              title={`Set simulation speed to ${definition.label}`}
               onClick={() => {
                 clockController.handleSpeedSelection(definition.id);
               }}
