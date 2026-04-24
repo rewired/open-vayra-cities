@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 023: add canonical line-vehicle projection domain types (`LineVehicleProjectionId`, projection status union, per-vehicle contract, per-line result, and network summary) for current-minute marker projection boundaries.
+- Slice 023: add pure `projectLineVehicleNetwork` projection module that consumes current minute, active time band, existing departure schedule output, and stored `line.routeSegments` to derive active in-flight departures and marker coordinates without route recomputation.
+- Slice 023: map degraded departure/service conditions to `degraded-projected`, emit optional unavailable line notes without creating markers, and preserve immutable input contracts.
+- Slice 023: add focused unit coverage for active-departure filtering, degraded status mapping, unavailable line-note behavior, and input immutability checks.
+- Add ADR 0068 documenting current-minute line-vehicle projection boundaries and explicit non-goals.
+
 - Slice 021: add pure current-time-band departure schedule projection helpers that reuse current service projection output to derive deterministic active-band departure rasters, previous/next departure values, minutes-until-next, and network summary totals.
 - Slice 021: add compact selected-line inspector departure schedule rendering (status, headway, previous/next departure, minutes until next departure, active-band departure count, and capped upcoming departures list).
 - Slice 021: add fixture-backed and unit test coverage for unavailable/available/degraded departure semantics, bounded active-band minute windows, and no route-segment recomputation during projection.
