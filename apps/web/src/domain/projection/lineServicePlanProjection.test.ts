@@ -140,6 +140,7 @@ describe('projectLineServicePlan', () => {
     const projection = projectLineServicePlan([configuredLine, notConfiguredLine], placedStops, 'morning-rush');
 
     expect(projection.summary.activeTimeBandId).toBe('morning-rush');
+    expect(projection.summary.totalCompletedLineCount).toBe(2);
     expect(projection.summary.totalLineCount).toBe(2);
     expect(projection.summary.configuredLineCount).toBe(1);
     expect(projection.summary.notConfiguredLineCount).toBe(1);

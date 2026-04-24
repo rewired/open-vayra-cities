@@ -94,6 +94,8 @@ export interface LineServiceProjectionSummary {
   /** Active time band used for this projection run. */
   readonly activeTimeBandId: TimeBandId;
   /** Number of completed lines passed into projection. */
+  readonly totalCompletedLineCount: number;
+  /** Backward-compatible alias for `totalCompletedLineCount`. */
   readonly totalLineCount: number;
   /** Number of lines in `blocked` status. */
   readonly blockedLineCount: number;

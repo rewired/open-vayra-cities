@@ -149,6 +149,7 @@ export const projectLineServicePlan = (
   const summary = lines.reduce<LineServiceProjectionSummary>(
     (accumulator, lineResult) => ({
       activeTimeBandId,
+      totalCompletedLineCount: accumulator.totalCompletedLineCount + 1,
       totalLineCount: accumulator.totalLineCount + 1,
       blockedLineCount: accumulator.blockedLineCount + (lineResult.status === 'blocked' ? 1 : 0),
       notConfiguredLineCount: accumulator.notConfiguredLineCount + (lineResult.status === 'not-configured' ? 1 : 0),
@@ -161,6 +162,7 @@ export const projectLineServicePlan = (
     }),
     {
       activeTimeBandId,
+      totalCompletedLineCount: 0,
       totalLineCount: 0,
       blockedLineCount: 0,
       notConfiguredLineCount: 0,

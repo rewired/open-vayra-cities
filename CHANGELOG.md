@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 022: extend line service network projection summary with `totalCompletedLineCount` while preserving `totalLineCount` as a backward-compatible alias.
+- Slice 022: add a compact active-service subsection under static network summary in `App.tsx` showing active time band and configured/degraded/not-configured/blocked completed-line counts.
+- Slice 022 non-goals preserved: no simulation execution changes, no demand/economy/passenger KPIs, and no broad inspector layout redesign.
+- Add ADR 0066 documenting active-service network summary projection consumption in the shell inspector.
+
 - Slice 021: add a compact line-selected service inspector projection helper (`projectLineSelectedServiceInspector`) that derives active-band label, service status label, headway/departure labels, route-time/segment totals, blocker/warning counts, and a bounded note list from canonical line service projection output.
 - Slice 021: refactor `App.tsx` line-selected inspector and status-bar selected-line frequency hint to consume domain projection output instead of ad-hoc active-band frequency semantics in React.
 - Slice 021 non-goals preserved: no demand/economy/vehicle/satisfaction KPI additions.

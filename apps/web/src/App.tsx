@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
 import {
   projectLineSelectedServiceInspector,
+  projectLineServicePlan,
   projectLineServicePlanForLine
 } from './domain/projection/lineServicePlanProjection';
 import {
@@ -259,6 +260,11 @@ export default function App(): ReactElement {
   const selectedLineServiceProjection = selectedLine
     ? projectLineServicePlanForLine(selectedLine, sessionStops, activeSimulationTimeBandId)
     : null;
+  const networkServicePlanProjection = projectLineServicePlan(
+    sessionLines,
+    sessionStops,
+    activeSimulationTimeBandId
+  );
   const selectedLineServiceInspectorProjection = selectedLineServiceProjection
     ? projectLineSelectedServiceInspector(selectedLineServiceProjection, MAX_READINESS_ISSUES_VISIBLE)
     : null;
@@ -494,6 +500,14 @@ export default function App(): ReactElement {
           <h3>Static network summary</h3>
           <p>Total stops: {staticNetworkSummaryKpis.totalStopCount}</p>
           <p>Completed lines: {staticNetworkSummaryKpis.completedLineCount}</p>
+          <div>
+            <p>Active service time band: {TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}</p>
+            <p>Total completed lines (service): {networkServicePlanProjection.summary.totalCompletedLineCount}</p>
+            <p>Configured lines: {networkServicePlanProjection.summary.configuredLineCount}</p>
+            <p>Degraded lines: {networkServicePlanProjection.summary.degradedLineCount}</p>
+            <p>Not configured lines: {networkServicePlanProjection.summary.notConfiguredLineCount}</p>
+            <p>Blocked lines: {networkServicePlanProjection.summary.blockedLineCount}</p>
+          </div>
           {staticNetworkSummaryKpis.selectedCompletedLine ? (
             <div>
               <p>Selected line stops: {staticNetworkSummaryKpis.selectedCompletedLine.stopCount}</p>
