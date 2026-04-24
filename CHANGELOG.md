@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 015i: add canonical selected-line export payload types in `apps/web/src/domain/types/selectedLineExport.ts`, including schema-version and kind discriminators plus typed root/line/segment/stop/metadata blocks.
+- Slice 015i: keep exported route-segment fields directly aligned to `LineRouteSegment` field truth (id, line/from/to stop ids, ordered geometry, distance, in-motion/dwell/total minutes, and status) without recomputation semantics.
+- Add ADR 0055 documenting selected-line export schema typing boundaries and non-goals.
+
 - Slice 015h: lift canonical placed-stop session ownership to `App.tsx` as `readonly Stop[]` and derive inspector/network stop counts from that single source of truth.
 - Slice 015h: update `MapWorkspaceSurface` to consume injected `placedStops` plus immutable stop-appender callback, removing local stop ownership and count-export callback flow.
 - Slice 015h: reuse injected canonical stops for stop/line GeoJSON source synchronization and fallback line-segment generation during draft completion.
