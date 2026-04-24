@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 027: replace projected vehicle map marker rendering from symbol/text contracts to a circle-layer contract in `mapRenderConstants.ts` and `MapWorkspaceSurface.tsx`.
+- Slice 027: remove vehicle text-field/glyph layout dependency and bind a canonical circle paint expression keyed by the `degraded` feature property.
+- Slice 027: add higher-visibility vehicle marker radius plus contrasting near-white circle stroke for legibility over streets and stop markers.
+- Add ADR 0073 documenting the vehicle circle-layer rendering contract and explicit non-goals.
+
 - Slice 022V (vehicle projection): derive current-minute bus vehicle projections from theoretical departures plus stored route segments/timing, with map-native GeoJSON rendering output and projection-only status semantics.
 - Slice 022V non-goals preserved: no demand/economy/passenger/fleet/depot/layover/dispatch/persistence/backend/import/savegame/scenario/replay/mobile/multimodal scope expansion.
 - Add ADR 0072 documenting the post-departure-schedule derived vehicle projection rationale and visual-projection-only bus boundary.

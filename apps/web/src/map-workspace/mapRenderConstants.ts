@@ -41,7 +41,7 @@ export const MAP_LAYER_ID_COMPLETED_LINES_SELECTED = 'cityops-completed-lines-se
  */
 export const MAP_LAYER_ID_DRAFT_LINE = 'cityops-draft-line';
 /**
- * Canonical symbol layer id for projected active vehicle marker rendering.
+ * Canonical circle layer id for projected active vehicle marker rendering.
  */
 export const MAP_LAYER_ID_VEHICLES = 'cityops-vehicles';
 
@@ -124,20 +124,11 @@ export const MAP_DRAFT_LINE_LAYER_PAINT = {
 } as const;
 
 /**
- * Canonical symbol layer layout for projected active vehicle marker placement and overlap behavior.
+ * Canonical circle layer paint for projected/degraded projected vehicle marker colors and contrast.
  */
-export const MAP_VEHICLE_LAYER_LAYOUT = {
-  'text-field': '●',
-  'text-size': 13,
-  'text-allow-overlap': true,
-  'text-ignore-placement': true
-} as const;
-
-/**
- * Canonical symbol layer paint for projected/degraded projected vehicle marker colors.
- */
-export const MAP_VEHICLE_LAYER_PAINT = {
-  'text-color': ['case', ['get', 'degraded'], '#f59e0b', '#7c3aed'],
-  'text-halo-color': '#ffffff',
-  'text-halo-width': 1.25
+export const MAP_VEHICLE_CIRCLE_LAYER_PAINT = {
+  'circle-radius': 7,
+  'circle-color': ['case', ['get', 'degraded'], '#f59e0b', '#7c3aed'],
+  'circle-stroke-color': '#f8fafc',
+  'circle-stroke-width': 2
 } as const;
