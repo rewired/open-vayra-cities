@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 031: add a reusable native `<details>/<summary>` `DebugDisclosure` UI component for keyboard-accessible collapsed diagnostics sections.
+- Slice 031: keep compact map workspace overlays visible by default while relocating map telemetry, interaction lifecycle text, feature-count diagnostics, and draft metadata into a collapsed debug disclosure block.
+- Slice 031 non-goals preserved: no map interaction/sync/rendering/projection semantics changes and no simulation/domain behavior changes.
+- Add ADR 0085 documenting map workspace debug disclosure presentation boundaries and explicit non-goals.
+
 - Slice 026: add a top simulation control bar near the header with prominent day/time/active-band readout, a single play/pause toggle icon button, reset icon button, and discrete slider-like speed selection for canonical `1x`/`5x`/`10x`/`20x`.
 - Slice 026: refactor session load/export actions into compact accessible icon buttons, convert static network summary and selected-line service/departure sections to compact tables, and move heavier debug diagnostics into collapsible details blocks.
 - Slice 026 non-goals preserved: no simulation/routing/projection semantics changes, no loader/export contract changes, no persistence/savegame/scenario/fixture replay, no demand/economy/passenger/fleet/depot/layover logic, no backend, no multimodal expansion, and no mobile behavior.
