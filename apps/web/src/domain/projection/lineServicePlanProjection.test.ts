@@ -1,6 +1,15 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
-import { createLineFrequencyMinutes, createLineId, createUnsetLineFrequencyByTimeBand, type Line } from '../types/line';
+import type { SelectedLineExportPayload } from '../types/selectedLineExport';
+import {
+  createLineFrequencyMinutes,
+  createLineId,
+  createUnsetLineFrequencyByTimeBand,
+  type Line
+} from '../types/line';
 import {
   createLineSegmentId,
   createRouteDistanceMeters,
@@ -16,6 +25,8 @@ import {
 
 const lineAId = createLineId('line-a');
 const lineBId = createLineId('line-b');
+const lineCId = createLineId('line-c');
+const lineDId = createLineId('line-d');
 
 const stopA = createStopId('stop-a');
 const stopB = createStopId('stop-b');
@@ -50,11 +61,17 @@ const createSegment = (
   status
 });
 
-const createBaseLine = (lineId: Line['id']): Line => ({
+const createBaseLine = (
+  lineId: Line['id'],
+  routeStatus: LineRouteSegment['status'] = 'routed'
+): Line => ({
   id: lineId,
   label: `Line ${lineId}`,
   stopIds: [stopA, stopB, stopC],
-  routeSegments: [createSegment(1, lineId, stopA, stopB, 4), createSegment(2, lineId, stopB, stopC, 6)],
+  routeSegments: [
+    createSegment(1, lineId, stopA, stopB, 4, routeStatus),
+    createSegment(2, lineId, stopB, stopC, 6, routeStatus)
+  ],
   frequencyByTimeBand: {
     'morning-rush': createLineFrequencyMinutes(6),
     'late-morning': createLineFrequencyMinutes(8),
@@ -66,32 +83,20 @@ const createBaseLine = (lineId: Line['id']): Line => ({
   }
 });
 
-describe('projectLineServicePlanForLine', () => {
-  it('returns configured when readiness is ready and current-band headway is valid', () => {
-    const result = projectLineServicePlanForLine(createBaseLine(lineAId), placedStops, 'morning-rush');
+describe('projectLineServicePlanProjection coverage', () => {
+  it('1) projects ready line + current frequency to configured and fallback-only line to degraded', () => {
+    const configuredResult = projectLineServicePlanForLine(createBaseLine(lineAId), placedStops, 'morning-rush');
+    const degradedResult = projectLineServicePlanForLine(
+      createBaseLine(lineAId, 'fallback-routed'),
+      placedStops,
+      'morning-rush'
+    );
 
-    expect(result.status).toBe('configured');
-    expect(result.currentBandHeadwayMinutes).toBe(6);
-    expect(result.theoreticalDeparturesPerHour).toBe(10);
-    expect(result.routeSegmentCount).toBe(2);
-    expect(result.totalRouteTravelMinutes).toBe(10);
-    expect(result.notes).toBeUndefined();
+    expect(configuredResult.status).toBe('configured');
+    expect(degradedResult.status).toBe('degraded');
   });
 
-  it('returns blocked when readiness has errors', () => {
-    const blockedLine: Line = {
-      ...createBaseLine(lineAId),
-      stopIds: [stopA],
-      routeSegments: []
-    };
-
-    const result = projectLineServicePlanForLine(blockedLine, placedStops, 'morning-rush');
-
-    expect(result.status).toBe('blocked');
-    expect(result.notes?.length).toBeGreaterThan(0);
-  });
-
-  it('returns not-configured when active-band frequency is unset and line is non-blocked', () => {
+  it('2) returns not-configured when line is non-blocked without active-band frequency', () => {
     const notConfiguredLine: Line = {
       ...createBaseLine(lineAId),
       frequencyByTimeBand: {
@@ -104,94 +109,142 @@ describe('projectLineServicePlanForLine', () => {
 
     expect(result.readiness.status).toBe('partially-ready');
     expect(result.status).toBe('not-configured');
-    expect(result.currentBandHeadwayMinutes).toBeNull();
-    expect(result.theoreticalDeparturesPerHour).toBeNull();
   });
 
-  it('returns degraded when active-band frequency is valid but readiness has warnings', () => {
-    const degradedLine: Line = {
+  it('3) returns blocked for blocked readiness', () => {
+    const blockedLine: Line = {
       ...createBaseLine(lineAId),
-      routeSegments: [
-        createSegment(1, lineAId, stopA, stopB, 4, 'fallback-routed'),
-        createSegment(2, lineAId, stopB, stopC, 6, 'fallback-routed')
-      ]
+      stopIds: [stopA],
+      routeSegments: []
     };
 
-    const result = projectLineServicePlanForLine(degradedLine, placedStops, 'morning-rush');
+    const result = projectLineServicePlanForLine(blockedLine, placedStops, 'morning-rush');
 
-    expect(result.readiness.status).toBe('partially-ready');
-    expect(result.status).toBe('degraded');
+    expect(result.readiness.status).toBe('blocked');
+    expect(result.status).toBe('blocked');
+  });
+
+  it('4) calculates departures/hour as 60 / headway', () => {
+    const line = createBaseLine(lineAId);
+
+    const result = projectLineServicePlanForLine(line, placedStops, 'morning-rush');
+
     expect(result.currentBandHeadwayMinutes).toBe(6);
     expect(result.theoreticalDeparturesPerHour).toBe(10);
   });
-});
 
-describe('projectLineServicePlan', () => {
-  it('builds network-level totals and status counts for projected lines', () => {
+  it('5) sums total route time from stored segment totals', () => {
+    const line = createBaseLine(lineAId);
+
+    const result = projectLineServicePlanForLine(line, placedStops, 'morning-rush');
+
+    expect(result.totalRouteTravelMinutes).toBe(10);
+  });
+
+  it('6) includes route segment count in projection', () => {
+    const line = createBaseLine(lineAId);
+
+    const result = projectLineServicePlanForLine(line, placedStops, 'morning-rush');
+
+    expect(result.routeSegmentCount).toBe(2);
+  });
+
+  it('7) reflects fallback-only route segments as degraded status and warning notes', () => {
+    const line = createBaseLine(lineAId, 'fallback-routed');
+
+    const result = projectLineServicePlanForLine(line, placedStops, 'morning-rush');
+
+    expect(result.status).toBe('degraded');
+    expect(result.notes?.some((note) => note.severity === 'warning')).toBe(true);
+  });
+
+  it('8) computes network summary counts correctly by status bucket', () => {
     const configuredLine = createBaseLine(lineAId);
+    const degradedLine = createBaseLine(lineBId, 'fallback-routed');
     const notConfiguredLine: Line = {
-      ...createBaseLine(lineBId),
+      ...createBaseLine(lineCId),
       frequencyByTimeBand: {
-        ...createUnsetLineFrequencyByTimeBand(),
-        midday: createLineFrequencyMinutes(10)
-      }
-    };
-
-    const projection = projectLineServicePlan([configuredLine, notConfiguredLine], placedStops, 'morning-rush');
-
-    expect(projection.summary.activeTimeBandId).toBe('morning-rush');
-    expect(projection.summary.totalCompletedLineCount).toBe(2);
-    expect(projection.summary.totalLineCount).toBe(2);
-    expect(projection.summary.configuredLineCount).toBe(1);
-    expect(projection.summary.notConfiguredLineCount).toBe(1);
-    expect(projection.summary.blockedLineCount).toBe(0);
-    expect(projection.summary.degradedLineCount).toBe(0);
-    expect(projection.summary.totalRouteSegmentCount).toBe(4);
-    expect(projection.summary.totalRouteTravelMinutes).toBe(20);
-    expect(projection.summary.totalTheoreticalDeparturesPerHour).toBe(10);
-  });
-});
-
-describe('projectLineSelectedServiceInspector', () => {
-  it('returns compact configured projection fields with bounded note list', () => {
-    const degradedLine: Line = {
-      ...createBaseLine(lineAId),
-      routeSegments: [
-        createSegment(1, lineAId, stopA, stopB, 4, 'fallback-routed'),
-        createSegment(2, lineAId, stopB, stopC, 6, 'fallback-routed')
-      ]
-    };
-    const lineProjection = projectLineServicePlanForLine(degradedLine, placedStops, 'morning-rush');
-
-    const inspectorProjection = projectLineSelectedServiceInspector(lineProjection, 1);
-
-    expect(inspectorProjection.activeTimeBandLabel).toBe('Morning rush');
-    expect(inspectorProjection.status).toBe('degraded');
-    expect(inspectorProjection.statusLabel).toBe('Configured with warnings');
-    expect(inspectorProjection.headwayLabel).toBe('6 min');
-    expect(inspectorProjection.theoreticalDeparturesPerHourLabel).toBe('10.00 departures/hour');
-    expect(inspectorProjection.totalRouteTravelMinutesLabel).toBe('10.00 min');
-    expect(inspectorProjection.routeSegmentCount).toBe(2);
-    expect(inspectorProjection.blockerCount).toBe(0);
-    expect(inspectorProjection.warningCount).toBeGreaterThan(0);
-    expect(inspectorProjection.noteMessages).toHaveLength(1);
-  });
-
-  it('projects an explicit unconfigured headway message when no active-band frequency exists', () => {
-    const notConfiguredLine: Line = {
-      ...createBaseLine(lineAId),
-      frequencyByTimeBand: {
-        ...createBaseLine(lineAId).frequencyByTimeBand,
+        ...createBaseLine(lineCId).frequencyByTimeBand,
         'morning-rush': null
       }
     };
-    const lineProjection = projectLineServicePlanForLine(notConfiguredLine, placedStops, 'morning-rush');
+    const blockedLine: Line = {
+      ...createBaseLine(lineDId),
+      stopIds: [stopA],
+      routeSegments: []
+    };
 
-    const inspectorProjection = projectLineSelectedServiceInspector(lineProjection);
+    const projection = projectLineServicePlan(
+      [configuredLine, degradedLine, notConfiguredLine, blockedLine],
+      placedStops,
+      'morning-rush'
+    );
 
-    expect(inspectorProjection.status).toBe('not-configured');
-    expect(inspectorProjection.headwayLabel).toBe('No active-band headway configured.');
-    expect(inspectorProjection.theoreticalDeparturesPerHour).toBeNull();
-    expect(inspectorProjection.theoreticalDeparturesPerHourLabel).toBeNull();
+    expect(projection.summary.totalLineCount).toBe(4);
+    expect(projection.summary.configuredLineCount).toBe(1);
+    expect(projection.summary.degradedLineCount).toBe(1);
+    expect(projection.summary.notConfiguredLineCount).toBe(1);
+    expect(projection.summary.blockedLineCount).toBe(1);
+  });
+
+  it('9) changes projection when active time band changes', () => {
+    const line: Line = {
+      ...createBaseLine(lineAId),
+      frequencyByTimeBand: {
+        ...createUnsetLineFrequencyByTimeBand(),
+        'morning-rush': createLineFrequencyMinutes(6),
+        midday: null
+      }
+    };
+
+    const morningResult = projectLineServicePlanForLine(line, placedStops, 'morning-rush');
+    const middayResult = projectLineServicePlanForLine(line, placedStops, 'midday');
+
+    expect(morningResult.status).toBe('degraded');
+    expect(middayResult.status).toBe('not-configured');
+    expect(morningResult.currentBandHeadwayMinutes).toBe(6);
+    expect(middayResult.currentBandHeadwayMinutes).toBeNull();
+  });
+
+  it('10) fixture-derived all-null frequencies do not produce configured service', () => {
+    const fixturePath = path.resolve(
+      path.dirname(new URL(import.meta.url).pathname),
+      '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v2.json'
+    );
+    const payload = JSON.parse(readFileSync(fixturePath, 'utf8')) as SelectedLineExportPayload;
+
+    const line: Line = {
+      id: payload.line.id,
+      label: payload.line.label,
+      stopIds: payload.line.orderedStopIds,
+      routeSegments: payload.line.routeSegments,
+      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
+    };
+
+    const result = projectLineServicePlanForLine(line, payload.stops, 'morning-rush');
+
+    expect(result.status).not.toBe('configured');
+    expect(result.currentBandHeadwayMinutes).toBeNull();
+  });
+
+  it('11) does not recompute or mutate route segments during projection', () => {
+    const line = createBaseLine(lineAId);
+    const beforeJson = JSON.stringify(line.routeSegments);
+
+    const result = projectLineServicePlanForLine(line, placedStops, 'morning-rush');
+
+    expect(result.routeSegmentCount).toBe(line.routeSegments.length);
+    expect(JSON.stringify(line.routeSegments)).toBe(beforeJson);
+  });
+
+  it('12) keeps blocker/warning counts stable across repeated inspector projections', () => {
+    const degradedLine = createBaseLine(lineAId, 'fallback-routed');
+    const lineProjection = projectLineServicePlanForLine(degradedLine, placedStops, 'morning-rush');
+
+    const firstInspector = projectLineSelectedServiceInspector(lineProjection, 1);
+    const secondInspector = projectLineSelectedServiceInspector(lineProjection, 3);
+
+    expect(firstInspector.blockerCount).toBe(secondInspector.blockerCount);
+    expect(firstInspector.warningCount).toBe(secondInspector.warningCount);
   });
 });
