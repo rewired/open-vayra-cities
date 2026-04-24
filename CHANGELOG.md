@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 015g: formalize the routing-support boundary for completed lines so canonical `routeSegments` are introduced now for deterministic map projection and structural inspector baselines, without claiming full routing simulation completeness.
+- Slice 015g: keep fallback routing explicitly deterministic and limited (ordered adjacent stop-pair resolution with deterministic ids/order), and clarify that fallback geometry/time outputs are continuity baselines rather than final service truth.
+- Slice 015g: keep completed-line rendering segment-first by preferring persisted route-segment geometry for GeoJSON assembly, with stop-order fallback only when routed coordinates are unavailable.
+- Slice 015g: document explicit non-goals (no full graph routing, traffic, demand/economy/vehicle simulation, persistence, backend/remote routing, or multimodal expansion).
+- Add ADR 0053 documenting routing-support boundary timing, fallback resolver intent/limits, segment-first rendering semantics, and non-goals.
+
 - Slice 015f: add a lightweight Vitest test runner baseline for `apps/web` with `test` and `test:watch` scripts.
 - Slice 015f: add root-level `test:web` and `test` scripts to aggregate web package unit-test execution through existing pnpm workspace tooling.
 - Slice 015f: add focused unit coverage for fallback line-routing helper behavior (segment cardinality/order, deterministic ids, aggregate distance/time compatibility, fallback status preservation, and explicit insufficient-stop failure contract).
