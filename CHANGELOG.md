@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2026-04-24
+
+- Slice 015a: add canonical line-route domain primitives (`LineSegmentId`, `RouteGeometryCoordinate`, branded route distance/travel time, and explicit `RouteStatus` with `fallback-routed`) in `apps/web/src/domain/types/lineRoute.ts`.
+- Slice 015a: extend canonical `Line` with readonly typed `routeSegments` using `LineRouteSegment[]`, and initialize new lines with an empty route-segment list in map workspace line completion flow.
+- Add ADR 0047 documenting the canonical line-route segment type surface and line-level route-segment ownership boundary.
+
 ## 2026-04-23
 
 - Slice 014n: keep street-snap fallback strictly secondary by returning direct-hit candidates immediately when available.
