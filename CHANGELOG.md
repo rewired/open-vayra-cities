@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 037: add a compact, read-only selected-line context tray near the map workspace bottom and render it only when a completed line is selected.
+- Slice 037: show existing selected-line/session/projection values only (line id/label, stop count + compact stop sequence, segment count, total route time, active-band headway, next departure, projected vehicle count).
+- Slice 037 non-goals preserved: no simulation/routing/projection behavior changes, no new interactive focusable controls, and no mobile/multimodal scope expansion.
+- Add ADR 0091 documenting context-tray placement, projection-consumption boundaries, and explicit non-goals.
+
 - Slice 036: switch `MAP_WORKSPACE_BOOTSTRAP_CONFIG.styleUrl` from CARTO Positron to CARTO Dark Matter GL (`https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json`) for a dark, MapLibre-compatible no-key startup basemap.
 - Slice 036: preserve centralized bootstrap ownership of style URL and keep attribution behavior unchanged without introducing API-key/secret-dependent providers.
 - Slice 036 non-goals preserved: no map interaction/lifecycle behavior changes and no style URL duplication outside bootstrap config.
