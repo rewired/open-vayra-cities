@@ -323,6 +323,53 @@ body {
   margin-top: 12px;
 }
 
+.inspector-route-baseline {
+  margin-top: 12px;
+  padding: 8px;
+  border: 1px solid #2f415f;
+  border-radius: 8px;
+  background: #131f31;
+}
+
+.inspector-route-baseline h3 {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.inspector-route-baseline__totals {
+  margin-top: 4px;
+}
+
+.inspector-route-baseline__totals p {
+  margin-top: 4px;
+  font-size: 0.8rem;
+}
+
+.inspector-route-baseline__fallback-note {
+  color: #f7d9a0;
+  font-size: 0.75rem;
+}
+
+.inspector-route-baseline__segment-table {
+  width: 100%;
+  margin-top: 8px;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.inspector-route-baseline__segment-table th,
+.inspector-route-baseline__segment-table td {
+  padding: 4px 5px;
+  text-align: left;
+  vertical-align: top;
+  border-top: 1px solid #2f415f;
+}
+
+.inspector-route-baseline__segment-table th {
+  color: #cfe0fb;
+  font-weight: 600;
+}
+
 .inspector-frequency-editor__row {
   display: grid;
   gap: 4px;

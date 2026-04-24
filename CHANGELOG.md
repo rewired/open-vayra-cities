@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 015e: add a compact line-selected inspector `Route baseline` block with aggregate route-segment metrics (segment count, total distance, in-motion minutes, dwell minutes, and total line minutes).
+- Slice 015e: add per-segment structural/debug rows (from/to stop ids, distance/travel values, and explicit route-status labels including `Fallback routed`).
+- Slice 015e: show explicit fallback-routing disclaimer text when any segment status is `fallback-routed`, avoiding accuracy claims.
+- Add ADR 0051 documenting structural-only route baseline inspector boundaries and explicit non-goals against demand/economy/vehicle KPIs.
+
 - Slice 015d: update completed-line GeoJSON assembly to prefer persisted `routeSegments` geometry over stop-order fallback when routed segment coordinates are available.
 - Slice 015d: flatten completed-line segment geometries in segment order and de-duplicate shared adjacent boundary coordinates to avoid duplicate vertices.
 - Slice 015d: preserve completed-line feature properties (`lineId`, `selected`) to keep existing feature-first map selection behavior unchanged.
