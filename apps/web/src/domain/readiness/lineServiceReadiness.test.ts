@@ -1,28 +1,46 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
+import {
+  LINE_SERVICE_READINESS_ISSUE_CODES,
+  LINE_SERVICE_READINESS_ISSUE_SEVERITIES
+} from '../constants/lineServiceReadiness';
+import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
+import type { SelectedLineExportPayload } from '../types/selectedLineExport';
 import { createLineFrequencyMinutes, createLineId, createUnsetLineFrequencyByTimeBand, type Line } from '../types/line';
-import { createLineSegmentId, createRouteDistanceMeters, createRouteTravelMinutes, type RouteStatus } from '../types/lineRoute';
+import {
+  createLineSegmentId,
+  createRouteDistanceMeters,
+  createRouteTravelMinutes,
+  type LineRouteSegment,
+  type RouteStatus
+} from '../types/lineRoute';
+import type { LineServiceReadinessIssue } from '../types/lineServiceReadiness';
 import { createStopId, type Stop } from '../types/stop';
-import { LINE_SERVICE_READINESS_ISSUE_CODES } from '../constants/lineServiceReadiness';
 import { evaluateLineServiceReadiness } from './lineServiceReadiness';
 
 const lineId = createLineId('line-1');
+const differentLineId = createLineId('line-2');
 const stopA = createStopId('stop-a');
 const stopB = createStopId('stop-b');
 const stopC = createStopId('stop-c');
+const stopD = createStopId('stop-d');
 
 const placedStops: readonly Stop[] = [
   { id: stopA, position: { lng: 9.99, lat: 53.55 }, label: 'A' },
   { id: stopB, position: { lng: 10.0, lat: 53.56 }, label: 'B' },
-  { id: stopC, position: { lng: 10.01, lat: 53.57 }, label: 'C' }
+  { id: stopC, position: { lng: 10.01, lat: 53.57 }, label: 'C' },
+  { id: stopD, position: { lng: 10.02, lat: 53.58 }, label: 'D' }
 ];
 
 const createSegment = (
   segmentNumber: number,
   fromStopId: Stop['id'],
   toStopId: Stop['id'],
-  status: RouteStatus = 'routed'
-) => ({
+  overrides: Partial<LineRouteSegment> = {}
+): LineRouteSegment => ({
   id: createLineSegmentId(`segment-${segmentNumber}`),
   lineId,
   fromStopId,
@@ -30,15 +48,16 @@ const createSegment = (
   orderedGeometry: [
     [9.99 + segmentNumber * 0.01, 53.55 + segmentNumber * 0.01],
     [10.0 + segmentNumber * 0.01, 53.56 + segmentNumber * 0.01]
-  ] as const,
+  ],
   distanceMeters: createRouteDistanceMeters(500),
   inMotionTravelMinutes: createRouteTravelMinutes(2),
   dwellMinutes: createRouteTravelMinutes(0.5),
   totalTravelMinutes: createRouteTravelMinutes(2.5),
-  status
+  status: 'routed',
+  ...overrides
 });
 
-const createValidLine = (): Line => ({
+const createFullyConfiguredLine = (): Line => ({
   id: lineId,
   label: 'Line 1',
   stopIds: [stopA, stopB, stopC],
@@ -54,66 +73,214 @@ const createValidLine = (): Line => ({
   }
 });
 
+const issueCodes = (issues: readonly LineServiceReadinessIssue[]): readonly string[] => issues.map((issue) => issue.code);
+
 describe('evaluateLineServiceReadiness', () => {
-  it('returns ready when line structure, routing, and frequencies are complete', () => {
-    const result = evaluateLineServiceReadiness(createValidLine(), placedStops);
+  it('returns ready for a fully configured and coherent line', () => {
+    const result = evaluateLineServiceReadiness(createFullyConfiguredLine(), placedStops);
 
     expect(result.status).toBe('ready');
     expect(result.issues).toEqual([]);
-    expect(result.summary.errorIssueCount).toBe(0);
-    expect(result.summary.warningIssueCount).toBe(0);
-    expect(result.summary.hasAllCanonicalTimeBandsConfigured).toBe(true);
   });
 
-  it('returns blocked for structural and frequency failures', () => {
-    const invalidLine: Line = {
-      ...createValidLine(),
-      label: ' ',
-      stopIds: [stopA, createStopId('missing-stop')],
-      routeSegments: [
-        {
-          ...createSegment(1, stopA, stopC),
-          totalTravelMinutes: createRouteTravelMinutes(1),
-          status: 'invalid-status' as RouteStatus
-        }
-      ],
-      frequencyByTimeBand: { 'morning-rush': 0 } as Line['frequencyByTimeBand']
+  it('returns blocked when all frequencies are unset', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
     };
 
-    const result = evaluateLineServiceReadiness(invalidLine, placedStops);
+    const result = evaluateLineServiceReadiness(line, placedStops);
 
     expect(result.status).toBe('blocked');
-    expect(result.summary.errorIssueCount).toBeGreaterThan(0);
-    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.INVALID_LINE_LABEL)).toBe(true);
-    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_PLACED_STOP_REFERENCE)).toBe(true);
-    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.ROUTE_SEGMENT_ADJACENCY_MISMATCH)).toBe(true);
-    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.ROUTE_SEGMENT_TIMING_UNUSABLE)).toBe(true);
-    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.UNKNOWN_ROUTE_STATUS)).toBe(true);
-    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY)).toBe(true);
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY);
   });
 
-  it('returns partially-ready when only warnings are present', () => {
-    const frequencyByTimeBand = {
-      ...createUnsetLineFrequencyByTimeBand(),
-      'morning-rush': createLineFrequencyMinutes(6)
+  it('returns partially-ready when frequencies are only partially configured', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      frequencyByTimeBand: {
+        ...createUnsetLineFrequencyByTimeBand(),
+        'morning-rush': createLineFrequencyMinutes(6),
+        midday: createLineFrequencyMinutes(10)
+      }
     };
 
-    const warningLine: Line = {
-      ...createValidLine(),
-      routeSegments: [
-        createSegment(1, stopA, stopB, 'fallback-routed'),
-        createSegment(2, stopB, stopC, 'fallback-routed')
-      ],
-      frequencyByTimeBand
-    };
-
-    const result = evaluateLineServiceReadiness(warningLine, placedStops);
+    const result = evaluateLineServiceReadiness(line, placedStops);
 
     expect(result.status).toBe('partially-ready');
-    expect(result.summary.errorIssueCount).toBe(0);
-    expect(result.summary.warningIssueCount).toBeGreaterThanOrEqual(1);
+    expect(result.summary.configuredTimeBandCount).toBe(2);
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION);
+  });
+
+  it('returns blocked when fewer than minimum stops are configured', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      stopIds: [stopA],
+      routeSegments: []
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+
+    expect(result.status).toBe('blocked');
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.INSUFFICIENT_ORDERED_STOPS);
+  });
+
+  it('returns blocked when a referenced stop is missing from placed stops', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      stopIds: [stopA, createStopId('stop-missing'), stopC],
+      routeSegments: [createSegment(1, stopA, createStopId('stop-missing')), createSegment(2, createStopId('stop-missing'), stopC)]
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+
+    expect(result.status).toBe('blocked');
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_PLACED_STOP_REFERENCE);
+  });
+
+  it('returns blocked when route segments are missing', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      routeSegments: []
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+
+    expect(result.status).toBe('blocked');
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_ROUTE_SEGMENTS);
+  });
+
+  it('returns blocked when route segment count does not match stop adjacency count', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      routeSegments: [createSegment(1, stopA, stopB)]
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+
+    expect(result.status).toBe('blocked');
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.ROUTE_SEGMENT_COUNT_MISMATCH);
+  });
+
+  it('returns blocked when route segment adjacency mismatches ordered stop pairs', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      routeSegments: [createSegment(1, stopA, stopC), createSegment(2, stopB, stopC)]
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+
+    expect(result.status).toBe('blocked');
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.ROUTE_SEGMENT_ADJACENCY_MISMATCH);
+  });
+
+  it('returns blocked when route segment lineId does not match line id', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      routeSegments: [
+        createSegment(1, stopA, stopB),
+        createSegment(2, stopB, stopC, { lineId: differentLineId })
+      ]
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+
+    expect(result.status).toBe('blocked');
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.ROUTE_SEGMENT_LINE_ID_MISMATCH);
+  });
+
+  it('returns blocked when segment timing is invalid', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      routeSegments: [
+        createSegment(1, stopA, stopB),
+        createSegment(2, stopB, stopC, { totalTravelMinutes: createRouteTravelMinutes(1) })
+      ]
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+
+    expect(result.status).toBe('blocked');
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.ROUTE_SEGMENT_TIMING_UNUSABLE);
+  });
+
+  it('surfaces fallback-routed warning when all segments are fallback-routed', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      routeSegments: [
+        createSegment(1, stopA, stopB, { status: 'fallback-routed' }),
+        createSegment(2, stopB, stopC, { status: 'fallback-routed' })
+      ]
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+
+    expect(result.status).toBe('partially-ready');
     expect(result.summary.hasFallbackOnlyRouting).toBe(true);
-    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.FALLBACK_ONLY_ROUTING)).toBe(true);
-    expect(result.issues.some((issue) => issue.code === LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION)).toBe(true);
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.FALLBACK_ONLY_ROUTING);
+  });
+
+  it('reports configured and missing canonical time-band counts correctly', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      frequencyByTimeBand: {
+        ...createUnsetLineFrequencyByTimeBand(),
+        'morning-rush': createLineFrequencyMinutes(5),
+        evening: createLineFrequencyMinutes(12)
+      }
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+
+    expect(result.summary.configuredTimeBandCount).toBe(2);
+    expect(result.summary.canonicalTimeBandCount).toBe(MVP_TIME_BAND_IDS.length);
+    expect(result.summary.hasAllCanonicalTimeBandsConfigured).toBe(false);
+  });
+
+  it('keeps issue code and severity contracts stable for representative diagnostics', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      routeSegments: [
+        createSegment(1, stopA, stopB, { status: 'invalid-status' as RouteStatus }),
+        createSegment(2, stopB, stopC, { status: 'fallback-routed' })
+      ],
+      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+    const issuesByCode = new Map(result.issues.map((issue) => [issue.code, issue]));
+
+    expect(issuesByCode.get(LINE_SERVICE_READINESS_ISSUE_CODES.UNKNOWN_ROUTE_STATUS)?.severity).toBe(
+      LINE_SERVICE_READINESS_ISSUE_SEVERITIES.ERROR
+    );
+    expect(issuesByCode.get(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY)?.severity).toBe(
+      LINE_SERVICE_READINESS_ISSUE_SEVERITIES.ERROR
+    );
+    expect(issuesByCode.get(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION)?.severity).toBe(
+      LINE_SERVICE_READINESS_ISSUE_SEVERITIES.WARNING
+    );
+  });
+
+  it('evaluates Hamburg fixture-derived line as not fully ready when frequencies are unset', () => {
+    const fixturePath = path.resolve(
+      path.dirname(new URL(import.meta.url).pathname),
+      '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v2.json'
+    );
+    const payload = JSON.parse(readFileSync(fixturePath, 'utf8')) as SelectedLineExportPayload;
+
+    const line: Line = {
+      id: payload.line.id,
+      label: payload.line.label,
+      stopIds: payload.line.orderedStopIds,
+      routeSegments: payload.line.routeSegments,
+      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
+    };
+
+    const result = evaluateLineServiceReadiness(line, payload.stops);
+
+    expect(result.status).toBe('blocked');
+    expect(result.summary.hasAtLeastOneConfiguredFrequency).toBe(false);
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY);
+    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.FALLBACK_ONLY_ROUTING);
   });
 });
