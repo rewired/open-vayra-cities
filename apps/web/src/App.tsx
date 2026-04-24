@@ -1,163 +1,22 @@
-import { useEffect, useRef, useState, type ChangeEvent, type ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
-import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
-import {
-  projectLineDepartureScheduleForLine,
-  projectLineDepartureScheduleNetwork,
-  projectLineSelectedDepartureInspector
-} from './domain/projection/lineDepartureScheduleProjection';
-import { projectLineVehicleNetwork } from './domain/projection/lineVehicleProjection';
-import {
-  projectLineSelectedServiceInspector,
-  projectLineServicePlan,
-  projectLineServicePlanForLine
-} from './domain/projection/lineServicePlanProjection';
-import {
-  applySimulationClockCommand,
-  createInitialSimulationClockState,
-  deriveTimeBandIdFromMinuteOfDay,
-  formatSimulationMinuteOfDay,
-  formatSimulationRunningStateLabel,
-  parseSimulationSpeedId
-} from './domain/simulation/simulationClock';
-import { createLineFrequencyMinutes, type Line } from './domain/types/line';
-import type { LineRouteSegment, RouteStatus } from './domain/types/lineRoute';
+import { TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
 import { buildSelectedLineExportPayload } from './domain/types/selectedLineExport';
-import type { SimulationSpeedId } from './domain/types/simulationClock';
-import type { Stop, StopId } from './domain/types/stop';
-import type { TimeBandId } from './domain/types/timeBand';
+import { formatSimulationMinuteOfDay, formatSimulationRunningStateLabel, parseSimulationSpeedId } from './domain/simulation/simulationClock';
 import { SIMULATION_SPEED_DEFINITIONS } from './domain/constants/simulationClock';
-import { parseSelectedLineExportFile } from './domain/export/selectedLineExportFileLoader';
-import { convertSelectedLineExportPayloadToSession } from './domain/export/selectedLineExportSessionLoader';
-import { validateSelectedLineExportPayload } from './domain/export/selectedLineExportValidation';
-import {
-  MapWorkspaceSurface,
-  type StopSelectionState
-} from './map-workspace/MapWorkspaceSurface';
+import { useNetworkPlanningProjections } from './domain/projection/useNetworkPlanningProjections';
+import { InspectorPanel } from './inspector/InspectorPanel';
+import type { InspectorPanelState } from './inspector/types';
+import { MapWorkspaceSurface } from './map-workspace/MapWorkspaceSurface';
+import { SessionActions } from './session/SessionActions';
+import { useNetworkSessionState } from './session/useNetworkSessionState';
+import { useSimulationClockController } from './simulation/useSimulationClockController';
 import { MaterialIcon } from './ui/icons/MaterialIcon';
 import { WORKSPACE_MODE_ICONS } from './ui/icons/materialIcons';
 
 import './App.css';
 
-/**
- * Defines the workspace tool modes available in the desktop shell.
- */
-export type WorkspaceToolMode = 'inspect' | 'place-stop' | 'build-line';
-
-/**
- * Carries the active line-building draft selection as an ordered stop-id list.
- */
-export interface LineBuildSelectionState {
-  readonly selectedStopIds: readonly StopId[];
-}
-
-/**
- * Carries the currently selected completed line for structural inspector rendering.
- */
-export interface LineSelectionState {
-  readonly selectedLine: Line | null;
-}
-
-type LineFrequencyInputByTimeBand = Readonly<Record<TimeBandId, string>>;
-
-type LineFrequencyValidationByTimeBand = Readonly<Record<TimeBandId, string | null>>;
-
-interface SelectedLineStructureSummary {
-  readonly stopCount: number;
-  readonly configuredTimeBandCount: number;
-  readonly unconfiguredTimeBandCount: number;
-}
-
-interface StaticNetworkSummaryKpis {
-  readonly totalStopCount: number;
-  readonly completedLineCount: number;
-  readonly selectedCompletedLine: SelectedLineStructureSummary | null;
-}
-
-interface RouteBaselineAggregateMetrics {
-  readonly segmentCount: number;
-  readonly totalDistanceMeters: number;
-  readonly totalInMotionMinutes: number;
-  readonly totalDwellMinutes: number;
-  readonly totalLineMinutes: number;
-  readonly hasFallbackSegments: boolean;
-}
-
-interface SelectedLineImportFeedback {
-  readonly kind: 'success' | 'error';
-  readonly title: string;
-  readonly detail: string;
-}
-
-const MAX_READINESS_ISSUES_VISIBLE = 5;
-const MAX_UPCOMING_DEPARTURES_VISIBLE = 5;
-
-/**
- * Enumerates the inspector's mutually exclusive visual states.
- */
-export type InspectorPanelMode = 'line-selected' | 'stop-selected' | 'empty';
-
-/**
- * Carries inspector data when a completed line is the active selection context.
- */
-export interface LineSelectedInspectorPanelState {
-  readonly mode: 'line-selected';
-  readonly selectedLine: Line;
-}
-
-/**
- * Carries inspector data when a stop is the active selection context.
- */
-export interface StopSelectedInspectorPanelState {
-  readonly mode: 'stop-selected';
-  readonly selectedStop: StopSelectionState;
-}
-
-/**
- * Carries inspector data when neither a line nor stop is selected.
- */
-export interface EmptyInspectorPanelState {
-  readonly mode: 'empty';
-}
-
-/**
- * Represents the resolved inspector view model after applying selection priority rules.
- */
-export type InspectorPanelState =
-  | LineSelectedInspectorPanelState
-  | StopSelectedInspectorPanelState
-  | EmptyInspectorPanelState;
-
-const INITIAL_LINE_BUILD_SELECTION_STATE: LineBuildSelectionState = {
-  selectedStopIds: []
-};
-
-const createEmptyLineFrequencyInputByTimeBand = (): LineFrequencyInputByTimeBand =>
-  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, ''])) as LineFrequencyInputByTimeBand;
-
-const createEmptyLineFrequencyValidationByTimeBand = (): LineFrequencyValidationByTimeBand =>
-  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, null])) as LineFrequencyValidationByTimeBand;
-
-const ROUTE_STATUS_LABELS: Readonly<Record<RouteStatus, string>> = {
-  'not-routed': 'Not routed',
-  routed: 'Routed',
-  'fallback-routed': 'Fallback routed',
-  'routing-failed': 'Routing failed'
-};
-
-const formatDistanceMeters = (distanceMeters: number): string => `${distanceMeters.toFixed(0)} m`;
-
-const formatTravelMinutes = (travelMinutes: number): string => `${travelMinutes.toFixed(2)} min`;
-
-const formatMinuteOfDayNumber = (minuteOfDay: number): string => {
-  const normalizedMinute = ((Math.floor(minuteOfDay) % 1440) + 1440) % 1440;
-  const hours = Math.floor(normalizedMinute / 60);
-  const minutes = normalizedMinute % 60;
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-};
-
-const buildSelectedLineExportFilename = (lineId: Line['id']): string => `cityops-line-${lineId}.json`;
+const buildSelectedLineExportFilename = (lineId: string): string => `cityops-line-${lineId}.json`;
 
 const downloadJsonFile = (filename: string, payload: unknown): void => {
   const jsonBlob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -171,25 +30,10 @@ const downloadJsonFile = (filename: string, payload: unknown): void => {
   URL.revokeObjectURL(objectUrl);
 };
 
-const projectRouteBaselineAggregateMetrics = (
-  routeSegments: readonly LineRouteSegment[]
-): RouteBaselineAggregateMetrics => ({
-  segmentCount: routeSegments.length,
-  totalDistanceMeters: routeSegments.reduce((sum, segment) => sum + segment.distanceMeters, 0),
-  totalInMotionMinutes: routeSegments.reduce((sum, segment) => sum + segment.inMotionTravelMinutes, 0),
-  totalDwellMinutes: routeSegments.reduce((sum, segment) => sum + segment.dwellMinutes, 0),
-  totalLineMinutes: routeSegments.reduce((sum, segment) => sum + segment.totalTravelMinutes, 0),
-  hasFallbackSegments: routeSegments.some((segment) => segment.status === 'fallback-routed')
-});
-
-/**
- * Resolves the inspector panel state with explicit selection priority:
- * selected line first, then selected stop, else neutral empty state.
- */
-function resolveInspectorPanelState(
-  selectedLine: Line | null,
-  selectedStop: StopSelectionState | null
-): InspectorPanelState {
+const resolveInspectorPanelState = (
+  selectedLine: ReturnType<typeof useNetworkSessionState>['selectedLine'],
+  selectedStop: ReturnType<typeof useNetworkSessionState>['selectedStop']
+): InspectorPanelState => {
   if (selectedLine) {
     return {
       mode: 'line-selected',
@@ -207,341 +51,28 @@ function resolveInspectorPanelState(
   return {
     mode: 'empty'
   };
-}
+};
 
-/**
- * Projects a minimal structural-only network KPI summary from current in-memory planning state.
- */
-function projectStaticNetworkSummaryKpis(
-  totalStopCount: number,
-  sessionLines: readonly Line[],
-  selectedLine: Line | null
-): StaticNetworkSummaryKpis {
-  if (!selectedLine) {
-    return {
-      totalStopCount,
-      completedLineCount: sessionLines.length,
-      selectedCompletedLine: null
-    };
-  }
-
-  const configuredTimeBandCount = MVP_TIME_BAND_IDS.filter((timeBandId) => {
-    const frequencyValue = selectedLine.frequencyByTimeBand[timeBandId];
-    return frequencyValue !== null && frequencyValue !== undefined;
-  }).length;
-
-  return {
-    totalStopCount,
-    completedLineCount: sessionLines.length,
-    selectedCompletedLine: {
-      stopCount: selectedLine.stopIds.length,
-      configuredTimeBandCount,
-      unconfiguredTimeBandCount: MVP_TIME_BAND_IDS.length - configuredTimeBandCount
-    }
-  };
-}
-
-/**
- * Renders the initial desktop-only CityOps application shell layout.
- */
+/** Renders the desktop-only CityOps application shell layout and composes extracted session/projection/inspector boundaries. */
 export default function App(): ReactElement {
-  const [activeToolMode, setActiveToolMode] = useState<WorkspaceToolMode>('inspect');
-  const [sessionStops, setSessionStops] = useState<readonly Stop[]>([]);
-  const [selectedStop, setSelectedStop] = useState<StopSelectionState | null>(null);
-  const [lineBuildSelection, setLineBuildSelection] =
-    useState<LineBuildSelectionState>(INITIAL_LINE_BUILD_SELECTION_STATE);
-  const [sessionLines, setSessionLines] = useState<readonly Line[]>([]);
-  const [selectedLineId, setSelectedLineId] = useState<Line['id'] | null>(null);
-  const [lineFrequencyInputByTimeBand, setLineFrequencyInputByTimeBand] =
-    useState<LineFrequencyInputByTimeBand>(createEmptyLineFrequencyInputByTimeBand);
-  const [lineFrequencyValidationByTimeBand, setLineFrequencyValidationByTimeBand] =
-    useState<LineFrequencyValidationByTimeBand>(createEmptyLineFrequencyValidationByTimeBand);
-  const [simulationClockState, setSimulationClockState] = useState(createInitialSimulationClockState);
-  const lastClockTickRealMillisecondsRef = useRef<number | null>(null);
-  const lineJsonFileInputRef = useRef<HTMLInputElement | null>(null);
-  const [selectedLineImportFeedback, setSelectedLineImportFeedback] = useState<SelectedLineImportFeedback | null>(
-    null
-  );
+  const sessionController = useNetworkSessionState();
+  const clockController = useSimulationClockController();
 
-  const handleToolModeSelection = (nextMode: WorkspaceToolMode): void => {
-    setActiveToolMode(nextMode);
-
-    if (nextMode !== 'build-line') {
-      setLineBuildSelection(INITIAL_LINE_BUILD_SELECTION_STATE);
-    }
-  };
-
-  const selectedLine = sessionLines.find((line) => line.id === selectedLineId) ?? null;
-  const currentSimulationMinuteOfDay = simulationClockState.timestamp.minuteOfDay;
-  const activeSimulationTimeBandId = deriveTimeBandIdFromMinuteOfDay(currentSimulationMinuteOfDay);
-  const selectedStopId: StopId | null = selectedStop?.selectedStopId ?? null;
-  const inspectorPanelState = resolveInspectorPanelState(selectedLine, selectedStop);
-  const staticNetworkSummaryKpis = projectStaticNetworkSummaryKpis(
-    sessionStops.length,
-    sessionLines,
-    selectedLine
+  const projections = useNetworkPlanningProjections(
+    sessionController.sessionLines,
+    sessionController.sessionStops,
+    sessionController.selectedLine,
+    clockController.activeSimulationTimeBandId,
+    clockController.currentSimulationMinuteOfDay
   );
-  const selectedLineRouteBaselineMetrics = selectedLine
-    ? projectRouteBaselineAggregateMetrics(selectedLine.routeSegments)
-    : null;
-  const selectedLineServiceProjection = selectedLine
-    ? projectLineServicePlanForLine(selectedLine, sessionStops, activeSimulationTimeBandId)
-    : null;
-  const selectedLineDepartureProjection = selectedLine
-    ? projectLineDepartureScheduleForLine(
-        selectedLine,
-        sessionStops,
-        activeSimulationTimeBandId,
-        currentSimulationMinuteOfDay
-      )
-    : null;
-  const networkDepartureScheduleProjection = projectLineDepartureScheduleNetwork(
-    sessionLines,
-    sessionStops,
-    activeSimulationTimeBandId,
-    currentSimulationMinuteOfDay
+  const inspectorPanelState = resolveInspectorPanelState(
+    sessionController.selectedLine,
+    sessionController.selectedStop
   );
-  const vehicleNetworkProjection = projectLineVehicleNetwork(
-    sessionLines,
-    networkDepartureScheduleProjection,
-    currentSimulationMinuteOfDay,
-    activeSimulationTimeBandId
-  );
-  const selectedLineVehicleProjection = selectedLine
-    ? vehicleNetworkProjection.lines.find((lineProjection) => lineProjection.lineId === selectedLine.id) ?? null
-    : null;
-  const networkServicePlanProjection = projectLineServicePlan(
-    sessionLines,
-    sessionStops,
-    activeSimulationTimeBandId
-  );
-  const selectedLineServiceInspectorProjection = selectedLineServiceProjection
-    ? projectLineSelectedServiceInspector(selectedLineServiceProjection, MAX_READINESS_ISSUES_VISIBLE)
-    : null;
-  const selectedLineDepartureInspectorProjection = selectedLineDepartureProjection
-    ? projectLineSelectedDepartureInspector(
-        selectedLineDepartureProjection,
-        MAX_UPCOMING_DEPARTURES_VISIBLE,
-        MAX_READINESS_ISSUES_VISIBLE
-      )
-    : null;
   const selectedCompletedLineForExport =
     inspectorPanelState.mode === 'line-selected'
-      ? sessionLines.find((line) => line.id === inspectorPanelState.selectedLine.id) ?? null
+      ? sessionController.sessionLines.find((line) => line.id === inspectorPanelState.selectedLine.id) ?? null
       : null;
-
-  useEffect(() => {
-    if (!selectedLine) {
-      setLineFrequencyInputByTimeBand(createEmptyLineFrequencyInputByTimeBand());
-      setLineFrequencyValidationByTimeBand(createEmptyLineFrequencyValidationByTimeBand());
-      return;
-    }
-
-    setLineFrequencyInputByTimeBand(
-      Object.fromEntries(
-        MVP_TIME_BAND_IDS.map((timeBandId) => [
-          timeBandId,
-          selectedLine.frequencyByTimeBand[timeBandId] === null ||
-          selectedLine.frequencyByTimeBand[timeBandId] === undefined
-            ? ''
-            : String(selectedLine.frequencyByTimeBand[timeBandId])
-        ])
-      ) as LineFrequencyInputByTimeBand
-    );
-    setLineFrequencyValidationByTimeBand(createEmptyLineFrequencyValidationByTimeBand());
-  }, [selectedLine]);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      const nowMilliseconds = performance.now();
-      const previousTick = lastClockTickRealMillisecondsRef.current;
-      lastClockTickRealMillisecondsRef.current = nowMilliseconds;
-
-      if (previousTick === null) {
-        return;
-      }
-
-      const elapsedRealMilliseconds = nowMilliseconds - previousTick;
-      setSimulationClockState((currentClockState) =>
-        applySimulationClockCommand(currentClockState, {
-          type: 'advance-elapsed',
-          elapsedRealMilliseconds
-        }).nextState
-      );
-    }, 250);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, []);
-
-  const updateSelectedCompletedLineFrequency = (
-    timeBandId: TimeBandId,
-    rawInputValue: string
-  ): void => {
-    setLineFrequencyInputByTimeBand((currentInputs) => ({
-      ...currentInputs,
-      [timeBandId]: rawInputValue
-    }));
-
-    if (!selectedLine) {
-      return;
-    }
-
-    const trimmedValue = rawInputValue.trim();
-    if (trimmedValue.length === 0) {
-      setLineFrequencyValidationByTimeBand((currentValidation) => ({
-        ...currentValidation,
-        [timeBandId]: null
-      }));
-      setSessionLines((currentLines) =>
-        currentLines.map((line) =>
-          line.id === selectedLine.id
-            ? {
-                ...line,
-                frequencyByTimeBand: {
-                  ...line.frequencyByTimeBand,
-                  [timeBandId]: null
-                }
-              }
-            : line
-        )
-      );
-      return;
-    }
-
-    const parsedFrequencyMinutes = Number(trimmedValue);
-    if (!Number.isFinite(parsedFrequencyMinutes) || parsedFrequencyMinutes <= 0) {
-      setLineFrequencyValidationByTimeBand((currentValidation) => ({
-        ...currentValidation,
-        [timeBandId]: 'Enter a positive minute interval.'
-      }));
-      return;
-    }
-
-    setLineFrequencyValidationByTimeBand((currentValidation) => ({
-      ...currentValidation,
-      [timeBandId]: null
-    }));
-    setSessionLines((currentLines) =>
-      currentLines.map((line) =>
-        line.id === selectedLine.id
-          ? {
-              ...line,
-              frequencyByTimeBand: {
-                ...line.frequencyByTimeBand,
-                [timeBandId]: createLineFrequencyMinutes(parsedFrequencyMinutes)
-              }
-            }
-          : line
-      )
-    );
-  };
-
-  const handleSelectedLineExport = (): void => {
-    if (!selectedCompletedLineForExport) {
-      return;
-    }
-
-    const exportPayload = buildSelectedLineExportPayload({
-      selectedLine: selectedCompletedLineForExport,
-      placedStops: sessionStops,
-      createdAtIsoUtc: new Date().toISOString(),
-      sourceMetadata: {
-        source: 'cityops-web'
-      }
-    });
-
-    downloadJsonFile(
-      buildSelectedLineExportFilename(selectedCompletedLineForExport.id),
-      exportPayload
-    );
-  };
-
-  const handleLineJsonPickerOpen = (): void => {
-    setSelectedLineImportFeedback(null);
-    lineJsonFileInputRef.current?.click();
-  };
-
-  const handleLineJsonFileSelection = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const selectedFile = event.currentTarget.files?.[0];
-    event.currentTarget.value = '';
-
-    if (!selectedFile) {
-      return;
-    }
-
-    const parsedResult = await parseSelectedLineExportFile(selectedFile);
-    if (!parsedResult.ok) {
-      setSelectedLineImportFeedback({
-        kind: 'error',
-        title: 'Line JSON could not be loaded',
-        detail: parsedResult.issue.message
-      });
-      return;
-    }
-
-    const validationResult = validateSelectedLineExportPayload(parsedResult.parsed);
-    if (!validationResult.ok) {
-      const firstIssue = validationResult.issues[0];
-      setSelectedLineImportFeedback({
-        kind: 'error',
-        title: 'Line JSON could not be loaded',
-        detail: firstIssue
-          ? `${firstIssue.message}${validationResult.issues.length > 1 ? ` (${validationResult.issues.length} issues)` : ''}`
-          : 'The selected line JSON failed validation.'
-      });
-      return;
-    }
-
-    const conversionResult = convertSelectedLineExportPayloadToSession(validationResult.payload);
-    if (!conversionResult.ok) {
-      setSelectedLineImportFeedback({
-        kind: 'error',
-        title: 'Line JSON could not be loaded',
-        detail: conversionResult.issue.message
-      });
-      return;
-    }
-
-    setSessionStops(conversionResult.session.placedStops);
-    setSessionLines(conversionResult.session.sessionLines);
-    setSelectedLineId(conversionResult.session.selectedLineId);
-    setSelectedStop(null);
-    setLineBuildSelection(INITIAL_LINE_BUILD_SELECTION_STATE);
-    setSelectedLineImportFeedback({
-      kind: 'success',
-      title: 'Line JSON loaded',
-      detail: `Loaded line ${conversionResult.session.selectedLineId} and replaced the current in-memory network.`
-    });
-  };
-
-  const handlePauseClock = (): void => {
-    setSimulationClockState((currentClockState) =>
-      applySimulationClockCommand(currentClockState, { type: 'pause' }).nextState
-    );
-  };
-
-  const handleResumeClock = (): void => {
-    setSimulationClockState((currentClockState) =>
-      applySimulationClockCommand(currentClockState, { type: 'resume' }).nextState
-    );
-  };
-
-  const handleResetClock = (): void => {
-    setSimulationClockState((currentClockState) =>
-      applySimulationClockCommand(currentClockState, { type: 'reset' }).nextState
-    );
-  };
-
-  const handleSpeedSelection = (speedId: SimulationSpeedId): void => {
-    setSimulationClockState((currentClockState) =>
-      applySimulationClockCommand(currentClockState, {
-        type: 'set-speed',
-        speedId
-      }).nextState
-    );
-  };
 
   return (
     <div className="app-shell" data-app-surface="desktop-shell">
@@ -553,14 +84,14 @@ export default function App(): ReactElement {
       <aside className="left-panel" aria-label="Tools and navigation panel">
         <h2>Tools</h2>
         <div className="tool-mode-control" aria-label="Active workspace tool">
-          <p>Current mode: {activeToolMode}</p>
+          <p>Current mode: {sessionController.activeToolMode}</p>
           <div className="tool-mode-control__button-row" role="group" aria-label="Workspace mode selection">
             <button
               type="button"
               className="tool-mode-control__button"
-              aria-pressed={activeToolMode === 'inspect'}
+              aria-pressed={sessionController.activeToolMode === 'inspect'}
               onClick={() => {
-                handleToolModeSelection('inspect');
+                sessionController.handleToolModeSelection('inspect');
               }}
             >
               <MaterialIcon name={WORKSPACE_MODE_ICONS.inspect} />
@@ -569,9 +100,9 @@ export default function App(): ReactElement {
             <button
               type="button"
               className="tool-mode-control__button"
-              aria-pressed={activeToolMode === 'place-stop'}
+              aria-pressed={sessionController.activeToolMode === 'place-stop'}
               onClick={() => {
-                handleToolModeSelection('place-stop');
+                sessionController.handleToolModeSelection('place-stop');
               }}
             >
               <MaterialIcon name={WORKSPACE_MODE_ICONS['place-stop']} />
@@ -580,9 +111,9 @@ export default function App(): ReactElement {
             <button
               type="button"
               className="tool-mode-control__button"
-              aria-pressed={activeToolMode === 'build-line'}
+              aria-pressed={sessionController.activeToolMode === 'build-line'}
               onClick={() => {
-                handleToolModeSelection('build-line');
+                sessionController.handleToolModeSelection('build-line');
               }}
             >
               <MaterialIcon name={WORKSPACE_MODE_ICONS['build-line']} />
@@ -594,302 +125,85 @@ export default function App(): ReactElement {
 
       <main className="workspace" aria-label="Main workspace">
         <MapWorkspaceSurface
-          activeToolMode={activeToolMode}
-          selectedStopId={selectedStopId}
-          placedStops={sessionStops}
-          lineBuildSelection={lineBuildSelection}
-          sessionLines={sessionLines}
-          selectedLineId={selectedLineId}
-          vehicleNetworkProjection={vehicleNetworkProjection}
-          onPlacedStopsChange={setSessionStops}
-          onStopSelectionChange={setSelectedStop}
-          onLineBuildSelectionChange={setLineBuildSelection}
-          onSessionLinesChange={setSessionLines}
-          onSelectedLineIdChange={setSelectedLineId}
+          activeToolMode={sessionController.activeToolMode}
+          selectedStopId={sessionController.selectedStopId}
+          placedStops={sessionController.sessionStops}
+          lineBuildSelection={sessionController.lineBuildSelection}
+          sessionLines={sessionController.sessionLines}
+          selectedLineId={sessionController.selectedLineId}
+          vehicleNetworkProjection={projections.vehicleNetworkProjection}
+          onPlacedStopsChange={sessionController.setSessionStops}
+          onStopSelectionChange={sessionController.setSelectedStop}
+          onLineBuildSelectionChange={sessionController.setLineBuildSelection}
+          onSessionLinesChange={sessionController.setSessionLines}
+          onSelectedLineIdChange={sessionController.setSelectedLineId}
         />
       </main>
 
-      <aside className="right-panel" aria-label="Inspector panel">
-        <h2>Inspector</h2>
-        <p>Active mode: {activeToolMode}</p>
-        <section className="inspector-network-summary" aria-label="Static network summary">
-          <h3>Static network summary</h3>
-          <p>Total stops: {staticNetworkSummaryKpis.totalStopCount}</p>
-          <p>Completed lines: {staticNetworkSummaryKpis.completedLineCount}</p>
-          <div>
-            <p>Active service time band: {TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}</p>
-            <p>Total completed lines (service): {networkServicePlanProjection.summary.totalCompletedLineCount}</p>
-            <p>Configured lines: {networkServicePlanProjection.summary.configuredLineCount}</p>
-            <p>Degraded lines: {networkServicePlanProjection.summary.degradedLineCount}</p>
-            <p>Not configured lines: {networkServicePlanProjection.summary.notConfiguredLineCount}</p>
-            <p>Blocked lines: {networkServicePlanProjection.summary.blockedLineCount}</p>
-            <p>Projected vehicles: {vehicleNetworkProjection.summary.totalProjectedVehicleCount}</p>
-            <p>Degraded projected vehicles: {vehicleNetworkProjection.summary.totalDegradedProjectedVehicleCount}</p>
-          </div>
-          {staticNetworkSummaryKpis.selectedCompletedLine ? (
-            <div>
-              <p>Selected line stops: {staticNetworkSummaryKpis.selectedCompletedLine.stopCount}</p>
-              <p>Configured time bands: {staticNetworkSummaryKpis.selectedCompletedLine.configuredTimeBandCount}</p>
-              <p>Unconfigured time bands: {staticNetworkSummaryKpis.selectedCompletedLine.unconfiguredTimeBandCount}</p>
-            </div>
-          ) : (
-            <p>Selected completed line: none</p>
-          )}
-        </section>
-        <section className="inspector-line-json-loader" aria-label="Line JSON loader">
-          <h3>Session line loading</h3>
-          <p>Load replaces current in-memory stops and completed lines.</p>
-          <button type="button" onClick={handleLineJsonPickerOpen}>
-            Load line JSON
-          </button>
-          <input
-            ref={lineJsonFileInputRef}
-            type="file"
-            accept=".json,application/json"
-            className="inspector-line-json-loader__file-input"
-            onChange={(event) => {
-              void handleLineJsonFileSelection(event);
+      <InspectorPanel
+        activeToolMode={sessionController.activeToolMode}
+        inspectorPanelState={inspectorPanelState}
+        staticNetworkSummaryKpis={projections.staticNetworkSummaryKpis}
+        networkServicePlanProjection={projections.networkServicePlanProjection}
+        vehicleNetworkProjection={projections.vehicleNetworkProjection}
+        selectedLineRouteBaselineMetrics={projections.selectedLineRouteBaselineMetrics}
+        selectedLineServiceProjection={projections.selectedLineServiceProjection}
+        selectedLineServiceInspectorProjection={projections.selectedLineServiceInspectorProjection}
+        selectedLineDepartureInspectorProjection={projections.selectedLineDepartureInspectorProjection}
+        selectedLineVehicleProjection={projections.selectedLineVehicleProjection}
+        lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
+        lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}
+        onFrequencyChange={sessionController.updateSelectedCompletedLineFrequency}
+        sessionActions={
+          <SessionActions
+            selectedLineImportFeedback={sessionController.selectedLineImportFeedback}
+            hasSelectedLineForExport={selectedCompletedLineForExport !== null}
+            onLoadStart={sessionController.clearSelectedLineImportFeedback}
+            onFileSelection={sessionController.handleLineJsonFileSelection}
+            onExportSelectedLine={() => {
+              if (!selectedCompletedLineForExport) {
+                return;
+              }
+
+              const exportPayload = buildSelectedLineExportPayload({
+                selectedLine: selectedCompletedLineForExport,
+                placedStops: sessionController.sessionStops,
+                createdAtIsoUtc: new Date().toISOString(),
+                sourceMetadata: {
+                  source: 'cityops-web'
+                }
+              });
+
+              downloadJsonFile(
+                buildSelectedLineExportFilename(selectedCompletedLineForExport.id),
+                exportPayload
+              );
             }}
           />
-          {selectedLineImportFeedback ? (
-            <p
-              className={
-                selectedLineImportFeedback.kind === 'error'
-                  ? 'inspector-line-json-loader__feedback inspector-line-json-loader__feedback--error'
-                  : 'inspector-line-json-loader__feedback inspector-line-json-loader__feedback--success'
-              }
-            >
-              <strong>{selectedLineImportFeedback.title}:</strong> {selectedLineImportFeedback.detail}
-            </p>
-          ) : null}
-        </section>
-        <p>MVP time bands: {MVP_TIME_BAND_IDS.map((timeBandId) => TIME_BAND_DISPLAY_LABELS[timeBandId]).join(', ')}</p>
-        {inspectorPanelState.mode === 'line-selected' ? (
-          <div>
-            <p>Selected line</p>
-            <p>ID/Label: {`${inspectorPanelState.selectedLine.id} / ${inspectorPanelState.selectedLine.label}`}</p>
-            <p>Stop count: {inspectorPanelState.selectedLine.stopIds.length}</p>
-            <p>Ordered stops: {inspectorPanelState.selectedLine.stopIds.join(' → ')}</p>
-            {selectedLineServiceInspectorProjection ? (
-              <section className="inspector-line-service-plan" aria-label="Line service plan">
-                <h3>Line service plan</h3>
-                <p>Active time band: {selectedLineServiceInspectorProjection.activeTimeBandLabel}</p>
-                <p>Current service status: {selectedLineServiceInspectorProjection.statusLabel}</p>
-                <p>Configured headway: {selectedLineServiceInspectorProjection.headwayLabel}</p>
-                {selectedLineServiceInspectorProjection.theoreticalDeparturesPerHourLabel ? (
-                  <p>
-                    Theoretical departures/hour:{' '}
-                    {selectedLineServiceInspectorProjection.theoreticalDeparturesPerHourLabel}
-                  </p>
-                ) : null}
-                <p>Total stored route time: {selectedLineServiceInspectorProjection.totalRouteTravelMinutesLabel}</p>
-                <p>Route segment count: {selectedLineServiceInspectorProjection.routeSegmentCount}</p>
-                <p>Blocker issues: {selectedLineServiceInspectorProjection.blockerCount}</p>
-                <p>Warning issues: {selectedLineServiceInspectorProjection.warningCount}</p>
-                {selectedLineServiceInspectorProjection.noteMessages.length > 0 ? (
-                  <ul className="inspector-line-readiness__issues">
-                    {selectedLineServiceInspectorProjection.noteMessages.map((message, index) => (
-                      <li key={`line-service-note-${index}`}>{message}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No service notes.</p>
-                )}
-              </section>
-            ) : null}
-            {selectedLineDepartureInspectorProjection ? (
-              <section className="inspector-line-departure-schedule" aria-label="Line departure schedule">
-                <h3>Line departure schedule</h3>
-                <p>Active time band: {selectedLineDepartureInspectorProjection.activeTimeBandLabel}</p>
-                <p>Departure projection status: {selectedLineDepartureInspectorProjection.statusLabel}</p>
-                <p>Configured headway: {selectedLineDepartureInspectorProjection.headwayLabel}</p>
-                <p>Departures in active band: {selectedLineDepartureInspectorProjection.departureCount}</p>
-                {selectedLineDepartureInspectorProjection.nextDepartureLabel ? (
-                  <p>Next departure: {selectedLineDepartureInspectorProjection.nextDepartureLabel}</p>
-                ) : (
-                  <p>No next departure in the active time band.</p>
-                )}
-                {selectedLineDepartureInspectorProjection.minutesUntilNextDepartureLabel ? (
-                  <p>
-                    Minutes until next departure:{' '}
-                    {selectedLineDepartureInspectorProjection.minutesUntilNextDepartureLabel}
-                  </p>
-                ) : null}
-                {selectedLineDepartureInspectorProjection.previousDepartureLabel ? (
-                  <p>Previous departure: {selectedLineDepartureInspectorProjection.previousDepartureLabel}</p>
-                ) : null}
-                {selectedLineDepartureInspectorProjection.upcomingDepartureLabels.length > 0 ? (
-                  <p>
-                    Upcoming departures:{' '}
-                    {selectedLineDepartureInspectorProjection.upcomingDepartureLabels.join(', ')}
-                  </p>
-                ) : (
-                  <p>No departure raster available for the active time band.</p>
-                )}
-              </section>
-            ) : null}
-            {selectedLineVehicleProjection ? (
-              <section className="inspector-line-projected-vehicles" aria-label="Projected vehicles">
-                <h3>Projected vehicles</h3>
-                <p>Projected vehicle count: {selectedLineVehicleProjection.vehicles.length}</p>
-                {selectedLineVehicleProjection.vehicles.length > 0 ? (
-                  <p>
-                    Active departure minutes:{' '}
-                    {selectedLineVehicleProjection.vehicles
-                      .map((vehicle) => formatMinuteOfDayNumber(vehicle.departureMinute))
-                      .join(', ')}
-                  </p>
-                ) : (
-                  <p>No projected departures active in the current minute.</p>
-                )}
-                {selectedLineVehicleProjection.departureScheduleStatus === 'degraded' ? (
-                  <p>Degraded note: {selectedLineVehicleProjection.note ?? 'Degraded departure projection in active time band.'}</p>
-                ) : null}
-              </section>
-            ) : null}
-            {selectedLineServiceProjection ? (
-              <section className="inspector-line-readiness" aria-label="Line readiness">
-                <h3>Line readiness</h3>
-                <p>Status: {selectedLineServiceProjection.readiness.status}</p>
-                <p>Configured time bands: {selectedLineServiceProjection.readiness.summary.configuredTimeBandCount}</p>
-                <p>
-                  Missing/unset time bands:{' '}
-                  {selectedLineServiceProjection.readiness.summary.canonicalTimeBandCount -
-                    selectedLineServiceProjection.readiness.summary.configuredTimeBandCount}
-                </p>
-                <p>Route segments: {selectedLineServiceProjection.readiness.summary.routeSegmentCount}</p>
-                <p>Blocker issues: {selectedLineServiceProjection.readiness.summary.errorIssueCount}</p>
-                <p>Warning issues: {selectedLineServiceProjection.readiness.summary.warningIssueCount}</p>
-                {selectedLineServiceProjection.readiness.issues.length > 0 ? (
-                  <ul className="inspector-line-readiness__issues">
-                    {selectedLineServiceProjection.readiness.issues
-                      .slice(0, MAX_READINESS_ISSUES_VISIBLE)
-                      .map((issue, index) => (
-                      <li key={`${issue.code}-${index}`}>
-                        <span>{issue.message}</span>{' '}
-                        {issue.code ? <code className="inspector-line-readiness__code">{issue.code}</code> : null}
-                      </li>
-                      ))}
-                  </ul>
-                ) : (
-                  <p>No readiness issues.</p>
-                )}
-              </section>
-            ) : null}
-            {selectedCompletedLineForExport ? (
-              <button type="button" onClick={handleSelectedLineExport}>
-                Export line JSON
-              </button>
-            ) : null}
-            <section className="inspector-route-baseline" aria-label="Route baseline">
-              <h3>Route baseline</h3>
-              <div className="inspector-route-baseline__totals">
-                <p>Segment count: {selectedLineRouteBaselineMetrics?.segmentCount ?? 0}</p>
-                <p>
-                  Total distance:{' '}
-                  {formatDistanceMeters(selectedLineRouteBaselineMetrics?.totalDistanceMeters ?? 0)}
-                </p>
-                <p>
-                  Total in-motion time:{' '}
-                  {formatTravelMinutes(selectedLineRouteBaselineMetrics?.totalInMotionMinutes ?? 0)}
-                </p>
-                <p>
-                  Total dwell time:{' '}
-                  {formatTravelMinutes(selectedLineRouteBaselineMetrics?.totalDwellMinutes ?? 0)}
-                </p>
-                <p>Total line time: {formatTravelMinutes(selectedLineRouteBaselineMetrics?.totalLineMinutes ?? 0)}</p>
-              </div>
-              {selectedLineRouteBaselineMetrics?.hasFallbackSegments ? (
-                <p className="inspector-route-baseline__fallback-note">
-                  Fallback routed segments detected. Values are baseline fallback outputs and are not accuracy
-                  claims.
-                </p>
-              ) : null}
-              {inspectorPanelState.selectedLine.routeSegments.length > 0 ? (
-                <table className="inspector-route-baseline__segment-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">From</th>
-                      <th scope="col">To</th>
-                      <th scope="col">Distance</th>
-                      <th scope="col">In-motion</th>
-                      <th scope="col">Dwell</th>
-                      <th scope="col">Line time</th>
-                      <th scope="col">Route status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inspectorPanelState.selectedLine.routeSegments.map((segment) => (
-                      <tr key={segment.id}>
-                        <td>{segment.fromStopId}</td>
-                        <td>{segment.toStopId}</td>
-                        <td>{formatDistanceMeters(segment.distanceMeters)}</td>
-                        <td>{formatTravelMinutes(segment.inMotionTravelMinutes)}</td>
-                        <td>{formatTravelMinutes(segment.dwellMinutes)}</td>
-                        <td>{formatTravelMinutes(segment.totalTravelMinutes)}</td>
-                        <td>{ROUTE_STATUS_LABELS[segment.status]}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p>No route segments available.</p>
-              )}
-            </section>
-            <div className="inspector-frequency-editor">
-              {MVP_TIME_BAND_IDS.map((timeBandId) => (
-                <label key={timeBandId} className="inspector-frequency-editor__row">
-                  <span>{TIME_BAND_DISPLAY_LABELS[timeBandId]} interval (minutes)</span>
-                  <input
-                    type="number"
-                    min={1}
-                    value={lineFrequencyInputByTimeBand[timeBandId] ?? ''}
-                    onChange={(event) => {
-                      updateSelectedCompletedLineFrequency(timeBandId, event.currentTarget.value);
-                    }}
-                  />
-                  {lineFrequencyValidationByTimeBand[timeBandId] ? (
-                    <span className="inspector-frequency-editor__error">
-                      {lineFrequencyValidationByTimeBand[timeBandId]}
-                    </span>
-                  ) : null}
-                </label>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
-        {inspectorPanelState.mode === 'stop-selected' ? (
-          <div>
-            <p>Selected stop</p>
-            <p>ID: {inspectorPanelState.selectedStop.selectedStopId}</p>
-          </div>
-        ) : null}
-
-        {inspectorPanelState.mode === 'empty' ? <p>No stop or line selected.</p> : null}
-      </aside>
+        }
+      />
 
       <footer className="status-bar" aria-label="Status bar">
         <div className="status-bar__clock-readout">
-          <span>Status: {formatSimulationRunningStateLabel(simulationClockState.runningState)}</span>
-          <span>Day {simulationClockState.timestamp.dayIndex}</span>
-          <span>Time {formatSimulationMinuteOfDay(currentSimulationMinuteOfDay)}</span>
-          <span>Band {TIME_BAND_DISPLAY_LABELS[activeSimulationTimeBandId]}</span>
+          <span>Status: {formatSimulationRunningStateLabel(clockController.simulationClockState.runningState)}</span>
+          <span>Day {clockController.simulationClockState.timestamp.dayIndex}</span>
+          <span>Time {formatSimulationMinuteOfDay(clockController.currentSimulationMinuteOfDay)}</span>
+          <span>Band {TIME_BAND_DISPLAY_LABELS[clockController.activeSimulationTimeBandId]}</span>
         </div>
         <div className="status-bar__clock-controls" role="group" aria-label="Simulation clock controls">
           <button
             type="button"
             className="status-bar__button"
-            onClick={handlePauseClock}
-            disabled={simulationClockState.runningState === 'paused'}
+            onClick={clockController.handlePauseClock}
+            disabled={clockController.simulationClockState.runningState === 'paused'}
           >
             Pause
           </button>
           <button
             type="button"
             className="status-bar__button"
-            onClick={handleResumeClock}
-            disabled={simulationClockState.runningState === 'running'}
+            onClick={clockController.handleResumeClock}
+            disabled={clockController.simulationClockState.runningState === 'running'}
           >
             Resume
           </button>
@@ -899,28 +213,28 @@ export default function App(): ReactElement {
                 key={speedDefinition.id}
                 type="button"
                 className="status-bar__button"
-                aria-pressed={simulationClockState.speedId === speedDefinition.id}
+                aria-pressed={clockController.simulationClockState.speedId === speedDefinition.id}
                 onClick={() => {
                   const parsedSpeedId = parseSimulationSpeedId(speedDefinition.id);
                   if (!parsedSpeedId) {
                     return;
                   }
 
-                  handleSpeedSelection(parsedSpeedId);
+                  clockController.handleSpeedSelection(parsedSpeedId);
                 }}
               >
                 {speedDefinition.label}
               </button>
             ))}
           </div>
-          <button type="button" className="status-bar__button" onClick={handleResetClock}>
+          <button type="button" className="status-bar__button" onClick={clockController.handleResetClock}>
             Reset
           </button>
         </div>
-        {selectedLine ? (
+        {sessionController.selectedLine ? (
           <div className="status-bar__line-frequency-hint">
             <span>Selected line service plan:</span>
-            <span>{selectedLineServiceInspectorProjection?.headwayLabel ?? 'No line selected.'}</span>
+            <span>{projections.selectedLineServiceInspectorProjection?.headwayLabel ?? 'No line selected.'}</span>
           </div>
         ) : null}
       </footer>

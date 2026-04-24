@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 025: refactor `App.tsx` by extracting shell session state/commands, simulation clock lifecycle control, projection aggregation, inspector rendering boundaries, and session load/export UI actions into focused modules while preserving behavior.
+- Slice 025: keep planning session truth in-memory and shell-owned through hooks, keep inspector components presentational, and avoid test-suite reorganization beyond boundary fallout.
+- Add ADR 0083 documenting the Slice 025 App shell boundary refactor rationale, extracted responsibilities, behavior-preserving intent, and explicit non-goals.
+
 - Slice 024: refactor `MapWorkspaceSurface.tsx` boundaries by extracting street snap resolution, interaction bindings, lifecycle utilities, and map workspace UI feedback projection helpers into focused map-workspace modules while preserving behavior.
 - Slice 024: keep React/session ownership in `MapWorkspaceSurface` with callback-driven helper contracts and no gameplay/UI semantics changes.
 - Add ADR 0082 documenting the Slice 024 boundary-refactor rationale, extracted responsibilities, behavior-preserving intent, and explicit non-goals.

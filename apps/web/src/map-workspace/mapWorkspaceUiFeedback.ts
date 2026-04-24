@@ -1,6 +1,6 @@
 import { MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE } from '../domain/constants/lineBuilding';
 import type { StopId } from '../domain/types/stop';
-import type { WorkspaceToolMode } from '../App';
+import type { WorkspaceToolMode } from '../session/sessionTypes';
 import type { PlacementAttemptResult } from './mapWorkspaceInteractions';
 
 export const PLACEMENT_MODE_INDICATOR_LABEL = 'Placement mode active';

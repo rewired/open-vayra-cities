@@ -2,7 +2,7 @@ import type { Line } from '../domain/types/line';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createLineId } from '../domain/types/line';
 import { createStopId } from '../domain/types/stop';
-import type { WorkspaceToolMode } from '../App';
+import type { WorkspaceToolMode } from '../session/sessionTypes';
 import {
   MAP_LAYER_ID_COMPLETED_LINES,
   MAP_LAYER_ID_STOPS_CIRCLE

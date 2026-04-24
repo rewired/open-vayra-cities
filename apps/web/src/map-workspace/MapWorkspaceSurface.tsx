@@ -10,7 +10,7 @@ import { createLineId, createUnsetLineFrequencyByTimeBand } from '../domain/type
 import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
-import type { LineBuildSelectionState, WorkspaceToolMode } from '../App';
+import type { LineBuildSelectionState, WorkspaceToolMode } from '../session/sessionTypes';
 import {
   MAP_LAYER_ID_COMPLETED_LINES,
   MAP_LAYER_ID_DRAFT_LINE,
