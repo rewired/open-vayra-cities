@@ -11,26 +11,13 @@ import type { LineRouteSegment, RouteGeometryCoordinate } from '../types/lineRou
 import type { LineDepartureScheduleNetworkProjection } from '../types/lineDepartureScheduleProjection';
 import type { SimulationMinuteOfDay } from '../types/simulationClock';
 import type { TimeBandId } from '../types/timeBand';
-
-const clampRatio = (value: number): number => Math.max(0, Math.min(1, value));
+import { clampRouteSegmentProgressRatio, projectCoordinateAlongRouteGeometry } from './routeGeometryInterpolation';
 
 const isActiveDeparture = (
   departureMinute: number,
   currentMinuteOfDay: SimulationMinuteOfDay,
   totalRouteTimeMinutes: number
 ): boolean => departureMinute <= currentMinuteOfDay && currentMinuteOfDay < departureMinute + totalRouteTimeMinutes;
-
-const toRouteCoordinate = (
-  fromCoordinate: RouteGeometryCoordinate,
-  toCoordinate: RouteGeometryCoordinate,
-  ratio: number
-): RouteGeometryCoordinate => {
-  const boundedRatio = clampRatio(ratio);
-  const lng = fromCoordinate[0] + (toCoordinate[0] - fromCoordinate[0]) * boundedRatio;
-  const lat = fromCoordinate[1] + (toCoordinate[1] - fromCoordinate[1]) * boundedRatio;
-
-  return [lng, lat];
-};
 
 const findSegmentProgress = (
   routeSegments: readonly LineRouteSegment[],
@@ -59,10 +46,7 @@ const findSegmentProgress = (
     const nextTraversedMinutes = traversedMinutes + segmentDurationMinutes;
 
     if (clampedElapsedMinutes <= nextTraversedMinutes) {
-      const fromCoordinate = segment.orderedGeometry[0];
-      const toCoordinate = segment.orderedGeometry.at(-1);
-
-      if (!fromCoordinate || !toCoordinate) {
+      if (segment.orderedGeometry.length < 2) {
         return {
           currentSegmentId: null,
           segmentProgressRatio: 0,
@@ -72,12 +56,14 @@ const findSegmentProgress = (
       }
 
       const segmentProgressRatio =
-        segmentDurationMinutes <= 0 ? 1 : clampRatio((clampedElapsedMinutes - traversedMinutes) / segmentDurationMinutes);
+        segmentDurationMinutes <= 0
+          ? 1
+          : clampRouteSegmentProgressRatio((clampedElapsedMinutes - traversedMinutes) / segmentDurationMinutes);
 
       return {
         currentSegmentId: segment.id,
         segmentProgressRatio,
-        coordinate: toRouteCoordinate(fromCoordinate, toCoordinate, segmentProgressRatio)
+        coordinate: projectCoordinateAlongRouteGeometry(segment.orderedGeometry, segmentProgressRatio)
       };
     }
 
@@ -131,7 +117,7 @@ const projectVehiclesForLine = (
 
   const vehicles = activeDepartures.map<LineVehicleProjection>((departureMinute) => {
     const elapsedMinutes = currentMinuteOfDay - departureMinute;
-    const routeProgressRatio = clampRatio(elapsedMinutes / totalRouteTimeMinutes);
+    const routeProgressRatio = clampRouteSegmentProgressRatio(elapsedMinutes / totalRouteTimeMinutes);
     const segmentProgress = findSegmentProgress(line.routeSegments, elapsedMinutes, totalRouteTimeMinutes);
 
     return {

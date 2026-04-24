@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 024: add pure `routeGeometryInterpolation` domain helper to clamp segment progress ratios and project coordinates along ordered route geometry by walking leg distances (2-point and multi-point support).
+- Slice 024: reuse route-geometry interpolation in line-vehicle projection so marker coordinates follow intermediate geometry points instead of endpoint-only interpolation.
+- Slice 024: add focused unit coverage for ratio clamping, finite-ratio guarding, 2-point and multi-point interpolation, terminal clamping, and minimum-geometry validation.
+- Add ADR 0069 documenting route-geometry interpolation helper boundaries and explicit non-goals.
+
 - Slice 023: add canonical line-vehicle projection domain types (`LineVehicleProjectionId`, projection status union, per-vehicle contract, per-line result, and network summary) for current-minute marker projection boundaries.
 - Slice 023: add pure `projectLineVehicleNetwork` projection module that consumes current minute, active time band, existing departure schedule output, and stored `line.routeSegments` to derive active in-flight departures and marker coordinates without route recomputation.
 - Slice 023: map degraded departure/service conditions to `degraded-projected`, emit optional unavailable line notes without creating markers, and preserve immutable input contracts.
