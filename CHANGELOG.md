@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 020: add canonical line service plan projection types for active-band status, per-line projection output, optional projection notes, and network-level summary totals.
+- Slice 020: add pure line service plan projection helpers that reuse `evaluateLineServiceReadiness` and derive active-band headway, theoretical departures per hour, route segment count, and total route travel minutes.
+- Slice 020: add deterministic projection status semantics (`blocked`, `not-configured`, `configured`, `degraded`) with explicit warning-based degradation handling.
+- Slice 020: add unit tests for line-level and network-level projection behavior, including blocked/not-configured/configured/degraded status resolution.
+- Add ADR 0064 documenting line service plan projection boundary and status semantics.
+
 - Slice 019: add a pure simulation clock baseline (deterministic day/minute timestamp, running-state transitions, canonical speed controls, reset support, and elapsed-time advancement helpers) outside React and map rendering modules.
 - Slice 019: add canonical clock constants and full-day minute-range-to-time-band mapping for deterministic active MVP time-band derivation.
 - Slice 019: add shell status-bar clock projection and controls for pause/resume/speed/reset, plus current day/time/time-band/running-state display.
