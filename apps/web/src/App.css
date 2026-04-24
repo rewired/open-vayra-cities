@@ -408,6 +408,10 @@ body {
   font-size: 0.95rem;
 }
 
+.inspector-network-summary__primary-table {
+  margin-top: 4px;
+}
+
 .inspector-frequency-editor {
   display: grid;
   gap: 10px;
@@ -722,6 +726,19 @@ body {
   cursor: pointer;
   color: #cfe0fb;
   font-size: 0.78rem;
+}
+
+.inspector-debug-details {
+  margin-top: 6px;
+}
+
+.inspector-debug-details summary {
+  color: #9fb0cb;
+  font-size: 0.72rem;
+}
+
+.inspector-debug-details__table {
+  margin-top: 4px;
 }
 
 .inspector-line-readiness__status {
