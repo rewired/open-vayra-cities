@@ -1,0 +1,244 @@
+{
+  "schemaVersion": "cityops-selected-line-export-v2",
+  "exportKind": "single-line",
+  "createdAtIsoUtc": "2026-04-24T19:51:03.457Z",
+  "sourceMetadata": {
+    "source": "cityops-web"
+  },
+  "line": {
+    "id": "line-1",
+    "label": "Line 1",
+    "orderedStopIds": [
+      "stop-1",
+      "stop-2",
+      "stop-3",
+      "stop-4",
+      "stop-5",
+      "stop-6",
+      "stop-7",
+      "stop-1"
+    ],
+    "frequencyByTimeBand": {
+      "morning-rush": null,
+      "late-morning": null,
+      "midday": null,
+      "afternoon": null,
+      "evening-rush": null,
+      "evening": null,
+      "night": null
+    },
+    "routeSegments": [
+      {
+        "id": "line-1-segment-1",
+        "lineId": "line-1",
+        "fromStopId": "stop-1",
+        "toStopId": "stop-2",
+        "orderedGeometry": [
+          [
+            9.93749981475606,
+            53.54618153163518
+          ],
+          [
+            9.950913060252734,
+            53.546357517045806
+          ]
+        ],
+        "distanceMeters": 886.4167000438057,
+        "inMotionTravelMinutes": 1.9698148889862348,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 2.469814888986235,
+        "status": "fallback-routed"
+      },
+      {
+        "id": "line-1-segment-2",
+        "lineId": "line-1",
+        "fromStopId": "stop-2",
+        "toStopId": "stop-3",
+        "orderedGeometry": [
+          [
+            9.950913060252734,
+            53.546357517045806
+          ],
+          [
+            9.963103709974286,
+            53.546481794343634
+          ]
+        ],
+        "distanceMeters": 805.5405896445384,
+        "inMotionTravelMinutes": 1.7900901992100853,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 2.290090199210085,
+        "status": "fallback-routed"
+      },
+      {
+        "id": "line-1-segment-3",
+        "lineId": "line-1",
+        "fromStopId": "stop-3",
+        "toStopId": "stop-4",
+        "orderedGeometry": [
+          [
+            9.963103709974286,
+            53.546481794343634
+          ],
+          [
+            9.969943539127835,
+            53.549327890070295
+          ]
+        ],
+        "distanceMeters": 551.6819996016669,
+        "inMotionTravelMinutes": 1.2259599991148153,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 1.7259599991148153,
+        "status": "fallback-routed"
+      },
+      {
+        "id": "line-1-segment-4",
+        "lineId": "line-1",
+        "fromStopId": "stop-4",
+        "toStopId": "stop-5",
+        "orderedGeometry": [
+          [
+            9.969943539127835,
+            53.549327890070295
+          ],
+          [
+            9.96088366388947,
+            53.54952942659153
+          ]
+        ],
+        "distanceMeters": 598.9522445106535,
+        "inMotionTravelMinutes": 1.3310049878014523,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 1.8310049878014523,
+        "status": "fallback-routed"
+      },
+      {
+        "id": "line-1-segment-5",
+        "lineId": "line-1",
+        "fromStopId": "stop-5",
+        "toStopId": "stop-6",
+        "orderedGeometry": [
+          [
+            9.96088366388947,
+            53.54952942659153
+          ],
+          [
+            9.9487263481973,
+            53.5490359242829
+          ]
+        ],
+        "distanceMeters": 805.0378120934788,
+        "inMotionTravelMinutes": 1.7889729157632863,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 2.2889729157632863,
+        "status": "fallback-routed"
+      },
+      {
+        "id": "line-1-segment-6",
+        "lineId": "line-1",
+        "fromStopId": "stop-6",
+        "toStopId": "stop-7",
+        "orderedGeometry": [
+          [
+            9.9487263481973,
+            53.5490359242829
+          ],
+          [
+            9.9401876731997,
+            53.54784393716965
+          ]
+        ],
+        "distanceMeters": 579.4752381468892,
+        "inMotionTravelMinutes": 1.2877227514375316,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 1.7877227514375316,
+        "status": "fallback-routed"
+      },
+      {
+        "id": "line-1-segment-7",
+        "lineId": "line-1",
+        "fromStopId": "stop-7",
+        "toStopId": "stop-1",
+        "orderedGeometry": [
+          [
+            9.9401876731997,
+            53.54784393716965
+          ],
+          [
+            9.93749981475606,
+            53.54618153163518
+          ]
+        ],
+        "distanceMeters": 256.3298559213101,
+        "inMotionTravelMinutes": 0.5696219020473559,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 1.0696219020473559,
+        "status": "fallback-routed"
+      }
+    ]
+  },
+  "stops": [
+    {
+      "id": "stop-1",
+      "position": {
+        "lng": 9.93749981475606,
+        "lat": 53.54618153163518
+      },
+      "label": "Stop 1"
+    },
+    {
+      "id": "stop-2",
+      "position": {
+        "lng": 9.950913060252734,
+        "lat": 53.546357517045806
+      },
+      "label": "Stop 2"
+    },
+    {
+      "id": "stop-3",
+      "position": {
+        "lng": 9.963103709974286,
+        "lat": 53.546481794343634
+      },
+      "label": "Stop 3"
+    },
+    {
+      "id": "stop-4",
+      "position": {
+        "lng": 9.969943539127835,
+        "lat": 53.549327890070295
+      },
+      "label": "Stop 4"
+    },
+    {
+      "id": "stop-5",
+      "position": {
+        "lng": 9.96088366388947,
+        "lat": 53.54952942659153
+      },
+      "label": "Stop 5"
+    },
+    {
+      "id": "stop-6",
+      "position": {
+        "lng": 9.9487263481973,
+        "lat": 53.5490359242829
+      },
+      "label": "Stop 6"
+    },
+    {
+      "id": "stop-7",
+      "position": {
+        "lng": 9.9401876731997,
+        "lat": 53.54784393716965
+      },
+      "label": "Stop 7"
+    }
+  ],
+  "metadata": {
+    "lineCount": 1,
+    "stopCount": 7,
+    "routeSegmentCount": 7,
+    "includedTimeBandIds": []
+  }
+}
