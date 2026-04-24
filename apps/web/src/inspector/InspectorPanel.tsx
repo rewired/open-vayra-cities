@@ -46,7 +46,7 @@ export function InspectorPanel({
       <p>Active mode: {activeToolMode}</p>
       <section className="inspector-network-summary" aria-label="Static network summary">
         <h3>Static network summary</h3>
-        <table className="inspector-compact-table">
+        <table className="inspector-compact-table inspector-network-summary__primary-table">
           <tbody>
             <tr>
               <th scope="row">Stops</th>
@@ -61,20 +61,12 @@ export function InspectorPanel({
               <td>{vehicleNetworkProjection.summary.totalProjectedVehicleCount}</td>
             </tr>
             <tr>
-              <th scope="row">Degraded projected vehicles</th>
-              <td>{vehicleNetworkProjection.summary.totalDegradedProjectedVehicleCount}</td>
-            </tr>
-            <tr>
               <th scope="row">Active service band</th>
               <td>{TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}</td>
             </tr>
             <tr>
               <th scope="row">Service completed lines</th>
               <td>{networkServicePlanProjection.summary.totalCompletedLineCount}</td>
-            </tr>
-            <tr>
-              <th scope="row">Configured service lines</th>
-              <td>{networkServicePlanProjection.summary.configuredLineCount}</td>
             </tr>
             <tr>
               <th scope="row">Degraded service lines</th>
@@ -86,6 +78,21 @@ export function InspectorPanel({
             </tr>
           </tbody>
         </table>
+        <details className="inspector-details inspector-debug-details">
+          <summary>Debug details</summary>
+          <table className="inspector-compact-table inspector-debug-details__table">
+            <tbody>
+              <tr>
+                <th scope="row">Degraded projected vehicles</th>
+                <td>{vehicleNetworkProjection.summary.totalDegradedProjectedVehicleCount}</td>
+              </tr>
+              <tr>
+                <th scope="row">Configured service lines</th>
+                <td>{networkServicePlanProjection.summary.configuredLineCount}</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
       </section>
       {inspectorPanelState.mode === 'line-selected' ? (
         <SelectedLineInspector

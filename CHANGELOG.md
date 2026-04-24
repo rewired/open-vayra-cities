@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 034: keep static network summary essentials (stops, completed lines, projected vehicles, active service band, and service-status counts) always visible in the inspector.
+- Slice 034: move lower-priority static network diagnostic counts (degraded projected vehicles and configured service lines) into a collapsed `Debug details` subsection in the inspector summary.
+- Slice 034: add compact summary/disclosure styling for the inspector summary block while preserving existing projection/service semantics.
+- Add ADR 0088 documenting static network summary disclosure boundaries and explicit non-goals.
+
 - Slice 033: keep selected-line identity, frequency editing, and compact readiness/service/departure/vehicle summaries always visible while adding an always-visible blockers/warnings summary line whenever issues exist.
 - Slice 033: move heavy selected-line diagnostics behind disclosures (full readiness issue list, detailed service notes, upcoming departure lists, and projected vehicle departure-minute lists) while preserving existing projection wiring.
 - Slice 033 non-goals preserved: no simulation/domain/projection behavior changes and no new transport-mode/mobile scope.
