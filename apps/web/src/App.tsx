@@ -2,6 +2,10 @@ import { useEffect, useRef, useState, type ReactElement } from 'react';
 
 import { MVP_TIME_BAND_IDS, TIME_BAND_DISPLAY_LABELS } from './domain/constants/timeBands';
 import {
+  projectLineDepartureScheduleForLine,
+  projectLineSelectedDepartureInspector
+} from './domain/projection/lineDepartureScheduleProjection';
+import {
   projectLineSelectedServiceInspector,
   projectLineServicePlan,
   projectLineServicePlanForLine
@@ -75,6 +79,7 @@ interface RouteBaselineAggregateMetrics {
 }
 
 const MAX_READINESS_ISSUES_VISIBLE = 5;
+const MAX_UPCOMING_DEPARTURES_VISIBLE = 5;
 
 /**
  * Enumerates the inspector's mutually exclusive visual states.
@@ -260,6 +265,14 @@ export default function App(): ReactElement {
   const selectedLineServiceProjection = selectedLine
     ? projectLineServicePlanForLine(selectedLine, sessionStops, activeSimulationTimeBandId)
     : null;
+  const selectedLineDepartureProjection = selectedLine
+    ? projectLineDepartureScheduleForLine(
+        selectedLine,
+        sessionStops,
+        activeSimulationTimeBandId,
+        simulationClockState.timestamp.minuteOfDay
+      )
+    : null;
   const networkServicePlanProjection = projectLineServicePlan(
     sessionLines,
     sessionStops,
@@ -267,6 +280,13 @@ export default function App(): ReactElement {
   );
   const selectedLineServiceInspectorProjection = selectedLineServiceProjection
     ? projectLineSelectedServiceInspector(selectedLineServiceProjection, MAX_READINESS_ISSUES_VISIBLE)
+    : null;
+  const selectedLineDepartureInspectorProjection = selectedLineDepartureProjection
+    ? projectLineSelectedDepartureInspector(
+        selectedLineDepartureProjection,
+        MAX_UPCOMING_DEPARTURES_VISIBLE,
+        MAX_READINESS_ISSUES_VISIBLE
+      )
     : null;
   const selectedCompletedLineForExport =
     inspectorPanelState.mode === 'line-selected'
@@ -549,6 +569,37 @@ export default function App(): ReactElement {
                   </ul>
                 ) : (
                   <p>No service notes.</p>
+                )}
+              </section>
+            ) : null}
+            {selectedLineDepartureInspectorProjection ? (
+              <section className="inspector-line-departure-schedule" aria-label="Line departure schedule">
+                <h3>Line departure schedule</h3>
+                <p>Active time band: {selectedLineDepartureInspectorProjection.activeTimeBandLabel}</p>
+                <p>Departure projection status: {selectedLineDepartureInspectorProjection.statusLabel}</p>
+                <p>Configured headway: {selectedLineDepartureInspectorProjection.headwayLabel}</p>
+                <p>Departures in active band: {selectedLineDepartureInspectorProjection.departureCount}</p>
+                {selectedLineDepartureInspectorProjection.nextDepartureLabel ? (
+                  <p>Next departure: {selectedLineDepartureInspectorProjection.nextDepartureLabel}</p>
+                ) : (
+                  <p>No next departure in the active time band.</p>
+                )}
+                {selectedLineDepartureInspectorProjection.minutesUntilNextDepartureLabel ? (
+                  <p>
+                    Minutes until next departure:{' '}
+                    {selectedLineDepartureInspectorProjection.minutesUntilNextDepartureLabel}
+                  </p>
+                ) : null}
+                {selectedLineDepartureInspectorProjection.previousDepartureLabel ? (
+                  <p>Previous departure: {selectedLineDepartureInspectorProjection.previousDepartureLabel}</p>
+                ) : null}
+                {selectedLineDepartureInspectorProjection.upcomingDepartureLabels.length > 0 ? (
+                  <p>
+                    Upcoming departures:{' '}
+                    {selectedLineDepartureInspectorProjection.upcomingDepartureLabels.join(', ')}
+                  </p>
+                ) : (
+                  <p>No departure raster available for the active time band.</p>
                 )}
               </section>
             ) : null}

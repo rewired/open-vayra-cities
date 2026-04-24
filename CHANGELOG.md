@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-24
 
+- Slice 021: add pure current-time-band departure schedule projection helpers that reuse current service projection output to derive deterministic active-band departure rasters, previous/next departure values, minutes-until-next, and network summary totals.
+- Slice 021: add compact selected-line inspector departure schedule rendering (status, headway, previous/next departure, minutes until next departure, active-band departure count, and capped upcoming departures list).
+- Slice 021: add fixture-backed and unit test coverage for unavailable/available/degraded departure semantics, bounded active-band minute windows, and no route-segment recomputation during projection.
+- Slice 021 non-goals preserved: no demand/economy/passenger/vehicle execution, no dispatch/fleet/depot/layover logic, no routing recalculation, and no import/persistence/backend/savegame/scenario/fixture replay/mobile scope expansion.
+- Add ADR 0067 documenting deterministic active-time-band departure projection boundaries and explicit non-goals.
+
 - Slice 022: extend line service network projection summary with `totalCompletedLineCount` while preserving `totalLineCount` as a backward-compatible alias.
 - Slice 022: add a compact active-service subsection under static network summary in `App.tsx` showing active time band and configured/degraded/not-configured/blocked completed-line counts.
 - Slice 022 non-goals preserved: no simulation execution changes, no demand/economy/passenger KPIs, and no broad inspector layout redesign.
