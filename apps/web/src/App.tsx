@@ -17,6 +17,7 @@ import {
   type DebugModalServiceDiagnostics
 } from './ui/DebugModal';
 import { summarizeDemandNodes } from './domain/demand/demandNodeHelpers';
+import { MVP_DEMAND_SCENARIO } from './domain/demand/mvpDemandScenario';
 import { WORKSPACE_MODE_ICONS } from './ui/icons/materialIcons';
 
 import './App.css';
@@ -88,7 +89,8 @@ export default function App(): ReactElement {
     sessionController.sessionStops,
     sessionController.selectedLine,
     clockController.activeSimulationTimeBandId,
-    clockController.currentSimulationMinuteOfDay
+    clockController.currentSimulationMinuteOfDay,
+    MVP_DEMAND_SCENARIO
   );
   const inspectorPanelState = resolveInspectorPanelState(
     sessionController.selectedLine,
@@ -120,7 +122,7 @@ export default function App(): ReactElement {
     totalProjectedVehicleCount: projections.vehicleNetworkProjection.summary.totalProjectedVehicleCount,
     draftOrderedStopIds: sessionController.lineBuildSelection.selectedStopIds,
     completedLineIds: sessionController.sessionLines.map((line) => line.id),
-    demandNodeSummary: summarizeDemandNodes([])
+    demandNodeSummary: summarizeDemandNodes(MVP_DEMAND_SCENARIO)
   };
   const routingDiagnostics: DebugModalRoutingDiagnostics = {
     selectedLineOrderedStopIds: sessionController.selectedLine?.stopIds ?? [],

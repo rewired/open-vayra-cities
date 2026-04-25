@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 055: implement a deterministic, in-memory MVP demand scenario for the Hamburg area with residential origin and workplace destination nodes.
+- Slice 055: wire the scenario demand nodes into the application/session projection flow, replacing empty demand arrays in network planning projections and debug diagnostics.
+- Add ADR 0113 documenting the deterministic MVP demand scenario baseline decision, spatial demand node boundaries, and explicit non-goals.
 - Slice 032: redesign selected-line `Departures` into a player-facing stop-by-hour timetable matrix (`Stop` + `00..23`) with per-cell minute departures, quiet no-service dashes, and clear unavailable downstream timing states when segment-level offsets are missing.
 - Slice 032: add pure deterministic `lineDepartureTimetableProjection` helper to project full-day departures from canonical service-band plans (`frequency` only), including midnight-wrapping night service handling.
 - Slice 032: remove the separate player-facing `Route baseline` action/modal and integrate compact route runtime/segment/status support details directly into `Departures`, with fallback-routing warning text when relevant.
