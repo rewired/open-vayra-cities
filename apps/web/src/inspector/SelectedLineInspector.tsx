@@ -67,7 +67,7 @@ export function SelectedLineInspector({
           <tbody>
             <tr>
               <th scope="row">ID / Label</th>
-              <td>{`${panelState.selectedLine.id} / ${panelState.selectedLine.label}`}</td>
+              <td className="inspector-compact-table__value--left">{`${panelState.selectedLine.id} / ${panelState.selectedLine.label}`}</td>
             </tr>
             <tr>
               <th scope="row">Stop count</th>
@@ -75,7 +75,7 @@ export function SelectedLineInspector({
             </tr>
             <tr>
               <th scope="row">Ordered stops</th>
-              <td>{panelState.selectedLine.stopIds.join(' → ')}</td>
+              <td className="inspector-compact-table__value--left">{panelState.selectedLine.stopIds.join(' → ')}</td>
             </tr>
             <tr>
               <th scope="row">Segments / route time</th>

@@ -87,7 +87,9 @@ export function ServicePlanDialog({
               <tbody>
                 <tr>
                   <th scope="row">Active time band</th>
-                  <td>{selectedLineServiceInspectorProjection.activeTimeBandLabel}</td>
+                  <td className="inspector-compact-table__value--left">
+                    {selectedLineServiceInspectorProjection.activeTimeBandLabel}
+                  </td>
                 </tr>
                 <tr>
                   <th scope="row">Current headway</th>

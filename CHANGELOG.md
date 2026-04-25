@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 047: update shared inspector compact-table alignment so row headers stay left-aligned and value cells default to right alignment.
+- Slice 047: add explicit `inspector-compact-table__value--left` opt-out usage for textual/status cells in Network, Selected line, Service plan, Departures, and Projected vehicles summaries.
+- Slice 047: preserve numeric/value-first right alignment across compact inspector/dialog tables while keeping only readability exceptions left-aligned.
+- Add ADR 0103 documenting compact inspector value-cell right-alignment defaults and targeted left-alignment opt-out boundaries.
+
 - Slice 046: add reusable selected-line inspector dialog size modifiers (`small`, `medium`, `large`) on `inspector-dialog__surface` in shared app styles.
 - Slice 046: apply dialog size variants by intent (`Edit service plan` small, `Service plan` medium, `Departures` large) and remove legacy ad-hoc service-plan width class usage.
 - Slice 046: keep large departures dialog constrained and scrollable with a dedicated large-surface modifier instead of per-component width handling.

@@ -32,11 +32,15 @@ export function DeparturesDialog({
               <tbody>
                 <tr>
                   <th scope="row">Active time band</th>
-                  <td>{selectedLineDepartureInspectorProjection.activeTimeBandLabel}</td>
+                  <td className="inspector-compact-table__value--left">
+                    {selectedLineDepartureInspectorProjection.activeTimeBandLabel}
+                  </td>
                 </tr>
                 <tr>
                   <th scope="row">Projection status</th>
-                  <td>{selectedLineDepartureInspectorProjection.statusLabel}</td>
+                  <td className="inspector-compact-table__value--left">
+                    {selectedLineDepartureInspectorProjection.statusLabel}
+                  </td>
                 </tr>
                 <tr>
                   <th scope="row">Headway</th>

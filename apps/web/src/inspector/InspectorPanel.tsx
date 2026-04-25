@@ -115,11 +115,13 @@ export function InspectorPanel({
               </tr>
               <tr>
                 <th scope="row">Active service band</th>
-                <td>{TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}</td>
+                <td className="inspector-compact-table__value--left">
+                  {TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}
+                </td>
               </tr>
               <tr>
                 <th scope="row">Global state</th>
-                <td>{globalStateLabel}</td>
+                <td className="inspector-compact-table__value--left">{globalStateLabel}</td>
               </tr>
               <tr>
                 <th scope="row">Degraded service lines</th>
