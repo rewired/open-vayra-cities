@@ -163,8 +163,8 @@ export default function App(): ReactElement {
       </main>
 
       <InspectorPanel
-        activeToolMode={sessionController.activeToolMode}
         inspectorPanelState={inspectorPanelState}
+        completedLines={sessionController.sessionLines}
         staticNetworkSummaryKpis={projections.staticNetworkSummaryKpis}
         networkServicePlanProjection={projections.networkServicePlanProjection}
         vehicleNetworkProjection={projections.vehicleNetworkProjection}
@@ -176,6 +176,7 @@ export default function App(): ReactElement {
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
         lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}
         onFrequencyChange={sessionController.updateSelectedCompletedLineFrequency}
+        onSelectedLineIdChange={sessionController.setSelectedLineId}
       />
     </div>
   );

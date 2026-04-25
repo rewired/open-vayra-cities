@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2026-04-25
+
+- Slice 038: replace inspector stacked composition with a tabbed UI-local state model (`Network`, `Lines`, `Debug`) and remove the `Active mode` line from inspector content.
+- Slice 038: keep `Network` tab focused on concise network-level summary metrics only (stops, completed lines, projected vehicles, active service band, global state, and service status counts).
+- Slice 038: add `Lines` tab list-first behavior (completed-line list by default, explicit Back action from selected-line detail) while reusing existing read-only projection wiring.
+- Slice 038: move technical/dev-focused details (raw selected ids, session counts, configured/degraded counts, and schematic caveat text) into `Debug`.
+- Add ADR 0093 documenting inspector tab-state boundaries, list-first line-detail behavior, and explicit non-goals.
+
 ## 2026-04-24
 
 - Slice 028: document the product-style map-centric shell rationale as a layout/presentation-only consolidation (integrated top bar, real-tool left rail, contextual inspector, selected-line bottom tray, and dark basemap decisions).

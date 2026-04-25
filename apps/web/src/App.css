@@ -408,6 +408,29 @@ body {
   color: #9fb0cb;
 }
 
+
+.inspector-tabs {
+  margin-top: 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.inspector-tabs__button {
+  border: 1px solid #425b83;
+  border-radius: 8px;
+  background: #1d2a3f;
+  color: #d9e7fd;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.inspector-tabs__button[aria-selected='true'] {
+  border-color: #f5c358;
+  background: #2f466f;
+  color: #fdf4df;
+}
+
 .inspector-network-summary {
   margin-top: 14px;
   padding: 10px;
@@ -782,4 +805,43 @@ body {
 .inspector-line-readiness__status {
   font-weight: 600;
   color: #dbe8ff;
+}
+
+
+.inspector-lines-tab {
+  margin-top: 12px;
+}
+
+.inspector-lines-tab__list {
+  margin-top: 10px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.inspector-lines-tab__list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.inspector-lines-tab__action,
+.inspector-lines-tab__back {
+  border: 1px solid #425b83;
+  border-radius: 6px;
+  background: #1d2a3f;
+  color: #e8eef9;
+  padding: 4px 8px;
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.inspector-lines-tab__back {
+  margin-top: 8px;
+}
+
+.inspector-debug-details__caveat {
+  color: #9fb0cb;
+  font-size: 0.72rem;
 }

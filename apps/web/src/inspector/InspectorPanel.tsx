@@ -1,16 +1,17 @@
-import type { ReactElement } from 'react';
+import { useEffect, useMemo, useState, type ReactElement } from 'react';
 
 import { TIME_BAND_DISPLAY_LABELS } from '../domain/constants/timeBands';
-import { EmptyInspector } from './EmptyInspector';
+import type { Line } from '../domain/types/line';
 import { SelectedLineInspector } from './SelectedLineInspector';
 import { SelectedStopInspector } from './SelectedStopInspector';
+import { INSPECTOR_TAB_IDS, INSPECTOR_TAB_LABELS, type InspectorTabId } from './inspectorTabs';
 import type { InspectorPanelState } from './types';
 import type { LineFrequencyInputByTimeBand, LineFrequencyValidationByTimeBand } from '../session/useNetworkSessionState';
 import type { TimeBandId } from '../domain/types/timeBand';
 
 interface InspectorPanelProps {
-  readonly activeToolMode: string;
   readonly inspectorPanelState: InspectorPanelState;
+  readonly completedLines: readonly Line[];
   readonly staticNetworkSummaryKpis: import('../domain/projection/useNetworkPlanningProjections').StaticNetworkSummaryKpis;
   readonly networkServicePlanProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineServicePlan>;
   readonly vehicleNetworkProjection: ReturnType<typeof import('../domain/projection/lineVehicleProjection').projectLineVehicleNetwork>;
@@ -22,12 +23,25 @@ interface InspectorPanelProps {
   readonly lineFrequencyInputByTimeBand: LineFrequencyInputByTimeBand;
   readonly lineFrequencyValidationByTimeBand: LineFrequencyValidationByTimeBand;
   readonly onFrequencyChange: (timeBandId: TimeBandId, rawInputValue: string) => void;
+  readonly onSelectedLineIdChange: (lineId: Line['id']) => void;
 }
 
-/** Renders the inspector panel layout while delegating selection-specific details to focused child components. */
+const resolveGlobalStateLabel = (panelState: InspectorPanelState): string => {
+  if (panelState.mode === 'line-selected') {
+    return `Line selected (${panelState.selectedLine.id})`;
+  }
+
+  if (panelState.mode === 'stop-selected') {
+    return `Stop selected (${panelState.selectedStop.selectedStopId})`;
+  }
+
+  return 'No active line or stop selection';
+};
+
+/** Renders inspector tab sections while keeping projection usage read-only and selection-specific details delegated to child components. */
 export function InspectorPanel({
-  activeToolMode,
   inspectorPanelState,
+  completedLines,
   staticNetworkSummaryKpis,
   networkServicePlanProjection,
   vehicleNetworkProjection,
@@ -38,50 +52,155 @@ export function InspectorPanel({
   selectedLineVehicleProjection,
   lineFrequencyInputByTimeBand,
   lineFrequencyValidationByTimeBand,
-  onFrequencyChange
+  onFrequencyChange,
+  onSelectedLineIdChange
 }: InspectorPanelProps): ReactElement {
+  const [activeTabId, setActiveTabId] = useState<InspectorTabId>('network');
+  const [linesViewMode, setLinesViewMode] = useState<'list' | 'detail'>('list');
+  const globalStateLabel = useMemo(() => resolveGlobalStateLabel(inspectorPanelState), [inspectorPanelState]);
+
+  useEffect(() => {
+    if (linesViewMode === 'detail' && inspectorPanelState.mode !== 'line-selected') {
+      setLinesViewMode('list');
+    }
+  }, [inspectorPanelState.mode, linesViewMode]);
+
   return (
     <aside className="right-panel" aria-label="Inspector panel">
       <h2>Inspector</h2>
-      <p>Active mode: {activeToolMode}</p>
-      <section className="inspector-network-summary" aria-label="Static network summary">
-        <h3>Static network summary</h3>
-        <table className="inspector-compact-table inspector-network-summary__primary-table">
-          <tbody>
-            <tr>
-              <th scope="row">Stops</th>
-              <td>{staticNetworkSummaryKpis.totalStopCount}</td>
-            </tr>
-            <tr>
-              <th scope="row">Completed lines</th>
-              <td>{staticNetworkSummaryKpis.completedLineCount}</td>
-            </tr>
-            <tr>
-              <th scope="row">Projected vehicles</th>
-              <td>{vehicleNetworkProjection.summary.totalProjectedVehicleCount}</td>
-            </tr>
-            <tr>
-              <th scope="row">Active service band</th>
-              <td>{TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}</td>
-            </tr>
-            <tr>
-              <th scope="row">Service completed lines</th>
-              <td>{networkServicePlanProjection.summary.totalCompletedLineCount}</td>
-            </tr>
-            <tr>
-              <th scope="row">Degraded service lines</th>
-              <td>{networkServicePlanProjection.summary.degradedLineCount}</td>
-            </tr>
-            <tr>
-              <th scope="row">Blocked service lines</th>
-              <td>{networkServicePlanProjection.summary.blockedLineCount}</td>
-            </tr>
-          </tbody>
-        </table>
-        <details className="inspector-details inspector-debug-details">
-          <summary>Debug details</summary>
+
+      <nav className="inspector-tabs" aria-label="Inspector tabs" role="tablist">
+        {INSPECTOR_TAB_IDS.map((tabId) => (
+          <button
+            key={tabId}
+            type="button"
+            role="tab"
+            aria-selected={activeTabId === tabId}
+            className="inspector-tabs__button"
+            onClick={() => {
+              setActiveTabId(tabId);
+            }}
+          >
+            {INSPECTOR_TAB_LABELS[tabId]}
+          </button>
+        ))}
+      </nav>
+
+      {activeTabId === 'network' ? (
+        <section className="inspector-network-summary" aria-label="Network">
+          <h3>Network</h3>
+          <table className="inspector-compact-table inspector-network-summary__primary-table">
+            <tbody>
+              <tr>
+                <th scope="row">Stops</th>
+                <td>{staticNetworkSummaryKpis.totalStopCount}</td>
+              </tr>
+              <tr>
+                <th scope="row">Completed lines</th>
+                <td>{staticNetworkSummaryKpis.completedLineCount}</td>
+              </tr>
+              <tr>
+                <th scope="row">Projected vehicles</th>
+                <td>{vehicleNetworkProjection.summary.totalProjectedVehicleCount}</td>
+              </tr>
+              <tr>
+                <th scope="row">Active service band</th>
+                <td>{TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}</td>
+              </tr>
+              <tr>
+                <th scope="row">Global state</th>
+                <td>{globalStateLabel}</td>
+              </tr>
+              <tr>
+                <th scope="row">Degraded service lines</th>
+                <td>{networkServicePlanProjection.summary.degradedLineCount}</td>
+              </tr>
+              <tr>
+                <th scope="row">Blocked service lines</th>
+                <td>{networkServicePlanProjection.summary.blockedLineCount}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      ) : null}
+
+      {activeTabId === 'lines' ? (
+        <section className="inspector-card inspector-lines-tab" aria-label="Lines">
+          <h3>Lines</h3>
+          {linesViewMode === 'list' ? (
+            completedLines.length > 0 ? (
+              <ul className="inspector-simple-list inspector-lines-tab__list" aria-label="Completed line list">
+                {completedLines.map((line) => (
+                  <li key={line.id} className="inspector-lines-tab__list-item">
+                    <span>{`${line.id} · ${line.label}`}</span>
+                    <button
+                      type="button"
+                      className="inspector-lines-tab__action"
+                      onClick={() => {
+                        onSelectedLineIdChange(line.id);
+                        setLinesViewMode('detail');
+                      }}
+                    >
+                      View
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No completed lines.</p>
+            )
+          ) : (
+            <>
+              <button
+                type="button"
+                className="inspector-lines-tab__back"
+                onClick={() => {
+                  setLinesViewMode('list');
+                }}
+              >
+                Back to completed lines
+              </button>
+              {inspectorPanelState.mode === 'line-selected' ? (
+                <SelectedLineInspector
+                  panelState={inspectorPanelState}
+                  selectedLineRouteBaselineMetrics={selectedLineRouteBaselineMetrics}
+                  lineFrequencyInputByTimeBand={lineFrequencyInputByTimeBand}
+                  lineFrequencyValidationByTimeBand={lineFrequencyValidationByTimeBand}
+                  selectedLineServiceProjection={selectedLineServiceProjection}
+                  selectedLineServiceInspectorProjection={selectedLineServiceInspectorProjection}
+                  selectedLineDepartureInspectorProjection={selectedLineDepartureInspectorProjection}
+                  selectedLineVehicleProjection={selectedLineVehicleProjection}
+                  onFrequencyChange={onFrequencyChange}
+                />
+              ) : (
+                <p>Select a completed line from the list to open detail.</p>
+              )}
+            </>
+          )}
+        </section>
+      ) : null}
+
+      {activeTabId === 'debug' ? (
+        <section className="inspector-card inspector-debug-details" aria-label="Debug">
+          <h3>Debug</h3>
           <table className="inspector-compact-table inspector-debug-details__table">
             <tbody>
+              <tr>
+                <th scope="row">Selected line id</th>
+                <td>{inspectorPanelState.mode === 'line-selected' ? inspectorPanelState.selectedLine.id : 'None'}</td>
+              </tr>
+              <tr>
+                <th scope="row">Selected stop id</th>
+                <td>{inspectorPanelState.mode === 'stop-selected' ? inspectorPanelState.selectedStop.selectedStopId : 'None'}</td>
+              </tr>
+              <tr>
+                <th scope="row">Session stop count</th>
+                <td>{staticNetworkSummaryKpis.totalStopCount}</td>
+              </tr>
+              <tr>
+                <th scope="row">Session completed line count</th>
+                <td>{staticNetworkSummaryKpis.completedLineCount}</td>
+              </tr>
               <tr>
                 <th scope="row">Degraded projected vehicles</th>
                 <td>{vehicleNetworkProjection.summary.totalDegradedProjectedVehicleCount}</td>
@@ -92,23 +211,12 @@ export function InspectorPanel({
               </tr>
             </tbody>
           </table>
-        </details>
-      </section>
-      {inspectorPanelState.mode === 'line-selected' ? (
-        <SelectedLineInspector
-          panelState={inspectorPanelState}
-          selectedLineRouteBaselineMetrics={selectedLineRouteBaselineMetrics}
-          lineFrequencyInputByTimeBand={lineFrequencyInputByTimeBand}
-          lineFrequencyValidationByTimeBand={lineFrequencyValidationByTimeBand}
-          selectedLineServiceProjection={selectedLineServiceProjection}
-          selectedLineServiceInspectorProjection={selectedLineServiceInspectorProjection}
-          selectedLineDepartureInspectorProjection={selectedLineDepartureInspectorProjection}
-          selectedLineVehicleProjection={selectedLineVehicleProjection}
-          onFrequencyChange={onFrequencyChange}
-        />
+          {inspectorPanelState.mode === 'stop-selected' ? <SelectedStopInspector panelState={inspectorPanelState} /> : null}
+          <p className="inspector-debug-details__caveat">
+            Schematic caveat: inspector diagnostics mirror projection outputs and fallback route baselines; they are not claims of full operational simulation fidelity.
+          </p>
+        </section>
       ) : null}
-      {inspectorPanelState.mode === 'stop-selected' ? <SelectedStopInspector panelState={inspectorPanelState} /> : null}
-      {inspectorPanelState.mode === 'empty' ? <EmptyInspector /> : null}
     </aside>
   );
 }
