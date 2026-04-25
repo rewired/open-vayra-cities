@@ -8,7 +8,11 @@ import {
   SIMULATION_MINUTES_PER_DAY,
   SIMULATION_SPEED_DEFINITIONS
 } from '../constants/simulationClock';
-import { TIME_BAND_MINUTE_RANGES } from '../constants/timeBands';
+import {
+  TIME_BAND_DEFINITIONS,
+  formatMinuteOfDayToClock,
+  resolveTimeBandIdForMinuteOfDay
+} from '../constants/timeBands';
 import type {
   SimulationClockCommand,
   SimulationClockState,
@@ -19,7 +23,7 @@ import type {
   SimulationSpeedDefinition,
   SimulationSpeedId
 } from '../types/simulationClock';
-import type { TimeBandId } from '../types/timeBand';
+import { createMinuteOfDay, type TimeBandId } from '../types/timeBand';
 
 const SIMULATION_SPEED_BY_ID: Readonly<Record<SimulationSpeedId, SimulationSpeedDefinition>> =
   Object.fromEntries(SIMULATION_SPEED_DEFINITIONS.map((speedDefinition) => [speedDefinition.id, speedDefinition])) as Readonly<
@@ -81,27 +85,14 @@ export const parseSimulationSpeedId = (rawSpeedId: string): SimulationSpeedId | 
 /**
  * Derives the canonical MVP time band from a simulation minute-of-day value.
  */
-export const deriveTimeBandIdFromMinuteOfDay = (minuteOfDay: SimulationMinuteOfDay): TimeBandId => {
-  const matchingRange = TIME_BAND_MINUTE_RANGES.find(
-    (range) => minuteOfDay >= range.startMinute && minuteOfDay <= range.endMinute
-  );
-
-  if (!matchingRange) {
-    throw new Error(`No canonical time-band mapping found for minute ${minuteOfDay}.`);
-  }
-
-  return matchingRange.timeBandId;
-};
+export const deriveTimeBandIdFromMinuteOfDay = (minuteOfDay: SimulationMinuteOfDay): TimeBandId =>
+  resolveTimeBandIdForMinuteOfDay(createMinuteOfDay(minuteOfDay), TIME_BAND_DEFINITIONS);
 
 /**
  * Formats a simulation minute-of-day value into a stable `HH:MM` display string.
  */
-export const formatSimulationMinuteOfDay = (minuteOfDay: SimulationMinuteOfDay): string => {
-  const hours = Math.floor(minuteOfDay / 60);
-  const minutes = minuteOfDay % 60;
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-};
+export const formatSimulationMinuteOfDay = (minuteOfDay: SimulationMinuteOfDay): string =>
+  formatMinuteOfDayToClock(createMinuteOfDay(minuteOfDay));
 
 /**
  * Returns a copy of clock state with running status set to paused.

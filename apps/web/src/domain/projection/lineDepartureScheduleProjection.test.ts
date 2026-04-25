@@ -308,4 +308,27 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
     expect(result.totalRouteTravelMinutes).toBe(10);
     expect(JSON.stringify(line.routeSegments)).toBe(beforeJson);
   });
+
+  it('15) wrapped night windows resolve to the correct active segment before and after midnight', () => {
+    const line = createBaseLine(lineAId);
+
+    const lateNight = projectLineDepartureScheduleForLine(
+      line,
+      placedStops,
+      'night',
+      createSimulationMinuteOfDay(1385)
+    );
+    const afterMidnight = projectLineDepartureScheduleForLine(
+      line,
+      placedStops,
+      'night',
+      createSimulationMinuteOfDay(120)
+    );
+
+    expect(lateNight.timeBandStartMinute).toBe(1380);
+    expect(lateNight.timeBandEndMinute).toBe(1440);
+    expect(afterMidnight.timeBandStartMinute).toBe(0);
+    expect(afterMidnight.timeBandEndMinute).toBe(360);
+  });
+
 });

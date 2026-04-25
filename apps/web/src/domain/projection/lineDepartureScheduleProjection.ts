@@ -1,4 +1,9 @@
-import { TIME_BAND_DISPLAY_LABELS, TIME_BAND_MINUTE_RANGES } from '../constants/timeBands';
+import {
+  TIME_BAND_DEFINITIONS,
+  TIME_BAND_DISPLAY_LABELS,
+  formatMinuteOfDayToClock,
+  resolveTimeBandIdForMinuteOfDay
+} from '../constants/timeBands';
 import {
   projectLineServicePlan,
   projectLineServicePlanForLine
@@ -14,9 +19,10 @@ import type {
   MinutesUntilDeparture
 } from '../types/lineDepartureScheduleProjection';
 import type { LineServiceProjectionResult } from '../types/lineServicePlanProjection';
+import { SIMULATION_MINUTES_PER_DAY } from '../constants/simulationClock';
 import type { SimulationMinuteOfDay } from '../types/simulationClock';
 import type { Stop } from '../types/stop';
-import type { TimeBandId } from '../types/timeBand';
+import { createMinuteOfDay, type TimeBandId } from '../types/timeBand';
 
 const DEPARTURE_STATUS_LABELS: Readonly<Record<LineDepartureScheduleProjectionStatus, string>> = {
   unavailable: 'Unavailable',
@@ -34,22 +40,41 @@ export const resolveActiveTimeBandMinuteRange = (
   activeTimeBandId: TimeBandId,
   currentMinuteOfDay: SimulationMinuteOfDay
 ): { readonly startMinute: number; readonly endMinuteExclusive: number } => {
-  const matchingCurrentRange = TIME_BAND_MINUTE_RANGES.find(
-    (range) =>
-      range.timeBandId === activeTimeBandId &&
-      currentMinuteOfDay >= range.startMinute &&
-      currentMinuteOfDay <= range.endMinute
-  );
-  const fallbackRange = TIME_BAND_MINUTE_RANGES.find((range) => range.timeBandId === activeTimeBandId);
-  const resolvedRange = matchingCurrentRange ?? fallbackRange;
+  const currentMinute = createMinuteOfDay(currentMinuteOfDay);
+  const resolvedActiveTimeBandId = resolveTimeBandIdForMinuteOfDay(currentMinute, TIME_BAND_DEFINITIONS);
 
-  if (!resolvedRange) {
-    throw new Error(`No canonical minute range found for active time band "${activeTimeBandId}".`);
+  if (resolvedActiveTimeBandId !== activeTimeBandId) {
+    throw new Error(
+      `Active time-band mismatch. Minute ${currentMinuteOfDay} resolves to "${resolvedActiveTimeBandId}", not "${activeTimeBandId}".`
+    );
+  }
+
+  const definition = TIME_BAND_DEFINITIONS.find((entry) => entry.id === activeTimeBandId);
+
+  if (!definition) {
+    throw new Error(`No canonical time-band definition found for "${activeTimeBandId}".`);
+  }
+
+  const startMinute = definition.startMinuteOfDay;
+  const endMinute = definition.endMinuteOfDay;
+
+  if (startMinute < endMinute) {
+    return {
+      startMinute,
+      endMinuteExclusive: endMinute
+    };
+  }
+
+  if (currentMinute >= startMinute) {
+    return {
+      startMinute,
+      endMinuteExclusive: SIMULATION_MINUTES_PER_DAY
+    };
   }
 
   return {
-    startMinute: resolvedRange.startMinute,
-    endMinuteExclusive: resolvedRange.endMinute + 1
+    startMinute: 0,
+    endMinuteExclusive: endMinute
   };
 };
 
@@ -91,12 +116,7 @@ const createDepartureMinutes = (
   return departures;
 };
 
-const toClockLabel = (minuteOfDay: number): string => {
-  const hours = Math.floor(minuteOfDay / 60);
-  const minutes = minuteOfDay % 60;
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-};
+const toClockLabel = (minuteOfDay: number): string => formatMinuteOfDayToClock(createMinuteOfDay(minuteOfDay));
 
 /**
  * Projects deterministic departure-raster values for one line using existing service projection output.

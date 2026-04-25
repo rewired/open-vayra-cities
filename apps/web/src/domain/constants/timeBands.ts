@@ -1,50 +1,107 @@
-import type { TimeBandId } from '../types/timeBand';
+import {
+  createMinuteOfDay,
+  type MinuteOfDay,
+  type TimeBandDefinition,
+  type TimeBandId
+} from '../types/timeBand';
 
 /**
- * Defines the canonical ordered time-band sequence used by the MVP service planner.
+ * Canonical ordered time-band definitions used by the MVP service planner and simulation clock.
  */
-export const MVP_TIME_BAND_IDS = [
-  'morning-rush',
-  'late-morning',
-  'midday',
-  'afternoon',
-  'evening-rush',
-  'evening',
-  'night'
-] as const satisfies readonly TimeBandId[];
+export const TIME_BAND_DEFINITIONS: readonly TimeBandDefinition[] = [
+  {
+    id: 'morning-rush',
+    label: 'Morning rush',
+    startMinuteOfDay: createMinuteOfDay(6 * 60),
+    endMinuteOfDay: createMinuteOfDay(9 * 60)
+  },
+  {
+    id: 'late-morning',
+    label: 'Late morning',
+    startMinuteOfDay: createMinuteOfDay(9 * 60),
+    endMinuteOfDay: createMinuteOfDay(11 * 60)
+  },
+  {
+    id: 'midday',
+    label: 'Midday',
+    startMinuteOfDay: createMinuteOfDay(11 * 60),
+    endMinuteOfDay: createMinuteOfDay(14 * 60)
+  },
+  {
+    id: 'afternoon',
+    label: 'Afternoon',
+    startMinuteOfDay: createMinuteOfDay(14 * 60),
+    endMinuteOfDay: createMinuteOfDay(16 * 60)
+  },
+  {
+    id: 'evening-rush',
+    label: 'Evening rush',
+    startMinuteOfDay: createMinuteOfDay(16 * 60),
+    endMinuteOfDay: createMinuteOfDay(19 * 60)
+  },
+  {
+    id: 'evening',
+    label: 'Evening',
+    startMinuteOfDay: createMinuteOfDay(19 * 60),
+    endMinuteOfDay: createMinuteOfDay(23 * 60)
+  },
+  {
+    id: 'night',
+    label: 'Night',
+    startMinuteOfDay: createMinuteOfDay(23 * 60),
+    endMinuteOfDay: createMinuteOfDay(6 * 60)
+  }
+] as const;
 
 /**
- * Provides minimal inspector-safe display labels for each canonical time-band identifier.
+ * Canonical ordered time-band identifiers derived from the central definition list.
  */
-export const TIME_BAND_DISPLAY_LABELS: Readonly<Record<TimeBandId, string>> = {
-  'morning-rush': 'Morning rush',
-  'late-morning': 'Late morning',
-  midday: 'Midday',
-  afternoon: 'Afternoon',
-  'evening-rush': 'Evening rush',
-  evening: 'Evening',
-  night: 'Night'
+export const MVP_TIME_BAND_IDS: readonly TimeBandId[] = TIME_BAND_DEFINITIONS.map((definition) => definition.id);
+
+/**
+ * Inspector-safe display labels derived from canonical time-band definitions.
+ */
+export const TIME_BAND_DISPLAY_LABELS: Readonly<Record<TimeBandId, string>> = Object.fromEntries(
+  TIME_BAND_DEFINITIONS.map((definition) => [definition.id, definition.label])
+) as Readonly<Record<TimeBandId, string>>;
+
+/**
+ * Formats a canonical minute-of-day into a stable `HH:MM` clock label.
+ */
+export const formatMinuteOfDayToClock = (minute: MinuteOfDay): string => {
+  const hours = Math.floor(minute / 60);
+  const minutes = minute % 60;
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 };
 
 /**
- * Canonical inclusive minute-range mapping from simulation clock time to MVP time-band ids.
+ * Formats one time-band definition into a compact `HH:MM–HH:MM` window label.
  */
-export interface TimeBandMinuteRange {
-  readonly timeBandId: TimeBandId;
-  readonly startMinute: number;
-  readonly endMinute: number;
-}
+export const formatTimeBandWindow = (definition: TimeBandDefinition): string =>
+  `${formatMinuteOfDayToClock(definition.startMinuteOfDay)}–${formatMinuteOfDayToClock(definition.endMinuteOfDay)}`;
 
 /**
- * Full-day minute-range map used to resolve the active canonical MVP time band.
+ * Resolves the active canonical time-band id for one minute using explicit midnight-wrap handling.
  */
-export const TIME_BAND_MINUTE_RANGES: readonly TimeBandMinuteRange[] = [
-  { timeBandId: 'night', startMinute: 0, endMinute: 359 },
-  { timeBandId: 'morning-rush', startMinute: 360, endMinute: 539 },
-  { timeBandId: 'late-morning', startMinute: 540, endMinute: 659 },
-  { timeBandId: 'midday', startMinute: 660, endMinute: 839 },
-  { timeBandId: 'afternoon', startMinute: 840, endMinute: 959 },
-  { timeBandId: 'evening-rush', startMinute: 960, endMinute: 1139 },
-  { timeBandId: 'evening', startMinute: 1140, endMinute: 1379 },
-  { timeBandId: 'night', startMinute: 1380, endMinute: 1439 }
-] as const satisfies readonly TimeBandMinuteRange[];
+export const resolveTimeBandIdForMinuteOfDay = (
+  minute: MinuteOfDay,
+  definitions: readonly TimeBandDefinition[]
+): TimeBandId => {
+  const matchingDefinition = definitions.find((definition) => {
+    const startMinute = definition.startMinuteOfDay;
+    const endMinute = definition.endMinuteOfDay;
+
+    if (startMinute < endMinute) {
+      return minute >= startMinute && minute < endMinute;
+    }
+
+    return minute >= startMinute || minute < endMinute;
+  });
+
+  if (!matchingDefinition) {
+    throw new Error(`No canonical time-band mapping found for minute ${minute}.`);
+  }
+
+  return matchingDefinition.id;
+};

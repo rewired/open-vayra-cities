@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 040: add canonical branded `MinuteOfDay` and `TimeBandDefinition` domain contracts with validated `0..1439` constructor semantics.
+- Slice 040: replace split time-band id/label/range ownership with one canonical ordered `TIME_BAND_DEFINITIONS` source and derived `MVP_TIME_BAND_IDS`/display labels.
+- Slice 040: add pure time-band helpers for `HH:MM` formatting, formatted window labels, and canonical minute-to-band resolution with explicit midnight-wrap handling.
+- Slice 040: refactor simulation clock and departure schedule projection to consume canonical resolver logic, including wrapped night-window active segment resolution.
+- Add ADR 0095 documenting canonical time-band definition ownership and midnight resolver boundaries.
+
 - Slice 039: refactor selected-line inspector into a compact summary header with issue/readiness pills and action-first dialog entry points (`Edit frequency`, `Service plan`, `Departures`, `Projected vehicles`, `Route baseline`).
 - Slice 039: move always-visible frequency editing and detailed service/departure/vehicle/route sections into dedicated selected-line dialog components while preserving existing projection wiring and callback contracts.
 - Slice 039: show truthful unavailable states in dialog content when selected-line projections or route-baseline metrics are null/missing.

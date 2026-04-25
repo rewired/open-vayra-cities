@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { TIME_BAND_MINUTE_RANGES } from '../constants/timeBands';
 import {
   advanceSimulationClock,
   applySimulationClockCommand,
@@ -103,12 +102,11 @@ describe('simulationClock', () => {
     expect(deriveTimeBandIdFromMinuteOfDay(createSimulationMinuteOfDay(0))).toBe('night');
     expect(deriveTimeBandIdFromMinuteOfDay(createSimulationMinuteOfDay(1439))).toBe('night');
 
-    const coveredMinuteCount = TIME_BAND_MINUTE_RANGES.reduce(
-      (total, range) => total + (range.endMinute - range.startMinute + 1),
-      0
-    );
+    const resolvedMinuteCount = Array.from({ length: 1440 }, (_, minute) =>
+      deriveTimeBandIdFromMinuteOfDay(createSimulationMinuteOfDay(minute))
+    ).length;
 
-    expect(coveredMinuteCount).toBe(1440);
+    expect(resolvedMinuteCount).toBe(1440);
   });
 
   it('formats simulation time as stable HH:MM output', () => {
