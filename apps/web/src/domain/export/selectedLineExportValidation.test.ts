@@ -149,19 +149,27 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
     expect(result.ok).toBe(true);
   });
 
-  it('allows empty includedTimeBandIds when all service plans are unset', () => {
+  it('requires canonical includedTimeBandIds when all service plans are no-service', () => {
     const payload = readFixturePayload();
 
     payload.line.frequencyByTimeBand = {
-      'morning-rush': { kind: 'unset' },
-      'late-morning': { kind: 'unset' },
-      midday: { kind: 'unset' },
-      afternoon: { kind: 'unset' },
-      'evening-rush': { kind: 'unset' },
-      evening: { kind: 'unset' },
-      night: { kind: 'unset' }
+      'morning-rush': { kind: 'no-service' },
+      'late-morning': { kind: 'no-service' },
+      midday: { kind: 'no-service' },
+      afternoon: { kind: 'no-service' },
+      'evening-rush': { kind: 'no-service' },
+      evening: { kind: 'no-service' },
+      night: { kind: 'no-service' }
     };
-    payload.metadata.includedTimeBandIds = [];
+    payload.metadata.includedTimeBandIds = [
+      'morning-rush',
+      'late-morning',
+      'midday',
+      'afternoon',
+      'evening-rush',
+      'evening',
+      'night'
+    ];
 
     const result = validateSelectedLineExportPayload(payload);
 
@@ -173,7 +181,7 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
     payload.line.frequencyByTimeBand = {
       ...payload.line.frequencyByTimeBand,
       evening: { kind: 'no-service' },
-      night: { kind: 'unset' }
+      night: { kind: 'no-service' }
     };
     payload.metadata.includedTimeBandIds = [
       'morning-rush',
@@ -181,7 +189,8 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
       'midday',
       'afternoon',
       'evening-rush',
-      'evening'
+      'evening',
+      'night'
     ];
 
     const result = validateSelectedLineExportPayload(payload);

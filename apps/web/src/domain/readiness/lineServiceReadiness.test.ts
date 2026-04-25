@@ -9,7 +9,7 @@ import {
 } from '../constants/lineServiceReadiness';
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
 import type { SelectedLineExportPayload } from '../types/selectedLineExport';
-import { createLineFrequencyMinutes, createLineId, createUnsetLineServiceByTimeBand, type Line } from '../types/line';
+import { createLineFrequencyMinutes, createLineId, createNoServiceLineServiceByTimeBand, type Line } from '../types/line';
 import {
   createLineSegmentId,
   createRouteDistanceMeters,
@@ -83,18 +83,18 @@ describe('evaluateLineServiceReadiness', () => {
     expect(result.issues).toEqual([]);
   });
 
-  it('returns blocked when all frequencies are unset', () => {
+  it('returns ready when all frequencies are explicit no-service', () => {
     const line: Line = {
       ...createFullyConfiguredLine(),
-      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     const result = evaluateLineServiceReadiness(line, placedStops);
 
-    expect(result.status).toBe('blocked');
-    expect(result.summary.configuredTimeBandCount).toBe(0);
-    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY);
-    expect(issueCodes(result.issues)).toContain(
+    expect(result.status).toBe('ready');
+    expect(result.summary.configuredTimeBandCount).toBe(MVP_TIME_BAND_IDS.length);
+    expect(issueCodes(result.issues)).not.toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY);
+    expect(issueCodes(result.issues)).not.toContain(
       LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION
     );
   });
@@ -103,7 +103,7 @@ describe('evaluateLineServiceReadiness', () => {
     const line: Line = {
       ...createFullyConfiguredLine(),
       frequencyByTimeBand: {
-        ...createUnsetLineServiceByTimeBand(),
+        ...createNoServiceLineServiceByTimeBand(),
         'morning-rush': { kind: 'no-service' },
         'late-morning': { kind: 'no-service' },
         midday: { kind: 'no-service' },
@@ -124,11 +124,11 @@ describe('evaluateLineServiceReadiness', () => {
     );
   });
 
-  it('returns partially-ready when frequencies are only partially configured', () => {
+  it('returns ready when mixed frequency and no-service plans cover all canonical bands', () => {
     const line: Line = {
       ...createFullyConfiguredLine(),
       frequencyByTimeBand: {
-        ...createUnsetLineServiceByTimeBand(),
+        ...createNoServiceLineServiceByTimeBand(),
         'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(6) },
         midday: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
       }
@@ -136,9 +136,9 @@ describe('evaluateLineServiceReadiness', () => {
 
     const result = evaluateLineServiceReadiness(line, placedStops);
 
-    expect(result.status).toBe('partially-ready');
-    expect(result.summary.configuredTimeBandCount).toBe(2);
-    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION);
+    expect(result.status).toBe('ready');
+    expect(result.summary.configuredTimeBandCount).toBe(MVP_TIME_BAND_IDS.length);
+    expect(issueCodes(result.issues)).not.toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION);
   });
 
   it('returns blocked when fewer than minimum stops are configured', () => {
@@ -253,7 +253,7 @@ describe('evaluateLineServiceReadiness', () => {
     const line: Line = {
       ...createFullyConfiguredLine(),
       frequencyByTimeBand: {
-        ...createUnsetLineServiceByTimeBand(),
+        ...createNoServiceLineServiceByTimeBand(),
         'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(5) },
         evening: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(12) }
       }
@@ -261,9 +261,9 @@ describe('evaluateLineServiceReadiness', () => {
 
     const result = evaluateLineServiceReadiness(line, placedStops);
 
-    expect(result.summary.configuredTimeBandCount).toBe(2);
+    expect(result.summary.configuredTimeBandCount).toBe(MVP_TIME_BAND_IDS.length);
     expect(result.summary.canonicalTimeBandCount).toBe(MVP_TIME_BAND_IDS.length);
-    expect(result.summary.hasAllCanonicalTimeBandsConfigured).toBe(false);
+    expect(result.summary.hasAllCanonicalTimeBandsConfigured).toBe(true);
   });
 
   it('keeps issue code and severity contracts stable for representative diagnostics', () => {
@@ -273,7 +273,7 @@ describe('evaluateLineServiceReadiness', () => {
         createSegment(1, stopA, stopB, { status: 'invalid-status' as RouteStatus }),
         createSegment(2, stopB, stopC, { status: 'fallback-routed' })
       ],
-      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     const result = evaluateLineServiceReadiness(line, placedStops);
@@ -282,15 +282,9 @@ describe('evaluateLineServiceReadiness', () => {
     expect(issuesByCode.get(LINE_SERVICE_READINESS_ISSUE_CODES.UNKNOWN_ROUTE_STATUS)?.severity).toBe(
       LINE_SERVICE_READINESS_ISSUE_SEVERITIES.ERROR
     );
-    expect(issuesByCode.get(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY)?.severity).toBe(
-      LINE_SERVICE_READINESS_ISSUE_SEVERITIES.ERROR
-    );
-    expect(issuesByCode.get(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION)?.severity).toBe(
-      LINE_SERVICE_READINESS_ISSUE_SEVERITIES.WARNING
-    );
   });
 
-  it('evaluates Hamburg fixture-derived line as not fully ready when frequencies are unset', () => {
+  it('evaluates Hamburg fixture-derived line as partially-ready when frequencies are no-service', () => {
     const fixturePath = path.resolve(
       path.dirname(new URL(import.meta.url).pathname),
       '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v2.json'
@@ -302,14 +296,13 @@ describe('evaluateLineServiceReadiness', () => {
       label: payload.line.label,
       stopIds: payload.line.orderedStopIds,
       routeSegments: payload.line.routeSegments,
-      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     const result = evaluateLineServiceReadiness(line, payload.stops);
 
-    expect(result.status).toBe('blocked');
-    expect(result.summary.hasAtLeastOneConfiguredFrequency).toBe(false);
-    expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY);
+    expect(result.status).toBe('partially-ready');
+    expect(result.summary.hasAtLeastOneConfiguredFrequency).toBe(true);
     expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.FALLBACK_ONLY_ROUTING);
   });
 });

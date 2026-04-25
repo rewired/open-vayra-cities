@@ -20,11 +20,7 @@ const toActiveServiceStateLabel = (
     return 'No service';
   }
 
-  if (activeBandState === 'unset') {
-    return 'Unset';
-  }
-
-  return currentBandHeadwayMinutes === null ? 'Unset' : `Every ${currentBandHeadwayMinutes} min`;
+  return currentBandHeadwayMinutes === null ? 'No service' : `Every ${currentBandHeadwayMinutes} min`;
 };
 
 /** Renders selected-line service readiness and service-plan detail in a dialog. */

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createLineFrequencyMinutes, createLineId, createUnsetLineServiceByTimeBand, type Line } from './line';
+import { createLineFrequencyMinutes, createLineId, createNoServiceLineServiceByTimeBand, type Line } from './line';
 import {
   createLineSegmentId,
   createRouteDistanceMeters,
@@ -39,7 +39,7 @@ const selectedLine: Line = {
   stopIds: [stopAId, stopBId],
   routeSegments,
   frequencyByTimeBand: {
-    ...createUnsetLineServiceByTimeBand(),
+    ...createNoServiceLineServiceByTimeBand(),
     'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(8) }
   }
 };
@@ -73,16 +73,16 @@ describe('buildSelectedLineExportPayload', () => {
       lineCount: 1,
       stopCount: 2,
       routeSegmentCount: 1,
-      includedTimeBandIds: ['morning-rush']
+      includedTimeBandIds: ['morning-rush', 'late-morning', 'midday', 'afternoon', 'evening-rush', 'evening', 'night']
     });
     expect(payload.line.frequencyByTimeBand).toEqual({
       'morning-rush': { kind: 'frequency', headwayMinutes: 8 },
-      'late-morning': { kind: 'unset' },
-      midday: { kind: 'unset' },
-      afternoon: { kind: 'unset' },
-      'evening-rush': { kind: 'unset' },
-      evening: { kind: 'unset' },
-      night: { kind: 'unset' }
+      'late-morning': { kind: 'no-service' },
+      midday: { kind: 'no-service' },
+      afternoon: { kind: 'no-service' },
+      'evening-rush': { kind: 'no-service' },
+      evening: { kind: 'no-service' },
+      night: { kind: 'no-service' }
     });
     expect(payload.sourceMetadata).toEqual({
       source: 'cityops-web',

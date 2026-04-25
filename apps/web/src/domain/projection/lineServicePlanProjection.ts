@@ -39,10 +39,6 @@ const resolveProjectionStatus = (
     return 'blocked';
   }
 
-  if (activeBandState === 'unset') {
-    return 'not-configured';
-  }
-
   if (activeBandState === 'no-service') {
     return readinessStatus === 'partially-ready' ? 'degraded' : 'configured';
   }
@@ -56,7 +52,6 @@ const resolveProjectionStatus = (
 
 const SERVICE_STATUS_LABELS: Readonly<Record<LineServiceProjectionStatus, string>> = {
   blocked: 'Blocked',
-  'not-configured': 'Not configured',
   configured: 'Configured',
   degraded: 'Configured with warnings'
 };
@@ -66,10 +61,9 @@ const SERVICE_STATUS_LABELS: Readonly<Record<LineServiceProjectionStatus, string
  *
  * Status resolution order is deterministic:
  * 1) `blocked` when readiness has blockers,
- * 2) `not-configured` when non-blocked and the active-band plan is `unset`,
- * 3) `configured`/`degraded` when non-blocked and the active-band plan is `no-service`,
- * 4) `degraded` when active-band frequency is valid but readiness is warning-only (`partially-ready`),
- * 5) otherwise `configured`.
+ * 2) `configured`/`degraded` when non-blocked and the active-band plan is `no-service`,
+ * 3) `degraded` when active-band frequency is valid but readiness is warning-only (`partially-ready`),
+ * 4) otherwise `configured`.
  */
 export const projectLineServicePlanForLine = (
   line: Line,
@@ -130,7 +124,7 @@ export const projectLineSelectedServiceInspector = (
     currentBandHeadwayMinutes: lineProjection.currentBandHeadwayMinutes,
     headwayLabel:
       lineProjection.currentBandHeadwayMinutes === null
-        ? 'No active-band headway configured.'
+        ? 'No service in active time band.'
         : `${lineProjection.currentBandHeadwayMinutes} min`,
     theoreticalDeparturesPerHour: lineProjection.theoreticalDeparturesPerHour,
     theoreticalDeparturesPerHourLabel:
@@ -162,7 +156,6 @@ export const projectLineServicePlan = (
       totalCompletedLineCount: accumulator.totalCompletedLineCount + 1,
       totalLineCount: accumulator.totalLineCount + 1,
       blockedLineCount: accumulator.blockedLineCount + (lineResult.status === 'blocked' ? 1 : 0),
-      notConfiguredLineCount: accumulator.notConfiguredLineCount + (lineResult.status === 'not-configured' ? 1 : 0),
       configuredLineCount: accumulator.configuredLineCount + (lineResult.status === 'configured' ? 1 : 0),
       degradedLineCount: accumulator.degradedLineCount + (lineResult.status === 'degraded' ? 1 : 0),
       totalRouteSegmentCount: accumulator.totalRouteSegmentCount + lineResult.routeSegmentCount,
@@ -175,7 +168,6 @@ export const projectLineServicePlan = (
       totalCompletedLineCount: 0,
       totalLineCount: 0,
       blockedLineCount: 0,
-      notConfiguredLineCount: 0,
       configuredLineCount: 0,
       degradedLineCount: 0,
       totalRouteSegmentCount: 0,

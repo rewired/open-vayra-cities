@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 031b: remove canonical `unset` line service state so every MVP time band is explicitly `frequency` or `no-service`, and initialize newly completed lines with all-band `no-service` defaults.
+- Slice 031b: refactor `Edit service plan` into a compact desktop editor with `WINDOW / TIME BAND / SERVICE` columns and per-row `Interval` + text-input + `No service` controls only.
+- Slice 031b: enforce controlled interval input validation (`1..999`, digits-only, max three characters) with helper-owned parsing/activation behavior and no implicit no-service conversion from empty input.
+- Add ADR 0107 documenting no-unset service-state semantics and compact service-plan editor boundaries.
+
 - Slice 050: replace selected-line ordered-stop text worm with compact stop chips plus an expandable full stop-sequence disclosure for long lines.
 - Slice 050: replace the selected-line `Segments / route time` row with three truthful route-summary stat cards (`Stops`, `Segments`, `Runtime`) using existing selected-line and route-baseline projection values only.
 - Slice 050: keep readiness/issue pills near the top of selected-line inspector content and retain required action entrypoints (`Edit frequency`, `Service plan`, `Departures`, `Projected vehicles`) while preserving the existing `Route baseline` action.

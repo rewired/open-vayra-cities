@@ -97,10 +97,6 @@ const deriveUnavailableReason = (
     return 'blocked-service';
   }
 
-  if (lineServiceProjection.activeBandState === 'unset') {
-    return 'active-band-unset';
-  }
-
   if (lineServiceProjection.activeBandState === 'no-service') {
     return 'active-band-no-service';
   }

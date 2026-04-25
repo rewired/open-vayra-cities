@@ -206,7 +206,6 @@ export const evaluateLineServiceReadiness = (
 
     const bandPlan = line.frequencyByTimeBand[timeBandId];
     const isValidBandPlan =
-      bandPlan.kind === 'unset' ||
       bandPlan.kind === 'no-service' ||
       (bandPlan.kind === 'frequency' && isPositiveFiniteNumber(bandPlan.headwayMinutes));
 
@@ -214,7 +213,7 @@ export const evaluateLineServiceReadiness = (
       addIssue({
         code: LINE_SERVICE_READINESS_ISSUE_CODES.INVALID_FREQUENCY_VALUE,
         severity: LINE_SERVICE_READINESS_ISSUE_SEVERITIES.ERROR,
-        message: 'line.frequencyByTimeBand values must be unset, no-service, or positive finite frequency plans.',
+        message: 'line.frequencyByTimeBand values must be no-service or positive finite frequency plans.',
         lineId: line.id,
         timeBandId
       });
@@ -233,14 +232,13 @@ export const evaluateLineServiceReadiness = (
     }
 
     const isValidBandPlan =
-      bandPlan.kind === 'unset' ||
       bandPlan.kind === 'no-service' ||
       (bandPlan.kind === 'frequency' && isPositiveFiniteNumber(bandPlan.headwayMinutes));
     if (!isValidBandPlan) {
       addIssue({
         code: LINE_SERVICE_READINESS_ISSUE_CODES.INVALID_FREQUENCY_VALUE,
         severity: LINE_SERVICE_READINESS_ISSUE_SEVERITIES.ERROR,
-        message: 'line.frequencyByTimeBand values must be unset, no-service, or positive finite frequency plans.',
+        message: 'line.frequencyByTimeBand values must be no-service or positive finite frequency plans.',
         lineId: line.id,
         timeBandId: timeBandId as TimeBandId
       });
@@ -262,7 +260,7 @@ export const evaluateLineServiceReadiness = (
     addIssue({
       code: LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION,
       severity: LINE_SERVICE_READINESS_ISSUE_SEVERITIES.WARNING,
-      message: 'Not all canonical time bands have configured service plan bands (unset bands remain).',
+      message: 'Not all canonical time bands have configured service plan bands.',
       lineId: line.id
     });
   }

@@ -23,7 +23,6 @@ export type SelectedLineExportSourceMetadata = Readonly<Record<string, string | 
  * JSON-serializable service-band state for one exported time band.
  */
 export type SelectedLineExportServiceBandPlan =
-  | { readonly kind: 'unset' }
   | { readonly kind: 'frequency'; readonly headwayMinutes: number }
   | { readonly kind: 'no-service' };
 
@@ -98,8 +97,6 @@ export const buildSelectedLineExportPayload = ({
   const stops = placedStops.filter((stop) => referencedStopIds.has(stop.id));
   const toExportServiceBandPlan = (bandPlan: LineServiceBandPlan): SelectedLineExportServiceBandPlan => {
     switch (bandPlan.kind) {
-      case 'unset':
-        return { kind: 'unset' };
       case 'no-service':
         return { kind: 'no-service' };
       case 'frequency':
@@ -109,10 +106,7 @@ export const buildSelectedLineExportPayload = ({
   const frequencyByTimeBand = Object.fromEntries(
     MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, toExportServiceBandPlan(selectedLine.frequencyByTimeBand[timeBandId])])
   ) as SelectedLineExportServiceByTimeBand;
-  const includedTimeBandIds = MVP_TIME_BAND_IDS.filter((timeBandId) => {
-    const bandPlan = frequencyByTimeBand[timeBandId];
-    return bandPlan.kind !== 'unset';
-  });
+  const includedTimeBandIds = MVP_TIME_BAND_IDS;
 
   return {
     schemaVersion: SELECTED_LINE_EXPORT_SCHEMA_VERSION,

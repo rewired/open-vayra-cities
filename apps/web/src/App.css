@@ -358,22 +358,22 @@ body {
 
 .inspector-frequency-editor {
   display: grid;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .inspector-frequency-editor__note {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   font-size: 0.75rem;
   color: #bfd0ec;
 }
 
 .inspector-frequency-editor__header {
   display: grid;
-  grid-template-columns: minmax(124px, 0.7fr) minmax(112px, 0.65fr) minmax(0, 1.65fr);
+  grid-template-columns: minmax(102px, 0.56fr) minmax(124px, 0.78fr) minmax(0, 1.66fr);
   align-items: center;
   gap: 8px;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: #9eb4d7;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -382,20 +382,15 @@ body {
 
 .inspector-frequency-editor__row {
   display: grid;
-  grid-template-columns: minmax(124px, 0.7fr) minmax(112px, 0.65fr) minmax(0, 1.65fr);
+  grid-template-columns: minmax(102px, 0.56fr) minmax(124px, 0.78fr) minmax(0, 1.66fr);
   align-items: center;
   gap: 8px;
-  font-size: 0.8rem;
+  font-size: 0.79rem;
   color: #c8d6ee;
   margin: 0;
-  padding: 7px 8px;
+  padding: 6px 8px;
   border: 1px solid #2f415f;
   border-radius: 8px;
-}
-
-.inspector-frequency-editor__row--not-configured {
-  border-color: #425b83;
-  background: rgb(24 35 56 / 35%);
 }
 
 .inspector-frequency-editor__band-label,
@@ -414,44 +409,44 @@ body {
 }
 
 .inspector-frequency-editor__controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.inspector-frequency-editor__choice {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.73rem;
-  color: #d2def3;
+  justify-content: flex-start;
+  gap: 7px;
 }
 
-.inspector-frequency-editor__choice input {
-  margin: 0;
+.inspector-frequency-editor__toggle {
+  border: 1px solid #425b83;
+  border-radius: 6px;
+  background: #1b2a40;
+  color: #d9e7fd;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.inspector-frequency-editor__toggle[data-active='true'] {
+  border-color: #f5c358;
+  background: #2f466f;
+  color: #fdf4df;
 }
 
 .inspector-frequency-editor__interval-field {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   color: #c4d3ea;
   font-size: 0.73rem;
 }
 
-.inspector-frequency-editor__interval-label {
-  color: #aabdda;
-}
-
 .inspector-frequency-editor__interval-field input {
-  width: 58px;
-  padding: 4px 6px;
+  width: 48px;
+  padding: 3px 5px;
   border: 1px solid #425b83;
   border-radius: 6px;
   background: #182338;
   color: #e8eef9;
-  text-align: right;
+  text-align: center;
 }
 
 .inspector-frequency-editor__interval-field input:disabled {
@@ -793,6 +788,10 @@ body {
 
 .inspector-dialog__surface--small {
   --inspector-dialog-surface-width: 560px;
+}
+
+.inspector-dialog__surface--service-plan {
+  --inspector-dialog-surface-width: 700px;
 }
 
 .inspector-dialog__surface--medium {

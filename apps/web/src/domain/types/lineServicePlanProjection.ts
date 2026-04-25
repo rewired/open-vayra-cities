@@ -4,17 +4,13 @@ import type { TimeBandId } from './timeBand';
 
 /**
  * Current service projection status for one completed line in the active time band.
- *
- * `not-configured` is only used when the active band is `unset`.
- * `configured`/`degraded` can still apply when the active band is explicitly `no-service`.
- * `degraded` is used when readiness is warning-only (`partially-ready`).
  */
-export type LineServiceProjectionStatus = 'blocked' | 'not-configured' | 'configured' | 'degraded';
+export type LineServiceProjectionStatus = 'blocked' | 'configured' | 'degraded';
 
 /**
  * Explicit active-band service plan kind resolved from one line's active time-band configuration.
  */
-export type LineServiceActiveBandState = 'unset' | 'no-service' | 'frequency';
+export type LineServiceActiveBandState = 'no-service' | 'frequency';
 
 /**
  * Optional projection note shape used to surface per-line warning/error diagnostics.
@@ -40,9 +36,9 @@ export interface LineServiceProjectionResult {
   readonly lineLabel: string;
   /** Active time band used for headway/frequency extraction. */
   readonly activeTimeBandId: TimeBandId;
-  /** Explicit active-band service plan kind (`unset`, `no-service`, or `frequency`). */
+  /** Explicit active-band service plan kind (`no-service` or `frequency`). */
   readonly activeBandState: LineServiceActiveBandState;
-  /** Current active-band headway in minutes, or `null` when unset/invalid. */
+  /** Current active-band headway in minutes, or `null` when unavailable. */
   readonly currentBandHeadwayMinutes: number | null;
   /** Theoretical departures per hour (`60 / headway`) when headway is configured, otherwise `null`. */
   readonly theoreticalDeparturesPerHour: number | null;
@@ -64,7 +60,7 @@ export interface LineServiceProjectionResult {
 export interface LineSelectedServiceInspectorProjection {
   /** Active time-band identifier used for this inspector projection. */
   readonly activeTimeBandId: TimeBandId;
-  /** Explicit active-band service plan kind (`unset`, `no-service`, or `frequency`). */
+  /** Explicit active-band service plan kind (`no-service` or `frequency`). */
   readonly activeBandState: LineServiceActiveBandState;
   /** Active time-band display label for compact UI rendering. */
   readonly activeTimeBandLabel: string;
@@ -72,11 +68,11 @@ export interface LineSelectedServiceInspectorProjection {
   readonly status: LineServiceProjectionStatus;
   /** Human-readable status label for inspector/status-bar rendering. */
   readonly statusLabel: string;
-  /** Active-band headway in minutes, or `null` when unset/invalid. */
+  /** Active-band headway in minutes, or `null` when unavailable. */
   readonly currentBandHeadwayMinutes: number | null;
   /**
    * Active-band headway label.
-   * Uses an explicit unconfigured message when no valid active-band headway exists.
+   * Uses an explicit no-service message when no active-band frequency exists.
    */
   readonly headwayLabel: string;
   /** Theoretical departures per hour (`60 / headway`) when configured, otherwise `null`. */
@@ -109,8 +105,6 @@ export interface LineServiceProjectionSummary {
   readonly totalLineCount: number;
   /** Number of lines in `blocked` status. */
   readonly blockedLineCount: number;
-  /** Number of lines in `not-configured` status. */
-  readonly notConfiguredLineCount: number;
   /** Number of lines in `configured` status. */
   readonly configuredLineCount: number;
   /** Number of lines in `degraded` status. */
