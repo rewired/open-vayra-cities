@@ -234,13 +234,6 @@ body {
   text-transform: none;
 }
 
-.map-workspace__overlay--line-note {
-  left: 14px;
-  bottom: 14px;
-  max-width: min(56ch, calc(100% - 28px));
-  text-transform: none;
-}
-
 .map-workspace__overlay-button-row {
   display: flex;
   gap: 8px;

@@ -628,6 +628,7 @@ export function MapWorkspaceSurface({
             <li>{`Placement street rule hint: ${placementUiFeedback.streetRuleHint ?? 'n/a'}`}</li>
             <li>{`Build-line instruction: ${buildLineUiFeedback.modeInstruction ?? 'n/a'}`}</li>
             <li>{`Build-line minimum requirement: ${buildLineUiFeedback.minimumStopRequirement ?? 'n/a'}`}</li>
+            <li>{`Completed overlay note: ${LINE_OVERLAY_COPY.completed}`}</li>
             <li>{`Draft overlay note: ${LINE_OVERLAY_COPY.draft}`}</li>
             <li>{draftMetadataSummary}</li>
           </ul>
@@ -661,12 +662,6 @@ export function MapWorkspaceSurface({
         </div>
       ) : null}
 
-      {sessionLines.length > 0 ? (
-        <div className="map-workspace__overlay map-workspace__overlay--line-note" aria-label="Line overlay interpretation">
-          <strong>Line overlay note</strong>
-          <span> · {LINE_OVERLAY_COPY.completed}</span>
-        </div>
-      ) : null}
     </section>
   );
 }
