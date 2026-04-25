@@ -74,8 +74,8 @@ export function FrequencyEditorDialog({
             return (
               <section key={timeBandId} className={rowClassName} role="row">
                 <p className="inspector-frequency-editor__band-label" role="rowheader">
-                  <span>{TIME_BAND_DISPLAY_LABELS[timeBandId]}</span>{' '}
-                  <span className="inspector-frequency-editor__band-window">({TIME_BAND_WINDOW_BY_ID[timeBandId]})</span>
+                  <span className="inspector-frequency-editor__band-window">{TIME_BAND_WINDOW_BY_ID[timeBandId]}</span>{' '}
+                  <span>({TIME_BAND_DISPLAY_LABELS[timeBandId]})</span>
                 </p>
                 <div className="inspector-frequency-editor__controls">
                   <button
