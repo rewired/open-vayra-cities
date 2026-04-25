@@ -2,7 +2,7 @@ import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
 import { projectLineDepartureScheduleForLine, projectLineDepartureScheduleNetwork } from './lineDepartureScheduleProjection';
 import { projectLineServicePlan, projectLineServicePlanForLine, projectLineSelectedServiceInspector } from './lineServicePlanProjection';
 import { projectLineVehicleNetwork } from './lineVehicleProjection';
-import { projectLinePlanningVehicles } from './linePlanningVehicleProjection';
+import { projectLinePlanningVehicles, projectNetworkPlanningVehicles } from './linePlanningVehicleProjection';
 import { resolveLineServiceBandHeadwayMinutes, type Line } from '../types/line';
 import type { Stop } from '../types/stop';
 import type { TimeBandId } from '../types/timeBand';
@@ -96,9 +96,12 @@ export const useNetworkPlanningProjections = (
   currentSimulationMinuteOfDay: SimulationMinuteOfDay
 ): NetworkPlanningProjections => {
   const staticNetworkSummaryKpis = projectStaticNetworkSummaryKpis(sessionStops.length, sessionLines, selectedLine);
-  const selectedLineRouteBaseline = selectedLine
-    ? resolveLineRouteBaseline(selectedLine, sessionStops)
-    : null;
+  const routeBaselinesByLineId = new Map(
+    sessionLines.map((line) => [line.id, resolveLineRouteBaseline(line, sessionStops)])
+  );
+  const selectedLineRouteBaseline = selectedLine ? (routeBaselinesByLineId.get(selectedLine.id) ?? null) : null;
+  const networkPlanningVehicleProjections = projectNetworkPlanningVehicles(sessionLines, routeBaselinesByLineId);
+
   const selectedLineServiceProjection = selectedLine
     ? projectLineServicePlanForLine(selectedLine, sessionStops, activeSimulationTimeBandId)
     : null;
@@ -118,7 +121,8 @@ export const useNetworkPlanningProjections = (
   );
   const vehicleNetworkProjection = projectLineVehicleNetwork(
     sessionLines,
-    networkDepartureScheduleProjection,
+    routeBaselinesByLineId,
+    networkPlanningVehicleProjections,
     currentSimulationMinuteOfDay,
     activeSimulationTimeBandId
   );

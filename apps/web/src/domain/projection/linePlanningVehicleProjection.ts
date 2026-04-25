@@ -121,3 +121,12 @@ export const projectLinePlanningVehicles = (
     hasFallbackRouteWarning
   };
 };
+
+/**
+ * Projects planning vehicle requirements for a network of completed lines.
+ */
+export const projectNetworkPlanningVehicles = (
+  lines: readonly Line[],
+  routeBaselinesByLineId: ReadonlyMap<string, LineRouteBaseline>
+): readonly LinePlanningVehicleProjection[] =>
+  lines.map((line) => projectLinePlanningVehicles(line, routeBaselinesByLineId.get(line.id) ?? null));

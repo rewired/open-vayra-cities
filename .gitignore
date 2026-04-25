@@ -55,3 +55,14 @@ temp/
 *.gpkg
 *.pbf
 /docs/slices/*
+
+
+# Local OSM extracts for routing experiments.
+# These files are large, replaceable downloads and must not be committed.
+data/osm/*.pbf
+data/osm/**/*.pbf
+data/osm/*.pbf.md5
+data/osm/**/*.pbf.md5
+
+# Keep the local OSM data directory discoverable without committing extracts.
+!data/osm/.gitkeep

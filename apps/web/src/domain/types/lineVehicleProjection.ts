@@ -1,6 +1,6 @@
 import type { Line, LineId } from './line';
-import type { LineSegmentId, RouteGeometryCoordinate } from './lineRoute';
-import type { DepartureMinute, LineDepartureScheduleProjectionStatus } from './lineDepartureScheduleProjection';
+import type { RouteGeometryCoordinate } from './lineRoute';
+import type { LineRouteBaselineStatus } from './routeBaseline';
 import type { TimeBandId } from './timeBand';
 
 /**
@@ -14,7 +14,7 @@ export type LineVehicleProjectionId = string & { readonly __brand: 'LineVehicleP
 export type LineVehicleProjectionStatus = 'projected' | 'degraded-projected' | 'unavailable';
 
 /**
- * Per-vehicle projection derived from one active departure in the active time band.
+ * Per-vehicle projection derived deterministically from service headway and route runtime.
  */
 export interface LineVehicleProjection {
   /** Stable vehicle projection identifier for keyed rendering and diffing. */
@@ -25,16 +25,12 @@ export interface LineVehicleProjection {
   readonly lineLabel: string;
   /** Active time band used by this projection run. */
   readonly activeTimeBandId: TimeBandId;
-  /** Departure minute that originated this projected vehicle. */
-  readonly departureMinute: DepartureMinute;
-  /** Elapsed minutes since the projected departure minute. */
-  readonly elapsedMinutes: number;
-  /** Progress ratio through the full route travel time, clamped to `[0, 1]`. */
+  /** Progress ratio through the full route round-trip, clamped to `[0, 1]`. */
   readonly routeProgressRatio: number;
-  /** Progress ratio through the current route segment, clamped to `[0, 1]`. */
-  readonly segmentProgressRatio: number;
-  /** Current route-segment id hosting this projected vehicle, or `null` when unavailable. */
-  readonly currentSegmentId: LineSegmentId | null;
+  /** Current route-segment index hosting this projected vehicle, or `null` when unavailable. */
+  readonly segmentIndex: number | null;
+  /** Interpolated travel direction derived from headway phase. */
+  readonly direction: 'outbound' | 'return';
   /** Current projected marker coordinate, or `null` when unavailable. */
   readonly coordinate: RouteGeometryCoordinate | null;
   /** Projection status for this vehicle marker in the current simulation minute. */
@@ -44,7 +40,7 @@ export interface LineVehicleProjection {
 }
 
 /**
- * Per-line vehicle projection result containing all active departures for one line.
+ * Per-line vehicle projection result containing all visible buses for one line.
  */
 export interface LineVehicleProjectionForLine {
   /** Line identifier associated with this line-level projection result. */
@@ -53,9 +49,11 @@ export interface LineVehicleProjectionForLine {
   readonly lineLabel: string;
   /** Active time band used for this line-level projection result. */
   readonly activeTimeBandId: TimeBandId;
-  /** Upstream departure projection status forwarded for line-level diagnostics. */
-  readonly departureScheduleStatus: LineDepartureScheduleProjectionStatus;
-  /** Active vehicle projections derived from active departures for this line. */
+  /** Active service state used to derive this projection. */
+  readonly serviceState: 'frequency' | 'no-service' | 'unset';
+  /** Route baseline status defining availability and fallback states. */
+  readonly routeStatus: LineRouteBaselineStatus;
+  /** Active vehicle projections derived from deterministic phasing. */
   readonly vehicles: readonly LineVehicleProjection[];
   /** Optional line-level note when projection is unavailable or degraded. */
   readonly note?: string;

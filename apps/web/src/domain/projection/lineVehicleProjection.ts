@@ -1,81 +1,76 @@
+import { DEFAULT_TURNAROUND_RECOVERY_MINUTES } from '../constants/lineService';
 import type { Line } from '../types/line';
-import {
-  createLineVehicleProjectionId,
-  type LineVehicleNetworkProjection,
-  type LineVehicleProjection,
-  type LineVehicleProjectionForLine,
-  type LineVehicleProjectionStatus,
-  type LineVehicleProjectionSummary
+import type {
+  LineVehicleNetworkProjection,
+  LineVehicleProjection,
+  LineVehicleProjectionForLine,
+  LineVehicleProjectionSummary,
+  LineVehicleProjectionStatus
 } from '../types/lineVehicleProjection';
-import type { LineRouteSegment, RouteGeometryCoordinate } from '../types/lineRoute';
-import type { LineDepartureScheduleNetworkProjection } from '../types/lineDepartureScheduleProjection';
+import { createLineVehicleProjectionId } from '../types/lineVehicleProjection';
+import type { RouteGeometryCoordinate } from '../types/lineRoute';
+import type { LineRouteBaseline, RouteSegmentBaseline } from '../types/routeBaseline';
+import type { LinePlanningVehicleProjection, LineBandVehicleProjection } from '../types/linePlanningVehicleProjection';
 import type { SimulationMinuteOfDay } from '../types/simulationClock';
 import type { TimeBandId } from '../types/timeBand';
 import { clampRouteSegmentProgressRatio, projectCoordinateAlongRouteGeometry } from './routeGeometryInterpolation';
 
-const isActiveDeparture = (
-  departureMinute: number,
-  currentMinuteOfDay: SimulationMinuteOfDay,
-  totalRouteTimeMinutes: number
-): boolean => departureMinute <= currentMinuteOfDay && currentMinuteOfDay < departureMinute + totalRouteTimeMinutes;
+const SECONDS_PER_MINUTE = 60;
 
 const findSegmentProgress = (
-  routeSegments: readonly LineRouteSegment[],
-  elapsedMinutes: number,
-  totalRouteTimeMinutes: number
+  segments: readonly RouteSegmentBaseline[],
+  elapsedSeconds: number,
+  totalTravelTimeSeconds: number
 ): {
-  readonly currentSegmentId: LineRouteSegment['id'] | null;
-  readonly segmentProgressRatio: number;
+  readonly segmentIndex: number | null;
   readonly coordinate: RouteGeometryCoordinate | null;
   readonly note?: string;
 } => {
-  if (routeSegments.length === 0 || totalRouteTimeMinutes <= 0) {
+  if (segments.length === 0 || totalTravelTimeSeconds <= 0) {
     return {
-      currentSegmentId: null,
-      segmentProgressRatio: 0,
+      segmentIndex: null,
       coordinate: null,
       note: 'Unavailable: line has no routed segments for marker projection.'
     };
   }
 
-  const clampedElapsedMinutes = Math.max(0, Math.min(elapsedMinutes, totalRouteTimeMinutes));
-  let traversedMinutes = 0;
+  const clampedElapsedSeconds = Math.max(0, Math.min(elapsedSeconds, totalTravelTimeSeconds));
+  let traversedSeconds = 0;
 
-  for (const segment of routeSegments) {
-    const segmentDurationMinutes = segment.totalTravelMinutes;
-    const nextTraversedMinutes = traversedMinutes + segmentDurationMinutes;
+  for (let i = 0; i < segments.length; i += 1) {
+    const segment = segments[i] as RouteSegmentBaseline;
+    const segmentDurationSeconds = segment.travelTimeSeconds;
+    const nextTraversedSeconds = traversedSeconds + segmentDurationSeconds;
 
-    if (clampedElapsedMinutes <= nextTraversedMinutes) {
-      if (segment.orderedGeometry.length < 2) {
+    if (clampedElapsedSeconds <= nextTraversedSeconds) {
+      if (segment.geometry.length < 2) {
         return {
-          currentSegmentId: null,
-          segmentProgressRatio: 0,
+          segmentIndex: null,
           coordinate: null,
-          note: `Unavailable: segment "${segment.id}" has no geometry coordinate anchors.`
+          note: `Unavailable: segment index ${i} has no geometry coordinate anchors.`
         };
       }
 
       const segmentProgressRatio =
-        segmentDurationMinutes <= 0
+        segmentDurationSeconds <= 0
           ? 1
-          : clampRouteSegmentProgressRatio((clampedElapsedMinutes - traversedMinutes) / segmentDurationMinutes);
+          : clampRouteSegmentProgressRatio((clampedElapsedSeconds - traversedSeconds) / segmentDurationSeconds);
 
       return {
-        currentSegmentId: segment.id,
-        segmentProgressRatio,
-        coordinate: projectCoordinateAlongRouteGeometry(segment.orderedGeometry, segmentProgressRatio)
+        segmentIndex: i,
+        coordinate: projectCoordinateAlongRouteGeometry(segment.geometry, segmentProgressRatio)
       };
     }
 
-    traversedMinutes = nextTraversedMinutes;
+    traversedSeconds = nextTraversedSeconds;
   }
 
-  const lastSegment = routeSegments.at(-1);
-  const lastCoordinate = lastSegment?.orderedGeometry.at(-1) ?? null;
+  const lastSegmentIndex = segments.length - 1;
+  const lastSegment = segments[lastSegmentIndex];
+  const lastCoordinate = lastSegment?.geometry.at(-1) ?? null;
 
   return {
-    currentSegmentId: lastSegment?.id ?? null,
-    segmentProgressRatio: 1,
+    segmentIndex: lastSegmentIndex,
     coordinate: lastCoordinate,
     ...(lastCoordinate === null
       ? { note: 'Unavailable: no terminal route geometry coordinate for projected vehicle.' }
@@ -83,109 +78,131 @@ const findSegmentProgress = (
   };
 };
 
-const toVehicleStatus = (
-  departureProjectionStatus: LineVehicleProjectionForLine['departureScheduleStatus']
-): LineVehicleProjectionStatus => (departureProjectionStatus === 'degraded' ? 'degraded-projected' : 'projected');
-
 const projectVehiclesForLine = (
   line: Line,
+  routeBaseline: LineRouteBaseline,
+  planningProjection: LineBandVehicleProjection,
   currentMinuteOfDay: SimulationMinuteOfDay,
-  activeTimeBandId: TimeBandId,
-  departureLineProjection: LineDepartureScheduleNetworkProjection['lines'][number]
+  activeTimeBandId: TimeBandId
 ): LineVehicleProjectionForLine => {
-  const totalRouteTimeMinutes = departureLineProjection.totalRouteTravelMinutes;
-  const status = departureLineProjection.status;
-
-  if (status === 'unavailable' || totalRouteTimeMinutes <= 0) {
-    const unavailableReasonNote =
-      departureLineProjection.unavailableReason === 'active-band-no-service'
-        ? 'Unavailable: active time band is explicitly configured as no-service, so zero vehicles are required or projected.'
-        : 'Unavailable: no active departure/service projection is available for this line.';
-
+  if (planningProjection.serviceState !== 'frequency' || planningProjection.status === 'route-unavailable') {
     return {
       lineId: line.id,
       lineLabel: line.label,
       activeTimeBandId,
-      departureScheduleStatus: status,
+      serviceState: planningProjection.serviceState,
+      routeStatus: routeBaseline.status,
       vehicles: [],
-      note:
-        status === 'unavailable'
-          ? unavailableReasonNote
-          : 'Unavailable: total route travel minutes are not positive.'
+      note: `Unavailable: service state is ${planningProjection.serviceState} or route is unavailable.`
     };
   }
 
-  const vehicleStatus = toVehicleStatus(status);
-  const activeDepartures = departureLineProjection.departureMinutes.filter((departureMinute) =>
-    isActiveDeparture(departureMinute, currentMinuteOfDay, totalRouteTimeMinutes)
-  );
-
-  const vehicles = activeDepartures.map<LineVehicleProjection>((departureMinute) => {
-    const elapsedMinutes = currentMinuteOfDay - departureMinute;
-    const routeProgressRatio = clampRouteSegmentProgressRatio(elapsedMinutes / totalRouteTimeMinutes);
-    const segmentProgress = findSegmentProgress(line.routeSegments, elapsedMinutes, totalRouteTimeMinutes);
-
+  const vehicles: LineVehicleProjection[] = [];
+  const projectedVehicleCount = planningProjection.projectedVehicles;
+  const headwayMinutes = planningProjection.headwayMinutes;
+  
+  if (projectedVehicleCount === undefined || headwayMinutes === undefined || projectedVehicleCount <= 0 || !planningProjection.roundTripSeconds) {
     return {
-      id: createLineVehicleProjectionId(`${line.id}:${activeTimeBandId}:${departureMinute}`),
       lineId: line.id,
       lineLabel: line.label,
       activeTimeBandId,
-      departureMinute,
-      elapsedMinutes,
+      serviceState: planningProjection.serviceState,
+      routeStatus: routeBaseline.status,
+      vehicles: [],
+      note: 'Unavailable: calculated projected vehicles is zero, or required planning inputs are missing.'
+    };
+  }
+
+  const roundTripSeconds = planningProjection.roundTripSeconds;
+  const totalTravelTimeSeconds = routeBaseline.totalTravelTimeSeconds;
+  const recoverySeconds = DEFAULT_TURNAROUND_RECOVERY_MINUTES * SECONDS_PER_MINUTE;
+  const currentSecondsOfDay = currentMinuteOfDay * SECONDS_PER_MINUTE;
+
+  const vehicleStatus: LineVehicleProjectionStatus = routeBaseline.status === 'fallback-routed' ? 'degraded-projected' : 'projected';
+  const fallbackNote = routeBaseline.status === 'fallback-routed' ? 'Degraded: fallback routing in use.' : undefined;
+
+  for (let i = 0; i < projectedVehicleCount; i += 1) {
+    // Determine deterministic start time for this bus phase
+    const phaseOffsetSeconds = i * headwayMinutes * SECONDS_PER_MINUTE;
+    const elapsedPhaseSeconds = (currentSecondsOfDay + phaseOffsetSeconds) % roundTripSeconds;
+    const routeProgressRatio = clampRouteSegmentProgressRatio(elapsedPhaseSeconds / roundTripSeconds);
+
+    let direction: 'outbound' | 'return';
+    let activeTravelSeconds: number;
+
+    if (elapsedPhaseSeconds <= totalTravelTimeSeconds) {
+      direction = 'outbound';
+      activeTravelSeconds = elapsedPhaseSeconds;
+    } else if (elapsedPhaseSeconds <= totalTravelTimeSeconds + recoverySeconds / 2) {
+      direction = 'outbound';
+      activeTravelSeconds = totalTravelTimeSeconds;
+    } else if (elapsedPhaseSeconds <= 2 * totalTravelTimeSeconds + recoverySeconds / 2) {
+      direction = 'return';
+      const timeInReturn = elapsedPhaseSeconds - (totalTravelTimeSeconds + recoverySeconds / 2);
+      activeTravelSeconds = Math.max(0, totalTravelTimeSeconds - timeInReturn);
+    } else {
+      direction = 'return';
+      activeTravelSeconds = 0;
+    }
+
+    const segmentProgress = findSegmentProgress(routeBaseline.segments, activeTravelSeconds, totalTravelTimeSeconds);
+
+    const degradedNote = segmentProgress.note ?? fallbackNote;
+    vehicles.push({
+      id: createLineVehicleProjectionId(`${line.id}:${activeTimeBandId}:bus-${i}`),
+      lineId: line.id,
+      lineLabel: line.label,
+      activeTimeBandId,
       routeProgressRatio,
-      segmentProgressRatio: segmentProgress.segmentProgressRatio,
-      currentSegmentId: segmentProgress.currentSegmentId,
+      segmentIndex: segmentProgress.segmentIndex,
+      direction,
       coordinate: segmentProgress.coordinate,
       status: segmentProgress.coordinate === null ? 'unavailable' : vehicleStatus,
-      ...(vehicleStatus === 'degraded-projected'
-        ? {
-            degradedNote:
-              segmentProgress.note ?? 'Degraded: upstream departure/service projection indicates fallback conditions.'
-          }
-        : segmentProgress.note
-          ? { degradedNote: segmentProgress.note }
-          : {})
-    };
-  });
+      ...(degradedNote ? { degradedNote } : {})
+    });
+  }
 
   return {
     lineId: line.id,
     lineLabel: line.label,
     activeTimeBandId,
-    departureScheduleStatus: status,
+    serviceState: planningProjection.serviceState,
+    routeStatus: routeBaseline.status,
     vehicles,
-    ...(status === 'degraded'
-      ? { note: 'Degraded: active departures projected with fallback service conditions.' }
-      : {})
+    ...(fallbackNote ? { note: fallbackNote } : {})
   };
 };
 
 /**
- * Projects current-minute in-flight line vehicles from departure schedule output and stored route segments.
+ * Projects derived visible bus positions for all lines based on deterministic headway pacing.
  */
 export const projectLineVehicleNetwork = (
   completedLines: readonly Line[],
-  departureScheduleProjection: LineDepartureScheduleNetworkProjection,
+  routeBaselinesByLineId: ReadonlyMap<string, LineRouteBaseline>,
+  planningProjections: readonly LinePlanningVehicleProjection[],
   currentMinuteOfDay: SimulationMinuteOfDay,
   activeTimeBandId: TimeBandId
 ): LineVehicleNetworkProjection => {
-  const lineById = new Map(completedLines.map((line) => [line.id, line]));
+  const planningByLineId = new Map(planningProjections.map((p) => [p.lineId, p]));
 
-  const lines = departureScheduleProjection.lines.map<LineVehicleProjectionForLine>((departureLineProjection) => {
-    const line = lineById.get(departureLineProjection.lineId);
+  const lines = completedLines.map<LineVehicleProjectionForLine>((line) => {
+    const routeBaseline = routeBaselinesByLineId.get(line.id);
+    const planningProjection = planningByLineId.get(line.id);
+    const bandPlanning = planningProjection?.bands.find((b) => b.timeBandId === activeTimeBandId);
 
-    if (!line) {
+    if (!routeBaseline || !bandPlanning) {
       return {
-        lineId: departureLineProjection.lineId,
-        lineLabel: departureLineProjection.lineLabel,
+        lineId: line.id,
+        lineLabel: line.label,
         activeTimeBandId,
-        departureScheduleStatus: departureLineProjection.status,
+        serviceState: 'unset',
+        routeStatus: routeBaseline?.status ?? 'unresolved',
         vehicles: [],
-        note: 'Unavailable: line is missing from the provided completed line set.'
+        note: 'Unavailable: missing route baseline or planning projection for this line.'
       };
     }
 
-    return projectVehiclesForLine(line, currentMinuteOfDay, activeTimeBandId, departureLineProjection);
+    return projectVehiclesForLine(line, routeBaseline, bandPlanning, currentMinuteOfDay, activeTimeBandId);
   });
 
   const summary = lines.reduce<LineVehicleProjectionSummary>(

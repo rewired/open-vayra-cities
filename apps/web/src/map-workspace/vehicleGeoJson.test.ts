@@ -4,7 +4,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createLineId } from '../domain/types/line';
-import { createDepartureMinute } from '../domain/types/lineDepartureScheduleProjection';
 import {
   createLineVehicleProjectionId,
   type LineVehicleNetworkProjection
@@ -24,18 +23,17 @@ const createVehicleNetworkProjection = (
       lineId,
       lineLabel: 'Line 1',
       activeTimeBandId: 'morning-rush',
-      departureScheduleStatus: 'available',
+      serviceState: 'frequency',
+      routeStatus: 'routed',
       vehicles: [
         {
           id: createLineVehicleProjectionId('line-1:420'),
           lineId,
           lineLabel: 'Line 1',
           activeTimeBandId: 'morning-rush',
-          departureMinute: createDepartureMinute(420),
-          elapsedMinutes: 2,
           routeProgressRatio: 0.2,
-          segmentProgressRatio: 0.5,
-          currentSegmentId: null,
+          segmentIndex: null,
+          direction: 'outbound',
           coordinate,
           status
         }
@@ -127,18 +125,17 @@ describe('buildVehicleFeatureCollection', () => {
             lineId,
             lineLabel: 'Line 1',
             activeTimeBandId: 'morning-rush',
-            departureScheduleStatus: 'available',
+            serviceState: 'frequency',
+            routeStatus: 'routed',
             vehicles: [
               {
                 id: createLineVehicleProjectionId('line-1:420'),
                 lineId,
                 lineLabel: 'Line 1',
                 activeTimeBandId: 'morning-rush',
-                departureMinute: createDepartureMinute(420),
-                elapsedMinutes: 2,
                 routeProgressRatio: 0.2,
-                segmentProgressRatio: 0.5,
-                currentSegmentId: null,
+                segmentIndex: null,
+                direction: 'outbound',
                 coordinate: [13.4, 52.5],
                 status: 'projected'
               },
@@ -147,11 +144,9 @@ describe('buildVehicleFeatureCollection', () => {
                 lineId,
                 lineLabel: 'Line 1',
                 activeTimeBandId: 'morning-rush',
-                departureMinute: createDepartureMinute(430),
-                elapsedMinutes: 1,
                 routeProgressRatio: 0.1,
-                segmentProgressRatio: 0.25,
-                currentSegmentId: null,
+                segmentIndex: null,
+                direction: 'outbound',
                 coordinate: [13.45, 52.55],
                 status: 'degraded-projected'
               },
@@ -160,11 +155,9 @@ describe('buildVehicleFeatureCollection', () => {
                 lineId,
                 lineLabel: 'Line 1',
                 activeTimeBandId: 'morning-rush',
-                departureMinute: createDepartureMinute(440),
-                elapsedMinutes: 0,
                 routeProgressRatio: 0,
-                segmentProgressRatio: 0,
-                currentSegmentId: null,
+                segmentIndex: null,
+                direction: 'outbound',
                 coordinate: [13.5, 52.6],
                 status: 'unavailable'
               },
@@ -173,11 +166,9 @@ describe('buildVehicleFeatureCollection', () => {
                 lineId,
                 lineLabel: 'Line 1',
                 activeTimeBandId: 'morning-rush',
-                departureMinute: createDepartureMinute(450),
-                elapsedMinutes: 0,
                 routeProgressRatio: 0,
-                segmentProgressRatio: 0,
-                currentSegmentId: null,
+                segmentIndex: null,
+                direction: 'outbound',
                 coordinate: null,
                 status: 'projected'
               }
@@ -215,18 +206,17 @@ describe('buildVehicleFeatureCollection', () => {
             lineId: fixtureLineId,
             lineLabel: payload.line.label,
             activeTimeBandId: 'morning-rush',
-            departureScheduleStatus: 'degraded',
+            serviceState: 'frequency',
+            routeStatus: 'fallback-routed',
             vehicles: [
               {
                 id: createLineVehicleProjectionId(`${payload.line.id}:projected`),
                 lineId: fixtureLineId,
                 lineLabel: payload.line.label,
                 activeTimeBandId: 'morning-rush',
-                departureMinute: createDepartureMinute(420),
-                elapsedMinutes: 1,
                 routeProgressRatio: 0.1,
-                segmentProgressRatio: 0.5,
-                currentSegmentId: null,
+                segmentIndex: null,
+                direction: 'outbound',
                 coordinate: [payload.stops[0]!.position.lng, payload.stops[0]!.position.lat],
                 status: 'projected'
               },
@@ -235,11 +225,9 @@ describe('buildVehicleFeatureCollection', () => {
                 lineId: fixtureLineId,
                 lineLabel: payload.line.label,
                 activeTimeBandId: 'morning-rush',
-                departureMinute: createDepartureMinute(430),
-                elapsedMinutes: 2,
                 routeProgressRatio: 0.2,
-                segmentProgressRatio: 0.75,
-                currentSegmentId: null,
+                segmentIndex: null,
+                direction: 'outbound',
                 coordinate: [payload.stops[1]!.position.lng, payload.stops[1]!.position.lat],
                 status: 'degraded-projected'
               },
@@ -248,11 +236,9 @@ describe('buildVehicleFeatureCollection', () => {
                 lineId: fixtureLineId,
                 lineLabel: payload.line.label,
                 activeTimeBandId: 'morning-rush',
-                departureMinute: createDepartureMinute(440),
-                elapsedMinutes: 3,
                 routeProgressRatio: 0.3,
-                segmentProgressRatio: 0,
-                currentSegmentId: null,
+                segmentIndex: null,
+                direction: 'outbound',
                 coordinate: [payload.stops[2]!.position.lng, payload.stops[2]!.position.lat],
                 status: 'unavailable'
               }
