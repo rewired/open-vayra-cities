@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 039: refactor selected-line inspector into a compact summary header with issue/readiness pills and action-first dialog entry points (`Edit frequency`, `Service plan`, `Departures`, `Projected vehicles`, `Route baseline`).
+- Slice 039: move always-visible frequency editing and detailed service/departure/vehicle/route sections into dedicated selected-line dialog components while preserving existing projection wiring and callback contracts.
+- Slice 039: show truthful unavailable states in dialog content when selected-line projections or route-baseline metrics are null/missing.
+- Add ADR 0094 documenting compact selected-line inspector dialog workflow boundaries and explicit non-goals.
+
 - Slice 038: replace inspector stacked composition with a tabbed UI-local state model (`Network`, `Lines`, `Debug`) and remove the `Active mode` line from inspector content.
 - Slice 038: keep `Network` tab focused on concise network-level summary metrics only (stops, completed lines, projected vehicles, active service band, global state, and service status counts).
 - Slice 038: add `Lines` tab list-first behavior (completed-line list by default, explicit Back action from selected-line detail) while reusing existing read-only projection wiring.
