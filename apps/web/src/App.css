@@ -45,6 +45,11 @@ body {
   padding-top: 6px;
 }
 
+.tool-mode-rail__button--debug {
+  margin-top: 8px;
+  border-style: dashed;
+}
+
 .tool-mode-rail__button {
   display: grid;
   justify-items: center;
@@ -186,45 +191,6 @@ body {
 
 .map-workspace__overlay--interactive-controls {
   pointer-events: auto;
-}
-
-.map-workspace__overlay--hud {
-  top: 14px;
-  left: 14px;
-}
-
-.map-workspace__overlay--debug {
-  top: 58px;
-  left: 14px;
-  max-width: min(44ch, calc(100% - 28px));
-  border-color: rgb(66 91 131 / 55%);
-  background: rgb(13 23 38 / 58%);
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.debug-disclosure {
-  margin: 0;
-}
-
-.debug-disclosure > summary {
-  cursor: pointer;
-  color: #9fb0cb;
-  font-size: 0.72rem;
-  list-style: revert;
-}
-
-.debug-disclosure__content {
-  margin-top: 6px;
-  color: #bfd0e9;
-  font-size: 0.72rem;
-}
-
-.map-workspace__debug-list {
-  margin: 0;
-  padding-left: 18px;
-  display: grid;
-  gap: 2px;
 }
 
 .map-workspace__overlay--mode {
@@ -937,4 +903,50 @@ body {
 .inspector-debug-details__caveat {
   color: #9fb0cb;
   font-size: 0.72rem;
+}
+
+.app-debug-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+}
+
+.app-debug-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(7 11 17 / 62%);
+}
+
+.app-debug-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(760px, calc(100vw - 40px));
+  max-height: calc(100vh - 56px);
+  overflow: auto;
+  border: 1px solid #304766;
+  border-radius: 12px;
+  background: #121b2b;
+  box-shadow: 0 20px 50px rgb(0 0 0 / 35%);
+  padding: 16px;
+}
+
+.app-debug-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-debug-modal__header h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.app-debug-modal__list {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
 }

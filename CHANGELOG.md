@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 043: remove map-surface HUD/debug overlays (`map-workspace__overlay--hud`, `map-workspace__overlay--debug`) so map diagnostics no longer render directly on top of gameplay.
+- Slice 043: preserve existing map diagnostics derivations (interaction status, pointer/geographic summaries, feature diagnostics, and draft metadata) and route them through a shell-owned debug snapshot contract.
+- Slice 043: add an app-shell controlled debug modal and left-rail debug entrypoint to surface map diagnostics centrally outside the map overlays.
+- Add ADR 0099 documenting centralized shell-owned map debug modal state and non-goals.
+
 - Slice 030a: replace the selected-line `Edit frequency` dialog with a compact `Edit service plan` editor showing canonical time-band label/window rows and player-facing `Interval`/`No service` actions only.
 - Slice 030a: keep `unset` as internal not-configured state (no direct selection control), show neutral row styling for unset bands, and display an en dash (`–`) minute placeholder for explicit no-service bands.
 - Slice 030a: move interval entry to controlled text-input validation (`1..999`, whole minutes, max three digits, no spinner semantics) and keep explicit `{ kind: "no-service" }` domain state.

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 
-import { DebugDisclosure } from '../ui/DebugDisclosure';
 import {
   LINE_BUILD_PLACEHOLDER_LABEL_PREFIX,
   MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE
@@ -61,6 +60,24 @@ interface MapWorkspaceSurfaceProps {
   readonly onLineBuildSelectionChange: (nextSelection: LineBuildSelectionState) => void;
   readonly onSessionLinesChange: (updater: (currentLines: readonly Line[]) => readonly Line[]) => void;
   readonly onSelectedLineIdChange: (nextSelectedLineId: Line['id'] | null) => void;
+  readonly onDebugSnapshotChange: (nextSnapshot: MapWorkspaceDebugSnapshot) => void;
+}
+
+/** Canonical map diagnostics payload surfaced to shell-owned debug modal state. */
+export interface MapWorkspaceDebugSnapshot {
+  readonly interactionStatus: MapSurfaceInteractionState['status'];
+  readonly pointerSummary: string;
+  readonly geographicSummary: string;
+  readonly lineDiagnosticsSummary: string;
+  readonly vehicleDiagnosticsSummary: string;
+  readonly stopSelectionSummary: string;
+  readonly placementInstruction: string;
+  readonly placementStreetRuleHint: string;
+  readonly buildLineInstruction: string;
+  readonly buildLineMinimumRequirement: string;
+  readonly completedOverlayNote: string;
+  readonly draftOverlayNote: string;
+  readonly draftMetadataSummary: string;
 }
 
 interface DraftLineMetadata {
@@ -116,7 +133,8 @@ export function MapWorkspaceSurface({
   onStopSelectionChange,
   onLineBuildSelectionChange,
   onSessionLinesChange,
-  onSelectedLineIdChange
+  onSelectedLineIdChange,
+  onDebugSnapshotChange
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -560,6 +578,37 @@ export function MapWorkspaceSurface({
     ? 'Ready to complete.'
     : `Blocked: ${buildLineUiFeedback.minimumStopRequirement}`;
 
+  useEffect(() => {
+    onDebugSnapshotChange({
+      interactionStatus: interactionState.status,
+      pointerSummary,
+      geographicSummary,
+      lineDiagnosticsSummary,
+      vehicleDiagnosticsSummary,
+      stopSelectionSummary,
+      placementInstruction: placementUiFeedback.modeInstruction ?? 'n/a',
+      placementStreetRuleHint: placementUiFeedback.streetRuleHint ?? 'n/a',
+      buildLineInstruction: buildLineUiFeedback.modeInstruction ?? 'n/a',
+      buildLineMinimumRequirement: buildLineUiFeedback.minimumStopRequirement ?? 'n/a',
+      completedOverlayNote: LINE_OVERLAY_COPY.completed,
+      draftOverlayNote: LINE_OVERLAY_COPY.draft,
+      draftMetadataSummary
+    });
+  }, [
+    buildLineUiFeedback.minimumStopRequirement,
+    buildLineUiFeedback.modeInstruction,
+    draftMetadataSummary,
+    geographicSummary,
+    interactionState.status,
+    lineDiagnosticsSummary,
+    onDebugSnapshotChange,
+    placementUiFeedback.modeInstruction,
+    placementUiFeedback.streetRuleHint,
+    pointerSummary,
+    stopSelectionSummary,
+    vehicleDiagnosticsSummary
+  ]);
+
   const handleDraftCancel = (): void => {
     setDraftLineState(INITIAL_DRAFT_LINE_STATE);
   };
@@ -607,33 +656,6 @@ export function MapWorkspaceSurface({
   return (
     <section className="map-workspace" aria-label="Map workspace surface">
       <div ref={mapContainerRef} className="map-workspace__map" aria-label="CityOps baseline map" />
-
-      <div className="map-workspace__overlay map-workspace__overlay--hud" aria-label="Map workspace compact status">
-        <strong>Mode: {activeToolMode}</strong>
-        <span>{` · Placed stops: ${placedStops.length}`}</span>
-        <span>{` · Session lines: ${sessionLines.length}`}</span>
-        <span>{` · Draft stops: ${draftLineState.stopIds.length}`}</span>
-      </div>
-
-      <div className="map-workspace__overlay map-workspace__overlay--debug map-workspace__overlay--interactive-controls" aria-label="Map workspace debug diagnostics">
-        <DebugDisclosure>
-          <ul className="map-workspace__debug-list">
-            <li>{`Interaction status: ${interactionState.status}`}</li>
-            <li>{`Pointer: ${pointerSummary}`}</li>
-            <li>{`Geo: ${geographicSummary}`}</li>
-            <li>{lineDiagnosticsSummary}</li>
-            <li>{vehicleDiagnosticsSummary}</li>
-            <li>{stopSelectionSummary}</li>
-            <li>{`Placement instruction: ${placementUiFeedback.modeInstruction ?? 'n/a'}`}</li>
-            <li>{`Placement street rule hint: ${placementUiFeedback.streetRuleHint ?? 'n/a'}`}</li>
-            <li>{`Build-line instruction: ${buildLineUiFeedback.modeInstruction ?? 'n/a'}`}</li>
-            <li>{`Build-line minimum requirement: ${buildLineUiFeedback.minimumStopRequirement ?? 'n/a'}`}</li>
-            <li>{`Completed overlay note: ${LINE_OVERLAY_COPY.completed}`}</li>
-            <li>{`Draft overlay note: ${LINE_OVERLAY_COPY.draft}`}</li>
-            <li>{draftMetadataSummary}</li>
-          </ul>
-        </DebugDisclosure>
-      </div>
 
       {placementUiFeedback.showPlacementModeIndicator ? (
         <div className="map-workspace__overlay map-workspace__overlay--mode" aria-live="polite" aria-label="Placement mode status">
