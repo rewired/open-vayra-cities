@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
@@ -286,7 +287,7 @@ describe('evaluateLineServiceReadiness', () => {
 
   it('evaluates Hamburg fixture-derived line as partially-ready when frequencies are no-service', () => {
     const fixturePath = path.resolve(
-      path.dirname(new URL(import.meta.url).pathname),
+      path.dirname(fileURLToPath(import.meta.url)),
       '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v2.json'
     );
     const payload = JSON.parse(readFileSync(fixturePath, 'utf8')) as SelectedLineExportPayload;
