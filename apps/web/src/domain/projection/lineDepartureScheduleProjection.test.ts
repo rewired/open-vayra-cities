@@ -230,7 +230,11 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
     expect(result.status).toBe('unavailable');
     expect(result.unavailableReason).toBe('active-band-no-service');
     expect(result.currentBandHeadwayMinutes).toBeNull();
+    expect(result.departureMinutes).toEqual([]);
     expect(result.departureCount).toBe(0);
+    expect(result.previousDepartureMinute).toBeNull();
+    expect(result.nextDepartureMinute).toBeNull();
+    expect(result.minutesUntilNextDeparture).toBeNull();
   });
 
   it('10) degraded current service returns degraded departure projection with departures', () => {
