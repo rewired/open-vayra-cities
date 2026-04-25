@@ -5,7 +5,6 @@ import { useNetworkPlanningProjections } from './domain/projection/useNetworkPla
 import { InspectorPanel } from './inspector/InspectorPanel';
 import type { InspectorPanelState } from './inspector/types';
 import { MapWorkspaceSurface } from './map-workspace/MapWorkspaceSurface';
-import { SelectedLineContextTray } from './map-workspace/SelectedLineContextTray';
 import { SessionActions } from './session/SessionActions';
 import { useNetworkSessionState } from './session/useNetworkSessionState';
 import { SimulationControlBar } from './simulation/SimulationControlBar';
@@ -153,13 +152,6 @@ export default function App(): ReactElement {
           onSessionLinesChange={sessionController.setSessionLines}
           onSelectedLineIdChange={sessionController.setSelectedLineId}
         />
-        {selectedCompletedLineForExport ? (
-          <SelectedLineContextTray
-            selectedLine={selectedCompletedLineForExport}
-            selectedLineDepartureInspectorProjection={projections.selectedLineDepartureInspectorProjection}
-            selectedLineVehicleProjection={projections.selectedLineVehicleProjection}
-          />
-        ) : null}
       </main>
 
       <InspectorPanel
