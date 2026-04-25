@@ -51,6 +51,12 @@ export const STREET_SNAP_FALLBACK_QUERY_OFFSETS: readonly StreetSnapFallbackQuer
 ] as const;
 
 /**
- * Pixel radius for the nearby rendered-label fallback query.
+ * Staged pixel radii for the nearby rendered-label lookup.
+ * Probes are performed sequentially until a usable label is found.
  */
-export const STREET_LABEL_NEARBY_QUERY_RADIUS_PIXELS = 16;
+export const STREET_LABEL_LOOKUP_QUERY_RADII_PIXELS = [12, 24, 40] as const;
+
+/**
+ * Layer/source hints used to identify and rank preferred street/road label features.
+ */
+export const STREET_LABEL_LAYER_HINTS = ['road', 'street', 'highway', 'transport', 'label', 'name'] as const;

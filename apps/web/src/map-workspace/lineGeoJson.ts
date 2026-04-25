@@ -8,6 +8,7 @@ import type { MapLibreGeoJsonFeatureCollection } from './maplibreGlobal';
  */
 export interface CompletedLineFeatureProperties {
   readonly lineId: Line['id'];
+  readonly travelDirection: 'forward' | 'reverse';
   readonly selected: boolean;
 }
 
@@ -23,8 +24,8 @@ const areCoordinatesEqual = (
   right: RouteGeometryCoordinate
 ): boolean => left[0] === right[0] && left[1] === right[1];
 
-const buildLineCoordinatesFromRouteSegments = (line: Line): readonly RouteGeometryCoordinate[] =>
-  line.routeSegments.reduce<readonly RouteGeometryCoordinate[]>((flattenedCoordinates, segment) => {
+const buildLineCoordinatesFromRouteSegments = (segments: readonly LineRouteSegment[]): readonly RouteGeometryCoordinate[] =>
+  segments.reduce<readonly RouteGeometryCoordinate[]>((flattenedCoordinates, segment) => {
     if (segment.orderedGeometry.length === 0) {
       return flattenedCoordinates;
     }
@@ -49,15 +50,19 @@ const buildLineCoordinatesFromRouteSegments = (line: Line): readonly RouteGeomet
 
 const buildLineCoordinatesFromStops = ({
   line,
-  stopsById
+  stopsById,
+  reverse = false
 }: {
   readonly line: Line;
   readonly stopsById: ReadonlyMap<StopId, Stop>;
-}): readonly RouteGeometryCoordinate[] =>
-  line.stopIds
+  readonly reverse?: boolean;
+}): readonly RouteGeometryCoordinate[] => {
+  const baseStopIds = reverse ? [...line.stopIds].reverse() : line.stopIds;
+  return baseStopIds
     .map((stopId) => stopsById.get(stopId))
     .filter((stop): stop is Stop => stop !== undefined)
     .map((stop) => [stop.position.lng, stop.position.lat] as const);
+};
 
 /**
  * Builds a typed GeoJSON feature collection for completed session line paths.
@@ -65,6 +70,8 @@ const buildLineCoordinatesFromStops = ({
  * Route-segment geometry is preferred and flattened in segment order with shared
  * segment-boundary coordinate de-duplication. Stop-order coordinates remain as
  * a fallback when routed segment geometry is unavailable.
+ *
+ * For bidirectional lines, separate features are emitted for forward and reverse directions.
  */
 export const buildCompletedLineFeatureCollection = ({
   lines,
@@ -74,34 +81,62 @@ export const buildCompletedLineFeatureCollection = ({
   readonly lines: readonly Line[];
   readonly stopsById: ReadonlyMap<StopId, Stop>;
   readonly selectedLineId: Line['id'] | null;
-}): MapLibreGeoJsonFeatureCollection<CompletedLineFeatureProperties> => ({
-  type: 'FeatureCollection',
-  features: lines
-    .map((line) => {
-      const routeSegmentCoordinates = buildLineCoordinatesFromRouteSegments(line);
-      const coordinates =
-        routeSegmentCoordinates.length >= 2
-          ? routeSegmentCoordinates
-          : buildLineCoordinatesFromStops({ line, stopsById });
+}): MapLibreGeoJsonFeatureCollection<CompletedLineFeatureProperties> => {
+  const features: any[] = [];
 
-      if (coordinates.length < 2) {
-        return null;
-      }
+  for (const line of lines) {
+    // 1. Forward direction
+    const forwardRouteSegmentCoordinates = buildLineCoordinatesFromRouteSegments(line.routeSegments);
+    const forwardCoordinates =
+      forwardRouteSegmentCoordinates.length >= 2
+        ? forwardRouteSegmentCoordinates
+        : buildLineCoordinatesFromStops({ line, stopsById });
 
-      return {
+    if (forwardCoordinates.length >= 2) {
+      features.push({
         type: 'Feature' as const,
         geometry: {
           type: 'LineString' as const,
-          coordinates
+          coordinates: forwardCoordinates
         },
         properties: {
           lineId: line.id,
+          travelDirection: 'forward',
           selected: selectedLineId === line.id
         }
-      };
-    })
-    .filter((feature): feature is NonNullable<typeof feature> => feature !== null)
-});
+      });
+    }
+
+    // 2. Reverse direction (only for bidirectional lines)
+    if (line.servicePattern === 'bidirectional') {
+      const reverseRouteSegmentCoordinates = buildLineCoordinatesFromRouteSegments(line.reverseRouteSegments ?? []);
+      const reverseCoordinates =
+        reverseRouteSegmentCoordinates.length >= 2
+          ? reverseRouteSegmentCoordinates
+          : buildLineCoordinatesFromStops({ line, stopsById, reverse: true });
+
+      if (reverseCoordinates.length >= 2) {
+        features.push({
+          type: 'Feature' as const,
+          geometry: {
+            type: 'LineString' as const,
+            coordinates: reverseCoordinates
+          },
+          properties: {
+            lineId: line.id,
+            travelDirection: 'reverse',
+            selected: selectedLineId === line.id
+          }
+        });
+      }
+    }
+  }
+
+  return {
+    type: 'FeatureCollection',
+    features
+  };
+};
 
 /**
  * Builds a typed GeoJSON feature collection for the active draft line stop-order preview.

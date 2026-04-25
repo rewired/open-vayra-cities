@@ -110,12 +110,23 @@ export const MAP_STOP_LABEL_LAYER_PAINT = {
 } as const;
 
 /**
+ * Pixel offset applied to separate forward and reverse directions of bidirectional lines.
+ */
+export const MAP_LINE_DIRECTION_OFFSET_PIXELS = 3;
+
+/**
  * Canonical contrast-casing style beneath completed line foreground rendering.
  */
 export const MAP_COMPLETED_LINE_CASING_LAYER_PAINT = {
   'line-color': '#0f172a',
   'line-width': 8,
-  'line-opacity': 0.75
+  'line-opacity': 0.75,
+  'line-offset': [
+    'case',
+    ['==', ['get', 'travelDirection'], 'reverse'],
+    -MAP_LINE_DIRECTION_OFFSET_PIXELS,
+    MAP_LINE_DIRECTION_OFFSET_PIXELS
+  ]
 } as const;
 
 /**
@@ -124,7 +135,13 @@ export const MAP_COMPLETED_LINE_CASING_LAYER_PAINT = {
 export const MAP_COMPLETED_LINE_LAYER_PAINT = {
   'line-color': ['case', ['get', 'selected'], '#f59e0b', '#1d4ed8'],
   'line-width': ['case', ['get', 'selected'], 6, 4],
-  'line-opacity': ['case', ['get', 'selected'], 1, 0.85]
+  'line-opacity': ['case', ['get', 'selected'], 1, 0.85],
+  'line-offset': [
+    'case',
+    ['==', ['get', 'travelDirection'], 'reverse'],
+    -MAP_LINE_DIRECTION_OFFSET_PIXELS,
+    MAP_LINE_DIRECTION_OFFSET_PIXELS
+  ]
 } as const;
 
 /**

@@ -29,6 +29,7 @@ export type SelectedLineExportValidationIssueCode =
   | 'invalid-line-topology'
   | 'invalid-line-service-pattern'
   | 'invalid-line-frequency-map'
+  | 'invalid-line-frequency-map'
   | 'invalid-frequency-time-band-id'
   | 'invalid-frequency-value'
   | 'invalid-route-segments'
@@ -36,7 +37,6 @@ export type SelectedLineExportValidationIssueCode =
   | 'invalid-route-segment-id'
   | 'duplicate-route-segment-id'
   | 'invalid-route-segment-line-id'
-  | 'invalid-route-segment-stop-reference'
   | 'route-segment-line-id-mismatch'
   | 'route-segment-count-mismatch'
   | 'route-segment-adjacency-mismatch'
@@ -98,7 +98,11 @@ const coordinatesCloseEnough = (
   left: readonly [number, number],
   right: readonly [number, number],
   tolerance: number
-): boolean => numbersCloseEnough(left[0], right[0], tolerance) && numbersCloseEnough(left[1], right[1], tolerance);
+): boolean => {
+  const lngDiff = Math.abs(left[0] - right[0]);
+  const latDiff = Math.abs(left[1] - right[1]);
+  return lngDiff <= tolerance && latDiff <= tolerance;
+};
 
 const parseIsoTimestamp = (value: unknown): value is string => {
   if (typeof value !== 'string') {

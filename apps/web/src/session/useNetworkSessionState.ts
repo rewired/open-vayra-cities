@@ -212,12 +212,14 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
       const validationResult = validateSelectedLineExportPayload(parsedResult.parsed);
       if (!validationResult.ok) {
         const firstIssue = validationResult.issues[0];
+        const detail = firstIssue
+          ? `${firstIssue.message} (code: ${firstIssue.code}, path: ${firstIssue.path})${validationResult.issues.length > 1 ? ` plus ${validationResult.issues.length - 1} more issues.` : ''}`
+          : 'The selected line JSON failed validation.';
+
         setSelectedLineImportFeedback({
           kind: 'error',
-          title: 'Line JSON could not be loaded',
-          detail: firstIssue
-            ? `${firstIssue.message}${validationResult.issues.length > 1 ? ` (${validationResult.issues.length} issues)` : ''}`
-            : 'The selected line JSON failed validation.'
+          title: 'Line JSON failed validation',
+          detail
         });
         return;
       }
@@ -226,28 +228,36 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
       if (!conversionResult.ok) {
         setSelectedLineImportFeedback({
           kind: 'error',
-          title: 'Line JSON could not be loaded',
+          title: 'Line JSON could not be converted',
           detail: conversionResult.issue.message
         });
         return;
       }
 
-      // Re-resolve route segments on load to ensure fresh geometry/metrics (with fallback safety)
       const importedLine = conversionResult.session.sessionLines[0];
-      const routingResult = await completeLineRouting({
-        lineId: importedLine.id,
-        orderedStopIds: importedLine.stopIds,
-        placedStops: conversionResult.session.placedStops,
-        topology: importedLine.topology,
-        servicePattern: importedLine.servicePattern,
-        routingAdapter: getDefaultRoutingAdapter()
-      });
+      
+      // Use cached route segments if present and valid (checked by validationResult above)
+      // Only re-route if segments are missing.
+      let finalLine: Line = importedLine;
+      const needsRouting = importedLine.routeSegments.length === 0 || 
+        (importedLine.servicePattern === 'bidirectional' && !importedLine.reverseRouteSegments);
 
-      const finalLine: Line = {
-        ...importedLine,
-        routeSegments: routingResult.routeSegments,
-        reverseRouteSegments: routingResult.reverseRouteSegments
-      };
+      if (needsRouting) {
+        const routingResult = await completeLineRouting({
+          lineId: importedLine.id,
+          orderedStopIds: importedLine.stopIds,
+          placedStops: conversionResult.session.placedStops,
+          topology: importedLine.topology,
+          servicePattern: importedLine.servicePattern,
+          routingAdapter: getDefaultRoutingAdapter()
+        });
+
+        finalLine = {
+          ...importedLine,
+          routeSegments: importedLine.routeSegments.length > 0 ? importedLine.routeSegments : routingResult.routeSegments,
+          reverseRouteSegments: importedLine.reverseRouteSegments ?? routingResult.reverseRouteSegments
+        };
+      }
 
       setSessionStops(conversionResult.session.placedStops);
       setSessionLines([finalLine]);
@@ -257,7 +267,9 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
       setSelectedLineImportFeedback({
         kind: 'success',
         title: 'Line JSON loaded',
-        detail: `Loaded line ${finalLine.id} and replaced the current in-memory network with fresh routing.`
+        detail: needsRouting 
+          ? `Loaded line ${finalLine.id} and generated missing routing.`
+          : `Loaded line ${finalLine.id} with its original stop labels and routed geometry.`
       });
     },
     clearSelectedLineImportFeedback: () => {

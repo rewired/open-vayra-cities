@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Slice 063**: Session round-trip repair, deterministic line labeling, bidirectional rendering, and ranked stop-label lookup.
+- Repair selected-line JSON round-trip import to preserve cached route segments and stop labels without mandatory re-routing on load.
+- Implement deterministic line labeling (e.g., "Stop A → Stop B" or "Stop A ↔ Stop B") derived from stop sequence and service pattern, including unique numeric suffixing for duplicates.
+- Render bidirectional reverse route geometry with a visual direction-aware line offset for distinguishable overlapping paths.
+- Replace fixed 16px stop-label lookup with a staged (12/24/40px) and ranked (road/street hints first) lookup for more robust stop naming.
+- Add ADR 0117 documenting bidirectional rendering offsets and deterministic labeling logic.
+- Add focused unit tests for line labeling, GeoJSON bidirectional features, and staged label lookup.
 - **Slice 061**: Street-derived stop labels from snapped map features with deterministic duplicate suffixing.
 - Derive newly placed stop labels from the street feature used for stop snapping instead of generic "Stop N" labels.
 - Implement deterministic suffixing (e.g., "Street A", "Street A 1") when multiple stops are placed on the same named street.

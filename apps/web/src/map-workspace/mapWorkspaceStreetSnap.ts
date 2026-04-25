@@ -5,7 +5,8 @@ import {
   STREET_SNAP_FALLBACK_MIN_DISTANCE_ADVANTAGE_PIXELS,
   STREET_SNAP_FALLBACK_QUERY_OFFSETS,
   STREET_SNAP_MAX_PIXEL_TOLERANCE,
-  STREET_LABEL_NEARBY_QUERY_RADIUS_PIXELS
+  STREET_LABEL_LOOKUP_QUERY_RADII_PIXELS,
+  STREET_LABEL_LAYER_HINTS
 } from './mapWorkspacePlacementConstants';
 import {
   getSourceRefsForLayerIds,
@@ -365,27 +366,58 @@ const resolveFallbackSnapCandidate = (
 };
 
 /**
- * Searches for a usable street name from any currently rendered features in a small radius around a point.
+ * Searches for a usable street name from any currently rendered features using a bounded staged/ranked lookup.
  * This is used as a fallback when the snapped street line feature has no descriptive name.
+ * 
+ * Logic:
+ * 1. Iterates through staged radii (centralized in constants).
+ * 2. Queries rendered features in the current radius.
+ * 3. Identifies candidates via extractStreetLabelCandidate.
+ * 4. Ranks candidates by:
+ *    - Layer/source match strength (road/street labels preferred)
+ *    - Stable lexical tie-breaker
  */
 export const resolveNearbyStreetLabelCandidate = (
   map: MapLibreMap,
   snappedPoint: GeographicPoint
 ): string | null => {
   const queryPoint = map.project([snappedPoint.lng, snappedPoint.lat]);
-  const radius = STREET_LABEL_NEARBY_QUERY_RADIUS_PIXELS;
+  
+  for (const radius of STREET_LABEL_LOOKUP_QUERY_RADII_PIXELS) {
+    const queryBox = [
+      { x: queryPoint.x - radius, y: queryPoint.y - radius },
+      { x: queryPoint.x + radius, y: queryPoint.y + radius }
+    ] as const;
 
-  const queryBox = [
-    { x: queryPoint.x - radius, y: queryPoint.y - radius },
-    { x: queryPoint.x + radius, y: queryPoint.y + radius }
-  ] as const;
+    const features = map.queryRenderedFeatures(queryBox);
+    const candidates: Array<{ label: string; matchStrength: number }> = [];
 
-  const features = map.queryRenderedFeatures(queryBox);
+    for (const feature of features) {
+      const label = extractStreetLabelCandidate(feature.properties);
+      if (!label) {
+        continue;
+      }
 
-  for (const feature of features) {
-    const label = extractStreetLabelCandidate(feature.properties);
-    if (label) {
-      return label;
+      // Rank by layer/source hint strength
+      const hasLabelHint = includesHint(feature.layer?.id, STREET_LABEL_LAYER_HINTS);
+      const hasSourceHint = 
+        includesHint(feature.source, STREET_LABEL_LAYER_HINTS) ||
+        includesHint(feature.sourceLayer ?? feature['source-layer'], STREET_LABEL_LAYER_HINTS);
+
+      const matchStrength = (hasLabelHint ? 0 : 1) + (hasSourceHint ? 0 : 1);
+      candidates.push({ label, matchStrength });
+    }
+
+    if (candidates.length > 0) {
+      // Sort by match strength (ascending, 0 is best) then alphabetically
+      candidates.sort((a, b) => {
+        if (a.matchStrength !== b.matchStrength) {
+          return a.matchStrength - b.matchStrength;
+        }
+        return a.label.localeCompare(b.label);
+      });
+
+      return candidates[0].label;
     }
   }
 

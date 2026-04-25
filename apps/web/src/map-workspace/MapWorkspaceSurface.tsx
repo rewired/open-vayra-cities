@@ -12,6 +12,7 @@ import type { LineVehicleNetworkProjection } from '../domain/types/lineVehiclePr
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
 import { createUniqueStopLabel } from '../domain/stop/stopLabeling';
+import { generateLineLabel, generateUniqueLineLabel } from '../domain/line/lineLabeling';
 import type { LineBuildSelectionState, WorkspaceToolMode } from '../session/sessionTypes';
 import {
   MAP_LAYER_ID_COMPLETED_LINES,
@@ -679,10 +680,23 @@ export function MapWorkspaceSurface({
         routingAdapter: getDefaultRoutingAdapter()
       });
 
-      // 3. Commit the new line to session state
+      // 3. Generate deterministic line label from stop labels
+      const lineStops = snapshottedStopIds
+        .map(id => snapshottedPlacedStops.find(s => s.id === id))
+        .filter((s): s is Stop => !!s);
+      
+      const baseLabel = generateLineLabel(lineStops, topology, servicePattern) 
+        ?? `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${snapshottedOrdinal}`;
+      
+      const finalLabel = generateUniqueLineLabel({
+        baseLabel,
+        existingLines: sessionLines
+      });
+
+      // 4. Commit the new line to session state
       const createdLine: Line = {
         id: nextCreatedLineId,
-        label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${snapshottedOrdinal}`,
+        label: finalLabel,
         stopIds: snapshottedStopIds,
         topology,
         servicePattern,

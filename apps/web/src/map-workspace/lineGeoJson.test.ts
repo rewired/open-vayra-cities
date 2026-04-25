@@ -203,4 +203,56 @@ describe('buildCompletedLineFeatureCollection', () => {
     expect(featureCollection.features).toHaveLength(1);
     expect(featureCollection.features[0]?.geometry.type).toBe('LineString');
   });
+
+  it('emits two features for bidirectional lines with forward and reverse geometry', () => {
+    const featureCollection = buildCompletedLineFeatureCollection({
+      lines: [
+        {
+          ...buildLine({
+            routeSegments: [
+              buildRouteSegment({ id: 'f-1', fromStopId: stopAId, toStopId: stopBId, orderedGeometry: [[0, 0], [1, 1]] })
+            ]
+          }),
+          servicePattern: 'bidirectional',
+          reverseRouteSegments: [
+            buildRouteSegment({ id: 'r-1', fromStopId: stopBId, toStopId: stopAId, orderedGeometry: [[1, 1], [0, 0]] })
+          ]
+        }
+      ],
+      stopsById,
+      selectedLineId: null
+    });
+
+    expect(featureCollection.features).toHaveLength(2);
+    expect(featureCollection.features[0]?.properties.travelDirection).toBe('forward');
+    expect(featureCollection.features[1]?.properties.travelDirection).toBe('reverse');
+    expect(featureCollection.features[0]?.geometry.coordinates).toEqual([[0, 0], [1, 1]]);
+    expect(featureCollection.features[1]?.geometry.coordinates).toEqual([[1, 1], [0, 0]]);
+  });
+
+  it('falls back to reversed stop-order geometry for bidirectional lines when reverseRouteSegments is missing', () => {
+    const featureCollection = buildCompletedLineFeatureCollection({
+      lines: [
+        {
+          ...buildLine({
+            stopIds: [stopAId, stopBId],
+            routeSegments: [
+              buildRouteSegment({ id: 'f-1', fromStopId: stopAId, toStopId: stopBId, orderedGeometry: [[0, 0], [1, 1]] })
+            ]
+          }),
+          servicePattern: 'bidirectional',
+          reverseRouteSegments: undefined
+        }
+      ],
+      stopsById,
+      selectedLineId: null
+    });
+
+    expect(featureCollection.features).toHaveLength(2);
+    expect(featureCollection.features[1]?.properties.travelDirection).toBe('reverse');
+    expect(featureCollection.features[1]?.geometry.coordinates).toEqual([
+      [10.01, 53.56], // stopB
+      [9.99, 53.55]   // stopA
+    ]);
+  });
 });
