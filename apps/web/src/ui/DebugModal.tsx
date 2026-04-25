@@ -18,6 +18,17 @@ export interface DebugModalOverviewDiagnostics {
   readonly completedLineIds: readonly string[];
 }
 
+/** Immutable selected-line segment detail for debug inspection. */
+export interface DebugModalRoutingSegment {
+  readonly index: number;
+  readonly fromStopId: string;
+  readonly toStopId: string;
+  readonly distanceMeters: number;
+  readonly travelTimeSeconds: number;
+  readonly status: string;
+  readonly warnings: readonly string[];
+}
+
 /** Immutable selected-line routing diagnostics forwarded without recomputation. */
 export interface DebugModalRoutingDiagnostics {
   readonly selectedLineOrderedStopIds: readonly string[];
@@ -27,6 +38,7 @@ export interface DebugModalRoutingDiagnostics {
   readonly selectedLineRouteFallbackNote: string;
   readonly completedOverlayNote: string;
   readonly draftOverlayNote: string;
+  readonly selectedLineSegments: readonly DebugModalRoutingSegment[];
 }
 
 /** Immutable selected-line and network service readiness diagnostics for debug review. */
@@ -158,6 +170,39 @@ export function DebugModal({
               <li>{`Draft overlay note: ${routingDiagnostics.draftOverlayNote}`}</li>
               <li>{mapWorkspaceDebugSnapshot.draftMetadataSummary}</li>
             </ul>
+
+            {routingDiagnostics.selectedLineSegments.length > 0 ? (
+              <div className="app-debug-modal__table-container">
+                <table className="inspector-compact-table app-debug-modal__table">
+                  <thead>
+                    <tr>
+                      <th>Idx</th>
+                      <th>From</th>
+                      <th>To</th>
+                      <th>Dist (m)</th>
+                      <th>Time (s)</th>
+                      <th>Status</th>
+                      <th>Warnings</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {routingDiagnostics.selectedLineSegments.map((segment) => (
+                      <tr key={segment.index}>
+                        <td>{segment.index}</td>
+                        <td>{segment.fromStopId}</td>
+                        <td>{segment.toStopId}</td>
+                        <td>{segment.distanceMeters.toFixed(1)}</td>
+                        <td>{segment.travelTimeSeconds.toFixed(1)}</td>
+                        <td>{segment.status}</td>
+                        <td>{segment.warnings.join(', ') || 'none'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="inspector-dialog__note">No route baseline segments resolved.</p>
+            )}
           </section>
         ) : null}
 

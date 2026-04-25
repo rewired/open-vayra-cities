@@ -61,10 +61,14 @@ export const resolveLineRouteBaseline = (line: Line, placedStops: readonly Stop[
     let travelTimeSeconds = createRouteTravelTimeSeconds(0);
     let geometry = routeSegment ? routeSegment.orderedGeometry : [];
 
-    if (!isFromPlaced || !isToPlaced || !routeSegment) {
+    if (!isFromPlaced || !isToPlaced) {
       status = 'unresolved';
       hasUnresolved = true;
       warnings.push({ type: 'missing-stop-position' });
+    } else if (!routeSegment) {
+      status = 'unresolved';
+      hasUnresolved = true;
+      warnings.push({ type: 'missing-route-segment' });
     } else {
       distanceMeters = routeSegment.distanceMeters;
       travelTimeSeconds = createRouteTravelTimeSeconds(routeSegment.totalTravelMinutes * SECONDS_PER_MINUTE);
@@ -72,7 +76,7 @@ export const resolveLineRouteBaseline = (line: Line, placedStops: readonly Stop[
       if (routeSegment.status === 'fallback-routed') {
         status = 'fallback-routed';
         hasFallback = true;
-        warnings.push({ type: 'straight-line-fallback' });
+        warnings.push({ type: 'fallback-routing-only' });
       } else if (routeSegment.status === 'routed') {
         status = 'routed';
         hasRouted = true;

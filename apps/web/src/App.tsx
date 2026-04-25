@@ -131,7 +131,17 @@ export default function App(): ReactElement {
       ? 'Fallback routed segments detected. Values are baseline fallback outputs and are not accuracy claims.'
       : 'No fallback routed segments detected.',
     completedOverlayNote: mapWorkspaceDebugSnapshot.completedOverlayNote,
-    draftOverlayNote: mapWorkspaceDebugSnapshot.draftOverlayNote
+    draftOverlayNote: mapWorkspaceDebugSnapshot.draftOverlayNote,
+    selectedLineSegments:
+      projections.selectedLineRouteBaseline?.segments.map((segment) => ({
+        index: segment.segmentIndex,
+        fromStopId: segment.fromStopId,
+        toStopId: segment.toStopId,
+        distanceMeters: segment.distanceMeters,
+        travelTimeSeconds: segment.travelTimeSeconds,
+        status: segment.status,
+        warnings: segment.warnings.map((w) => w.type)
+      })) ?? []
   };
   const serviceDiagnostics: DebugModalServiceDiagnostics = {
     selectedLineReadinessStatus: projections.selectedLineServiceProjection?.readiness.status ?? null,

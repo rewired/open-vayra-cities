@@ -16,7 +16,7 @@ export type RouteSegmentBaselineStatus = 'routed' | 'fallback-routed' | 'unresol
  * Descriptive warnings attached to individual segments.
  */
 export interface RouteSegmentBaselineWarning {
-  readonly type: 'missing-stop-position' | 'straight-line-fallback';
+  readonly type: 'missing-stop-position' | 'missing-route-segment' | 'fallback-routing-only';
 }
 
 /**

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createLineId } from '../types/line';
+import { createLineId, createNoServiceLineServiceByTimeBand } from '../types/line';
 import { createLineSegmentId, createRouteDistanceMeters, createRouteTravelMinutes } from '../types/lineRoute';
 import { createStopId } from '../types/stop';
 import { resolveLineRouteBaseline } from './routeBaselineProjection';
@@ -12,7 +12,7 @@ describe('routeBaselineProjection', () => {
         label: 'Test Line',
         stopIds: [createStopId('s1')],
         routeSegments: [],
-        frequencyByTimeBand: {} as any
+        frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
       },
       [{ id: createStopId('s1'), position: { lng: 0, lat: 0 } }]
     );
@@ -32,7 +32,7 @@ describe('routeBaselineProjection', () => {
         id: createLineId('l1'),
         label: 'Test Line',
         stopIds: [s1, s2, s3],
-        frequencyByTimeBand: {} as any,
+        frequencyByTimeBand: createNoServiceLineServiceByTimeBand(),
         routeSegments: [
           {
             id: createLineSegmentId('seg1'),
@@ -80,7 +80,7 @@ describe('routeBaselineProjection', () => {
       distanceMeters: 100,
       travelTimeSeconds: 90,
       status: 'fallback-routed',
-      warnings: [{ type: 'straight-line-fallback' }]
+      warnings: [{ type: 'fallback-routing-only' }]
     });
 
     expect(result.segments[1]).toMatchObject({
@@ -90,7 +90,7 @@ describe('routeBaselineProjection', () => {
       distanceMeters: 200,
       travelTimeSeconds: 150,
       status: 'fallback-routed',
-      warnings: [{ type: 'straight-line-fallback' }]
+      warnings: [{ type: 'fallback-routing-only' }]
     });
   });
 
@@ -103,7 +103,7 @@ describe('routeBaselineProjection', () => {
         id: createLineId('l1'),
         label: 'Test Line',
         stopIds: [s1, s2],
-        frequencyByTimeBand: {} as any,
+        frequencyByTimeBand: createNoServiceLineServiceByTimeBand(),
         routeSegments: [
           {
             id: createLineSegmentId('seg1'),
@@ -125,5 +125,28 @@ describe('routeBaselineProjection', () => {
     expect(result.status).toBe('unresolved');
     expect(result.segments[0]?.status).toBe('unresolved');
     expect(result.segments[0]?.warnings).toEqual([{ type: 'missing-stop-position' }]);
+  });
+
+  it('marks segments unresolved if route segment data is missing for placed stops', () => {
+    const s1 = createStopId('s1');
+    const s2 = createStopId('s2');
+
+    const result = resolveLineRouteBaseline(
+      {
+        id: createLineId('l1'),
+        label: 'Test Line',
+        stopIds: [s1, s2],
+        frequencyByTimeBand: createNoServiceLineServiceByTimeBand(),
+        routeSegments: [] // Missing segment data
+      },
+      [
+        { id: s1, position: { lng: 0, lat: 0 } },
+        { id: s2, position: { lng: 1, lat: 1 } }
+      ]
+    );
+
+    expect(result.status).toBe('unresolved');
+    expect(result.segments[0]?.status).toBe('unresolved');
+    expect(result.segments[0]?.warnings).toEqual([{ type: 'missing-route-segment' }]);
   });
 });
