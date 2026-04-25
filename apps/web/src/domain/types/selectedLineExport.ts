@@ -1,5 +1,5 @@
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
-import type { Line, LineFrequencyByTimeBand, LineId } from './line';
+import { resolveLineServiceBandHeadwayMinutes, type Line, type LineId } from './line';
 import type { LineRouteSegment } from './lineRoute';
 import type { Stop, StopId } from './stop';
 import type { TimeBandId } from './timeBand';
@@ -20,13 +20,18 @@ export const SELECTED_LINE_EXPORT_KIND = 'single-line' as const;
 export type SelectedLineExportSourceMetadata = Readonly<Record<string, string | number | boolean | null>>;
 
 /**
+ * JSON-serializable frequency map used by selected-line export payloads.
+ */
+export type SelectedLineExportFrequencyByTimeBand = Readonly<Record<TimeBandId, number | null>>;
+
+/**
  * Selected line block emitted by the export builder with ordered stop ids and stored route segments.
  */
 export interface SelectedLineExportLine {
   readonly id: LineId;
   readonly label: Line['label'];
   readonly orderedStopIds: readonly StopId[];
-  readonly frequencyByTimeBand: LineFrequencyByTimeBand;
+  readonly frequencyByTimeBand: SelectedLineExportFrequencyByTimeBand;
   readonly routeSegments: readonly LineRouteSegment[];
 }
 
@@ -83,9 +88,15 @@ export const buildSelectedLineExportPayload = ({
 }: BuildSelectedLineExportPayloadInput): SelectedLineExportPayload => {
   const referencedStopIds = new Set(selectedLine.stopIds);
   const stops = placedStops.filter((stop) => referencedStopIds.has(stop.id));
+  const frequencyByTimeBand = Object.fromEntries(
+    MVP_TIME_BAND_IDS.map((timeBandId) => [
+      timeBandId,
+      resolveLineServiceBandHeadwayMinutes(selectedLine.frequencyByTimeBand[timeBandId])
+    ])
+  ) as SelectedLineExportFrequencyByTimeBand;
   const includedTimeBandIds = MVP_TIME_BAND_IDS.filter((timeBandId) => {
-    const frequencyValue = selectedLine.frequencyByTimeBand[timeBandId];
-    return frequencyValue !== null && frequencyValue !== undefined;
+    const frequencyValue = frequencyByTimeBand[timeBandId];
+    return frequencyValue !== null;
   });
 
   return {
@@ -97,7 +108,7 @@ export const buildSelectedLineExportPayload = ({
       id: selectedLine.id,
       label: selectedLine.label,
       orderedStopIds: selectedLine.stopIds,
-      frequencyByTimeBand: selectedLine.frequencyByTimeBand,
+      frequencyByTimeBand,
       routeSegments: selectedLine.routeSegments
     },
     stops,

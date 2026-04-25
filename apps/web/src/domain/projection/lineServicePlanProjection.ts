@@ -1,6 +1,6 @@
 import { TIME_BAND_DISPLAY_LABELS } from '../constants/timeBands';
 import { evaluateLineServiceReadiness } from '../readiness/lineServiceReadiness';
-import type { Line } from '../types/line';
+import { resolveLineServiceBandHeadwayMinutes, type Line } from '../types/line';
 import type {
   LineServicePlanProjection,
   LineSelectedServiceInspectorProjection,
@@ -12,7 +12,7 @@ import type {
 import type { Stop } from '../types/stop';
 import type { TimeBandId } from '../types/timeBand';
 
-const isPositiveFiniteNumber = (value: number | null | undefined): value is number =>
+const isPositiveFiniteNumber = (value: number | null): value is number =>
   typeof value === 'number' && Number.isFinite(value) && value > 0;
 
 const toProjectionNotes = (
@@ -71,7 +71,7 @@ export const projectLineServicePlanForLine = (
   activeTimeBandId: TimeBandId
 ): LineServiceProjectionResult => {
   const readiness = evaluateLineServiceReadiness(line, placedStops);
-  const rawHeadway = line.frequencyByTimeBand[activeTimeBandId];
+  const rawHeadway = resolveLineServiceBandHeadwayMinutes(line.frequencyByTimeBand[activeTimeBandId]);
   const currentBandHeadwayMinutes = isPositiveFiniteNumber(rawHeadway) ? rawHeadway : null;
   const theoreticalDeparturesPerHour =
     currentBandHeadwayMinutes === null ? null : 60 / currentBandHeadwayMinutes;

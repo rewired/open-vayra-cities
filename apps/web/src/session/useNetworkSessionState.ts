@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type Dispatch, type SetStateAction } from 'react';
 
 import { MVP_TIME_BAND_IDS } from '../domain/constants/timeBands';
-import { createLineFrequencyMinutes, type Line } from '../domain/types/line';
+import {
+  createLineFrequencyMinutes,
+  resolveLineServiceBandHeadwayMinutes,
+  type Line,
+  type LineServiceBandPlan
+} from '../domain/types/line';
 import { parseSelectedLineExportFile } from '../domain/export/selectedLineExportFileLoader';
 import { validateSelectedLineExportPayload } from '../domain/export/selectedLineExportValidation';
 import { convertSelectedLineExportPayloadToSession } from '../domain/export/selectedLineExportSessionLoader';
@@ -87,9 +92,10 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
       Object.fromEntries(
         MVP_TIME_BAND_IDS.map((timeBandId) => [
           timeBandId,
-          selectedLine.frequencyByTimeBand[timeBandId] === null || selectedLine.frequencyByTimeBand[timeBandId] === undefined
-            ? ''
-            : String(selectedLine.frequencyByTimeBand[timeBandId])
+          (() => {
+            const headwayMinutes = resolveLineServiceBandHeadwayMinutes(selectedLine.frequencyByTimeBand[timeBandId]);
+            return headwayMinutes === null ? '' : String(headwayMinutes);
+          })()
         ])
       ) as LineFrequencyInputByTimeBand
     );
@@ -144,7 +150,7 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
                   ...line,
                   frequencyByTimeBand: {
                     ...line.frequencyByTimeBand,
-                    [timeBandId]: null
+                    [timeBandId]: { kind: 'unset' } satisfies LineServiceBandPlan
                   }
                 }
               : line
@@ -173,7 +179,10 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
                 ...line,
                 frequencyByTimeBand: {
                   ...line.frequencyByTimeBand,
-                  [timeBandId]: createLineFrequencyMinutes(parsedFrequencyMinutes)
+                  [timeBandId]: {
+                    kind: 'frequency',
+                    headwayMinutes: createLineFrequencyMinutes(parsedFrequencyMinutes)
+                  } satisfies LineServiceBandPlan
                 }
               }
             : line

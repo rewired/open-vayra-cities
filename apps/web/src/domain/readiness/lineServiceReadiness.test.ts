@@ -9,7 +9,7 @@ import {
 } from '../constants/lineServiceReadiness';
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
 import type { SelectedLineExportPayload } from '../types/selectedLineExport';
-import { createLineFrequencyMinutes, createLineId, createUnsetLineFrequencyByTimeBand, type Line } from '../types/line';
+import { createLineFrequencyMinutes, createLineId, createUnsetLineServiceByTimeBand, type Line } from '../types/line';
 import {
   createLineSegmentId,
   createRouteDistanceMeters,
@@ -63,13 +63,13 @@ const createFullyConfiguredLine = (): Line => ({
   stopIds: [stopA, stopB, stopC],
   routeSegments: [createSegment(1, stopA, stopB), createSegment(2, stopB, stopC)],
   frequencyByTimeBand: {
-    'morning-rush': createLineFrequencyMinutes(6),
-    'late-morning': createLineFrequencyMinutes(8),
-    midday: createLineFrequencyMinutes(10),
-    afternoon: createLineFrequencyMinutes(10),
-    'evening-rush': createLineFrequencyMinutes(7),
-    evening: createLineFrequencyMinutes(12),
-    night: createLineFrequencyMinutes(15)
+    'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(6) },
+    'late-morning': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(8) },
+    midday: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) },
+    afternoon: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) },
+    'evening-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(7) },
+    evening: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(12) },
+    night: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(15) }
   }
 });
 
@@ -86,7 +86,7 @@ describe('evaluateLineServiceReadiness', () => {
   it('returns blocked when all frequencies are unset', () => {
     const line: Line = {
       ...createFullyConfiguredLine(),
-      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
+      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
     };
 
     const result = evaluateLineServiceReadiness(line, placedStops);
@@ -99,9 +99,9 @@ describe('evaluateLineServiceReadiness', () => {
     const line: Line = {
       ...createFullyConfiguredLine(),
       frequencyByTimeBand: {
-        ...createUnsetLineFrequencyByTimeBand(),
-        'morning-rush': createLineFrequencyMinutes(6),
-        midday: createLineFrequencyMinutes(10)
+        ...createUnsetLineServiceByTimeBand(),
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(6) },
+        midday: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
       }
     };
 
@@ -224,9 +224,9 @@ describe('evaluateLineServiceReadiness', () => {
     const line: Line = {
       ...createFullyConfiguredLine(),
       frequencyByTimeBand: {
-        ...createUnsetLineFrequencyByTimeBand(),
-        'morning-rush': createLineFrequencyMinutes(5),
-        evening: createLineFrequencyMinutes(12)
+        ...createUnsetLineServiceByTimeBand(),
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(5) },
+        evening: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(12) }
       }
     };
 
@@ -244,7 +244,7 @@ describe('evaluateLineServiceReadiness', () => {
         createSegment(1, stopA, stopB, { status: 'invalid-status' as RouteStatus }),
         createSegment(2, stopB, stopC, { status: 'fallback-routed' })
       ],
-      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
+      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
     };
 
     const result = evaluateLineServiceReadiness(line, placedStops);
@@ -273,7 +273,7 @@ describe('evaluateLineServiceReadiness', () => {
       label: payload.line.label,
       stopIds: payload.line.orderedStopIds,
       routeSegments: payload.line.routeSegments,
-      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
+      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
     };
 
     const result = evaluateLineServiceReadiness(line, payload.stops);

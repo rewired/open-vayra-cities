@@ -4,7 +4,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import type { SelectedLineExportPayload } from '../types/selectedLineExport';
-import { createLineFrequencyMinutes, createLineId, createUnsetLineFrequencyByTimeBand, type Line } from '../types/line';
+import { createLineFrequencyMinutes, createLineId, createUnsetLineServiceByTimeBand, type Line } from '../types/line';
 import {
   createLineSegmentId,
   createRouteDistanceMeters,
@@ -67,13 +67,13 @@ const createBaseLine = (
     createSegment(2, lineId, stopB, stopC, 6, routeStatus)
   ],
   frequencyByTimeBand: {
-    'morning-rush': createLineFrequencyMinutes(6),
-    'late-morning': createLineFrequencyMinutes(8),
-    midday: createLineFrequencyMinutes(10),
-    afternoon: createLineFrequencyMinutes(10),
-    'evening-rush': createLineFrequencyMinutes(7),
-    evening: createLineFrequencyMinutes(12),
-    night: createLineFrequencyMinutes(15)
+    'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(6) },
+    'late-morning': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(8) },
+    midday: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) },
+    afternoon: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) },
+    'evening-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(7) },
+    evening: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(12) },
+    night: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(15) }
   }
 });
 
@@ -191,7 +191,7 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
       ...createBaseLine(lineAId),
       frequencyByTimeBand: {
         ...createBaseLine(lineAId).frequencyByTimeBand,
-        'morning-rush': null
+        'morning-rush': { kind: 'unset' }
       }
     };
 
@@ -229,7 +229,7 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
       ...createBaseLine(lineCId),
       frequencyByTimeBand: {
         ...createBaseLine(lineCId).frequencyByTimeBand,
-        'morning-rush': null
+        'morning-rush': { kind: 'unset' }
       }
     };
 
@@ -258,7 +258,7 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
       label: payload.line.label,
       stopIds: payload.line.orderedStopIds,
       routeSegments: payload.line.routeSegments,
-      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
+      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
     };
 
     const result = projectLineDepartureScheduleForLine(

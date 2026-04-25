@@ -2,7 +2,7 @@ import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
 import { projectLineDepartureScheduleForLine, projectLineDepartureScheduleNetwork, projectLineSelectedDepartureInspector } from './lineDepartureScheduleProjection';
 import { projectLineServicePlan, projectLineServicePlanForLine, projectLineSelectedServiceInspector } from './lineServicePlanProjection';
 import { projectLineVehicleNetwork } from './lineVehicleProjection';
-import type { Line } from '../types/line';
+import { resolveLineServiceBandHeadwayMinutes, type Line } from '../types/line';
 import type { Stop } from '../types/stop';
 import type { TimeBandId } from '../types/timeBand';
 import type { SimulationMinuteOfDay } from '../types/simulationClock';
@@ -81,8 +81,8 @@ const projectStaticNetworkSummaryKpis = (
   }
 
   const configuredTimeBandCount = MVP_TIME_BAND_IDS.filter((timeBandId) => {
-    const frequencyValue = selectedLine.frequencyByTimeBand[timeBandId];
-    return frequencyValue !== null && frequencyValue !== undefined;
+    const frequencyValue = resolveLineServiceBandHeadwayMinutes(selectedLine.frequencyByTimeBand[timeBandId]);
+    return frequencyValue !== null;
   }).length;
 
   return {

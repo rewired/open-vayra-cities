@@ -69,7 +69,14 @@ describe('convertSelectedLineExportPayloadToSession', () => {
     );
     expect(convertedLine.id).toBe(validatedPayload.line.id);
     expect(convertedLine.stopIds).toEqual(validatedPayload.line.orderedStopIds);
-    expect(convertedLine.frequencyByTimeBand).toEqual(validatedPayload.line.frequencyByTimeBand);
+    expect(convertedLine.frequencyByTimeBand).toEqual(
+      Object.fromEntries(
+        Object.entries(validatedPayload.line.frequencyByTimeBand).map(([timeBandId, frequency]) => [
+          timeBandId,
+          frequency === null ? { kind: 'unset' } : { kind: 'frequency', headwayMinutes: frequency }
+        ])
+      )
+    );
     expect(convertedLine.routeSegments).toEqual(validatedPayload.line.routeSegments);
   });
 
@@ -117,9 +124,7 @@ describe('convertSelectedLineExportPayloadToSession', () => {
     }
 
     const convertedLine = conversionResult.session.sessionLines[0];
-    expect(Object.values(convertedLine.frequencyByTimeBand).every((frequencyValue) => frequencyValue === null)).toBe(
-      true
-    );
+    expect(Object.values(convertedLine.frequencyByTimeBand).every((bandPlan) => bandPlan.kind === 'unset')).toBe(true);
   });
 
   it('does not convert invalid validation results into session state', () => {

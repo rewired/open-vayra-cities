@@ -7,7 +7,7 @@ import { createSimulationMinuteOfDay } from '../simulation/simulationClock';
 import {
   createLineFrequencyMinutes,
   createLineId,
-  createUnsetLineFrequencyByTimeBand,
+  createUnsetLineServiceByTimeBand,
   type Line
 } from '../types/line';
 import type {
@@ -60,7 +60,8 @@ const lineA: Line = {
   stopIds: [stopA, stopB, stopC],
   routeSegments: [createSegment(1, lineId, stopA, stopB, 4), createSegment(2, lineId, stopB, stopC, 6)],
   frequencyByTimeBand: {
-    'morning-rush': createLineFrequencyMinutes(6)
+    ...createUnsetLineServiceByTimeBand(),
+    'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(6) }
   }
 };
 
@@ -251,7 +252,7 @@ describe('projectLineVehicleNetwork', () => {
       label: payload.line.label,
       stopIds: payload.line.orderedStopIds,
       routeSegments: payload.line.routeSegments,
-      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
+      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
     };
 
     const departureWithoutOverlay = projectLineDepartureScheduleNetwork(
@@ -273,7 +274,7 @@ describe('projectLineVehicleNetwork', () => {
       ...lineFromFixture,
       frequencyByTimeBand: {
         ...lineFromFixture.frequencyByTimeBand,
-        'morning-rush': createLineFrequencyMinutes(10)
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
       }
     };
 

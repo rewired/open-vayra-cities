@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createLineFrequencyMinutes, createLineId, type Line } from './line';
+import { createLineFrequencyMinutes, createLineId, createUnsetLineServiceByTimeBand, type Line } from './line';
 import {
   createLineSegmentId,
   createRouteDistanceMeters,
@@ -39,8 +39,8 @@ const selectedLine: Line = {
   stopIds: [stopAId, stopBId],
   routeSegments,
   frequencyByTimeBand: {
-    'morning-rush': createLineFrequencyMinutes(8),
-    'evening-rush': null
+    ...createUnsetLineServiceByTimeBand(),
+    'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(8) }
   }
 };
 

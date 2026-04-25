@@ -4,7 +4,7 @@ import {
 } from '../constants/lineServiceReadiness';
 import { MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE } from '../constants/lineBuilding';
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
-import type { Line, LineFrequencyByTimeBand } from '../types/line';
+import type { Line, LineServiceBandPlan, LineServiceByTimeBand } from '../types/line';
 import { ROUTE_STATUSES, type RouteStatus } from '../types/lineRoute';
 import type {
   LineServiceReadinessIssue,
@@ -26,12 +26,12 @@ const isNonNegativeFiniteNumber = (value: number): boolean => Number.isFinite(va
 const isKnownRouteStatus = (status: RouteStatus): boolean => KNOWN_ROUTE_STATUSES.has(status);
 
 const countConfiguredTimeBands = (
-  frequencyByTimeBand: LineFrequencyByTimeBand,
+  frequencyByTimeBand: LineServiceByTimeBand,
   canonicalTimeBandIds: readonly TimeBandId[]
 ): number =>
   canonicalTimeBandIds.reduce((configuredCount, timeBandId) => {
     const value = frequencyByTimeBand[timeBandId];
-    if (typeof value === 'number' && isPositiveFiniteNumber(value)) {
+    if (value.kind === 'frequency' && isPositiveFiniteNumber(value.headwayMinutes)) {
       return configuredCount + 1;
     }
 
@@ -200,19 +200,24 @@ export const evaluateLineServiceReadiness = (
       });
     }
 
-    const frequency = line.frequencyByTimeBand[timeBandId];
-    if (frequency !== undefined && frequency !== null && !isPositiveFiniteNumber(frequency)) {
+    const bandPlan = line.frequencyByTimeBand[timeBandId];
+    const isValidBandPlan =
+      bandPlan.kind === 'unset' ||
+      bandPlan.kind === 'no-service' ||
+      (bandPlan.kind === 'frequency' && isPositiveFiniteNumber(bandPlan.headwayMinutes));
+
+    if (!isValidBandPlan) {
       addIssue({
         code: LINE_SERVICE_READINESS_ISSUE_CODES.INVALID_FREQUENCY_VALUE,
         severity: LINE_SERVICE_READINESS_ISSUE_SEVERITIES.ERROR,
-        message: 'line.frequencyByTimeBand values must be unset or positive finite numbers.',
+        message: 'line.frequencyByTimeBand values must be unset, no-service, or positive finite frequency plans.',
         lineId: line.id,
         timeBandId
       });
     }
   }
 
-  for (const [timeBandId, frequency] of Object.entries(line.frequencyByTimeBand)) {
+  for (const [timeBandId, bandPlan] of Object.entries(line.frequencyByTimeBand) as [TimeBandId, LineServiceBandPlan][]) {
     if (!canonicalTimeBandIdSet.has(timeBandId as TimeBandId)) {
       addIssue({
         code: LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CANONICAL_TIME_BAND,
@@ -223,11 +228,15 @@ export const evaluateLineServiceReadiness = (
       continue;
     }
 
-    if (frequency !== undefined && frequency !== null && !isPositiveFiniteNumber(frequency)) {
+    const isValidBandPlan =
+      bandPlan.kind === 'unset' ||
+      bandPlan.kind === 'no-service' ||
+      (bandPlan.kind === 'frequency' && isPositiveFiniteNumber(bandPlan.headwayMinutes));
+    if (!isValidBandPlan) {
       addIssue({
         code: LINE_SERVICE_READINESS_ISSUE_CODES.INVALID_FREQUENCY_VALUE,
         severity: LINE_SERVICE_READINESS_ISSUE_SEVERITIES.ERROR,
-        message: 'line.frequencyByTimeBand values must be unset or positive finite numbers.',
+        message: 'line.frequencyByTimeBand values must be unset, no-service, or positive finite frequency plans.',
         lineId: line.id,
         timeBandId: timeBandId as TimeBandId
       });

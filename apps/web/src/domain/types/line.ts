@@ -14,10 +14,17 @@ export type LineId = string & { readonly __brand: 'LineId' };
 export type LineFrequencyMinutes = number & { readonly __brand: 'LineFrequencyMinutes' };
 
 /**
- * Per-time-band line frequency assignment keyed by canonical time-band ids.
- * `null` represents an explicitly unset band; omitted keys are also treated as unset.
+ * Discriminated service-plan state for one canonical time band.
  */
-export type LineFrequencyByTimeBand = Readonly<Partial<Record<TimeBandId, LineFrequencyMinutes | null>>>;
+export type LineServiceBandPlan =
+  | { readonly kind: 'unset' }
+  | { readonly kind: 'frequency'; readonly headwayMinutes: LineFrequencyMinutes }
+  | { readonly kind: 'no-service' };
+
+/**
+ * Canonical per-time-band service-plan map keyed by all canonical time-band ids.
+ */
+export type LineServiceByTimeBand = Readonly<Record<TimeBandId, LineServiceBandPlan>>;
 
 /**
  * Minimal canonical transit line model for ordered stop sequences in the bus-first MVP.
@@ -27,7 +34,7 @@ export interface Line {
   readonly label: string;
   readonly stopIds: readonly StopId[];
   readonly routeSegments: readonly LineRouteSegment[];
-  readonly frequencyByTimeBand: LineFrequencyByTimeBand;
+  readonly frequencyByTimeBand: LineServiceByTimeBand;
 }
 
 /**
@@ -49,5 +56,11 @@ export const createLineFrequencyMinutes = (rawFrequencyMinutes: number): LineFre
 /**
  * Creates an initialized per-time-band frequency map with every canonical band explicitly unset.
  */
-export const createUnsetLineFrequencyByTimeBand = (): LineFrequencyByTimeBand =>
-  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, null])) as LineFrequencyByTimeBand;
+export const createUnsetLineServiceByTimeBand = (): LineServiceByTimeBand =>
+  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, { kind: 'unset' }])) as LineServiceByTimeBand;
+
+/**
+ * Resolves a numeric headway from one time-band plan when the plan kind is `frequency`.
+ */
+export const resolveLineServiceBandHeadwayMinutes = (bandPlan: LineServiceBandPlan): LineFrequencyMinutes | null =>
+  bandPlan.kind === 'frequency' ? bandPlan.headwayMinutes : null;

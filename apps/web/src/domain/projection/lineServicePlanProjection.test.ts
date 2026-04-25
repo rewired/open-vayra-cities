@@ -7,7 +7,7 @@ import type { SelectedLineExportPayload } from '../types/selectedLineExport';
 import {
   createLineFrequencyMinutes,
   createLineId,
-  createUnsetLineFrequencyByTimeBand,
+  createUnsetLineServiceByTimeBand,
   type Line
 } from '../types/line';
 import {
@@ -73,13 +73,13 @@ const createBaseLine = (
     createSegment(2, lineId, stopB, stopC, 6, routeStatus)
   ],
   frequencyByTimeBand: {
-    'morning-rush': createLineFrequencyMinutes(6),
-    'late-morning': createLineFrequencyMinutes(8),
-    midday: createLineFrequencyMinutes(10),
-    afternoon: createLineFrequencyMinutes(10),
-    'evening-rush': createLineFrequencyMinutes(7),
-    evening: createLineFrequencyMinutes(12),
-    night: createLineFrequencyMinutes(15)
+    'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(6) },
+    'late-morning': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(8) },
+    midday: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) },
+    afternoon: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) },
+    'evening-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(7) },
+    evening: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(12) },
+    night: { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(15) }
   }
 });
 
@@ -101,7 +101,7 @@ describe('projectLineServicePlanProjection coverage', () => {
       ...createBaseLine(lineAId),
       frequencyByTimeBand: {
         ...createBaseLine(lineAId).frequencyByTimeBand,
-        'morning-rush': null
+        'morning-rush': { kind: 'unset' }
       }
     };
 
@@ -165,7 +165,7 @@ describe('projectLineServicePlanProjection coverage', () => {
       ...createBaseLine(lineCId),
       frequencyByTimeBand: {
         ...createBaseLine(lineCId).frequencyByTimeBand,
-        'morning-rush': null
+        'morning-rush': { kind: 'unset' }
       }
     };
     const blockedLine: Line = {
@@ -191,9 +191,9 @@ describe('projectLineServicePlanProjection coverage', () => {
     const line: Line = {
       ...createBaseLine(lineAId),
       frequencyByTimeBand: {
-        ...createUnsetLineFrequencyByTimeBand(),
-        'morning-rush': createLineFrequencyMinutes(6),
-        midday: null
+        ...createUnsetLineServiceByTimeBand(),
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(6) },
+        midday: { kind: 'unset' }
       }
     };
 
@@ -218,7 +218,7 @@ describe('projectLineServicePlanProjection coverage', () => {
       label: payload.line.label,
       stopIds: payload.line.orderedStopIds,
       routeSegments: payload.line.routeSegments,
-      frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
+      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
     };
 
     const result = projectLineServicePlanForLine(line, payload.stops, 'morning-rush');

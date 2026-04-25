@@ -57,13 +57,16 @@ const convertLineRouteSegments = (payload: SelectedLineExportPayload): readonly 
     status: segment.status
   }));
 
-const convertLineFrequencyByTimeBand = (payload: SelectedLineExportPayload): Line['frequencyByTimeBand'] =>
+const convertLineServiceByTimeBand = (payload: SelectedLineExportPayload): Line['frequencyByTimeBand'] =>
   Object.fromEntries(
     Object.entries(payload.line.frequencyByTimeBand).map(([timeBandId, frequencyMinutes]) => [
       timeBandId,
       frequencyMinutes === null || frequencyMinutes === undefined
-        ? null
-        : createLineFrequencyMinutes(frequencyMinutes)
+        ? { kind: 'unset' }
+        : {
+            kind: 'frequency',
+            headwayMinutes: createLineFrequencyMinutes(frequencyMinutes)
+          }
     ])
   ) as Line['frequencyByTimeBand'];
 
@@ -99,7 +102,7 @@ export const convertSelectedLineExportPayloadToSession = (
     id: createLineId(payload.line.id),
     label: payload.line.label,
     stopIds: payload.line.orderedStopIds.map((stopId) => createStopId(stopId)),
-    frequencyByTimeBand: convertLineFrequencyByTimeBand(payload),
+    frequencyByTimeBand: convertLineServiceByTimeBand(payload),
     routeSegments: convertLineRouteSegments(payload)
   };
 

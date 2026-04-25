@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createUnsetLineFrequencyByTimeBand, createLineId, type Line } from '../domain/types/line';
+import { createUnsetLineServiceByTimeBand, createLineId, type Line } from '../domain/types/line';
 import {
   createLineSegmentId,
   createRouteDistanceMeters,
@@ -63,7 +63,7 @@ const buildLine = ({
   label: 'Line 1',
   stopIds,
   routeSegments,
-  frequencyByTimeBand: createUnsetLineFrequencyByTimeBand()
+  frequencyByTimeBand: createUnsetLineServiceByTimeBand()
 });
 
 describe('buildCompletedLineFeatureCollection', () => {
