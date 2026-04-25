@@ -1,10 +1,10 @@
-import type { ReactElement } from 'react';
+import { useCallback, useState, type ReactElement } from 'react';
 
 import { buildSelectedLineExportPayload } from './domain/types/selectedLineExport';
 import { useNetworkPlanningProjections } from './domain/projection/useNetworkPlanningProjections';
 import { InspectorPanel } from './inspector/InspectorPanel';
 import type { InspectorPanelState } from './inspector/types';
-import { MapWorkspaceSurface } from './map-workspace/MapWorkspaceSurface';
+import { MapWorkspaceSurface, type MapWorkspaceDebugSnapshot } from './map-workspace/MapWorkspaceSurface';
 import { SessionActions } from './session/SessionActions';
 import { useNetworkSessionState } from './session/useNetworkSessionState';
 import { SimulationControlBar } from './simulation/SimulationControlBar';
@@ -51,10 +51,30 @@ const resolveInspectorPanelState = (
   };
 };
 
+const INITIAL_MAP_WORKSPACE_DEBUG_SNAPSHOT: MapWorkspaceDebugSnapshot = {
+  interactionStatus: 'idle',
+  pointerSummary: 'none',
+  geographicSummary: 'lng/lat unavailable',
+  lineDiagnosticsSummary: 'Line features: builder 0 / source 0 / rendered 0',
+  vehicleDiagnosticsSummary: 'Vehicle features: builder 0 / source 0 / rendered 0',
+  stopSelectionSummary: 'Selected stop: none',
+  placementInstruction: 'n/a',
+  placementStreetRuleHint: 'n/a',
+  buildLineInstruction: 'n/a',
+  buildLineMinimumRequirement: 'n/a',
+  completedOverlayNote: 'n/a',
+  draftOverlayNote: 'n/a',
+  draftMetadataSummary: 'Draft inactive'
+};
+
 /** Renders the desktop-only CityOps application shell layout and composes extracted session/projection/inspector boundaries. */
 export default function App(): ReactElement {
   const sessionController = useNetworkSessionState();
   const clockController = useSimulationClockController();
+  const [isMapDebugModalOpen, setMapDebugModalOpen] = useState<boolean>(false);
+  const [mapWorkspaceDebugSnapshot, setMapWorkspaceDebugSnapshot] = useState<MapWorkspaceDebugSnapshot>(
+    INITIAL_MAP_WORKSPACE_DEBUG_SNAPSHOT
+  );
 
   const projections = useNetworkPlanningProjections(
     sessionController.sessionLines,
@@ -80,6 +100,9 @@ export default function App(): ReactElement {
     { mode: 'place-stop', shortLabel: 'STOP', accessibleLabel: 'Place stop tool' },
     { mode: 'build-line', shortLabel: 'LINE', accessibleLabel: 'Build line tool' }
   ];
+  const handleMapDebugSnapshotChange = useCallback((nextSnapshot: MapWorkspaceDebugSnapshot): void => {
+    setMapWorkspaceDebugSnapshot(nextSnapshot);
+  }, []);
 
   return (
     <div className="app-shell" data-app-surface="desktop-shell">
@@ -135,6 +158,20 @@ export default function App(): ReactElement {
             </button>
           ))}
         </nav>
+        <button
+          type="button"
+          className="tool-mode-rail__button tool-mode-rail__button--debug"
+          aria-pressed={isMapDebugModalOpen}
+          aria-label="Open map debug modal"
+          onClick={() => {
+            setMapDebugModalOpen(true);
+          }}
+        >
+          <MaterialIcon name="search" />
+          <span className="tool-mode-rail__label" aria-hidden="true">
+            Debug
+          </span>
+        </button>
       </aside>
 
       <main className="workspace" aria-label="Main workspace">
@@ -151,6 +188,7 @@ export default function App(): ReactElement {
           onLineBuildSelectionChange={sessionController.setLineBuildSelection}
           onSessionLinesChange={sessionController.setSessionLines}
           onSelectedLineIdChange={sessionController.setSelectedLineId}
+          onDebugSnapshotChange={handleMapDebugSnapshotChange}
         />
       </main>
 
@@ -171,6 +209,35 @@ export default function App(): ReactElement {
         onFrequencyChange={sessionController.updateSelectedCompletedLineFrequency}
         onSelectedLineIdChange={sessionController.setSelectedLineId}
       />
+
+      {isMapDebugModalOpen ? (
+        <div className="app-debug-modal" role="dialog" aria-modal="true" aria-label="Map workspace debug details">
+          <div className="app-debug-modal__backdrop" onClick={() => setMapDebugModalOpen(false)} />
+          <section className="app-debug-modal__panel">
+            <header className="app-debug-modal__header">
+              <h2>Map workspace debug details</h2>
+              <button type="button" onClick={() => setMapDebugModalOpen(false)} aria-label="Close debug modal">
+                Close
+              </button>
+            </header>
+            <ul className="app-debug-modal__list">
+              <li>{`Interaction status: ${mapWorkspaceDebugSnapshot.interactionStatus}`}</li>
+              <li>{`Pointer: ${mapWorkspaceDebugSnapshot.pointerSummary}`}</li>
+              <li>{`Geo: ${mapWorkspaceDebugSnapshot.geographicSummary}`}</li>
+              <li>{mapWorkspaceDebugSnapshot.lineDiagnosticsSummary}</li>
+              <li>{mapWorkspaceDebugSnapshot.vehicleDiagnosticsSummary}</li>
+              <li>{mapWorkspaceDebugSnapshot.stopSelectionSummary}</li>
+              <li>{`Placement instruction: ${mapWorkspaceDebugSnapshot.placementInstruction}`}</li>
+              <li>{`Placement street rule hint: ${mapWorkspaceDebugSnapshot.placementStreetRuleHint}`}</li>
+              <li>{`Build-line instruction: ${mapWorkspaceDebugSnapshot.buildLineInstruction}`}</li>
+              <li>{`Build-line minimum requirement: ${mapWorkspaceDebugSnapshot.buildLineMinimumRequirement}`}</li>
+              <li>{`Completed overlay note: ${mapWorkspaceDebugSnapshot.completedOverlayNote}`}</li>
+              <li>{`Draft overlay note: ${mapWorkspaceDebugSnapshot.draftOverlayNote}`}</li>
+              <li>{mapWorkspaceDebugSnapshot.draftMetadataSummary}</li>
+            </ul>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }
