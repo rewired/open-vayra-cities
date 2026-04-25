@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react';
+import { TIME_BAND_DEFINITIONS, formatTimeBandWindow } from '../domain/constants/timeBands';
 
 interface ServicePlanDialogProps {
   readonly open: boolean;
@@ -6,6 +7,25 @@ interface ServicePlanDialogProps {
   readonly selectedLineServiceProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineServicePlanForLine> | null;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineSelectedServiceInspector> | null;
 }
+
+const TIME_BAND_WINDOW_LABELS = Object.fromEntries(
+  TIME_BAND_DEFINITIONS.map((definition) => [definition.id, formatTimeBandWindow(definition)])
+) as Record<(typeof TIME_BAND_DEFINITIONS)[number]['id'], string>;
+
+const toActiveServiceStateLabel = (
+  activeBandState: NonNullable<ServicePlanDialogProps['selectedLineServiceInspectorProjection']>['activeBandState'],
+  currentBandHeadwayMinutes: number | null
+): string => {
+  if (activeBandState === 'no-service') {
+    return 'No service';
+  }
+
+  if (activeBandState === 'unset') {
+    return 'Unset';
+  }
+
+  return currentBandHeadwayMinutes === null ? 'Unset' : `Every ${currentBandHeadwayMinutes} min`;
+};
 
 /** Renders selected-line service readiness and service-plan detail in a dialog. */
 export function ServicePlanDialog({
@@ -32,48 +52,6 @@ export function ServicePlanDialog({
           <section className="inspector-card inspector-line-readiness" aria-label="Service readiness summary">
             <h3>Service readiness summary</h3>
             <p className="inspector-line-readiness__status">Status: {selectedLineServiceProjection.readiness.status}</p>
-            <table className="inspector-compact-table">
-              <tbody>
-                <tr>
-                  <th scope="row">Configured bands</th>
-                  <td>{selectedLineServiceProjection.readiness.summary.configuredTimeBandCount}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Missing / unset bands</th>
-                  <td>
-                    {selectedLineServiceProjection.readiness.summary.canonicalTimeBandCount -
-                      selectedLineServiceProjection.readiness.summary.configuredTimeBandCount}
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Route segments</th>
-                  <td>{selectedLineServiceProjection.readiness.summary.routeSegmentCount}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Blocker issues</th>
-                  <td>{selectedLineServiceProjection.readiness.summary.errorIssueCount}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Warning issues</th>
-                  <td>{selectedLineServiceProjection.readiness.summary.warningIssueCount}</td>
-                </tr>
-              </tbody>
-            </table>
-            {selectedLineServiceProjection.readiness.issues.length > 0 ? (
-              <details className="inspector-details" aria-label="Full readiness issue list">
-                <summary>Show full readiness issue list</summary>
-                <ul className="inspector-line-readiness__issues">
-                  {selectedLineServiceProjection.readiness.issues.map((issue, index) => (
-                    <li key={`${issue.code}-full-${index}`}>
-                      <span>{issue.message}</span>{' '}
-                      {issue.code ? <code className="inspector-line-readiness__code">{issue.code}</code> : null}
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            ) : (
-              <p>No readiness issues.</p>
-            )}
           </section>
         ) : (
           <p className="inspector-dialog__unavailable">Service readiness projection unavailable for the selected line.</p>
@@ -92,44 +70,60 @@ export function ServicePlanDialog({
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">Current headway</th>
-                  <td>{selectedLineServiceInspectorProjection.headwayLabel}</td>
+                  <th scope="row">Active window</th>
+                  <td>{TIME_BAND_WINDOW_LABELS[selectedLineServiceInspectorProjection.activeTimeBandId]}</td>
                 </tr>
                 <tr>
-                  <th scope="row">Departures/hour</th>
-                  <td>{selectedLineServiceInspectorProjection.theoreticalDeparturesPerHourLabel ?? 'Unavailable'}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Route time</th>
-                  <td>{selectedLineServiceInspectorProjection.totalRouteTravelMinutesLabel}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Route segment count</th>
-                  <td>{selectedLineServiceInspectorProjection.routeSegmentCount}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Blockers / warnings</th>
+                  <th scope="row">Active service state</th>
                   <td>
-                    {selectedLineServiceInspectorProjection.blockerCount} / {selectedLineServiceInspectorProjection.warningCount}
+                    {toActiveServiceStateLabel(
+                      selectedLineServiceInspectorProjection.activeBandState,
+                      selectedLineServiceInspectorProjection.currentBandHeadwayMinutes
+                    )}
                   </td>
                 </tr>
-                <tr>
-                  <th scope="row">Service notes</th>
-                  <td>{selectedLineServiceInspectorProjection.noteMessages.length}</td>
-                </tr>
+                {selectedLineServiceInspectorProjection.theoreticalDeparturesPerHourLabel ? (
+                  <tr>
+                    <th scope="row">Departures/hour</th>
+                    <td>{selectedLineServiceInspectorProjection.theoreticalDeparturesPerHourLabel}</td>
+                  </tr>
+                ) : null}
+                {selectedLineServiceInspectorProjection.routeSegmentCount > 0 ? (
+                  <tr>
+                    <th scope="row">Runtime</th>
+                    <td>{selectedLineServiceInspectorProjection.totalRouteTravelMinutesLabel}</td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
-            {selectedLineServiceInspectorProjection.noteMessages.length > 0 ? (
-              <details className="inspector-details" aria-label="Detailed service notes">
-                <summary>Show service notes and render timing details</summary>
-                <ul className="inspector-line-readiness__issues">
-                  {selectedLineServiceInspectorProjection.noteMessages.map((message, index) => (
-                    <li key={`line-service-note-${index}`}>{message}</li>
-                  ))}
-                </ul>
-              </details>
+            <div className="service-plan-dialog__issue-pills" aria-label="Service issues">
+              {selectedLineServiceInspectorProjection.blockerCount > 0 ? (
+                <p className="service-plan-dialog__issue-pill service-plan-dialog__issue-pill--blocker">
+                  {selectedLineServiceInspectorProjection.blockerCount} blocker
+                  {selectedLineServiceInspectorProjection.blockerCount === 1 ? '' : 's'}
+                </p>
+              ) : null}
+              {selectedLineServiceInspectorProjection.warningCount > 0 ? (
+                <p className="service-plan-dialog__issue-pill service-plan-dialog__issue-pill--warning">
+                  {selectedLineServiceInspectorProjection.warningCount} warning
+                  {selectedLineServiceInspectorProjection.warningCount === 1 ? '' : 's'}
+                </p>
+              ) : null}
+              {selectedLineServiceInspectorProjection.noteMessages.length > 0
+                ? selectedLineServiceInspectorProjection.noteMessages.map((message, index) => (
+                    <p key={`line-service-note-${index}`} className="service-plan-dialog__issue-pill service-plan-dialog__issue-pill--message">
+                      {message}
+                    </p>
+                  ))
+                : null}
+            </div>
+            {selectedLineServiceInspectorProjection.blockerCount > 0 ||
+            selectedLineServiceInspectorProjection.warningCount > 0 ? (
+              <p className="inspector-dialog__note">
+                Open the global Debug modal for full readiness issue details and technical issue codes.
+              </p>
             ) : (
-              <p>No service notes.</p>
+              <p className="inspector-dialog__note">No actionable issues for the active service band.</p>
             )}
           </section>
         ) : (

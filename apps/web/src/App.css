@@ -839,6 +839,37 @@ body {
   color: #dbe8ff;
 }
 
+.service-plan-dialog__issue-pills {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.service-plan-dialog__issue-pill {
+  margin: 0;
+  padding: 3px 8px;
+  border: 1px solid #425b83;
+  border-radius: 999px;
+  background: #1b2b44;
+  color: #d7e7ff;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.service-plan-dialog__issue-pill--blocker {
+  border-color: #845a49;
+  background: #3a2a22;
+  color: #f6d5cb;
+}
+
+.service-plan-dialog__issue-pill--warning,
+.service-plan-dialog__issue-pill--message {
+  border-color: #927b3a;
+  background: #3d351f;
+  color: #fae6b3;
+}
+
 
 .inspector-lines-tab {
   margin-top: 12px;
