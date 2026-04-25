@@ -12,7 +12,6 @@ export type LineDepartureScheduleProjectionStatus = 'unavailable' | 'available' 
  */
 export type LineDepartureScheduleUnavailableReason =
   | 'blocked-service'
-  | 'active-band-unset'
   | 'active-band-no-service'
   | 'missing-active-frequency';
 

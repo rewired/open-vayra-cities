@@ -17,7 +17,6 @@ export type LineFrequencyMinutes = number & { readonly __brand: 'LineFrequencyMi
  * Discriminated service-plan state for one canonical time band.
  */
 export type LineServiceBandPlan =
-  | { readonly kind: 'unset' }
   | { readonly kind: 'frequency'; readonly headwayMinutes: LineFrequencyMinutes }
   | { readonly kind: 'no-service' };
 
@@ -54,10 +53,10 @@ export const createLineFrequencyMinutes = (rawFrequencyMinutes: number): LineFre
 };
 
 /**
- * Creates an initialized per-time-band frequency map with every canonical band explicitly unset.
+ * Creates an initialized per-time-band service map with every canonical band set to explicit no-service.
  */
-export const createUnsetLineServiceByTimeBand = (): LineServiceByTimeBand =>
-  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, { kind: 'unset' }])) as LineServiceByTimeBand;
+export const createNoServiceLineServiceByTimeBand = (): LineServiceByTimeBand =>
+  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, { kind: 'no-service' }])) as LineServiceByTimeBand;
 
 /**
  * Resolves a numeric headway from one time-band plan when the plan kind is `frequency`.

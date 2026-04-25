@@ -4,7 +4,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import type { SelectedLineExportPayload } from '../types/selectedLineExport';
-import { createLineFrequencyMinutes, createLineId, createUnsetLineServiceByTimeBand, type Line } from '../types/line';
+import { createLineFrequencyMinutes, createLineId, createNoServiceLineServiceByTimeBand, type Line } from '../types/line';
 import {
   createLineSegmentId,
   createRouteDistanceMeters,
@@ -188,12 +188,12 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
     expect(result.departureCount).toBe(0);
   });
 
-  it('9) not-configured current service returns unavailable departure projection', () => {
+  it('9) configured current service returns unavailable departure projection', () => {
     const line: Line = {
       ...createBaseLine(lineAId),
       frequencyByTimeBand: {
         ...createBaseLine(lineAId).frequencyByTimeBand,
-        'morning-rush': { kind: 'unset' }
+        'morning-rush': { kind: 'no-service' }
       }
     };
 
@@ -204,9 +204,9 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
       createSimulationMinuteOfDay(420)
     );
 
-    expect(result.serviceProjectionStatus).toBe('not-configured');
+    expect(result.serviceProjectionStatus).toBe('configured');
     expect(result.status).toBe('unavailable');
-    expect(result.unavailableReason).toBe('active-band-unset');
+    expect(result.unavailableReason).toBe('active-band-no-service');
     expect(result.departureCount).toBe(0);
   });
 
@@ -260,7 +260,7 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
       ...createBaseLine(lineCId),
       frequencyByTimeBand: {
         ...createBaseLine(lineCId).frequencyByTimeBand,
-        'morning-rush': { kind: 'unset' }
+        'morning-rush': { kind: 'no-service' }
       }
     };
 
@@ -289,7 +289,7 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
       label: payload.line.label,
       stopIds: payload.line.orderedStopIds,
       routeSegments: payload.line.routeSegments,
-      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     const result = projectLineDepartureScheduleForLine(

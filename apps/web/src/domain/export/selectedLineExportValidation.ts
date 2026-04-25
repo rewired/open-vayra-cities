@@ -269,10 +269,6 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
           continue;
         }
 
-        if (servicePlan.kind === 'unset') {
-          continue;
-        }
-
         if (servicePlan.kind === 'no-service') {
           included.push(timeBandId as TimeBandId);
           continue;
@@ -294,7 +290,7 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
         addIssue(
           'invalid-frequency-value',
           `$.line.frequencyByTimeBand.${timeBandId}.kind`,
-          'Service plan kind must be "unset", "frequency", or "no-service".'
+          'Service plan kind must be "frequency" or "no-service".'
         );
       }
 

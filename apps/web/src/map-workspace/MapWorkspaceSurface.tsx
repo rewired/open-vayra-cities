@@ -6,7 +6,7 @@ import {
 } from '../domain/constants/lineBuilding';
 import { buildFallbackLineRouteSegments } from '../domain/routing/fallbackLineRouting';
 import type { Line } from '../domain/types/line';
-import { createLineId, createUnsetLineServiceByTimeBand } from '../domain/types/line';
+import { createLineId, createNoServiceLineServiceByTimeBand } from '../domain/types/line';
 import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
@@ -626,7 +626,7 @@ export function MapWorkspaceSurface({
       label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${sessionLines.length + 1}`,
       stopIds: draftStopIds,
       routeSegments: [],
-      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     onSessionLinesChange((currentLines) => {

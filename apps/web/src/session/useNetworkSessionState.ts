@@ -25,13 +25,13 @@ export type LineFrequencyInputByTimeBand = Readonly<Record<TimeBandId, string>>;
 export type LineFrequencyValidationByTimeBand = Readonly<Record<TimeBandId, string | null>>;
 
 /** Explicit editor control mode for a canonical time-band service plan. */
-export type LineFrequencyControlState = 'unset' | 'frequency' | 'no-service';
+export type LineFrequencyControlState = 'frequency' | 'no-service';
 
 /** Control-mode state for frequency editing fields keyed by canonical MVP time bands. */
 export type LineFrequencyControlByTimeBand = Readonly<Record<TimeBandId, LineFrequencyControlState>>;
 
 /** Explicit action contract for selected-line frequency updates. */
-export type SelectedLineFrequencyUpdateAction = 'set-unset' | 'set-frequency' | 'set-no-service' | 'input-change';
+export type SelectedLineFrequencyUpdateAction = 'activate-frequency' | 'set-no-service' | 'input-change';
 
 /** Exposes shell-owned in-memory session state and command callbacks. */
 export interface NetworkSessionStateController {
@@ -73,7 +73,7 @@ const createEmptyLineFrequencyValidationByTimeBand = (): LineFrequencyValidation
   Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, null])) as LineFrequencyValidationByTimeBand;
 
 const createEmptyLineFrequencyControlByTimeBand = (): LineFrequencyControlByTimeBand =>
-  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, 'unset'])) as LineFrequencyControlByTimeBand;
+  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, 'no-service'])) as LineFrequencyControlByTimeBand;
 
 /** Coordinates mutable in-memory session state for shell tools, selection, line editing, and JSON replacement load. */
 export const useNetworkSessionState = (): NetworkSessionStateController => {

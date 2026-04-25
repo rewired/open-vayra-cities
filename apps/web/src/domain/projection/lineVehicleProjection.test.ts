@@ -7,7 +7,7 @@ import { createSimulationMinuteOfDay } from '../simulation/simulationClock';
 import {
   createLineFrequencyMinutes,
   createLineId,
-  createUnsetLineServiceByTimeBand,
+  createNoServiceLineServiceByTimeBand,
   type Line
 } from '../types/line';
 import type {
@@ -60,7 +60,7 @@ const lineA: Line = {
   stopIds: [stopA, stopB, stopC],
   routeSegments: [createSegment(1, lineId, stopA, stopB, 4), createSegment(2, lineId, stopB, stopC, 6)],
   frequencyByTimeBand: {
-    ...createUnsetLineServiceByTimeBand(),
+    ...createNoServiceLineServiceByTimeBand(),
     'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(6) }
   }
 };
@@ -131,7 +131,7 @@ const createUnavailableProjection = (): LineDepartureScheduleNetworkProjection =
       lineLabel: 'Line A',
       activeTimeBandId: 'morning-rush',
       status: 'unavailable',
-      unavailableReason: 'active-band-unset',
+      unavailableReason: 'active-band-no-service',
       currentBandHeadwayMinutes: null,
       timeBandStartMinute: 360,
       timeBandEndMinute: 540,
@@ -141,7 +141,7 @@ const createUnavailableProjection = (): LineDepartureScheduleNetworkProjection =
       nextDepartureMinute: null,
       minutesUntilNextDeparture: null,
       totalRouteTravelMinutes: 10,
-      serviceProjectionStatus: 'not-configured'
+      serviceProjectionStatus: 'configured'
     }
   ],
   summary: {
@@ -282,7 +282,7 @@ describe('projectLineVehicleNetwork', () => {
       label: payload.line.label,
       stopIds: payload.line.orderedStopIds,
       routeSegments: payload.line.routeSegments,
-      frequencyByTimeBand: createUnsetLineServiceByTimeBand()
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     const departureWithoutOverlay = projectLineDepartureScheduleNetwork(

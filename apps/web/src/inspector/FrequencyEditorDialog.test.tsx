@@ -15,36 +15,34 @@ const createInputState = (value: string): LineFrequencyInputByTimeBand =>
 const createValidationState = (value: string | null): LineFrequencyValidationByTimeBand =>
   Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, value])) as LineFrequencyValidationByTimeBand;
 
-const createControlState = (value: 'unset' | 'frequency' | 'no-service'): LineFrequencyControlByTimeBand =>
+const createControlState = (value: 'frequency' | 'no-service'): LineFrequencyControlByTimeBand =>
   Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, value])) as LineFrequencyControlByTimeBand;
 
 describe('FrequencyEditorDialog', () => {
-  it('renders service-plan title, explanatory guidance, and explicit control modes', () => {
+  it('renders compact service plan copy with required column order and no legacy third-state wording', () => {
     const markup = renderToStaticMarkup(
       <FrequencyEditorDialog
         open
         onClose={() => {}}
         lineFrequencyInputByTimeBand={createInputState('')}
-        lineFrequencyControlByTimeBand={createControlState('unset')}
+        lineFrequencyControlByTimeBand={createControlState('no-service')}
         lineFrequencyValidationByTimeBand={createValidationState(null)}
         onFrequencyChange={() => {}}
       />
     );
 
     expect(markup).toContain('Edit service plan');
-    expect(markup).toContain('All values are in minutes. Empty values are treated as unset. Only positive values are valid. Zero or negative values are invalid.');
-    expect(markup).toContain('Time band');
-    expect(markup).toContain('Window');
-    expect(markup).toContain('Service');
-    expect(markup).toContain('Late morning');
-    expect(markup).toContain('09:00–11:00');
-    expect(markup).toContain('Frequency');
+    expect(markup).toContain('Set an interval for bands that operate, or choose no service for bands without departures.');
+    expect(markup).toContain('WINDOW');
+    expect(markup).toContain('TIME BAND');
+    expect(markup).toContain('SERVICE');
+    expect(markup).toContain('Interval');
     expect(markup).toContain('No service');
-    expect(markup).toContain('Unset');
-    expect(markup).toContain('inspector-frequency-editor__row--not-configured');
+    expect(markup).not.toContain('Unset');
+    expect(markup).not.toContain('Minutes');
   });
 
-  it('renders frequency rows with editable minute values', () => {
+  it('renders frequency rows with editable minute value and active interval control', () => {
     const markup = renderToStaticMarkup(
       <FrequencyEditorDialog
         open
@@ -57,10 +55,11 @@ describe('FrequencyEditorDialog', () => {
     );
 
     expect(markup).toContain('value="10"');
+    expect(markup).toContain('data-active="true">Interval');
     expect(markup).not.toContain('disabled=""');
   });
 
-  it('renders no-service rows with disabled and cleared minute input', () => {
+  it('renders no-service rows with active no-service control and muted dash interval display', () => {
     const markup = renderToStaticMarkup(
       <FrequencyEditorDialog
         open
@@ -72,7 +71,8 @@ describe('FrequencyEditorDialog', () => {
       />
     );
 
-    expect(markup).toContain('value=""');
+    expect(markup).toContain('value="–"');
+    expect(markup).toContain('data-active="true">No service');
     expect(markup).toContain('disabled=""');
   });
 });

@@ -1,3 +1,4 @@
+import { DEFAULT_LINE_SERVICE_INTERVAL_MINUTES } from '../domain/constants/lineService';
 import { createLineFrequencyMinutes, type LineServiceBandPlan } from '../domain/types/line';
 import type { SelectedLineFrequencyUpdateAction, LineFrequencyControlState } from './useNetworkSessionState';
 
@@ -21,22 +22,37 @@ export interface LineFrequencyEditorActionResult {
 export const normalizeLineFrequencyEditorInput = (rawInputValue: string): string =>
   rawInputValue.slice(0, LINE_FREQUENCY_EDITOR_MAX_LENGTH);
 
-const resolveLineFrequencyMinutes = (rawInputValue: string): number | null => {
+/**
+ * Validates and parses service-interval input to an integer within the inclusive supported range.
+ */
+export const parseLineServiceIntervalInput = (rawInputValue: string): number | null => {
   const trimmedValue = rawInputValue.trim();
   if (trimmedValue.length === 0) {
     return null;
   }
 
-  if (!/^\d{1,3}$/.test(trimmedValue)) {
+  if (!/^[0-9]{1,3}$/.test(trimmedValue)) {
     return Number.NaN;
   }
 
   const parsedValue = Number(trimmedValue);
-  if (!Number.isInteger(parsedValue) || parsedValue <= 0 || parsedValue > 999) {
+  if (!Number.isInteger(parsedValue) || parsedValue < 1 || parsedValue > 999) {
     return Number.NaN;
   }
 
   return parsedValue;
+};
+
+/**
+ * Resolves the input value that should be used when activating interval mode from a non-frequency row state.
+ */
+export const resolveIntervalActivationInput = (rawInputValue: string): string => {
+  const parsed = parseLineServiceIntervalInput(rawInputValue);
+  if (typeof parsed === 'number' && Number.isFinite(parsed)) {
+    return String(parsed);
+  }
+
+  return String(DEFAULT_LINE_SERVICE_INTERVAL_MINUTES);
 };
 
 /**
@@ -57,16 +73,20 @@ export const applyLineFrequencyEditorAction = (
     };
   }
 
-  if (action === 'set-unset') {
+  if (action === 'activate-frequency') {
+    const activationValue = resolveIntervalActivationInput(rawInputValue);
     return {
-      controlState: 'unset',
-      normalizedInputValue: '',
+      controlState: 'frequency',
+      normalizedInputValue: activationValue,
       validationMessage: null,
-      nextBandPlan: { kind: 'unset' }
+      nextBandPlan: {
+        kind: 'frequency',
+        headwayMinutes: createLineFrequencyMinutes(Number(activationValue))
+      }
     };
   }
 
-  const parsedValue = resolveLineFrequencyMinutes(rawInputValue);
+  const parsedValue = parseLineServiceIntervalInput(rawInputValue);
   if (parsedValue === null) {
     return {
       controlState: 'frequency',
