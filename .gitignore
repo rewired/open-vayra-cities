@@ -66,3 +66,13 @@ data/osm/**/*.pbf.md5
 
 # Keep the local OSM data directory discoverable without committing extracts.
 !data/osm/.gitkeep
+
+# Local OSRM routing artifacts.
+# These files are generated locally via Docker and must not be committed.
+data/routing/osrm/*.osrm
+data/routing/osrm/**/*.osrm
+data/routing/osrm/*.osrm.*
+data/routing/osrm/**/*.osrm.*
+
+# Keep the local OSRM data directory discoverable without committing generated files.
+!data/routing/osrm/.gitkeep

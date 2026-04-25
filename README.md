@@ -21,6 +21,23 @@ pnpm install
 pnpm --filter @city-ops/web dev
 ```
 
+### Local Routing (Docker)
+
+To enable realistic street-routing between stops, you must set up the local OSRM routing service. **Docker is required.**
+
+1. Download the OSM data:
+   `.\scripts\routing\download-hamburg-osm.ps1`
+2. Prepare the OSRM graph:
+   `.\scripts\routing\prepare-osrm.ps1`
+3. Start the routing service:
+   `.\scripts\routing\start-osrm.ps1`
+4. Run the smoke test to verify:
+   `pnpm tsx scripts/routing/smoke-test-osrm.ts`
+
+*Note: The map data used for routing is © OpenStreetMap contributors, provided by Geofabrik. Generated data will not be committed to the repository.*
+
+For more details, read [docs/routing/local-osrm-routing.md](docs/routing/local-osrm-routing.md).
+
 ## Documentation map
 
 Canonical project documentation lives at the repository root:
@@ -31,7 +48,7 @@ Canonical project documentation lives at the repository root:
 - `DD.md`
 - `TDD.md`
 - `SEC.md`
-- `DESIGN.md` (externally owned)
+- `DESIGN.md`
 
 Architecture Decision Records (ADRs) are located in:
 
