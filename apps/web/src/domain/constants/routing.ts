@@ -37,3 +37,8 @@ export const OSRM_ROUTE_OVERVIEW_MODE = "full";
  * Provider ID for the local OSRM instance.
  */
 export const OSRM_PROVIDER_ID_VALUE = "osrm-local";
+
+/**
+ * Maximum duration in milliseconds allowed for an external routing request before falling back.
+ */
+export const ROUTING_REQUEST_TIMEOUT_MS = 2000;

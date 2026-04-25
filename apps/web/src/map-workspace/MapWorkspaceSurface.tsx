@@ -4,6 +4,8 @@ import {
   LINE_BUILD_PLACEHOLDER_LABEL_PREFIX,
   MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE
 } from '../domain/constants/lineBuilding';
+import { completeLineRouting } from '../domain/routing/completeLineRouting';
+import { getDefaultRoutingAdapter } from '../domain/routing/defaultRoutingAdapter';
 import { buildFallbackLineRouteSegments } from '../domain/routing/fallbackLineRouting';
 import type { Line } from '../domain/types/line';
 import { createLineId, createNoServiceLineServiceByTimeBand } from '../domain/types/line';
@@ -149,6 +151,7 @@ export function MapWorkspaceSurface({
   const [featureDiagnostics, setFeatureDiagnostics] = useState<MapWorkspaceFeatureDiagnostics>(
     INITIAL_MAP_WORKSPACE_FEATURE_DIAGNOSTICS
   );
+  const [isCompletingLine, setIsCompletingLine] = useState(false);
   const activeToolModeRef = useRef<WorkspaceToolMode>(activeToolMode);
   const sessionLineCountRef = useRef(sessionLines.length);
   const onStopSelectionChangeRef = useRef(onStopSelectionChange);
@@ -619,44 +622,46 @@ export function MapWorkspaceSurface({
     setDraftLineState(INITIAL_DRAFT_LINE_STATE);
   };
 
-  const handleDraftComplete = (): void => {
+  const handleDraftComplete = async (): Promise<void> => {
     const draftStopIds = draftLineState.stopIds;
 
-    if (draftStopIds.length < MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE) {
+    if (draftStopIds.length < MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE || isCompletingLine) {
       return;
     }
 
-    let createdLineId: Line['id'] | null = null;
-    const nextLine: Line = {
-      id: createLineId(`line-${sessionLines.length + 1}`),
-      label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${sessionLines.length + 1}`,
-      stopIds: draftStopIds,
-      routeSegments: [],
-      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
-    };
+    // 1. Snapshot draft and ordinal to ensure async safety
+    const snapshottedStopIds = [...draftStopIds];
+    const snapshottedOrdinal = sessionLines.length + 1;
+    const nextCreatedLineId = createLineId(`line-${snapshottedOrdinal}`);
 
-    onSessionLinesChange((currentLines) => {
-      const createdLineOrdinal = currentLines.length + 1;
-      const nextCreatedLineId = createLineId(`line-${createdLineOrdinal}`);
+    setIsCompletingLine(true);
+
+    try {
+      // 2. Resolve route segments (async, street-routed if available)
+      const routeSegments = await completeLineRouting({
+        lineId: nextCreatedLineId,
+        orderedStopIds: snapshottedStopIds,
+        placedStops,
+        routingAdapter: getDefaultRoutingAdapter()
+      });
+
+      // 3. Commit the new line to session state
       const createdLine: Line = {
-        ...nextLine,
         id: nextCreatedLineId,
-        label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${createdLineOrdinal}`,
-        routeSegments: buildFallbackLineRouteSegments({
-          lineId: nextCreatedLineId,
-          orderedStopIds: draftStopIds,
-          placedStops
-        })
+        label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${snapshottedOrdinal}`,
+        stopIds: snapshottedStopIds,
+        routeSegments,
+        frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
       };
-      createdLineId = createdLine.id;
-      return [...currentLines, createdLine];
-    });
 
-    if (createdLineId !== null) {
-      onSelectedLineIdChange(createdLineId);
+      onSessionLinesChange((currentLines) => [...currentLines, createdLine]);
+      onSelectedLineIdChange(createdLine.id);
+
+      // 4. Clear draft only after success
+      setDraftLineState(INITIAL_DRAFT_LINE_STATE);
+    } finally {
+      setIsCompletingLine(false);
     }
-
-    setDraftLineState(INITIAL_DRAFT_LINE_STATE);
   };
 
   return (
@@ -683,8 +688,8 @@ export function MapWorkspaceSurface({
             <button type="button" onClick={handleDraftCancel}>
               Cancel draft
             </button>
-            <button type="button" onClick={handleDraftComplete} disabled={!buildLineUiFeedback.canCompleteDraft}>
-              Complete line
+            <button type="button" onClick={handleDraftComplete} disabled={!buildLineUiFeedback.canCompleteDraft || isCompletingLine}>
+              {isCompletingLine ? 'Creating...' : 'Complete line'}
             </button>
           </div>
         </div>
