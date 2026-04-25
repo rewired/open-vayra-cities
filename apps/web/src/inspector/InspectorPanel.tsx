@@ -6,7 +6,12 @@ import { SelectedLineInspector } from './SelectedLineInspector';
 import { SelectedStopInspector } from './SelectedStopInspector';
 import { INSPECTOR_TAB_IDS, INSPECTOR_TAB_LABELS, type InspectorTabId } from './inspectorTabs';
 import type { InspectorPanelState } from './types';
-import type { LineFrequencyInputByTimeBand, LineFrequencyValidationByTimeBand } from '../session/useNetworkSessionState';
+import type {
+  LineFrequencyControlByTimeBand,
+  LineFrequencyInputByTimeBand,
+  LineFrequencyValidationByTimeBand,
+  SelectedLineFrequencyUpdateAction
+} from '../session/useNetworkSessionState';
 import type { TimeBandId } from '../domain/types/timeBand';
 
 interface InspectorPanelProps {
@@ -21,8 +26,13 @@ interface InspectorPanelProps {
   readonly selectedLineDepartureInspectorProjection: ReturnType<typeof import('../domain/projection/lineDepartureScheduleProjection').projectLineSelectedDepartureInspector> | null;
   readonly selectedLineVehicleProjection: ReturnType<typeof import('../domain/projection/lineVehicleProjection').projectLineVehicleNetwork>['lines'][number] | null;
   readonly lineFrequencyInputByTimeBand: LineFrequencyInputByTimeBand;
+  readonly lineFrequencyControlByTimeBand: LineFrequencyControlByTimeBand;
   readonly lineFrequencyValidationByTimeBand: LineFrequencyValidationByTimeBand;
-  readonly onFrequencyChange: (timeBandId: TimeBandId, rawInputValue: string) => void;
+  readonly onFrequencyChange: (
+    timeBandId: TimeBandId,
+    rawInputValue: string,
+    action?: SelectedLineFrequencyUpdateAction
+  ) => void;
   readonly onSelectedLineIdChange: (lineId: Line['id']) => void;
 }
 
@@ -51,6 +61,7 @@ export function InspectorPanel({
   selectedLineDepartureInspectorProjection,
   selectedLineVehicleProjection,
   lineFrequencyInputByTimeBand,
+  lineFrequencyControlByTimeBand,
   lineFrequencyValidationByTimeBand,
   onFrequencyChange,
   onSelectedLineIdChange
@@ -165,6 +176,7 @@ export function InspectorPanel({
                   panelState={inspectorPanelState}
                   selectedLineRouteBaselineMetrics={selectedLineRouteBaselineMetrics}
                   lineFrequencyInputByTimeBand={lineFrequencyInputByTimeBand}
+                  lineFrequencyControlByTimeBand={lineFrequencyControlByTimeBand}
                   lineFrequencyValidationByTimeBand={lineFrequencyValidationByTimeBand}
                   selectedLineServiceProjection={selectedLineServiceProjection}
                   selectedLineServiceInspectorProjection={selectedLineServiceInspectorProjection}

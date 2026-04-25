@@ -28,6 +28,15 @@ export type LineFrequencyInputByTimeBand = Readonly<Record<TimeBandId, string>>;
 /** Validation text for frequency editing fields keyed by canonical MVP time bands. */
 export type LineFrequencyValidationByTimeBand = Readonly<Record<TimeBandId, string | null>>;
 
+/** Explicit editor control mode for a canonical time-band service plan. */
+export type LineFrequencyControlState = 'unset' | 'frequency' | 'no-service';
+
+/** Control-mode state for frequency editing fields keyed by canonical MVP time bands. */
+export type LineFrequencyControlByTimeBand = Readonly<Record<TimeBandId, LineFrequencyControlState>>;
+
+/** Explicit action contract for selected-line frequency updates. */
+export type SelectedLineFrequencyUpdateAction = 'set-unset' | 'set-frequency' | 'set-no-service' | 'input-change';
+
 /** Exposes shell-owned in-memory session state and command callbacks. */
 export interface NetworkSessionStateController {
   readonly activeToolMode: WorkspaceToolMode;
@@ -39,6 +48,7 @@ export interface NetworkSessionStateController {
   readonly selectedLine: Line | null;
   readonly selectedStopId: Stop['id'] | null;
   readonly lineFrequencyInputByTimeBand: LineFrequencyInputByTimeBand;
+  readonly lineFrequencyControlByTimeBand: LineFrequencyControlByTimeBand;
   readonly lineFrequencyValidationByTimeBand: LineFrequencyValidationByTimeBand;
   readonly selectedLineImportFeedback: SelectedLineImportFeedback | null;
   readonly handleToolModeSelection: (nextMode: WorkspaceToolMode) => void;
@@ -47,7 +57,11 @@ export interface NetworkSessionStateController {
   readonly setLineBuildSelection: Dispatch<SetStateAction<LineBuildSelectionState>>;
   readonly setSessionLines: Dispatch<SetStateAction<readonly Line[]>>;
   readonly setSelectedLineId: Dispatch<SetStateAction<Line['id'] | null>>;
-  readonly updateSelectedCompletedLineFrequency: (timeBandId: TimeBandId, rawInputValue: string) => void;
+  readonly updateSelectedCompletedLineFrequency: (
+    timeBandId: TimeBandId,
+    rawInputValue: string,
+    action?: SelectedLineFrequencyUpdateAction
+  ) => void;
   readonly handleLineJsonFileSelection: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   readonly clearSelectedLineImportFeedback: () => void;
 }
@@ -62,6 +76,9 @@ const createEmptyLineFrequencyInputByTimeBand = (): LineFrequencyInputByTimeBand
 const createEmptyLineFrequencyValidationByTimeBand = (): LineFrequencyValidationByTimeBand =>
   Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, null])) as LineFrequencyValidationByTimeBand;
 
+const createEmptyLineFrequencyControlByTimeBand = (): LineFrequencyControlByTimeBand =>
+  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, 'unset'])) as LineFrequencyControlByTimeBand;
+
 /** Coordinates mutable in-memory session state for shell tools, selection, line editing, and JSON replacement load. */
 export const useNetworkSessionState = (): NetworkSessionStateController => {
   const [activeToolMode, setActiveToolMode] = useState<WorkspaceToolMode>('inspect');
@@ -72,6 +89,8 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
   const [selectedLineId, setSelectedLineId] = useState<Line['id'] | null>(null);
   const [lineFrequencyInputByTimeBand, setLineFrequencyInputByTimeBand] =
     useState<LineFrequencyInputByTimeBand>(createEmptyLineFrequencyInputByTimeBand);
+  const [lineFrequencyControlByTimeBand, setLineFrequencyControlByTimeBand] =
+    useState<LineFrequencyControlByTimeBand>(createEmptyLineFrequencyControlByTimeBand);
   const [lineFrequencyValidationByTimeBand, setLineFrequencyValidationByTimeBand] =
     useState<LineFrequencyValidationByTimeBand>(createEmptyLineFrequencyValidationByTimeBand);
   const [selectedLineImportFeedback, setSelectedLineImportFeedback] = useState<SelectedLineImportFeedback | null>(null);
@@ -84,21 +103,24 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
   useEffect(() => {
     if (!selectedLine) {
       setLineFrequencyInputByTimeBand(createEmptyLineFrequencyInputByTimeBand());
+      setLineFrequencyControlByTimeBand(createEmptyLineFrequencyControlByTimeBand());
       setLineFrequencyValidationByTimeBand(createEmptyLineFrequencyValidationByTimeBand());
       return;
     }
 
-    setLineFrequencyInputByTimeBand(
-      Object.fromEntries(
-        MVP_TIME_BAND_IDS.map((timeBandId) => [
-          timeBandId,
-          (() => {
-            const headwayMinutes = resolveLineServiceBandHeadwayMinutes(selectedLine.frequencyByTimeBand[timeBandId]);
-            return headwayMinutes === null ? '' : String(headwayMinutes);
-          })()
-        ])
-      ) as LineFrequencyInputByTimeBand
-    );
+    setLineFrequencyInputByTimeBand(Object.fromEntries(
+      MVP_TIME_BAND_IDS.map((timeBandId) => {
+        const bandPlan = selectedLine.frequencyByTimeBand[timeBandId];
+        const headwayMinutes = resolveLineServiceBandHeadwayMinutes(bandPlan);
+        return [timeBandId, headwayMinutes === null ? '' : String(headwayMinutes)];
+      })
+    ) as LineFrequencyInputByTimeBand);
+    setLineFrequencyControlByTimeBand(Object.fromEntries(
+      MVP_TIME_BAND_IDS.map((timeBandId) => {
+        const bandPlan = selectedLine.frequencyByTimeBand[timeBandId];
+        return [timeBandId, bandPlan.kind];
+      })
+    ) as LineFrequencyControlByTimeBand);
     setLineFrequencyValidationByTimeBand(createEmptyLineFrequencyValidationByTimeBand());
   }, [selectedLine]);
 
@@ -114,6 +136,7 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
     selectedLine,
     selectedStopId,
     lineFrequencyInputByTimeBand,
+    lineFrequencyControlByTimeBand,
     lineFrequencyValidationByTimeBand,
     selectedLineImportFeedback,
     handleToolModeSelection: (nextMode) => {
@@ -127,7 +150,7 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
     setLineBuildSelection,
     setSessionLines,
     setSelectedLineId,
-    updateSelectedCompletedLineFrequency: (timeBandId, rawInputValue) => {
+    updateSelectedCompletedLineFrequency: (timeBandId, rawInputValue, action = 'input-change') => {
       setLineFrequencyInputByTimeBand((currentInputs) => ({
         ...currentInputs,
         [timeBandId]: rawInputValue
@@ -136,6 +159,65 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
       if (!selectedLine) {
         return;
       }
+
+      if (action === 'set-no-service') {
+        setLineFrequencyControlByTimeBand((currentControls) => ({
+          ...currentControls,
+          [timeBandId]: 'no-service'
+        }));
+        setLineFrequencyValidationByTimeBand((currentValidation) => ({
+          ...currentValidation,
+          [timeBandId]: null
+        }));
+        setSessionLines((currentLines) =>
+          currentLines.map((line) =>
+            line.id === selectedLine.id
+              ? {
+                  ...line,
+                  frequencyByTimeBand: {
+                    ...line.frequencyByTimeBand,
+                    [timeBandId]: { kind: 'no-service' } satisfies LineServiceBandPlan
+                  }
+                }
+              : line
+          )
+        );
+        return;
+      }
+
+      if (action === 'set-unset') {
+        setLineFrequencyInputByTimeBand((currentInputs) => ({
+          ...currentInputs,
+          [timeBandId]: ''
+        }));
+        setLineFrequencyControlByTimeBand((currentControls) => ({
+          ...currentControls,
+          [timeBandId]: 'unset'
+        }));
+        setLineFrequencyValidationByTimeBand((currentValidation) => ({
+          ...currentValidation,
+          [timeBandId]: null
+        }));
+        setSessionLines((currentLines) =>
+          currentLines.map((line) =>
+            line.id === selectedLine.id
+              ? {
+                  ...line,
+                  frequencyByTimeBand: {
+                    ...line.frequencyByTimeBand,
+                    [timeBandId]: { kind: 'unset' } satisfies LineServiceBandPlan
+                  }
+                }
+              : line
+          )
+        );
+        return;
+      }
+
+      setLineFrequencyControlByTimeBand((currentControls) => ({
+        ...currentControls,
+        [timeBandId]: 'frequency'
+      }));
 
       const trimmedValue = rawInputValue.trim();
       if (trimmedValue.length === 0) {

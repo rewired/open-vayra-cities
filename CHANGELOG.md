@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 042: add explicit selected-line frequency editor control state (`unset` / `frequency` / `no-service`) so UI intent is not inferred from empty input text.
+- Slice 042: update selected-line frequency update actions to include explicit `set-no-service` and `set-unset` paths while preserving empty-input-to-`unset` and positive-numeric-to-`frequency` semantics.
+- Slice 042: update frequency dialog per-band controls with explicit service-mode selection and keep validation messaging aligned with the new semantics.
+- Add ADR 0097 documenting explicit frequency editor mode controls and selected-line synchronization rules.
+
 - Slice 041: update line-service readiness semantics so canonical bands configured as `frequency` or `no-service` count as configured service-plan bands, while only `unset` bands are treated as missing.
 - Slice 041: preserve stable readiness issue codes while updating readiness messages to avoid treating explicit `no-service` plans as "missing frequency" configuration.
 - Slice 041: extend service-plan projection contracts with explicit active-band state (`unset`/`no-service`/`frequency`) and keep status derivation truthful for each state.

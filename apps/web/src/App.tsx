@@ -166,6 +166,7 @@ export default function App(): ReactElement {
         selectedLineDepartureInspectorProjection={projections.selectedLineDepartureInspectorProjection}
         selectedLineVehicleProjection={projections.selectedLineVehicleProjection}
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
+        lineFrequencyControlByTimeBand={sessionController.lineFrequencyControlByTimeBand}
         lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}
         onFrequencyChange={sessionController.updateSelectedCompletedLineFrequency}
         onSelectedLineIdChange={sessionController.setSelectedLineId}
