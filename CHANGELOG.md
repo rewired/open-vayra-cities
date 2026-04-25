@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 044: move debug access to one global top-bar `Debug` button wired directly to shell-owned modal open/close state in `App.tsx`.
+- Slice 044: remove inspector `Debug` tab ids/labels and delete the inspector debug rendering section so inspector navigation now includes only `Network` and `Lines`.
+- Slice 044: remove left-rail debug affordance so the top-bar control is the only debug entry point.
+- Add ADR 0100 documenting the single global debug entrypoint and inspector debug-tab removal boundaries.
+
 - Slice 043: remove map-surface HUD/debug overlays (`map-workspace__overlay--hud`, `map-workspace__overlay--debug`) so map diagnostics no longer render directly on top of gameplay.
 - Slice 043: preserve existing map diagnostics derivations (interaction status, pointer/geographic summaries, feature diagnostics, and draft metadata) and route them through a shell-owned debug snapshot contract.
 - Slice 043: add an app-shell controlled debug modal and left-rail debug entrypoint to surface map diagnostics centrally outside the map overlays.

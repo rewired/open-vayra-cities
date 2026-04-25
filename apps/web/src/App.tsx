@@ -108,6 +108,20 @@ export default function App(): ReactElement {
     <div className="app-shell" data-app-surface="desktop-shell">
       <SimulationControlBar
         clockController={clockController}
+        debugAction={
+          <button
+            type="button"
+            className="simulation-control-bar__debug-button"
+            aria-pressed={isMapDebugModalOpen}
+            aria-label="Open map debug modal"
+            onClick={() => {
+              setMapDebugModalOpen(true);
+            }}
+          >
+            <MaterialIcon name="search" />
+            <span>Debug</span>
+          </button>
+        }
         sessionActions={
           <SessionActions
             selectedLineImportFeedback={sessionController.selectedLineImportFeedback}
@@ -158,20 +172,6 @@ export default function App(): ReactElement {
             </button>
           ))}
         </nav>
-        <button
-          type="button"
-          className="tool-mode-rail__button tool-mode-rail__button--debug"
-          aria-pressed={isMapDebugModalOpen}
-          aria-label="Open map debug modal"
-          onClick={() => {
-            setMapDebugModalOpen(true);
-          }}
-        >
-          <MaterialIcon name="search" />
-          <span className="tool-mode-rail__label" aria-hidden="true">
-            Debug
-          </span>
-        </button>
       </aside>
 
       <main className="workspace" aria-label="Main workspace">

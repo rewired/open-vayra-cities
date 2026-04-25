@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { TIME_BAND_DISPLAY_LABELS } from '../domain/constants/timeBands';
 import type { Line } from '../domain/types/line';
 import { SelectedLineInspector } from './SelectedLineInspector';
-import { SelectedStopInspector } from './SelectedStopInspector';
 import { INSPECTOR_TAB_IDS, INSPECTOR_TAB_LABELS, type InspectorTabId } from './inspectorTabs';
 import type { InspectorPanelState } from './types';
 import type {
@@ -192,43 +191,6 @@ export function InspectorPanel({
         </section>
       ) : null}
 
-      {activeTabId === 'debug' ? (
-        <section className="inspector-card inspector-debug-details" aria-label="Debug">
-          <h3>Debug</h3>
-          <table className="inspector-compact-table inspector-debug-details__table">
-            <tbody>
-              <tr>
-                <th scope="row">Selected line id</th>
-                <td>{inspectorPanelState.mode === 'line-selected' ? inspectorPanelState.selectedLine.id : 'None'}</td>
-              </tr>
-              <tr>
-                <th scope="row">Selected stop id</th>
-                <td>{inspectorPanelState.mode === 'stop-selected' ? inspectorPanelState.selectedStop.selectedStopId : 'None'}</td>
-              </tr>
-              <tr>
-                <th scope="row">Session stop count</th>
-                <td>{staticNetworkSummaryKpis.totalStopCount}</td>
-              </tr>
-              <tr>
-                <th scope="row">Session completed line count</th>
-                <td>{staticNetworkSummaryKpis.completedLineCount}</td>
-              </tr>
-              <tr>
-                <th scope="row">Degraded projected vehicles</th>
-                <td>{vehicleNetworkProjection.summary.totalDegradedProjectedVehicleCount}</td>
-              </tr>
-              <tr>
-                <th scope="row">Configured service lines</th>
-                <td>{networkServicePlanProjection.summary.configuredLineCount}</td>
-              </tr>
-            </tbody>
-          </table>
-          {inspectorPanelState.mode === 'stop-selected' ? <SelectedStopInspector panelState={inspectorPanelState} /> : null}
-          <p className="inspector-debug-details__caveat">
-            Schematic caveat: inspector diagnostics mirror projection outputs and fallback route baselines; they are not claims of full operational simulation fidelity.
-          </p>
-        </section>
-      ) : null}
     </aside>
   );
 }

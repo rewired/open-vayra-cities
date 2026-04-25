@@ -9,12 +9,13 @@ import { MaterialIcon } from '../ui/icons/MaterialIcon';
 interface SimulationControlBarProps {
   readonly clockController: SimulationClockController;
   readonly sessionActions: ReactElement;
+  readonly debugAction: ReactElement;
 }
 
 const CANONICAL_SIMULATION_SPEED_IDS = ['1x', '5x', '10x', '20x'] as const;
 
 /** Renders the integrated top bar with brand, simulation clock controls, speed controls, and compact session actions. */
-export function SimulationControlBar({ clockController, sessionActions }: SimulationControlBarProps): ReactElement {
+export function SimulationControlBar({ clockController, sessionActions, debugAction }: SimulationControlBarProps): ReactElement {
   return (
     <section className="simulation-control-bar" aria-label="CityOps top bar">
       <div className="simulation-control-bar__brand" aria-label="Application brand">
@@ -77,7 +78,10 @@ export function SimulationControlBar({ clockController, sessionActions }: Simula
         </div>
       </div>
 
-      <div className="simulation-control-bar__session-actions">{sessionActions}</div>
+      <div className="simulation-control-bar__actions">
+        {debugAction}
+        {sessionActions}
+      </div>
     </section>
   );
 }
