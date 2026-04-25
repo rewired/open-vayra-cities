@@ -198,8 +198,10 @@ describe('projectLineVehicleNetwork', () => {
 
     expect(result.lines[0]?.vehicles).toEqual([]);
     expect(result.lines[0]?.note).toContain('no-service');
+    expect(result.lines[0]?.note).toContain('zero vehicles are required');
     expect(result.summary.totalProjectedVehicleCount).toBe(0);
     expect(result.summary.totalDegradedProjectedVehicleCount).toBe(0);
+    expect(result.summary.linesWithProjectedVehiclesCount).toBe(0);
   });
 
   it('applies before/equal/inside/after departure window filtering', () => {

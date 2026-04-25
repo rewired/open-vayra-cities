@@ -129,6 +129,45 @@ describe('projectLineServicePlanProjection coverage', () => {
     expect(result.currentBandHeadwayMinutes).toBeNull();
   });
 
+  it('2c) distinguishes active-band frequency vs no-service vs unset states', () => {
+    const base = createBaseLine(lineAId);
+    const frequencyResult = projectLineServicePlanForLine(base, placedStops, 'morning-rush');
+    const noServiceResult = projectLineServicePlanForLine(
+      {
+        ...base,
+        frequencyByTimeBand: {
+          ...base.frequencyByTimeBand,
+          'morning-rush': { kind: 'no-service' }
+        }
+      },
+      placedStops,
+      'morning-rush'
+    );
+    const unsetResult = projectLineServicePlanForLine(
+      {
+        ...base,
+        frequencyByTimeBand: {
+          ...base.frequencyByTimeBand,
+          'morning-rush': { kind: 'unset' }
+        }
+      },
+      placedStops,
+      'morning-rush'
+    );
+
+    expect(frequencyResult.activeBandState).toBe('frequency');
+    expect(frequencyResult.status).toBe('configured');
+    expect(frequencyResult.currentBandHeadwayMinutes).toBe(6);
+
+    expect(noServiceResult.activeBandState).toBe('no-service');
+    expect(noServiceResult.status).toBe('configured');
+    expect(noServiceResult.currentBandHeadwayMinutes).toBeNull();
+
+    expect(unsetResult.activeBandState).toBe('unset');
+    expect(unsetResult.status).toBe('not-configured');
+    expect(unsetResult.currentBandHeadwayMinutes).toBeNull();
+  });
+
   it('3) returns blocked for blocked readiness', () => {
     const blockedLine: Line = {
       ...createBaseLine(lineAId),

@@ -92,7 +92,11 @@ describe('evaluateLineServiceReadiness', () => {
     const result = evaluateLineServiceReadiness(line, placedStops);
 
     expect(result.status).toBe('blocked');
+    expect(result.summary.configuredTimeBandCount).toBe(0);
     expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY);
+    expect(issueCodes(result.issues)).toContain(
+      LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION
+    );
   });
 
   it('treats no-service bands as configured service-plan bands', () => {
