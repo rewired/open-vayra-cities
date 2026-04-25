@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 032: redesign selected-line `Departures` into a player-facing stop-by-hour timetable matrix (`Stop` + `00..23`) with per-cell minute departures, quiet no-service dashes, and clear unavailable downstream timing states when segment-level offsets are missing.
+- Slice 032: add pure deterministic `lineDepartureTimetableProjection` helper to project full-day departures from canonical service-band plans (`frequency` only), including midnight-wrapping night service handling.
+- Slice 032: remove the separate player-facing `Route baseline` action/modal and integrate compact route runtime/segment/status support details directly into `Departures`, with fallback-routing warning text when relevant.
+- Add ADR 0108 documenting departures timetable matrix boundaries and route-baseline integration decisions.
+
 - Slice 031b: remove canonical `unset` line service state so every MVP time band is explicitly `frequency` or `no-service`, and initialize newly completed lines with all-band `no-service` defaults.
 - Slice 031b: refactor `Edit service plan` into a compact desktop editor with `WINDOW / TIME BAND / SERVICE` columns and per-row `Interval` + text-input + `No service` controls only.
 - Slice 031b: enforce controlled interval input validation (`1..999`, digits-only, max three characters) with helper-owned parsing/activation behavior and no implicit no-service conversion from empty input.

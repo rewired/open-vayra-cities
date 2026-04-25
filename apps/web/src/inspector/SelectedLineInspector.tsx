@@ -3,7 +3,6 @@ import { useState, type ReactElement } from 'react';
 import { DeparturesDialog } from './DeparturesDialog';
 import { FrequencyEditorDialog } from './FrequencyEditorDialog';
 import { ProjectedVehiclesDialog } from './ProjectedVehiclesDialog';
-import { RouteBaselineDialog } from './RouteBaselineDialog';
 import { ServicePlanDialog } from './ServicePlanDialog';
 import type {
   LineFrequencyControlByTimeBand,
@@ -17,12 +16,13 @@ import type { TimeBandId } from '../domain/types/timeBand';
 interface SelectedLineInspectorProps {
   readonly panelState: LineSelectedInspectorPanelState;
   readonly selectedLineRouteBaselineMetrics: import('../domain/projection/useNetworkPlanningProjections').RouteBaselineAggregateMetrics | null;
+  readonly placedStops: readonly import('../domain/types/stop').Stop[];
+  readonly activeTimeBandId: TimeBandId;
   readonly lineFrequencyInputByTimeBand: LineFrequencyInputByTimeBand;
   readonly lineFrequencyControlByTimeBand: LineFrequencyControlByTimeBand;
   readonly lineFrequencyValidationByTimeBand: LineFrequencyValidationByTimeBand;
   readonly selectedLineServiceProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineServicePlanForLine> | null;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineSelectedServiceInspector> | null;
-  readonly selectedLineDepartureInspectorProjection: ReturnType<typeof import('../domain/projection/lineDepartureScheduleProjection').projectLineSelectedDepartureInspector> | null;
   readonly selectedLineVehicleProjection: ReturnType<typeof import('../domain/projection/lineVehicleProjection').projectLineVehicleNetwork>['lines'][number] | null;
   readonly onFrequencyChange: (
     timeBandId: TimeBandId,
@@ -31,7 +31,7 @@ interface SelectedLineInspectorProps {
   ) => void;
 }
 
-type SelectedLineDialogId = 'frequency' | 'service-plan' | 'departures' | 'projected-vehicles' | 'route-baseline';
+type SelectedLineDialogId = 'frequency' | 'service-plan' | 'departures' | 'projected-vehicles';
 
 const formatIssueSummaryLabel = (blockerCount: number, warningCount: number): string =>
   `${blockerCount} blocker${blockerCount === 1 ? '' : 's'} · ${warningCount} warning${warningCount === 1 ? '' : 's'}`;
@@ -44,12 +44,13 @@ const MAX_VISIBLE_STOP_CHIPS = 4;
 export function SelectedLineInspector({
   panelState,
   selectedLineRouteBaselineMetrics,
+  placedStops,
+  activeTimeBandId,
   lineFrequencyInputByTimeBand,
   lineFrequencyControlByTimeBand,
   lineFrequencyValidationByTimeBand,
   selectedLineServiceProjection,
   selectedLineServiceInspectorProjection,
-  selectedLineDepartureInspectorProjection,
   selectedLineVehicleProjection,
   onFrequencyChange
 }: SelectedLineInspectorProps): ReactElement {
@@ -155,9 +156,6 @@ export function SelectedLineInspector({
           >
             Projected vehicles
           </button>
-          <button type="button" className="inspector-lines-tab__action" onClick={() => setActiveDialogId('route-baseline')}>
-            Route baseline
-          </button>
         </div>
       </section>
 
@@ -178,18 +176,15 @@ export function SelectedLineInspector({
       <DeparturesDialog
         open={activeDialogId === 'departures'}
         onClose={() => setActiveDialogId(null)}
-        selectedLineDepartureInspectorProjection={selectedLineDepartureInspectorProjection}
+        selectedLine={panelState.selectedLine}
+        placedStops={placedStops}
+        activeTimeBandId={activeTimeBandId}
+        selectedLineRouteBaselineMetrics={selectedLineRouteBaselineMetrics}
       />
       <ProjectedVehiclesDialog
         open={activeDialogId === 'projected-vehicles'}
         onClose={() => setActiveDialogId(null)}
         selectedLineVehicleProjection={selectedLineVehicleProjection}
-      />
-      <RouteBaselineDialog
-        open={activeDialogId === 'route-baseline'}
-        onClose={() => setActiveDialogId(null)}
-        selectedLineRouteBaselineMetrics={selectedLineRouteBaselineMetrics}
-        routeSegments={panelState.selectedLine.routeSegments}
       />
     </div>
   );

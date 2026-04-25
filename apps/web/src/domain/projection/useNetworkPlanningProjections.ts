@@ -1,5 +1,5 @@
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
-import { projectLineDepartureScheduleForLine, projectLineDepartureScheduleNetwork, projectLineSelectedDepartureInspector } from './lineDepartureScheduleProjection';
+import { projectLineDepartureScheduleForLine, projectLineDepartureScheduleNetwork } from './lineDepartureScheduleProjection';
 import { projectLineServicePlan, projectLineServicePlanForLine, projectLineSelectedServiceInspector } from './lineServicePlanProjection';
 import { projectLineVehicleNetwork } from './lineVehicleProjection';
 import { resolveLineServiceBandHeadwayMinutes, type Line } from '../types/line';
@@ -9,7 +9,6 @@ import type { SimulationMinuteOfDay } from '../types/simulationClock';
 import type { LineRouteSegment, RouteStatus } from '../types/lineRoute';
 
 const MAX_READINESS_ISSUES_VISIBLE = 5;
-const MAX_UPCOMING_DEPARTURES_VISIBLE = 5;
 
 interface SelectedLineStructureSummary {
   readonly stopCount: number;
@@ -53,7 +52,6 @@ export interface NetworkPlanningProjections {
   readonly selectedLineVehicleProjection: ReturnType<typeof projectLineVehicleNetwork>['lines'][number] | null;
   readonly networkServicePlanProjection: ReturnType<typeof projectLineServicePlan>;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof projectLineSelectedServiceInspector> | null;
-  readonly selectedLineDepartureInspectorProjection: ReturnType<typeof projectLineSelectedDepartureInspector> | null;
 }
 
 const projectRouteBaselineAggregateMetrics = (
@@ -142,14 +140,6 @@ export const useNetworkPlanningProjections = (
   const selectedLineServiceInspectorProjection = selectedLineServiceProjection
     ? projectLineSelectedServiceInspector(selectedLineServiceProjection, MAX_READINESS_ISSUES_VISIBLE)
     : null;
-  const selectedLineDepartureInspectorProjection = selectedLineDepartureProjection
-    ? projectLineSelectedDepartureInspector(
-        selectedLineDepartureProjection,
-        MAX_UPCOMING_DEPARTURES_VISIBLE,
-        MAX_READINESS_ISSUES_VISIBLE
-      )
-    : null;
-
   return {
     staticNetworkSummaryKpis,
     selectedLineRouteBaselineMetrics,
@@ -159,7 +149,6 @@ export const useNetworkPlanningProjections = (
     vehicleNetworkProjection,
     selectedLineVehicleProjection,
     networkServicePlanProjection,
-    selectedLineServiceInspectorProjection,
-    selectedLineDepartureInspectorProjection
+    selectedLineServiceInspectorProjection
   };
 };

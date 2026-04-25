@@ -20,9 +20,10 @@ interface InspectorPanelProps {
   readonly networkServicePlanProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineServicePlan>;
   readonly vehicleNetworkProjection: ReturnType<typeof import('../domain/projection/lineVehicleProjection').projectLineVehicleNetwork>;
   readonly selectedLineRouteBaselineMetrics: import('../domain/projection/useNetworkPlanningProjections').RouteBaselineAggregateMetrics | null;
+  readonly placedStops: readonly import('../domain/types/stop').Stop[];
+  readonly activeTimeBandId: TimeBandId;
   readonly selectedLineServiceProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineServicePlanForLine> | null;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineSelectedServiceInspector> | null;
-  readonly selectedLineDepartureInspectorProjection: ReturnType<typeof import('../domain/projection/lineDepartureScheduleProjection').projectLineSelectedDepartureInspector> | null;
   readonly selectedLineVehicleProjection: ReturnType<typeof import('../domain/projection/lineVehicleProjection').projectLineVehicleNetwork>['lines'][number] | null;
   readonly lineFrequencyInputByTimeBand: LineFrequencyInputByTimeBand;
   readonly lineFrequencyControlByTimeBand: LineFrequencyControlByTimeBand;
@@ -55,9 +56,10 @@ export function InspectorPanel({
   networkServicePlanProjection,
   vehicleNetworkProjection,
   selectedLineRouteBaselineMetrics,
+  placedStops,
+  activeTimeBandId,
   selectedLineServiceProjection,
   selectedLineServiceInspectorProjection,
-  selectedLineDepartureInspectorProjection,
   selectedLineVehicleProjection,
   lineFrequencyInputByTimeBand,
   lineFrequencyControlByTimeBand,
@@ -176,12 +178,13 @@ export function InspectorPanel({
                 <SelectedLineInspector
                   panelState={inspectorPanelState}
                   selectedLineRouteBaselineMetrics={selectedLineRouteBaselineMetrics}
+                  placedStops={placedStops}
+                  activeTimeBandId={activeTimeBandId}
                   lineFrequencyInputByTimeBand={lineFrequencyInputByTimeBand}
                   lineFrequencyControlByTimeBand={lineFrequencyControlByTimeBand}
                   lineFrequencyValidationByTimeBand={lineFrequencyValidationByTimeBand}
                   selectedLineServiceProjection={selectedLineServiceProjection}
                   selectedLineServiceInspectorProjection={selectedLineServiceInspectorProjection}
-                  selectedLineDepartureInspectorProjection={selectedLineDepartureInspectorProjection}
                   selectedLineVehicleProjection={selectedLineVehicleProjection}
                   onFrequencyChange={onFrequencyChange}
                 />

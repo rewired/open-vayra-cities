@@ -241,9 +241,10 @@ export default function App(): ReactElement {
         networkServicePlanProjection={projections.networkServicePlanProjection}
         vehicleNetworkProjection={projections.vehicleNetworkProjection}
         selectedLineRouteBaselineMetrics={projections.selectedLineRouteBaselineMetrics}
+        placedStops={sessionController.sessionStops}
+        activeTimeBandId={clockController.activeSimulationTimeBandId}
         selectedLineServiceProjection={projections.selectedLineServiceProjection}
         selectedLineServiceInspectorProjection={projections.selectedLineServiceInspectorProjection}
-        selectedLineDepartureInspectorProjection={projections.selectedLineDepartureInspectorProjection}
         selectedLineVehicleProjection={projections.selectedLineVehicleProjection}
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
         lineFrequencyControlByTimeBand={sessionController.lineFrequencyControlByTimeBand}
