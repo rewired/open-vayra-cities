@@ -5,7 +5,12 @@ import { FrequencyEditorDialog } from './FrequencyEditorDialog';
 import { ProjectedVehiclesDialog } from './ProjectedVehiclesDialog';
 import { RouteBaselineDialog } from './RouteBaselineDialog';
 import { ServicePlanDialog } from './ServicePlanDialog';
-import type { LineFrequencyInputByTimeBand, LineFrequencyValidationByTimeBand } from '../session/useNetworkSessionState';
+import type {
+  LineFrequencyControlByTimeBand,
+  LineFrequencyInputByTimeBand,
+  LineFrequencyValidationByTimeBand,
+  SelectedLineFrequencyUpdateAction
+} from '../session/useNetworkSessionState';
 import type { LineSelectedInspectorPanelState } from './types';
 import type { TimeBandId } from '../domain/types/timeBand';
 
@@ -13,12 +18,17 @@ interface SelectedLineInspectorProps {
   readonly panelState: LineSelectedInspectorPanelState;
   readonly selectedLineRouteBaselineMetrics: import('../domain/projection/useNetworkPlanningProjections').RouteBaselineAggregateMetrics | null;
   readonly lineFrequencyInputByTimeBand: LineFrequencyInputByTimeBand;
+  readonly lineFrequencyControlByTimeBand: LineFrequencyControlByTimeBand;
   readonly lineFrequencyValidationByTimeBand: LineFrequencyValidationByTimeBand;
   readonly selectedLineServiceProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineServicePlanForLine> | null;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineSelectedServiceInspector> | null;
   readonly selectedLineDepartureInspectorProjection: ReturnType<typeof import('../domain/projection/lineDepartureScheduleProjection').projectLineSelectedDepartureInspector> | null;
   readonly selectedLineVehicleProjection: ReturnType<typeof import('../domain/projection/lineVehicleProjection').projectLineVehicleNetwork>['lines'][number] | null;
-  readonly onFrequencyChange: (timeBandId: TimeBandId, rawInputValue: string) => void;
+  readonly onFrequencyChange: (
+    timeBandId: TimeBandId,
+    rawInputValue: string,
+    action?: SelectedLineFrequencyUpdateAction
+  ) => void;
 }
 
 type SelectedLineDialogId = 'frequency' | 'service-plan' | 'departures' | 'projected-vehicles' | 'route-baseline';
@@ -33,6 +43,7 @@ export function SelectedLineInspector({
   panelState,
   selectedLineRouteBaselineMetrics,
   lineFrequencyInputByTimeBand,
+  lineFrequencyControlByTimeBand,
   lineFrequencyValidationByTimeBand,
   selectedLineServiceProjection,
   selectedLineServiceInspectorProjection,
@@ -118,6 +129,7 @@ export function SelectedLineInspector({
         open={activeDialogId === 'frequency'}
         onClose={() => setActiveDialogId(null)}
         lineFrequencyInputByTimeBand={lineFrequencyInputByTimeBand}
+        lineFrequencyControlByTimeBand={lineFrequencyControlByTimeBand}
         lineFrequencyValidationByTimeBand={lineFrequencyValidationByTimeBand}
         onFrequencyChange={onFrequencyChange}
       />

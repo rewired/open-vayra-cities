@@ -485,6 +485,34 @@ body {
   gap: 4px;
   font-size: 0.85rem;
   color: #c8d6ee;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid #2f415f;
+  border-radius: 8px;
+}
+
+.inspector-frequency-editor__row legend {
+  padding: 0 4px;
+  font-size: 0.82rem;
+  color: #d9e7ff;
+}
+
+.inspector-frequency-editor__mode-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.inspector-frequency-editor__mode-group label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inspector-frequency-editor__input-label {
+  display: grid;
+  gap: 4px;
 }
 
 .inspector-frequency-editor__row input {
