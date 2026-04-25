@@ -36,6 +36,8 @@ type SelectedLineDialogId = 'frequency' | 'service-plan' | 'departures' | 'proje
 const formatIssueSummaryLabel = (blockerCount: number, warningCount: number): string =>
   `${blockerCount} blocker${blockerCount === 1 ? '' : 's'} · ${warningCount} warning${warningCount === 1 ? '' : 's'}`;
 
+const MAX_VISIBLE_STOP_CHIPS = 4;
+
 /**
  * Renders compact selected-line summary actions and opens focused dialogs for detailed inspector sections.
  */
@@ -58,6 +60,9 @@ export function SelectedLineInspector({
   const serviceWarningCount = selectedLineServiceInspectorProjection?.warningCount ?? 0;
   const issueSummaryBlockerCount = Math.max(readinessBlockerCount, serviceBlockerCount);
   const issueSummaryWarningCount = Math.max(readinessWarningCount, serviceWarningCount);
+  const orderedStopIds = panelState.selectedLine.stopIds;
+  const visibleStopIds = orderedStopIds.slice(0, MAX_VISIBLE_STOP_CHIPS);
+  const hasCollapsedStops = orderedStopIds.length > MAX_VISIBLE_STOP_CHIPS;
 
   return (
     <div className="selected-line-inspector">
@@ -70,23 +75,54 @@ export function SelectedLineInspector({
               <td className="inspector-compact-table__value--left">{`${panelState.selectedLine.id} / ${panelState.selectedLine.label}`}</td>
             </tr>
             <tr>
-              <th scope="row">Stop count</th>
-              <td>{panelState.selectedLine.stopIds.length}</td>
-            </tr>
-            <tr>
               <th scope="row">Ordered stops</th>
-              <td className="inspector-compact-table__value--left">{panelState.selectedLine.stopIds.join(' → ')}</td>
-            </tr>
-            <tr>
-              <th scope="row">Segments / route time</th>
-              <td>
-                {selectedLineRouteBaselineMetrics
-                  ? `${selectedLineRouteBaselineMetrics.segmentCount} / ${selectedLineRouteBaselineMetrics.totalLineMinutes.toFixed(2)} min`
-                  : 'Unavailable'}
+              <td className="inspector-compact-table__value--left">
+                <div className="selected-line-inspector__stop-chip-row" aria-label="Ordered stops preview">
+                  {visibleStopIds.map((stopId) => (
+                    <span key={stopId} className="selected-line-inspector__stop-chip">
+                      {stopId}
+                    </span>
+                  ))}
+                  {hasCollapsedStops ? (
+                    <span className="selected-line-inspector__stop-chip selected-line-inspector__stop-chip--more">
+                      +{orderedStopIds.length - visibleStopIds.length} more
+                    </span>
+                  ) : null}
+                </div>
+                {hasCollapsedStops ? (
+                  <details className="selected-line-inspector__stop-sequence-details">
+                    <summary>Expand stop sequence</summary>
+                    <div className="selected-line-inspector__stop-chip-row" aria-label="Ordered stops full sequence">
+                      {orderedStopIds.map((stopId) => (
+                        <span key={`${stopId}-full`} className="selected-line-inspector__stop-chip">
+                          {stopId}
+                        </span>
+                      ))}
+                    </div>
+                  </details>
+                ) : null}
               </td>
             </tr>
           </tbody>
         </table>
+        <div className="selected-line-inspector__summary-stats" aria-label="Selected line route summary">
+          <div className="selected-line-inspector__summary-stat-card">
+            <span className="selected-line-inspector__summary-stat-label">Stops</span>
+            <strong className="selected-line-inspector__summary-stat-value">{orderedStopIds.length}</strong>
+          </div>
+          <div className="selected-line-inspector__summary-stat-card">
+            <span className="selected-line-inspector__summary-stat-label">Segments</span>
+            <strong className="selected-line-inspector__summary-stat-value">
+              {selectedLineRouteBaselineMetrics ? selectedLineRouteBaselineMetrics.segmentCount : 'Unavailable'}
+            </strong>
+          </div>
+          <div className="selected-line-inspector__summary-stat-card">
+            <span className="selected-line-inspector__summary-stat-label">Runtime</span>
+            <strong className="selected-line-inspector__summary-stat-value">
+              {selectedLineRouteBaselineMetrics ? `${selectedLineRouteBaselineMetrics.totalLineMinutes.toFixed(2)} min` : 'Unavailable'}
+            </strong>
+          </div>
+        </div>
       </section>
 
       <section className="inspector-card" aria-label="Selected line readiness pills">
@@ -104,7 +140,7 @@ export function SelectedLineInspector({
         <h3>Actions</h3>
         <div className="selected-line-inspector__actions-grid">
           <button type="button" className="inspector-lines-tab__action" onClick={() => setActiveDialogId('frequency')}>
-            Edit service plan
+            Edit frequency
           </button>
           <button type="button" className="inspector-lines-tab__action" onClick={() => setActiveDialogId('service-plan')}>
             Service plan
