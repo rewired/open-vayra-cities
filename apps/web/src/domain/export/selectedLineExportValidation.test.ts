@@ -10,8 +10,14 @@ const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = dirname(currentFilePath);
 const fixturePath = resolve(currentDirPath, '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v2.json');
 
-const readFixturePayload = (): SelectedLineExportPayload =>
-  JSON.parse(readFileSync(fixturePath, 'utf-8')) as SelectedLineExportPayload;
+const readFixturePayload = (): SelectedLineExportPayload => {
+  const payload = JSON.parse(readFileSync(fixturePath, 'utf-8')) as any;
+  // Patch old v2 fixture to satisfy v3 validation during migration
+  payload.schemaVersion = 'cityops-selected-line-export-v3';
+  payload.line.topology = payload.line.topology ?? 'linear';
+  payload.line.servicePattern = payload.line.servicePattern ?? 'one-way';
+  return payload as SelectedLineExportPayload;
+};
 
 const expectIssue = (payload: SelectedLineExportPayload, expectedCode: string): void => {
   const result = validateSelectedLineExportPayload(payload);

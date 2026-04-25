@@ -798,6 +798,67 @@ body {
   --inspector-dialog-surface-width: 760px;
 }
 
+.inspector-dialog__surface--completion {
+  --inspector-dialog-surface-width: 440px;
+}
+
+.line-completion-dialog__content {
+  display: grid;
+  gap: 20px;
+  padding: 8px 4px;
+}
+
+.line-completion-dialog__section h4 {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  color: #9eb4d7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.line-completion-dialog__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.line-completion-dialog__option {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid #425b83;
+  border-radius: 10px;
+  background: #1b2a40;
+  color: #d9e7fd;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.line-completion-dialog__option:hover {
+  border-color: #5379ad;
+  background: #243653;
+}
+
+.line-completion-dialog__option--active {
+  border-color: #f5c358;
+  background: #2f466f;
+  color: #fdf4df;
+}
+
+.line-completion-dialog__option strong {
+  font-size: 0.95rem;
+}
+
+.line-completion-dialog__option span {
+  font-size: 0.72rem;
+  color: #adc2e2;
+}
+
+.line-completion-dialog__option--active span {
+  color: #e8ce92;
+}
+
 .inspector-dialog__surface--large {
   --inspector-dialog-surface-width: 980px;
   max-height: min(86vh, 860px);

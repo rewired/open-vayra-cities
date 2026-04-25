@@ -62,6 +62,8 @@ const createFullyConfiguredLine = (): Line => ({
   id: lineId,
   label: 'Line 1',
   stopIds: [stopA, stopB, stopC],
+  topology: 'linear',
+  servicePattern: 'one-way',
   routeSegments: [createSegment(1, stopA, stopB), createSegment(2, stopB, stopC)],
   frequencyByTimeBand: {
     'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(6) },
@@ -296,6 +298,8 @@ describe('evaluateLineServiceReadiness', () => {
       id: payload.line.id,
       label: payload.line.label,
       stopIds: payload.line.orderedStopIds,
+      topology: (payload.line as any).topology ?? 'linear',
+      servicePattern: (payload.line as any).servicePattern ?? 'one-way',
       routeSegments: payload.line.routeSegments,
       frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };

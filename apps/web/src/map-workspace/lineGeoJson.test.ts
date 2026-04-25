@@ -62,6 +62,8 @@ const buildLine = ({
   id: lineId,
   label: 'Line 1',
   stopIds,
+  topology: 'linear',
+  servicePattern: 'one-way',
   routeSegments,
   frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
 });

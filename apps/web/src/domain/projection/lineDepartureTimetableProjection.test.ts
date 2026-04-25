@@ -48,6 +48,8 @@ const createLine = (segments: readonly LineRouteSegment[]): Line => ({
   id: lineId,
   label: 'Line 1',
   stopIds: [stopA, stopB, stopC],
+  topology: 'linear',
+  servicePattern: 'one-way',
   routeSegments: segments,
   frequencyByTimeBand: {
     'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(5) },

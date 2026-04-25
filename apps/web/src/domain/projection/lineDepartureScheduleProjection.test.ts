@@ -63,6 +63,8 @@ const createBaseLine = (
   id: lineId,
   label: `Line ${lineId}`,
   stopIds: [stopA, stopB, stopC],
+  topology: 'linear',
+  servicePattern: 'one-way',
   routeSegments: [
     createSegment(1, lineId, stopA, stopB, 4, routeStatus),
     createSegment(2, lineId, stopB, stopC, 6, routeStatus)
@@ -289,6 +291,8 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
       id: payload.line.id,
       label: payload.line.label,
       stopIds: payload.line.orderedStopIds,
+      topology: (payload.line as any).topology ?? 'linear',
+      servicePattern: (payload.line as any).servicePattern ?? 'one-way',
       routeSegments: payload.line.routeSegments,
       frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };

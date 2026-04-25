@@ -113,39 +113,76 @@ const projectVehiclesForLine = (
     };
   }
 
-  const roundTripSeconds = planningProjection.roundTripSeconds;
-  const totalTravelTimeSeconds = routeBaseline.totalTravelTimeSeconds;
+  const totalForwardSeconds = routeBaseline.totalTravelTimeSeconds;
+  const totalReverseSeconds = routeBaseline.totalReverseTravelTimeSeconds ?? totalForwardSeconds;
   const recoverySeconds = DEFAULT_TURNAROUND_RECOVERY_MINUTES * SECONDS_PER_MINUTE;
   const currentSecondsOfDay = currentMinuteOfDay * SECONDS_PER_MINUTE;
+
+  const isLoop = line.topology === 'loop';
+  const isBidirectional = line.servicePattern === 'bidirectional';
+  const roundTripSeconds = planningProjection.roundTripSeconds;
 
   const vehicleStatus: LineVehicleProjectionStatus = routeBaseline.status === 'fallback-routed' ? 'degraded-projected' : 'projected';
   const fallbackNote = routeBaseline.status === 'fallback-routed' ? 'Degraded: fallback routing in use.' : undefined;
 
   for (let i = 0; i < projectedVehicleCount; i += 1) {
-    // Determine deterministic start time for this bus phase
     const phaseOffsetSeconds = i * headwayMinutes * SECONDS_PER_MINUTE;
     const elapsedPhaseSeconds = (currentSecondsOfDay + phaseOffsetSeconds) % roundTripSeconds;
     const routeProgressRatio = clampRouteSegmentProgressRatio(elapsedPhaseSeconds / roundTripSeconds);
 
     let direction: 'outbound' | 'return';
     let activeTravelSeconds: number;
+    let activeSegments: readonly RouteSegmentBaseline[];
+    let activeTotalSeconds: number;
 
-    if (elapsedPhaseSeconds <= totalTravelTimeSeconds) {
+    if (elapsedPhaseSeconds <= totalForwardSeconds) {
+      // 1. Forward motion
       direction = 'outbound';
       activeTravelSeconds = elapsedPhaseSeconds;
-    } else if (elapsedPhaseSeconds <= totalTravelTimeSeconds + recoverySeconds / 2) {
+      activeSegments = routeBaseline.segments;
+      activeTotalSeconds = totalForwardSeconds;
+    } else if (isLoop && !isBidirectional) {
+      // 2. Loop Recovery (One-way loop)
       direction = 'outbound';
-      activeTravelSeconds = totalTravelTimeSeconds;
-    } else if (elapsedPhaseSeconds <= 2 * totalTravelTimeSeconds + recoverySeconds / 2) {
+      activeTravelSeconds = totalForwardSeconds;
+      activeSegments = routeBaseline.segments;
+      activeTotalSeconds = totalForwardSeconds;
+    } else if (elapsedPhaseSeconds <= totalForwardSeconds + recoverySeconds / 2) {
+      // 3. Outbound Recovery (Linear or Bidirectional)
+      direction = 'outbound';
+      activeTravelSeconds = totalForwardSeconds;
+      activeSegments = routeBaseline.segments;
+      activeTotalSeconds = totalForwardSeconds;
+    } else if (isBidirectional && routeBaseline.reverseSegments) {
+      // 4. Actual Reverse Motion
       direction = 'return';
-      const timeInReturn = elapsedPhaseSeconds - (totalTravelTimeSeconds + recoverySeconds / 2);
-      activeTravelSeconds = Math.max(0, totalTravelTimeSeconds - timeInReturn);
+      const timeInReturn = elapsedPhaseSeconds - (totalForwardSeconds + recoverySeconds / 2);
+      activeTravelSeconds = Math.min(timeInReturn, totalReverseSeconds);
+      activeSegments = routeBaseline.reverseSegments;
+      activeTotalSeconds = totalReverseSeconds;
+    } else if (isBidirectional) {
+      // 5. Symmetric Reverse Fallback (Missing reverse segments)
+      direction = 'return';
+      const timeInReturn = elapsedPhaseSeconds - (totalForwardSeconds + recoverySeconds / 2);
+      activeTravelSeconds = Math.max(0, totalForwardSeconds - timeInReturn);
+      activeSegments = routeBaseline.segments;
+      activeTotalSeconds = totalForwardSeconds;
+    } else if (!isLoop) {
+      // 6. Linear One-way Symmetric Return (Fallback behavior)
+      direction = 'return';
+      const timeInReturn = elapsedPhaseSeconds - (totalForwardSeconds + recoverySeconds / 2);
+      activeTravelSeconds = Math.max(0, totalForwardSeconds - timeInReturn);
+      activeSegments = routeBaseline.segments;
+      activeTotalSeconds = totalForwardSeconds;
     } else {
+      // 7. Final recovery
       direction = 'return';
       activeTravelSeconds = 0;
+      activeSegments = isBidirectional ? (routeBaseline.reverseSegments ?? routeBaseline.segments) : routeBaseline.segments;
+      activeTotalSeconds = isBidirectional ? totalReverseSeconds : totalForwardSeconds;
     }
 
-    const segmentProgress = findSegmentProgress(routeBaseline.segments, activeTravelSeconds, totalTravelTimeSeconds);
+    const segmentProgress = findSegmentProgress(activeSegments, activeTravelSeconds, activeTotalSeconds);
 
     const degradedNote = segmentProgress.note ?? fallbackNote;
     vehicles.push({

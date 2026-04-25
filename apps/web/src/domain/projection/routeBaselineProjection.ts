@@ -1,5 +1,5 @@
 import type { Line } from '../types/line';
-import { createRouteDistanceMeters } from '../types/lineRoute';
+import { createRouteDistanceMeters, type LineRouteSegment } from '../types/lineRoute';
 import {
   createRouteTravelTimeSeconds,
   type LineRouteBaseline,
@@ -9,19 +9,98 @@ import {
   type RouteSegmentBaselineStatus,
   type RouteSegmentBaselineWarning
 } from '../types/routeBaseline';
-import type { Stop } from '../types/stop';
+import type { Stop, StopId } from '../types/stop';
 
 const SECONDS_PER_MINUTE = 60;
 
 /**
+ * Internal helper to project a single segment baseline from precomputed route segments.
+ */
+function projectSegmentBaseline(
+  line: Line,
+  fromStopId: StopId,
+  toStopId: StopId,
+  segmentIndex: number,
+  placedStopIds: Set<StopId>,
+  routeSegments: readonly LineRouteSegment[]
+): {
+  segment: RouteSegmentBaseline;
+  isRouted: boolean;
+  isFallback: boolean;
+  isUnresolved: boolean;
+} {
+  const isFromPlaced = placedStopIds.has(fromStopId);
+  const isToPlaced = placedStopIds.has(toStopId);
+
+  // Match logic: preferred by index, then by stop pair match
+  const expectedSegment = routeSegments[segmentIndex];
+  const routeSegment =
+    expectedSegment?.fromStopId === fromStopId && expectedSegment?.toStopId === toStopId
+      ? expectedSegment
+      : routeSegments.find((segment) => segment.fromStopId === fromStopId && segment.toStopId === toStopId);
+
+  let status: RouteSegmentBaselineStatus;
+  const warnings: RouteSegmentBaselineWarning[] = [];
+  let distanceMeters = createRouteDistanceMeters(0);
+  let travelTimeSeconds = createRouteTravelTimeSeconds(0);
+  let geometry = routeSegment ? routeSegment.orderedGeometry : [];
+
+  let isRouted = false;
+  let isFallback = false;
+  let isUnresolved = false;
+
+  if (!isFromPlaced || !isToPlaced) {
+    status = 'unresolved';
+    isUnresolved = true;
+    warnings.push({ type: 'missing-stop-position' });
+  } else if (!routeSegment) {
+    status = 'unresolved';
+    isUnresolved = true;
+    warnings.push({ type: 'missing-route-segment' });
+  } else {
+    distanceMeters = routeSegment.distanceMeters;
+    travelTimeSeconds = createRouteTravelTimeSeconds(routeSegment.totalTravelMinutes * SECONDS_PER_MINUTE);
+
+    if (routeSegment.status === 'fallback-routed') {
+      status = 'fallback-routed';
+      isFallback = true;
+      warnings.push({ type: 'fallback-routing-only' });
+    } else if (routeSegment.status === 'routed') {
+      status = 'routed';
+      isRouted = true;
+    } else {
+      status = 'unresolved';
+      isUnresolved = true;
+    }
+  }
+
+  return {
+    segment: {
+      lineId: line.id,
+      segmentIndex,
+      fromStopId,
+      toStopId,
+      geometry,
+      distanceMeters,
+      travelTimeSeconds,
+      status,
+      warnings
+    },
+    isRouted,
+    isFallback,
+    isUnresolved
+  };
+}
+
+/**
  * Projects a deterministic route baseline from a line and its placed stops.
  *
- * It generates one segment record per consecutive stop pair in the line, gracefully
- * handling missing stop coordinates or missing precomputed routing segments by marking
- * them as unresolved. It will never throw for normal editing states.
+ * It generates segment records for both forward and (if bidirectional) reverse directions,
+ * accounting for loop topology where the last stop connects back to the first.
  */
 export const resolveLineRouteBaseline = (line: Line, placedStops: readonly Stop[]): LineRouteBaseline => {
-  if (line.stopIds.length < 2) {
+  const stopCount = line.stopIds.length;
+  if (stopCount < 2) {
     return {
       lineId: line.id,
       segments: [],
@@ -33,75 +112,58 @@ export const resolveLineRouteBaseline = (line: Line, placedStops: readonly Stop[
   }
 
   const placedStopIds = new Set(placedStops.map((stop) => stop.id));
-  const segments: RouteSegmentBaseline[] = [];
-  let totalDistanceRaw = 0;
-  let totalTravelSecondsRaw = 0;
+  const isLoop = line.topology === 'loop';
+  const isBidirectional = line.servicePattern === 'bidirectional';
+  const forwardTargetCount = isLoop ? stopCount : stopCount - 1;
+
   let hasRouted = false;
   let hasFallback = false;
   let hasUnresolved = false;
 
-  for (let index = 0; index < line.stopIds.length - 1; index += 1) {
-    const fromStopId = line.stopIds[index]!;
-    const toStopId = line.stopIds[index + 1]!;
+  // 1. Project forward segments
+  const forwardSegments: RouteSegmentBaseline[] = [];
+  let totalDistanceRaw = 0;
+  let totalTravelSecondsRaw = 0;
 
-    const isFromPlaced = placedStopIds.has(fromStopId);
-    const isToPlaced = placedStopIds.has(toStopId);
-
-    // Try to find the corresponding computed segment using both index and stop match
-    // to handle repeated stops safely if they occur.
-    const expectedSegment = line.routeSegments[index];
-    const routeSegment =
-      expectedSegment?.fromStopId === fromStopId && expectedSegment?.toStopId === toStopId
-        ? expectedSegment
-        : line.routeSegments.find((segment) => segment.fromStopId === fromStopId && segment.toStopId === toStopId);
-
-    let status: RouteSegmentBaselineStatus;
-    const warnings: RouteSegmentBaselineWarning[] = [];
-    let distanceMeters = createRouteDistanceMeters(0);
-    let travelTimeSeconds = createRouteTravelTimeSeconds(0);
-    let geometry = routeSegment ? routeSegment.orderedGeometry : [];
-
-    if (!isFromPlaced || !isToPlaced) {
-      status = 'unresolved';
-      hasUnresolved = true;
-      warnings.push({ type: 'missing-stop-position' });
-    } else if (!routeSegment) {
-      status = 'unresolved';
-      hasUnresolved = true;
-      warnings.push({ type: 'missing-route-segment' });
-    } else {
-      distanceMeters = routeSegment.distanceMeters;
-      travelTimeSeconds = createRouteTravelTimeSeconds(routeSegment.totalTravelMinutes * SECONDS_PER_MINUTE);
-
-      if (routeSegment.status === 'fallback-routed') {
-        status = 'fallback-routed';
-        hasFallback = true;
-        warnings.push({ type: 'fallback-routing-only' });
-      } else if (routeSegment.status === 'routed') {
-        status = 'routed';
-        hasRouted = true;
-      } else {
-        status = 'unresolved';
-        hasUnresolved = true;
-      }
-    }
-
-    totalDistanceRaw += distanceMeters;
-    totalTravelSecondsRaw += travelTimeSeconds;
-
-    segments.push({
-      lineId: line.id,
-      segmentIndex: index,
-      fromStopId,
-      toStopId,
-      geometry,
-      distanceMeters,
-      travelTimeSeconds,
-      status,
-      warnings
-    });
+  for (let i = 0; i < forwardTargetCount; i++) {
+    const fromStopId = line.stopIds[i]!;
+    const toStopId = line.stopIds[(i + 1) % stopCount]!;
+    const result = projectSegmentBaseline(line, fromStopId, toStopId, i, placedStopIds, line.routeSegments);
+    
+    forwardSegments.push(result.segment);
+    totalDistanceRaw += result.segment.distanceMeters;
+    totalTravelSecondsRaw += result.segment.travelTimeSeconds;
+    if (result.isRouted) hasRouted = true;
+    if (result.isFallback) hasFallback = true;
+    if (result.isUnresolved) hasUnresolved = true;
   }
 
+  // 2. Project reverse segments if bidirectional
+  let reverseSegments: RouteSegmentBaseline[] | undefined = undefined;
+  let totalReverseDistanceRaw = 0;
+  let totalReverseTravelSecondsRaw = 0;
+
+  if (isBidirectional && line.reverseRouteSegments) {
+    reverseSegments = [];
+    const reverseStopIds = isLoop
+      ? [line.stopIds[0], ...[...line.stopIds.slice(1)].reverse()]
+      : [...line.stopIds].reverse();
+
+    for (let i = 0; i < forwardTargetCount; i++) {
+      const fromStopId = reverseStopIds[i]!;
+      const toStopId = reverseStopIds[(i + 1) % stopCount]!;
+      const result = projectSegmentBaseline(line, fromStopId, toStopId, i, placedStopIds, line.reverseRouteSegments);
+      
+      reverseSegments.push(result.segment);
+      totalReverseDistanceRaw += result.segment.distanceMeters;
+      totalReverseTravelSecondsRaw += result.segment.travelTimeSeconds;
+      if (result.isRouted) hasRouted = true;
+      if (result.isFallback) hasFallback = true;
+      if (result.isUnresolved) hasUnresolved = true;
+    }
+  }
+
+  // 3. Aggregate aggregate status and warnings
   let aggregateStatus: LineRouteBaselineStatus;
   const aggregateWarnings: RouteBaselineWarning[] = [];
 
@@ -122,9 +184,12 @@ export const resolveLineRouteBaseline = (line: Line, placedStops: readonly Stop[
 
   return {
     lineId: line.id,
-    segments,
+    segments: forwardSegments,
+    reverseSegments,
     totalDistanceMeters: createRouteDistanceMeters(totalDistanceRaw),
+    totalReverseDistanceMeters: reverseSegments ? createRouteDistanceMeters(totalReverseDistanceRaw) : undefined,
     totalTravelTimeSeconds: createRouteTravelTimeSeconds(totalTravelSecondsRaw),
+    totalReverseTravelTimeSeconds: reverseSegments ? createRouteTravelTimeSeconds(totalReverseTravelSecondsRaw) : undefined,
     status: aggregateStatus,
     warnings: aggregateWarnings
   };

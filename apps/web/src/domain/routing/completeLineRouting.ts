@@ -1,10 +1,9 @@
 import { ROUTING_REQUEST_TIMEOUT_MS } from '../constants/routing';
-import type { LineId } from '../types/line';
+import type { LineId, LineServicePattern, LineTopology } from '../types/line';
 import type { LineRouteSegment } from '../types/lineRoute';
 import type { Stop, StopId } from '../types/stop';
 import {
   buildRoutedLineRouteSegments,
-  type BuildRoutedLineRouteSegmentsInput
 } from './buildRoutedLineRouteSegments';
 import { buildFallbackLineRouteSegments } from './fallbackLineRouting';
 import type { RoutingAdapter } from './RoutingAdapter';
@@ -16,7 +15,17 @@ export interface CompleteLineRoutingInput {
   readonly lineId: LineId;
   readonly orderedStopIds: readonly StopId[];
   readonly placedStops: readonly Stop[];
+  readonly topology: LineTopology;
+  readonly servicePattern: LineServicePattern;
   readonly routingAdapter: RoutingAdapter;
+}
+
+/**
+ * Result of completing a line with best-available routing.
+ */
+export interface CompleteLineRoutingResult {
+  readonly routeSegments: readonly LineRouteSegment[];
+  readonly reverseRouteSegments?: readonly LineRouteSegment[] | undefined;
 }
 
 /**
@@ -24,7 +33,7 @@ export interface CompleteLineRoutingInput {
  * 
  * Process:
  * 1. Prepares fallback segments (straight lines) as a reliable last resort.
- * 2. Attempts street-routed geometry via the provided adapter.
+ * 2. Attempts street-routed geometry via the provided adapter for forward and reverse directions.
  * 3. Enforces a centralized timeout to prevent UI hangs.
  * 4. Catches and gracefully handles any adapter failures or network errors.
  *
@@ -33,47 +42,86 @@ export interface CompleteLineRoutingInput {
  */
 export async function completeLineRouting(
   input: CompleteLineRoutingInput
-): Promise<LineRouteSegment[]> {
-  const { lineId, orderedStopIds, placedStops, routingAdapter } = input;
+): Promise<CompleteLineRoutingResult> {
+  const { lineId, orderedStopIds, placedStops, topology, servicePattern, routingAdapter } = input;
+  const closureMode = topology === 'loop' ? 'closed' : 'open';
 
-  // 1. Prepare the standard fallback as the "last resort" if the entire process hangs or crashes
-  const fallbackSegments = buildFallbackLineRouteSegments({
+  // 1. Prepare fallback data for both directions as a baseline
+  const forwardFallback = buildFallbackLineRouteSegments({
     lineId,
     orderedStopIds,
-    placedStops
+    placedStops,
+    closureMode
   });
 
-  try {
-    const buildInput: BuildRoutedLineRouteSegmentsInput = {
+  let reverseFallback: readonly LineRouteSegment[] | undefined = undefined;
+  let reverseStopIds: readonly StopId[] = [];
+  if (servicePattern === 'bidirectional') {
+    reverseStopIds = topology === 'loop'
+      ? [orderedStopIds[0]!, ...[...orderedStopIds.slice(1)].reverse()]
+      : [...orderedStopIds].reverse();
+
+    reverseFallback = buildFallbackLineRouteSegments({
+      lineId,
+      orderedStopIds: reverseStopIds,
+      placedStops,
+      closureMode
+    });
+  }
+
+  // 2. Execution block for the actual async routing attempts
+  const executeRouting = async (): Promise<CompleteLineRoutingResult> => {
+    const forwardResult = await buildRoutedLineRouteSegments({
       lineId,
       orderedStopIds,
       placedStops,
-      routingAdapter
-    };
-
-    // 2. Create a timeout promise that resolves to the fallback segments
-    const timeoutPromise = new Promise<LineRouteSegment[]>((resolve) => {
-      setTimeout(() => {
-        resolve(fallbackSegments);
-      }, ROUTING_REQUEST_TIMEOUT_MS);
+      routingAdapter,
+      closureMode
+    }).catch((error) => {
+      console.warn(`Forward routing failed for line ${lineId}, using fallback:`, error);
+      return { routeSegments: forwardFallback };
     });
 
-    // 3. Race the actual routing against the timeout
-    const routedResult = await Promise.race([
-      buildRoutedLineRouteSegments(buildInput),
-      timeoutPromise
-    ]);
-
-    // 4. Return result if it's the routed result, otherwise it's the timeout fallback
-    if (Array.isArray(routedResult)) {
-      return routedResult;
+    let reverseRouteSegments: readonly LineRouteSegment[] | undefined = undefined;
+    if (servicePattern === 'bidirectional') {
+      const reverseResult = await buildRoutedLineRouteSegments({
+        lineId,
+        orderedStopIds: reverseStopIds,
+        placedStops,
+        routingAdapter,
+        closureMode
+      }).catch((error) => {
+        console.warn(`Reverse routing failed for line ${lineId}, using fallback:`, error);
+        return { routeSegments: reverseFallback! };
+      });
+      reverseRouteSegments = reverseResult.routeSegments;
     }
 
-    return routedResult.routeSegments;
+    return {
+      routeSegments: forwardResult.routeSegments,
+      reverseRouteSegments
+    };
+  };
+
+  // 3. Race the routing execution against a centralized timeout
+  try {
+    return await Promise.race([
+      executeRouting(),
+      new Promise<CompleteLineRoutingResult>((resolve) => {
+        setTimeout(() => {
+          resolve({
+            routeSegments: forwardFallback,
+            reverseRouteSegments: reverseFallback
+          });
+        }, ROUTING_REQUEST_TIMEOUT_MS);
+      })
+    ]);
   } catch (error) {
-    // 5. Catch-all for any unexpected failures in the routing adapter or helper
-    // Ensures line completion never blocks the user.
-    console.error(`Routing failed for line ${lineId}, falling back to straight lines:`, error);
-    return fallbackSegments;
+    // Catch-all for any unexpected failures in the routing adapter or helper
+    console.error(`Routing orchestration failed for line ${lineId}, falling back:`, error);
+    return {
+      routeSegments: forwardFallback,
+      reverseRouteSegments: reverseFallback
+    };
   }
 }

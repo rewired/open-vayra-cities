@@ -106,8 +106,11 @@ export const convertSelectedLineExportPayloadToSession = (
     id: createLineId(payload.line.id),
     label: payload.line.label,
     stopIds: payload.line.orderedStopIds.map((stopId) => createStopId(stopId)),
+    topology: payload.line.topology,
+    servicePattern: payload.line.servicePattern,
     frequencyByTimeBand: convertLineServiceByTimeBand(payload),
-    routeSegments: convertLineRouteSegments(payload)
+    routeSegments: convertLineRouteSegments(payload),
+    reverseRouteSegments: payload.line.reverseRouteSegments
   };
 
   return {

@@ -87,8 +87,26 @@ export const projectLinePlanningVehicles = (
       warnings.push({ type: 'fallback-routing' });
     }
 
-    const roundTripSecondsRaw =
-      routeBaseline.totalTravelTimeSeconds * 2 + DEFAULT_TURNAROUND_RECOVERY_MINUTES * SECONDS_PER_MINUTE;
+    const isLoop = line.topology === 'loop';
+    const isBidirectional = line.servicePattern === 'bidirectional';
+    
+    let roundTripSecondsRaw: number;
+    if (isBidirectional) {
+      roundTripSecondsRaw = 
+        routeBaseline.totalTravelTimeSeconds + 
+        (routeBaseline.totalReverseTravelTimeSeconds ?? routeBaseline.totalTravelTimeSeconds) + 
+        DEFAULT_TURNAROUND_RECOVERY_MINUTES * SECONDS_PER_MINUTE;
+    } else if (isLoop) {
+      roundTripSecondsRaw = 
+        routeBaseline.totalTravelTimeSeconds + 
+        DEFAULT_TURNAROUND_RECOVERY_MINUTES * SECONDS_PER_MINUTE;
+    } else {
+      // Linear One-way: assume symmetric return trip
+      roundTripSecondsRaw = 
+        routeBaseline.totalTravelTimeSeconds * 2 + 
+        DEFAULT_TURNAROUND_RECOVERY_MINUTES * SECONDS_PER_MINUTE;
+    }
+
     const roundTripSeconds = createRouteTravelTimeSeconds(roundTripSecondsRaw);
     
     const roundTripMinutes = roundTripSecondsRaw / SECONDS_PER_MINUTE;

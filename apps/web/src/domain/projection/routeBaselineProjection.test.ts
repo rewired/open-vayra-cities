@@ -11,6 +11,8 @@ describe('routeBaselineProjection', () => {
         id: createLineId('l1'),
         label: 'Test Line',
         stopIds: [createStopId('s1')],
+        topology: 'linear',
+        servicePattern: 'one-way',
         routeSegments: [],
         frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
       },
@@ -32,6 +34,8 @@ describe('routeBaselineProjection', () => {
         id: createLineId('l1'),
         label: 'Test Line',
         stopIds: [s1, s2, s3],
+        topology: 'linear',
+        servicePattern: 'one-way',
         frequencyByTimeBand: createNoServiceLineServiceByTimeBand(),
         routeSegments: [
           {
@@ -103,6 +107,8 @@ describe('routeBaselineProjection', () => {
         id: createLineId('l1'),
         label: 'Test Line',
         stopIds: [s1, s2],
+        topology: 'linear',
+        servicePattern: 'one-way',
         frequencyByTimeBand: createNoServiceLineServiceByTimeBand(),
         routeSegments: [
           {
@@ -136,6 +142,8 @@ describe('routeBaselineProjection', () => {
         id: createLineId('l1'),
         label: 'Test Line',
         stopIds: [s1, s2],
+        topology: 'linear',
+        servicePattern: 'one-way',
         frequencyByTimeBand: createNoServiceLineServiceByTimeBand(),
         routeSegments: [] // Missing segment data
       },

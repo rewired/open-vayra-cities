@@ -45,6 +45,8 @@ const createBaseLine = (lineId: Line['id'], routeStatus: LineRouteSegment['statu
   id: lineId,
   label: `Line ${lineId}`,
   stopIds: [stopA, stopB, stopC],
+  topology: 'linear',
+  servicePattern: 'one-way',
   routeSegments: [createSegment(1, lineId, stopA, stopB, routeStatus), createSegment(2, lineId, stopB, stopC, routeStatus)],
   frequencyByTimeBand: {
     ...createNoServiceLineServiceByTimeBand(),

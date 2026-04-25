@@ -7,7 +7,7 @@ import {
 import { completeLineRouting } from '../domain/routing/completeLineRouting';
 import { getDefaultRoutingAdapter } from '../domain/routing/defaultRoutingAdapter';
 import type { Line } from '../domain/types/line';
-import { createLineId, createNoServiceLineServiceByTimeBand } from '../domain/types/line';
+import { createLineId, createNoServiceLineServiceByTimeBand, type LineTopology, type LineServicePattern } from '../domain/types/line';
 import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
@@ -30,6 +30,7 @@ import {
   type StopSelectionState
 } from './mapWorkspaceInteractions';
 import { StopHoverTooltip } from './StopHoverTooltip';
+import { LineCompletionDialog } from './LineCompletionDialog';
 import {
   buildLineModeUiFeedback,
   buildPlacementUiFeedback,
@@ -151,6 +152,7 @@ export function MapWorkspaceSurface({
     INITIAL_MAP_WORKSPACE_FEATURE_DIAGNOSTICS
   );
   const [isCompletingLine, setIsCompletingLine] = useState(false);
+  const [isCompletionDialogOpen, setIsCompletionDialogOpen] = useState(false);
   const activeToolModeRef = useRef<WorkspaceToolMode>(activeToolMode);
   const sessionLineCountRef = useRef(sessionLines.length);
   const onStopSelectionChangeRef = useRef(onStopSelectionChange);
@@ -621,12 +623,24 @@ export function MapWorkspaceSurface({
     setDraftLineState(INITIAL_DRAFT_LINE_STATE);
   };
 
-  const handleDraftComplete = async (): Promise<void> => {
+  const handleDraftCompleteClick = (): void => {
+    const draftStopIds = draftLineState.stopIds;
+
+    if (draftStopIds.length < MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE) {
+      return;
+    }
+
+    setIsCompletionDialogOpen(true);
+  };
+
+  const handleConfirmCompletion = async (options: { topology: LineTopology; servicePattern: LineServicePattern }): Promise<void> => {
     const draftStopIds = draftLineState.stopIds;
 
     if (draftStopIds.length < MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE || isCompletingLine) {
       return;
     }
+
+    const { topology, servicePattern } = options;
 
     // 1. Snapshot draft, ordinal, and placed stops to ensure async safety
     const snapshottedStopIds = [...draftStopIds];
@@ -638,10 +652,12 @@ export function MapWorkspaceSurface({
 
     try {
       // 2. Resolve route segments (async, street-routed if available)
-      const routeSegments = await completeLineRouting({
+      const routingResult = await completeLineRouting({
         lineId: nextCreatedLineId,
         orderedStopIds: snapshottedStopIds,
         placedStops: snapshottedPlacedStops,
+        topology,
+        servicePattern,
         routingAdapter: getDefaultRoutingAdapter()
       });
 
@@ -650,15 +666,21 @@ export function MapWorkspaceSurface({
         id: nextCreatedLineId,
         label: `${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} ${snapshottedOrdinal}`,
         stopIds: snapshottedStopIds,
-        routeSegments,
+        topology,
+        servicePattern,
+        routeSegments: routingResult.routeSegments,
+        reverseRouteSegments: routingResult.reverseRouteSegments,
         frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
       };
 
       onSessionLinesChange((currentLines) => [...currentLines, createdLine]);
       onSelectedLineIdChange(createdLine.id);
 
-      // 4. Clear draft only after success
+      // 4. Clear draft and close dialog only after success
       setDraftLineState(INITIAL_DRAFT_LINE_STATE);
+      setIsCompletionDialogOpen(false);
+    } catch (error) {
+      console.error('Failed to confirm line completion:', error);
     } finally {
       setIsCompletingLine(false);
     }
@@ -688,7 +710,7 @@ export function MapWorkspaceSurface({
             <button type="button" onClick={handleDraftCancel}>
               Cancel draft
             </button>
-            <button type="button" onClick={handleDraftComplete} disabled={!buildLineUiFeedback.canCompleteDraft || isCompletingLine}>
+            <button type="button" onClick={handleDraftCompleteClick} disabled={!buildLineUiFeedback.canCompleteDraft || isCompletingLine}>
               {isCompletingLine ? 'Creating...' : 'Complete line'}
             </button>
           </div>
@@ -702,6 +724,15 @@ export function MapWorkspaceSurface({
           y={hoveredStop.y}
           sessionLines={sessionLines}
           selectedLineId={selectedLineId}
+        />
+      )}
+
+      {isCompletionDialogOpen && (
+        <LineCompletionDialog
+          open={isCompletionDialogOpen}
+          onCancel={() => setIsCompletionDialogOpen(false)}
+          onConfirm={handleConfirmCompletion}
+          isProcessing={isCompletingLine}
         />
       )}
 

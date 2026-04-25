@@ -4,6 +4,35 @@ import type { LineRouteSegment } from './lineRoute';
 import type { StopId } from './stop';
 
 /**
+ * Explicit line topology determining how the stop sequence is traversed.
+ * - `linear`: an open path from the first stop to the last stop.
+ * - `loop`: a closed circuit where the last stop connects back to the first stop.
+ */
+export type LineTopology = 'linear' | 'loop';
+
+/**
+ * Explicit service direction pattern for the line.
+ * - `one-way`: service runs only in the forward (ordered) stop direction.
+ * - `bidirectional`: service runs in both forward and independently-routed reverse directions.
+ */
+export type LineServicePattern = 'one-way' | 'bidirectional';
+
+/**
+ * Directional discriminator for route segment lookups.
+ */
+export type LineTravelDirection = 'forward' | 'reverse';
+
+/**
+ * Canonical default topology for new lines.
+ */
+export const DEFAULT_LINE_TOPOLOGY: LineTopology = 'linear';
+
+/**
+ * Canonical default service pattern for new lines.
+ */
+export const DEFAULT_LINE_SERVICE_PATTERN: LineServicePattern = 'one-way';
+
+/**
  * Branded line identifier used to keep line ids distinct from plain strings.
  */
 export type LineId = string & { readonly __brand: 'LineId' };
@@ -32,7 +61,10 @@ export interface Line {
   readonly id: LineId;
   readonly label: string;
   readonly stopIds: readonly StopId[];
+  readonly topology: LineTopology;
+  readonly servicePattern: LineServicePattern;
   readonly routeSegments: readonly LineRouteSegment[];
+  readonly reverseRouteSegments?: readonly LineRouteSegment[] | undefined;
   readonly frequencyByTimeBand: LineServiceByTimeBand;
 }
 

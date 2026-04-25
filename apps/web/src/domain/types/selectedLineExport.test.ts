@@ -37,6 +37,8 @@ const selectedLine: Line = {
   id: lineId,
   label: 'Line 1',
   stopIds: [stopAId, stopBId],
+  topology: 'linear',
+  servicePattern: 'one-way',
   routeSegments,
   frequencyByTimeBand: {
     ...createNoServiceLineServiceByTimeBand(),
@@ -62,11 +64,13 @@ describe('buildSelectedLineExportPayload', () => {
       }
     });
 
-    expect(payload.schemaVersion).toBe('cityops-selected-line-export-v2');
+    expect(payload.schemaVersion).toBe('cityops-selected-line-export-v3');
     expect(payload.exportKind).toBe('single-line');
     expect(payload.createdAtIsoUtc).toBe('2026-04-24T12:00:00.000Z');
     expect(payload.line.id).toBe(lineId);
     expect(payload.line.orderedStopIds).toEqual([stopAId, stopBId]);
+    expect(payload.line.topology).toBe('linear');
+    expect(payload.line.servicePattern).toBe('one-way');
     expect(payload.line.routeSegments).toBe(routeSegments);
     expect(payload.stops.map((stop) => stop.id)).toEqual([stopAId, stopBId]);
     expect(payload.metadata).toEqual({

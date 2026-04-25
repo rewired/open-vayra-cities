@@ -43,6 +43,8 @@ const line: Line = {
   id: lineId,
   label: 'Line 1',
   stopIds: [stopA, stopB],
+  topology: 'linear',
+  servicePattern: 'one-way',
   routeSegments,
   frequencyByTimeBand: {
     'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(5) },

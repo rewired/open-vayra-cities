@@ -106,6 +106,22 @@ export function SelectedLineInspector({
                 ) : null}
               </td>
             </tr>
+            <tr>
+              <th scope="row">Topology</th>
+              <td className="inspector-compact-table__value--left">
+                <span className="selected-line-inspector__value-label">
+                  {panelState.selectedLine.topology === 'loop' ? 'Loop' : 'Linear'}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Service</th>
+              <td className="inspector-compact-table__value--left">
+                <span className="selected-line-inspector__value-label">
+                  {panelState.selectedLine.servicePattern === 'bidirectional' ? 'Both directions' : 'One-way'}
+                </span>
+              </td>
+            </tr>
           </tbody>
         </table>
         <div className="selected-line-inspector__summary-stats" aria-label="Selected line route summary">
@@ -116,7 +132,9 @@ export function SelectedLineInspector({
           <div className="selected-line-inspector__summary-stat-card">
             <span className="selected-line-inspector__summary-stat-label">Segments</span>
             <strong className="selected-line-inspector__summary-stat-value">
-              {selectedLineRouteBaseline ? selectedLineRouteBaseline.segments.length : 'Unavailable'}
+              {panelState.selectedLine.servicePattern === 'bidirectional' 
+                ? `F:${panelState.selectedLine.routeSegments.length} / R:${panelState.selectedLine.reverseRouteSegments?.length ?? 0}`
+                : panelState.selectedLine.routeSegments.length}
             </strong>
           </div>
           <div className="selected-line-inspector__summary-stat-card">

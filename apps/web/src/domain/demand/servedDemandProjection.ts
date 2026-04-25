@@ -124,8 +124,8 @@ export const projectLineBandDemand = (
 
   let status: DemandProjectionStatus = 'served';
 
-  const totalOriginRaw = stopOriginWeights.reduce((sum, w) => sum + w, 0);
-  const totalDestRaw = stopDestinationWeights.reduce((sum, w) => sum + w, 0);
+  const totalOriginRaw = (stopOriginWeights as readonly number[]).reduce((sum, w) => sum + w, 0);
+  const totalDestRaw = (stopDestinationWeights as readonly number[]).reduce((sum, w) => sum + w, 0);
 
   if (totalOriginRaw === 0 && totalDestRaw === 0) {
     status = 'no-demand';

@@ -12,6 +12,8 @@ const mockLine: Line = {
   id: mockLineId,
   label: 'Line 1',
   stopIds: [],
+  topology: 'linear',
+  servicePattern: 'one-way',
   routeSegments: [],
   frequencyByTimeBand: {
     [mockTimeBandId]: { kind: 'frequency', headwayMinutes: 10 as any }

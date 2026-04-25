@@ -12,6 +12,8 @@ const createMockLine = (frequencyByTimeBand: Partial<LineServiceByTimeBand> = {}
   id: createLineId('line-1'),
   label: 'Line 1',
   stopIds: [],
+  topology: 'linear',
+  servicePattern: 'one-way',
   routeSegments: [],
   frequencyByTimeBand: frequencyByTimeBand as LineServiceByTimeBand
 });

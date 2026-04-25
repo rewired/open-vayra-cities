@@ -1,5 +1,5 @@
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
-import { type Line, type LineId, type LineServiceBandPlan } from './line';
+import { type Line, type LineId, type LineServiceBandPlan, type LineServicePattern, type LineTopology } from './line';
 import type { LineRouteSegment } from './lineRoute';
 import type { Stop, StopId } from './stop';
 import type { TimeBandId } from './timeBand';
@@ -7,7 +7,7 @@ import type { TimeBandId } from './timeBand';
 /**
  * Canonical schema version literal for single-line JSON export payloads.
  */
-export const SELECTED_LINE_EXPORT_SCHEMA_VERSION = 'cityops-selected-line-export-v2' as const;
+export const SELECTED_LINE_EXPORT_SCHEMA_VERSION = 'cityops-selected-line-export-v3' as const;
 
 /**
  * Discriminator literal for payloads that export one completed selected line.
@@ -38,8 +38,11 @@ export interface SelectedLineExportLine {
   readonly id: LineId;
   readonly label: Line['label'];
   readonly orderedStopIds: readonly StopId[];
+  readonly topology: LineTopology;
+  readonly servicePattern: LineServicePattern;
   readonly frequencyByTimeBand: SelectedLineExportServiceByTimeBand;
   readonly routeSegments: readonly LineRouteSegment[];
+  readonly reverseRouteSegments?: readonly LineRouteSegment[] | undefined;
 }
 
 /**
@@ -113,8 +116,11 @@ export const buildSelectedLineExportPayload = ({
       id: selectedLine.id,
       label: selectedLine.label,
       orderedStopIds: selectedLine.stopIds,
+      topology: selectedLine.topology,
+      servicePattern: selectedLine.servicePattern,
       frequencyByTimeBand,
-      routeSegments: selectedLine.routeSegments
+      routeSegments: selectedLine.routeSegments,
+      reverseRouteSegments: selectedLine.reverseRouteSegments
     },
     stops,
     metadata: {

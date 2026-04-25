@@ -26,6 +26,8 @@ export type SelectedLineExportValidationIssueCode =
   | 'invalid-line-id'
   | 'invalid-line-label'
   | 'invalid-line-ordered-stop-ids'
+  | 'invalid-line-topology'
+  | 'invalid-line-service-pattern'
   | 'invalid-line-frequency-map'
   | 'invalid-frequency-time-band-id'
   | 'invalid-frequency-value'
@@ -246,6 +248,14 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
       });
     }
 
+    if (line.topology !== 'linear' && line.topology !== 'loop') {
+      addIssue('invalid-line-topology', '$.line.topology', 'line.topology must be "linear" or "loop".');
+    }
+
+    if (line.servicePattern !== 'one-way' && line.servicePattern !== 'bidirectional') {
+      addIssue('invalid-line-service-pattern', '$.line.servicePattern', 'line.servicePattern must be "one-way" or "bidirectional".');
+    }
+
     if (!isRecord(line.frequencyByTimeBand)) {
       addIssue('invalid-line-frequency-map', '$.line.frequencyByTimeBand', 'line.frequencyByTimeBand must be an object.');
     } else {
@@ -300,6 +310,7 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
     if (!Array.isArray(line.routeSegments)) {
       addIssue('invalid-route-segments', '$.line.routeSegments', 'line.routeSegments must be an array.');
     } else {
+      const isLoop = line.topology === 'loop';
       const segmentIds = new Set<string>();
       const stopOrderIndex = new Map<string, number>();
       orderedStopIds.forEach((stopId, index) => stopOrderIndex.set(stopId, index));
@@ -349,12 +360,21 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
               segmentPath,
               'Route segment endpoints must reference stops from line.orderedStopIds.'
             );
-          } else if (toIndex - fromIndex !== 1) {
-            addIssue(
-              'route-segment-adjacency-mismatch',
-              segmentPath,
-              'Route segments must connect adjacent stops in orderedStopIds order.'
-            );
+          } else {
+            const isLastSegment = segmentIndex === line.routeSegments.length - 1;
+            const isLoopClosure = isLoop && isLastSegment;
+            
+            const isValidAdjacency = isLoopClosure 
+              ? (fromIndex === orderedStopIds.length - 1 && toIndex === 0)
+              : (toIndex - fromIndex === 1);
+
+            if (!isValidAdjacency) {
+              addIssue(
+                'route-segment-adjacency-mismatch',
+                segmentPath,
+                'Route segments must connect adjacent stops in orderedStopIds order (or close the loop).'
+              );
+            }
           }
         }
 
@@ -452,12 +472,15 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
           addIssue('invalid-route-status', `${segmentPath}.status`, 'status must be a canonical RouteStatus value.');
         }
       }
-      const expectedRouteSegmentCount = Math.max(orderedStopIds.length - 1, 0);
+      const expectedRouteSegmentCount = isLoop 
+        ? Math.max(orderedStopIds.length, 0)
+        : Math.max(orderedStopIds.length - 1, 0);
+
       if (line.routeSegments.length !== expectedRouteSegmentCount) {
         addIssue(
           'route-segment-count-mismatch',
           '$.line.routeSegments',
-          'line.routeSegments length must equal orderedStopIds.length - 1.'
+          `line.routeSegments length must equal ${expectedRouteSegmentCount} for ${line.topology} topology.`
         );
       }
 

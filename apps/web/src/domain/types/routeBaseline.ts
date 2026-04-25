@@ -52,8 +52,11 @@ export interface RouteBaselineWarning {
 export interface LineRouteBaseline {
   readonly lineId: LineId;
   readonly segments: readonly RouteSegmentBaseline[];
+  readonly reverseSegments?: readonly RouteSegmentBaseline[] | undefined;
   readonly totalDistanceMeters: RouteDistanceMeters;
+  readonly totalReverseDistanceMeters?: RouteDistanceMeters | undefined;
   readonly totalTravelTimeSeconds: RouteTravelTimeSeconds;
+  readonly totalReverseTravelTimeSeconds?: RouteTravelTimeSeconds | undefined;
   readonly status: LineRouteBaselineStatus;
   readonly warnings: readonly RouteBaselineWarning[];
 }

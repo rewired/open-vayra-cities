@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- **Slice 056**: Explicit line topology (linear/loop) and service pattern (one-way/bidirectional) semantics.
+- Line completion decision flow with settings for topology and direction.
+- Loop closure routing for circular lines.
+- Independent reverse routing for bidirectional lines to respect one-way street constraints.
+- [ADR 0114](docs/adr/0114-explicit-line-topology-and-service-pattern-semantics.md): Explicit Line Topology and Service Pattern Semantics.
+
 ## 2026-04-25
 
 - Slice 055: implement a deterministic, in-memory MVP demand scenario for the Hamburg area with residential origin and workplace destination nodes.

@@ -1,0 +1,42 @@
+src/domain/demand/demandCatchment.test.ts(23,11): error TS2353: Object literal may only specify known properties, and ''band-1'' does not exist in type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(34,11): error TS2353: Object literal may only specify known properties, and ''band-1'' does not exist in type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(42,14): error TS18048: 'catchment' is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(43,14): error TS18048: 'catchment' is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(44,14): error TS18048: 'catchment' is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(44,14): error TS7053: Element implicitly has an 'any' type because expression of type '"band-1"' can't be used to index type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+  Property 'band-1' does not exist on type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(45,14): error TS18048: 'catchment' is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(45,14): error TS7053: Element implicitly has an 'any' type because expression of type '"band-1"' can't be used to index type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+  Property 'band-1' does not exist on type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(61,11): error TS2353: Object literal may only specify known properties, and ''band-morning'' does not exist in type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(73,11): error TS2353: Object literal may only specify known properties, and ''band-morning'' does not exist in type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(84,11): error TS2353: Object literal may only specify known properties, and ''band-morning'' does not exist in type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(91,14): error TS18048: 'catchment' is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(93,14): error TS18048: 'catchment' is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(93,14): error TS7053: Element implicitly has an 'any' type because expression of type '"band-morning"' can't be used to index type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+  Property 'band-morning' does not exist on type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(94,14): error TS18048: 'catchment' is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(94,14): error TS7053: Element implicitly has an 'any' type because expression of type '"band-evening"' can't be used to index type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+  Property 'band-evening' does not exist on type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(96,14): error TS18048: 'catchment' is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(96,14): error TS7053: Element implicitly has an 'any' type because expression of type '"band-morning"' can't be used to index type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+  Property 'band-morning' does not exist on type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(97,14): error TS18048: 'catchment' is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(97,14): error TS7053: Element implicitly has an 'any' type because expression of type '"band-evening"' can't be used to index type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+  Property 'band-evening' does not exist on type 'Readonly<Record<TimeBandId, DemandWeight>>'.
+src/domain/demand/demandCatchment.test.ts(108,14): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(109,26): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/demandCatchment.test.ts(110,26): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/demandCatchment.ts(38,11): error TS2740: Type '{}' is missing the following properties from type 'Record<TimeBandId, DemandWeight>': "morning-rush", "late-morning", midday, afternoon, and 3 more.
+src/domain/demand/demandCatchment.ts(39,11): error TS2740: Type '{}' is missing the following properties from type 'Record<TimeBandId, DemandWeight>': "morning-rush", "late-morning", midday, afternoon, and 3 more.
+src/domain/demand/demandNodeHelpers.test.ts(70,14): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/demandNodeHelpers.test.ts(74,14): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/demandNodeHelpers.test.ts(80,14): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/servedDemandProjection.test.ts(24,12): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/servedDemandProjection.test.ts(60,12): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/servedDemandProjection.ts(93,9): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/servedDemandProjection.ts(96,13): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/servedDemandProjection.ts(102,30): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/servedDemandProjection.ts(107,9): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/servedDemandProjection.ts(110,13): error TS2532: Object is possibly 'undefined'.
+src/domain/demand/servedDemandProjection.ts(116,35): error TS2532: Object is possibly 'undefined'.
