@@ -1,7 +1,7 @@
 {
   "schemaVersion": "cityops-selected-line-export-v3",
   "exportKind": "single-line",
-  "createdAtIsoUtc": "2026-04-25T20:54:38.974Z",
+  "createdAtIsoUtc": "2026-04-25T21:20:41.983Z",
   "sourceMetadata": {
     "source": "cityops-web"
   },
@@ -15,7 +15,9 @@
       "stop-4",
       "stop-5",
       "stop-6",
-      "stop-7"
+      "stop-7",
+      "stop-8",
+      "stop-9"
     ],
     "topology": "loop",
     "servicePattern": "one-way",
@@ -57,48 +59,140 @@
         "toStopId": "stop-2",
         "orderedGeometry": [
           [
-            10.005567,
-            53.55265
+            10.008684,
+            53.552938
           ],
           [
-            10.005532,
-            53.552688
+            10.008636,
+            53.55311
           ],
           [
-            10.005422,
-            53.552799
+            10.008533,
+            53.553421
           ],
           [
-            10.005367,
-            53.55286
-          ],
-          [
-            10.005171,
-            53.553032
-          ],
-          [
-            10.004926,
-            53.553239
-          ],
-          [
-            10.004729,
-            53.553393
-          ],
-          [
-            10.004608,
+            10.008511,
             53.553496
           ],
           [
-            10.004159,
-            53.553867
+            10.008489,
+            53.553574
           ],
           [
-            10.00411,
-            53.553908
+            10.008323,
+            53.554132
           ],
           [
-            10.003967,
-            53.554015
+            10.008271,
+            53.554317
+          ],
+          [
+            10.008248,
+            53.554396
+          ],
+          [
+            10.008109,
+            53.554873
+          ],
+          [
+            10.008098,
+            53.554909
+          ],
+          [
+            10.008073,
+            53.554938
+          ],
+          [
+            10.00805,
+            53.554959
+          ],
+          [
+            10.008021,
+            53.554974
+          ],
+          [
+            10.007994,
+            53.554983
+          ],
+          [
+            10.007961,
+            53.554989
+          ],
+          [
+            10.007916,
+            53.55499
+          ],
+          [
+            10.007746,
+            53.55497
+          ],
+          [
+            10.007678,
+            53.554963
+          ],
+          [
+            10.006872,
+            53.554862
+          ],
+          [
+            10.006558,
+            53.554816
+          ],
+          [
+            10.006379,
+            53.554795
+          ],
+          [
+            10.00633,
+            53.55479
+          ],
+          [
+            10.006122,
+            53.554752
+          ],
+          [
+            10.005878,
+            53.55469
+          ],
+          [
+            10.005664,
+            53.554625
+          ],
+          [
+            10.005246,
+            53.554478
+          ],
+          [
+            10.004922,
+            53.554365
+          ],
+          [
+            10.004877,
+            53.554351
+          ],
+          [
+            10.004802,
+            53.554327
+          ],
+          [
+            10.004577,
+            53.554257
+          ],
+          [
+            10.004308,
+            53.554237
+          ],
+          [
+            10.004137,
+            53.554192
+          ],
+          [
+            10.004078,
+            53.554175
+          ],
+          [
+            10.004043,
+            53.554164
           ],
           [
             10.003848,
@@ -115,6 +209,27 @@
           [
             10.00341,
             53.554404
+          ],
+          [
+            10.002524,
+            53.554932
+          ]
+        ],
+        "distanceMeters": 655.5,
+        "inMotionTravelMinutes": 1.1516666666666666,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 1.6516666666666666,
+        "status": "routed"
+      },
+      {
+        "id": "line-1-segment-2",
+        "lineId": "line-1",
+        "fromStopId": "stop-2",
+        "toStopId": "stop-3",
+        "orderedGeometry": [
+          [
+            10.002524,
+            53.554932
           ],
           [
             10.002514,
@@ -253,33 +368,33 @@
             53.557804
           ],
           [
-            9.991999,
-            53.557956
-          ]
-        ],
-        "distanceMeters": 1108.8,
-        "inMotionTravelMinutes": 1.8,
-        "dwellMinutes": 0.5,
-        "totalTravelMinutes": 2.3,
-        "status": "routed"
-      },
-      {
-        "id": "line-1-segment-2",
-        "lineId": "line-1",
-        "fromStopId": "stop-2",
-        "toStopId": "stop-3",
-        "orderedGeometry": [
-          [
-            9.991999,
-            53.557956
-          ],
-          [
             9.991902,
             53.55797
           ],
           [
             9.991349,
             53.558049
+          ],
+          [
+            9.991009,
+            53.558095
+          ]
+        ],
+        "distanceMeters": 851,
+        "inMotionTravelMinutes": 1.345,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 1.845,
+        "status": "routed"
+      },
+      {
+        "id": "line-1-segment-3",
+        "lineId": "line-1",
+        "fromStopId": "stop-3",
+        "toStopId": "stop-4",
+        "orderedGeometry": [
+          [
+            9.991009,
+            53.558095
           ],
           [
             9.990096,
@@ -414,33 +529,33 @@
             53.557047
           ],
           [
-            9.981692,
-            53.556999
-          ]
-        ],
-        "distanceMeters": 717.6,
-        "inMotionTravelMinutes": 1.1400000000000001,
-        "dwellMinutes": 0.5,
-        "totalTravelMinutes": 1.6400000000000001,
-        "status": "routed"
-      },
-      {
-        "id": "line-1-segment-3",
-        "lineId": "line-1",
-        "fromStopId": "stop-3",
-        "toStopId": "stop-4",
-        "orderedGeometry": [
-          [
-            9.981692,
-            53.556999
-          ],
-          [
             9.981537,
             53.556923
           ],
           [
             9.98126,
             53.556773
+          ],
+          [
+            9.980499,
+            53.556348
+          ]
+        ],
+        "distanceMeters": 757.5,
+        "inMotionTravelMinutes": 1.2016666666666667,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 1.7016666666666667,
+        "status": "routed"
+      },
+      {
+        "id": "line-1-segment-4",
+        "lineId": "line-1",
+        "fromStopId": "stop-4",
+        "toStopId": "stop-5",
+        "orderedGeometry": [
+          [
+            9.980499,
+            53.556348
           ],
           [
             9.979974,
@@ -611,29 +726,29 @@
             53.551277
           ],
           [
-            9.970216,
-            53.551134
-          ],
-          [
-            9.970169,
-            53.551078
+            9.970282,
+            53.551214
           ]
         ],
-        "distanceMeters": 1296.2,
-        "inMotionTravelMinutes": 2.158333333333333,
+        "distanceMeters": 1172.2,
+        "inMotionTravelMinutes": 1.9716666666666667,
         "dwellMinutes": 0.5,
-        "totalTravelMinutes": 2.658333333333333,
+        "totalTravelMinutes": 2.4716666666666667,
         "status": "routed"
       },
       {
-        "id": "line-1-segment-4",
+        "id": "line-1-segment-5",
         "lineId": "line-1",
-        "fromStopId": "stop-4",
-        "toStopId": "stop-5",
+        "fromStopId": "stop-5",
+        "toStopId": "stop-6",
         "orderedGeometry": [
           [
-            9.970169,
-            53.551078
+            9.970282,
+            53.551214
+          ],
+          [
+            9.970216,
+            53.551134
           ],
           [
             9.97015,
@@ -812,33 +927,33 @@
             53.545855
           ],
           [
-            9.970056,
-            53.545812
-          ]
-        ],
-        "distanceMeters": 696.6,
-        "inMotionTravelMinutes": 1.245,
-        "dwellMinutes": 0.5,
-        "totalTravelMinutes": 1.745,
-        "status": "routed"
-      },
-      {
-        "id": "line-1-segment-5",
-        "lineId": "line-1",
-        "fromStopId": "stop-5",
-        "toStopId": "stop-6",
-        "orderedGeometry": [
-          [
-            9.970056,
-            53.545812
-          ],
-          [
             9.970177,
             53.545781
           ],
           [
             9.970269,
             53.545756
+          ],
+          [
+            9.97043,
+            53.545712
+          ]
+        ],
+        "distanceMeters": 740.5,
+        "inMotionTravelMinutes": 1.3099999999999998,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 1.8099999999999998,
+        "status": "routed"
+      },
+      {
+        "id": "line-1-segment-6",
+        "lineId": "line-1",
+        "fromStopId": "stop-6",
+        "toStopId": "stop-7",
+        "orderedGeometry": [
+          [
+            9.97043,
+            53.545712
           ],
           [
             9.97078,
@@ -1109,29 +1224,29 @@
             53.544127
           ],
           [
-            9.982255,
-            53.544138
+            9.982294,
+            53.544147
+          ],
+          [
+            9.982398,
+            53.544175
           ]
         ],
-        "distanceMeters": 859.7,
-        "inMotionTravelMinutes": 1.4233333333333333,
+        "distanceMeters": 842.9,
+        "inMotionTravelMinutes": 1.4333333333333333,
         "dwellMinutes": 0.5,
-        "totalTravelMinutes": 1.9233333333333333,
+        "totalTravelMinutes": 1.9333333333333333,
         "status": "routed"
       },
       {
-        "id": "line-1-segment-6",
+        "id": "line-1-segment-7",
         "lineId": "line-1",
-        "fromStopId": "stop-6",
-        "toStopId": "stop-7",
+        "fromStopId": "stop-7",
+        "toStopId": "stop-8",
         "orderedGeometry": [
           [
-            9.982255,
-            53.544138
-          ],
-          [
-            9.982294,
-            53.544147
+            9.982398,
+            53.544175
           ],
           [
             9.982426,
@@ -1250,27 +1365,6 @@
             53.544718
           ],
           [
-            9.990675,
-            53.544708
-          ]
-        ],
-        "distanceMeters": 583.2,
-        "inMotionTravelMinutes": 1.0083333333333333,
-        "dwellMinutes": 0.5,
-        "totalTravelMinutes": 1.5083333333333333,
-        "status": "routed"
-      },
-      {
-        "id": "line-1-segment-7",
-        "lineId": "line-1",
-        "fromStopId": "stop-7",
-        "toStopId": "stop-1",
-        "orderedGeometry": [
-          [
-            9.990675,
-            53.544708
-          ],
-          [
             9.99093,
             53.544702
           ],
@@ -1337,6 +1431,27 @@
           [
             9.994813,
             53.545572
+          ],
+          [
+            9.995076,
+            53.545666
+          ]
+        ],
+        "distanceMeters": 894.5,
+        "inMotionTravelMinutes": 1.5083333333333333,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 2.0083333333333333,
+        "status": "routed"
+      },
+      {
+        "id": "line-1-segment-8",
+        "lineId": "line-1",
+        "fromStopId": "stop-8",
+        "toStopId": "stop-9",
+        "orderedGeometry": [
+          [
+            9.995076,
+            53.545666
           ],
           [
             9.995375,
@@ -1563,6 +1678,27 @@
             53.548902
           ],
           [
+            10.006435,
+            53.549029
+          ]
+        ],
+        "distanceMeters": 927.1,
+        "inMotionTravelMinutes": 1.5966666666666667,
+        "dwellMinutes": 0.5,
+        "totalTravelMinutes": 2.0966666666666667,
+        "status": "routed"
+      },
+      {
+        "id": "line-1-segment-9",
+        "lineId": "line-1",
+        "fromStopId": "stop-9",
+        "toStopId": "stop-1",
+        "orderedGeometry": [
+          [
+            10.006435,
+            53.549029
+          ],
+          [
             10.006441,
             53.549055
           ],
@@ -1639,42 +1775,122 @@
             53.551757
           ],
           [
-            10.005956,
-            53.551766
+            10.006041,
+            53.551759
           ],
           [
-            10.005916,
-            53.551889
+            10.006173,
+            53.55177
           ],
           [
-            10.005872,
+            10.006285,
+            53.551783
+          ],
+          [
+            10.006353,
+            53.551791
+          ],
+          [
+            10.006525,
+            53.551812
+          ],
+          [
+            10.006655,
+            53.551833
+          ],
+          [
+            10.006879,
+            53.551884
+          ],
+          [
+            10.006988,
+            53.551903
+          ],
+          [
+            10.007841,
+            53.552006
+          ],
+          [
+            10.007857,
+            53.552007
+          ],
+          [
+            10.007942,
             53.552018
           ],
           [
-            10.005769,
-            53.552302
+            10.008046,
+            53.552029
           ],
           [
-            10.005695,
-            53.552462
+            10.008184,
+            53.552003
           ],
           [
-            10.005631,
-            53.552568
+            10.00822,
+            53.552
           ],
           [
-            10.00561,
-            53.552603
+            10.008479,
+            53.552006
           ],
           [
-            10.005567,
-            53.55265
+            10.008565,
+            53.552013
+          ],
+          [
+            10.00865,
+            53.552023
+          ],
+          [
+            10.008853,
+            53.552048
+          ],
+          [
+            10.008877,
+            53.552122
+          ],
+          [
+            10.008881,
+            53.552154
+          ],
+          [
+            10.008878,
+            53.552211
+          ],
+          [
+            10.00887,
+            53.552251
+          ],
+          [
+            10.008856,
+            53.552317
+          ],
+          [
+            10.008849,
+            53.552351
+          ],
+          [
+            10.008804,
+            53.552505
+          ],
+          [
+            10.008787,
+            53.552572
+          ],
+          [
+            10.008776,
+            53.55261
+          ],
+          [
+            10.008684,
+            53.552938
           ]
         ],
-        "distanceMeters": 1660.6,
-        "inMotionTravelMinutes": 2.8333333333333335,
+        "distanceMeters": 604.7,
+        "inMotionTravelMinutes": 1.1966666666666665,
         "dwellMinutes": 0.5,
-        "totalTravelMinutes": 3.3333333333333335,
+        "totalTravelMinutes": 1.6966666666666665,
         "status": "routed"
       }
     ]
@@ -1683,64 +1899,80 @@
     {
       "id": "stop-1",
       "position": {
-        "lng": 10.005566013508567,
-        "lat": 53.552650203445744
+        "lng": 10.008684365000413,
+        "lat": 53.55293794101073
       },
       "label": "Stop 1"
     },
     {
       "id": "stop-2",
       "position": {
-        "lng": 9.991999198783505,
-        "lat": 53.557955348572946
+        "lng": 10.002518620773522,
+        "lat": 53.554928860655565
       },
       "label": "Stop 2"
     },
     {
       "id": "stop-3",
       "position": {
-        "lng": 9.981692790015922,
-        "lat": 53.55699847810073
+        "lng": 9.991009096314185,
+        "lat": 53.558095999940576
       },
       "label": "Stop 3"
     },
     {
       "id": "stop-4",
       "position": {
-        "lng": 9.97016982402284,
-        "lat": 53.55107776656518
+        "lng": 9.980498692077905,
+        "lat": 53.55634778258847
       },
       "label": "Stop 4"
     },
     {
       "id": "stop-5",
       "position": {
-        "lng": 9.970055816611742,
-        "lat": 53.54581163986526
+        "lng": 9.970281474532033,
+        "lat": 53.551214488494466
       },
       "label": "Stop 5"
     },
     {
       "id": "stop-6",
       "position": {
-        "lng": 9.982255011456612,
-        "lat": 53.544138461824296
+        "lng": 9.970429315699578,
+        "lat": 53.54571116684347
       },
       "label": "Stop 6"
     },
     {
       "id": "stop-7",
       "position": {
-        "lng": 9.990675392252957,
-        "lat": 53.544707714774084
+        "lng": 9.982396981530155,
+        "lat": 53.54417615735075
       },
       "label": "Stop 7"
+    },
+    {
+      "id": "stop-8",
+      "position": {
+        "lng": 9.995074722855293,
+        "lat": 53.545667040572106
+      },
+      "label": "Stop 8"
+    },
+    {
+      "id": "stop-9",
+      "position": {
+        "lng": 10.006435936531474,
+        "lat": 53.54902894257194
+      },
+      "label": "Stop 9"
     }
   ],
   "metadata": {
     "lineCount": 1,
-    "stopCount": 7,
-    "routeSegmentCount": 7,
+    "stopCount": 9,
+    "routeSegmentCount": 9,
     "includedTimeBandIds": [
       "morning-rush",
       "late-morning",
