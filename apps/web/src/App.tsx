@@ -16,6 +16,7 @@ import {
   type DebugModalRoutingDiagnostics,
   type DebugModalServiceDiagnostics
 } from './ui/DebugModal';
+import { summarizeDemandNodes } from './domain/demand/demandNodeHelpers';
 import { WORKSPACE_MODE_ICONS } from './ui/icons/materialIcons';
 
 import './App.css';
@@ -118,7 +119,8 @@ export default function App(): ReactElement {
     completedLineCount: sessionController.sessionLines.length,
     totalProjectedVehicleCount: projections.vehicleNetworkProjection.summary.totalProjectedVehicleCount,
     draftOrderedStopIds: sessionController.lineBuildSelection.selectedStopIds,
-    completedLineIds: sessionController.sessionLines.map((line) => line.id)
+    completedLineIds: sessionController.sessionLines.map((line) => line.id),
+    demandNodeSummary: summarizeDemandNodes([])
   };
   const routingDiagnostics: DebugModalRoutingDiagnostics = {
     selectedLineOrderedStopIds: sessionController.selectedLine?.stopIds ?? [],

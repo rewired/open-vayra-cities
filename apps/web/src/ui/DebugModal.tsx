@@ -6,6 +6,8 @@ import type { WorkspaceToolMode } from '../session/sessionTypes';
 /** Ordered debug-tab identifiers for the shell-owned diagnostics modal. */
 type DebugModalTabId = 'overview' | 'routing' | 'service' | 'raw-state';
 
+import type { DemandNodeSummary } from '../domain/demand/demandNodeHelpers';
+
 /** Immutable shell/session identity and count diagnostics for debug overview rendering. */
 export interface DebugModalOverviewDiagnostics {
   readonly activeToolMode: WorkspaceToolMode;
@@ -16,6 +18,7 @@ export interface DebugModalOverviewDiagnostics {
   readonly totalProjectedVehicleCount: number;
   readonly draftOrderedStopIds: readonly string[];
   readonly completedLineIds: readonly string[];
+  readonly demandNodeSummary: readonly DemandNodeSummary[];
 }
 
 /** Immutable selected-line segment detail for debug inspection. */
@@ -144,6 +147,12 @@ export function DebugModal({
                   <th scope="row">Completed line ids</th>
                   <td>{overviewDiagnostics.completedLineIds.length > 0 ? overviewDiagnostics.completedLineIds.join(', ') : 'none'}</td>
                 </tr>
+                {overviewDiagnostics.demandNodeSummary.map((summaryItem) => (
+                  <tr key={`${summaryItem.role}-${summaryItem.demandClass}`}>
+                    <th scope="row">Demand nodes ({summaryItem.demandClass} {summaryItem.role})</th>
+                    <td>{summaryItem.count}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             <ul className="app-debug-modal__list">
