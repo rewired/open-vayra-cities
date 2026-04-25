@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 050: replace selected-line ordered-stop text worm with compact stop chips plus an expandable full stop-sequence disclosure for long lines.
+- Slice 050: replace the selected-line `Segments / route time` row with three truthful route-summary stat cards (`Stops`, `Segments`, `Runtime`) using existing selected-line and route-baseline projection values only.
+- Slice 050: keep readiness/issue pills near the top of selected-line inspector content and retain required action entrypoints (`Edit frequency`, `Service plan`, `Departures`, `Projected vehicles`) while preserving the existing `Route baseline` action.
+- Add ADR 0106 documenting selected-line stop-sequence chip presentation and truthful route-summary stat-card boundaries.
+
 - Slice 049: restructure selected-line `Service plan` dialog around player-facing primary service status content (status pill, active band label/window, active service state, optional departures/hour, and optional runtime).
 - Slice 049: replace deep issue list disclosures in the service-plan dialog with compact actionable issue pills and a debug-modal redirect note for technical diagnostics.
 - Slice 049: keep service-plan dialog on the shared medium surface variant while removing player-facing raw issue-code exposure from this modal.
