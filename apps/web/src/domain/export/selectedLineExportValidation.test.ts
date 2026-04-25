@@ -8,14 +8,10 @@ import type { SelectedLineExportPayload } from '../types/selectedLineExport';
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = dirname(currentFilePath);
-const fixturePath = resolve(currentDirPath, '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v2.json');
+const fixturePath = resolve(currentDirPath, '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v3.json');
 
 const readFixturePayload = (): SelectedLineExportPayload => {
   const payload = JSON.parse(readFileSync(fixturePath, 'utf-8')) as any;
-  // Patch old v2 fixture to satisfy v3 validation during migration
-  payload.schemaVersion = 'cityops-selected-line-export-v3';
-  payload.line.topology = payload.line.topology ?? 'linear';
-  payload.line.servicePattern = payload.line.servicePattern ?? 'one-way';
   return payload as SelectedLineExportPayload;
 };
 
@@ -212,5 +208,15 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
     };
 
     expectIssue(payload, 'invalid-frequency-value');
+  });
+  
+  it('accepts payload with missing routeSegments as derived cache intent', () => {
+    const payload = readFixturePayload();
+    delete (payload.line as any).routeSegments;
+    (payload.metadata as any).routeSegmentCount = 0;
+
+    const result = validateSelectedLineExportPayload(payload);
+
+    expect(result.ok).toBe(true);
   });
 });

@@ -43,8 +43,8 @@ export type SelectedLineExportSessionLoadResult =
       readonly issue: SelectedLineExportSessionLoadFailure;
     };
 
-const convertLineRouteSegments = (payload: SelectedLineExportPayload): readonly LineRouteSegment[] =>
-  payload.line.routeSegments.map((segment) => ({
+const convertLineRouteSegments = (segments: readonly LineRouteSegment[]): readonly LineRouteSegment[] =>
+  segments.map((segment) => ({
     id: createLineSegmentId(segment.id),
     lineId: createLineId(segment.lineId),
     fromStopId: createStopId(segment.fromStopId),
@@ -109,8 +109,8 @@ export const convertSelectedLineExportPayloadToSession = (
     topology: payload.line.topology,
     servicePattern: payload.line.servicePattern,
     frequencyByTimeBand: convertLineServiceByTimeBand(payload),
-    routeSegments: convertLineRouteSegments(payload),
-    reverseRouteSegments: payload.line.reverseRouteSegments
+    routeSegments: payload.line.routeSegments ? convertLineRouteSegments(payload.line.routeSegments) : [],
+    reverseRouteSegments: payload.line.reverseRouteSegments ? convertLineRouteSegments(payload.line.reverseRouteSegments) : undefined
   };
 
   return {

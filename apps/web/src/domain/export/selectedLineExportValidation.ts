@@ -312,6 +312,10 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
       segmentsKey: string,
       expectedOrderedStopIds: readonly string[]
     ): void => {
+      if (segments === undefined) {
+        return;
+      }
+
       const segmentsPath = `$.line.${segmentsKey}`;
       if (!Array.isArray(segments)) {
         addIssue('invalid-route-segments', segmentsPath, `line.${segmentsKey} must be an array.`);
@@ -496,7 +500,7 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
 
     validateSegments(line.routeSegments, 'routeSegments', orderedStopIds);
 
-    if ('reverseRouteSegments' in line && line.reverseRouteSegments !== undefined) {
+    if (line.reverseRouteSegments !== undefined) {
       validateSegments(line.reverseRouteSegments, 'reverseRouteSegments', [...orderedStopIds].reverse());
     }
 
@@ -544,12 +548,15 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
         '$.metadata.routeSegmentCount',
         'metadata.routeSegmentCount must be a non-negative integer.'
       );
-    } else if (isRecord(line) && Array.isArray(line.routeSegments) && routeSegmentCount !== line.routeSegments.length) {
-      addIssue(
-        'invalid-metadata-counts',
-        '$.metadata.routeSegmentCount',
-        'metadata.routeSegmentCount must match line.routeSegments.length.'
-      );
+    } else if (isRecord(line)) {
+      const actualRouteSegmentCount = Array.isArray(line.routeSegments) ? line.routeSegments.length : 0;
+      if (routeSegmentCount !== actualRouteSegmentCount) {
+        addIssue(
+          'invalid-metadata-counts',
+          '$.metadata.routeSegmentCount',
+          `metadata.routeSegmentCount (${routeSegmentCount}) must match actual routeSegments.length (${actualRouteSegmentCount}).`
+        );
+      }
     }
 
     if (!Array.isArray(metadata.includedTimeBandIds)) {

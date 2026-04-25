@@ -9,14 +9,10 @@ import type { SelectedLineExportPayload } from '../types/selectedLineExport';
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = dirname(currentFilePath);
-const fixturePath = resolve(currentDirPath, '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v2.json');
+const fixturePath = resolve(currentDirPath, '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v3.json');
 
 const readFixturePayload = (): SelectedLineExportPayload => {
   const payload = JSON.parse(readFileSync(fixturePath, 'utf-8')) as any;
-  // Patch old v2 fixture to satisfy v3 validation during migration
-  payload.schemaVersion = 'cityops-selected-line-export-v3';
-  payload.line.topology = payload.line.topology ?? 'linear';
-  payload.line.servicePattern = payload.line.servicePattern ?? 'one-way';
   return payload as SelectedLineExportPayload;
 };
 
@@ -73,5 +69,18 @@ describe('convertSelectedLineExportPayloadToSession', () => {
     }
 
     expect(Object.values(conversionResult.session.sessionLines[0].frequencyByTimeBand).every((plan) => plan.kind === 'no-service')).toBe(true);
+  });
+
+  it('converts payload with missing routeSegments into empty session segments', () => {
+    const payload = readFixturePayload();
+    delete (payload.line as any).routeSegments;
+    (payload.metadata as any).routeSegmentCount = 0;
+
+    const conversionResult = convertSelectedLineExportPayloadToSession(payload);
+
+    expect(conversionResult.ok).toBe(true);
+    if (conversionResult.ok) {
+      expect(conversionResult.session.sessionLines[0].routeSegments).toEqual([]);
+    }
   });
 });

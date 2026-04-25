@@ -10,6 +10,12 @@ All notable changes to this project will be documented in this file.
 - Loop closure routing for circular lines.
 - Independent reverse routing for bidirectional lines to respect one-way street constraints.
 - [ADR 0114](docs/adr/0114-explicit-line-topology-and-service-pattern-semantics.md): Explicit Line Topology and Service Pattern Semantics.
+- **Slice 058**: Repair and clarify selected-line JSON import/export contract for intent-first loading with derived route cache.
+- Decouple canonical line intent from derived route geometry in export schema.
+- Implement async re-routing on import, ensuring fresh geometry and metrics consistent with the current routing environment.
+- Increase coordinate endpoint tolerance to `1e-5` degrees to handle common routing-engine (OSRM) rounding.
+- Update Hamburg fixture to v3 and handle filename/schemaVersion alignment.
+- [ADR 0115](docs/adr/0115-selected-line-export-intent-cache-contract.md): Selected-Line Exports Preserve Line Intent with Derived Route Cache.
 
 - **Slice 057**: Repair topology-aware projections and strict TypeScript verification issues.
 - Update `lineDepartureTimetableProjection` to be topology-aware, correctly handling $N$ segments for $N$ stops in loop lines while displaying $N-1$ downstream offsets.

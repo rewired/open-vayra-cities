@@ -41,7 +41,15 @@ export interface SelectedLineExportLine {
   readonly topology: LineTopology;
   readonly servicePattern: LineServicePattern;
   readonly frequencyByTimeBand: SelectedLineExportServiceByTimeBand;
-  readonly routeSegments: readonly LineRouteSegment[];
+  /** 
+   * Forward route segments from stop to stop. 
+   * Optional derived cache; can be reconstructed from canonical line intent on load.
+   */
+  readonly routeSegments?: readonly LineRouteSegment[] | undefined;
+  /** 
+   * Reverse route segments for bidirectional lines. 
+   * Optional derived cache; can be reconstructed from canonical line intent on load.
+   */
   readonly reverseRouteSegments?: readonly LineRouteSegment[] | undefined;
 }
 

@@ -9,6 +9,8 @@ import { convertSelectedLineExportPayloadToSession } from '../domain/export/sele
 import type { Stop } from '../domain/types/stop';
 import type { TimeBandId } from '../domain/types/timeBand';
 import type { StopSelectionState } from '../map-workspace/MapWorkspaceSurface';
+import { completeLineRouting } from '../domain/routing/completeLineRouting';
+import { getDefaultRoutingAdapter } from '../domain/routing/defaultRoutingAdapter';
 import type { LineBuildSelectionState, WorkspaceToolMode } from './sessionTypes';
 
 /** Feedback contract for selected-line JSON import actions. */
@@ -224,15 +226,32 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
         return;
       }
 
+      // Re-resolve route segments on load to ensure fresh geometry/metrics (with fallback safety)
+      const importedLine = conversionResult.session.sessionLines[0];
+      const routingResult = await completeLineRouting({
+        lineId: importedLine.id,
+        orderedStopIds: importedLine.stopIds,
+        placedStops: conversionResult.session.placedStops,
+        topology: importedLine.topology,
+        servicePattern: importedLine.servicePattern,
+        routingAdapter: getDefaultRoutingAdapter()
+      });
+
+      const finalLine: Line = {
+        ...importedLine,
+        routeSegments: routingResult.routeSegments,
+        reverseRouteSegments: routingResult.reverseRouteSegments
+      };
+
       setSessionStops(conversionResult.session.placedStops);
-      setSessionLines(conversionResult.session.sessionLines);
-      setSelectedLineId(conversionResult.session.selectedLineId);
+      setSessionLines([finalLine]);
+      setSelectedLineId(finalLine.id);
       setSelectedStop(null);
       setLineBuildSelection(INITIAL_LINE_BUILD_SELECTION_STATE);
       setSelectedLineImportFeedback({
         kind: 'success',
         title: 'Line JSON loaded',
-        detail: `Loaded line ${conversionResult.session.selectedLineId} and replaced the current in-memory network.`
+        detail: `Loaded line ${finalLine.id} and replaced the current in-memory network with fresh routing.`
       });
     },
     clearSelectedLineImportFeedback: () => {

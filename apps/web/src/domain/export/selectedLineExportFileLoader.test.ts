@@ -7,11 +7,11 @@ import {
 
 describe('selectedLineExportFileLoader', () => {
   it('parses valid JSON text safely', () => {
-    const result = parseSelectedLineExportJsonText('{"schemaVersion":"cityops-selected-line-export-v2"}');
+    const result = parseSelectedLineExportJsonText('{"schemaVersion":"cityops-selected-line-export-v3"}');
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.parsed).toEqual({ schemaVersion: 'cityops-selected-line-export-v2' });
+      expect(result.parsed).toEqual({ schemaVersion: 'cityops-selected-line-export-v3' });
     }
   });
 
