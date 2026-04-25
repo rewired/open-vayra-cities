@@ -31,6 +31,10 @@ const countConfiguredTimeBands = (
 ): number =>
   canonicalTimeBandIds.reduce((configuredCount, timeBandId) => {
     const value = frequencyByTimeBand[timeBandId];
+    if (value.kind === 'no-service') {
+      return configuredCount + 1;
+    }
+
     if (value.kind === 'frequency' && isPositiveFiniteNumber(value.headwayMinutes)) {
       return configuredCount + 1;
     }
@@ -187,7 +191,7 @@ export const evaluateLineServiceReadiness = (
   }
 
   const canonicalTimeBandIdSet = new Set<TimeBandId>(canonicalTimeBandIds);
-  const hasAtLeastOneConfiguredFrequency = countConfiguredTimeBands(line.frequencyByTimeBand, canonicalTimeBandIds) > 0;
+  const hasAtLeastOneConfiguredServiceBand = countConfiguredTimeBands(line.frequencyByTimeBand, canonicalTimeBandIds) > 0;
 
   for (const timeBandId of canonicalTimeBandIds) {
     if (!(timeBandId in line.frequencyByTimeBand)) {
@@ -244,11 +248,11 @@ export const evaluateLineServiceReadiness = (
   }
 
   const configuredTimeBandCount = countConfiguredTimeBands(line.frequencyByTimeBand, canonicalTimeBandIds);
-  if (!hasAtLeastOneConfiguredFrequency) {
+  if (!hasAtLeastOneConfiguredServiceBand) {
     addIssue({
       code: LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY,
       severity: LINE_SERVICE_READINESS_ISSUE_SEVERITIES.ERROR,
-      message: 'At least one canonical time band must have a configured positive frequency value.',
+      message: 'At least one canonical time band must have a configured service plan band (frequency or no-service).',
       lineId: line.id
     });
   }
@@ -258,7 +262,7 @@ export const evaluateLineServiceReadiness = (
     addIssue({
       code: LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION,
       severity: LINE_SERVICE_READINESS_ISSUE_SEVERITIES.WARNING,
-      message: 'Not all canonical time bands have configured frequencies.',
+      message: 'Not all canonical time bands have configured service plan bands (unset bands remain).',
       lineId: line.id
     });
   }
@@ -285,7 +289,7 @@ export const evaluateLineServiceReadiness = (
     canonicalTimeBandCount: canonicalTimeBandIds.length,
     warningIssueCount,
     errorIssueCount,
-    hasAtLeastOneConfiguredFrequency,
+    hasAtLeastOneConfiguredFrequency: hasAtLeastOneConfiguredServiceBand,
     hasAllCanonicalTimeBandsConfigured,
     hasFallbackOnlyRouting,
     isBlocked: errorIssueCount > 0

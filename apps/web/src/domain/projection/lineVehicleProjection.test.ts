@@ -83,6 +83,7 @@ const departureScheduleProjection: LineDepartureScheduleNetworkProjection = {
       lineLabel: 'Line A',
       activeTimeBandId: 'morning-rush',
       status: 'available',
+      unavailableReason: null,
       currentBandHeadwayMinutes: 6,
       timeBandStartMinute: 360,
       timeBandEndMinute: 540,
@@ -99,6 +100,7 @@ const departureScheduleProjection: LineDepartureScheduleNetworkProjection = {
       lineLabel: 'Line B',
       activeTimeBandId: 'morning-rush',
       status: 'degraded',
+      unavailableReason: null,
       currentBandHeadwayMinutes: 10,
       timeBandStartMinute: 360,
       timeBandEndMinute: 540,
@@ -129,6 +131,7 @@ const createUnavailableProjection = (): LineDepartureScheduleNetworkProjection =
       lineLabel: 'Line A',
       activeTimeBandId: 'morning-rush',
       status: 'unavailable',
+      unavailableReason: 'active-band-unset',
       currentBandHeadwayMinutes: null,
       timeBandStartMinute: 360,
       timeBandEndMinute: 540,
@@ -170,6 +173,31 @@ describe('projectLineVehicleNetwork', () => {
     );
 
     expect(result.lines[0]?.vehicles).toHaveLength(0);
+    expect(result.summary.totalProjectedVehicleCount).toBe(0);
+    expect(result.summary.totalDegradedProjectedVehicleCount).toBe(0);
+  });
+
+  it('keeps no-service unavailable projections at zero vehicles with explicit note', () => {
+    const noServiceProjection: LineDepartureScheduleNetworkProjection = {
+      lines: [
+        {
+          ...createUnavailableProjection().lines[0],
+          unavailableReason: 'active-band-no-service',
+          serviceProjectionStatus: 'configured'
+        }
+      ],
+      summary: createUnavailableProjection().summary
+    };
+
+    const result = projectLineVehicleNetwork(
+      [lineA],
+      noServiceProjection,
+      createSimulationMinuteOfDay(420),
+      'morning-rush'
+    );
+
+    expect(result.lines[0]?.vehicles).toEqual([]);
+    expect(result.lines[0]?.note).toContain('no-service');
     expect(result.summary.totalProjectedVehicleCount).toBe(0);
     expect(result.summary.totalDegradedProjectedVehicleCount).toBe(0);
   });

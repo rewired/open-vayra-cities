@@ -89,6 +89,7 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
     );
 
     expect(result.status).toBe('available');
+    expect(result.unavailableReason).toBeNull();
     expect(result.departureMinutes.slice(0, 4)).toEqual([360, 366, 372, 378]);
   });
 
@@ -183,6 +184,7 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
 
     expect(result.serviceProjectionStatus).toBe('blocked');
     expect(result.status).toBe('unavailable');
+    expect(result.unavailableReason).toBe('blocked-service');
     expect(result.departureCount).toBe(0);
   });
 
@@ -204,6 +206,30 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
 
     expect(result.serviceProjectionStatus).toBe('not-configured');
     expect(result.status).toBe('unavailable');
+    expect(result.unavailableReason).toBe('active-band-unset');
+    expect(result.departureCount).toBe(0);
+  });
+
+  it('9b) active no-service returns unavailable departures with explicit no-service reason', () => {
+    const noServiceLine: Line = {
+      ...createBaseLine(lineAId),
+      frequencyByTimeBand: {
+        ...createBaseLine(lineAId).frequencyByTimeBand,
+        'morning-rush': { kind: 'no-service' }
+      }
+    };
+
+    const result = projectLineDepartureScheduleForLine(
+      noServiceLine,
+      placedStops,
+      'morning-rush',
+      createSimulationMinuteOfDay(420)
+    );
+
+    expect(result.serviceProjectionStatus).toBe('configured');
+    expect(result.status).toBe('unavailable');
+    expect(result.unavailableReason).toBe('active-band-no-service');
+    expect(result.currentBandHeadwayMinutes).toBeNull();
     expect(result.departureCount).toBe(0);
   });
 
@@ -219,6 +245,7 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
 
     expect(result.serviceProjectionStatus).toBe('degraded');
     expect(result.status).toBe('degraded');
+    expect(result.unavailableReason).toBeNull();
     expect(result.departureCount).toBeGreaterThan(0);
   });
 

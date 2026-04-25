@@ -109,6 +109,24 @@ describe('projectLineServicePlanProjection coverage', () => {
 
     expect(result.readiness.status).toBe('partially-ready');
     expect(result.status).toBe('not-configured');
+    expect(result.activeBandState).toBe('unset');
+  });
+
+  it('2b) returns configured when active band is explicitly no-service', () => {
+    const noServiceLine: Line = {
+      ...createBaseLine(lineAId),
+      frequencyByTimeBand: {
+        ...createBaseLine(lineAId).frequencyByTimeBand,
+        'morning-rush': { kind: 'no-service' }
+      }
+    };
+
+    const result = projectLineServicePlanForLine(noServiceLine, placedStops, 'morning-rush');
+
+    expect(result.readiness.status).toBe('ready');
+    expect(result.status).toBe('configured');
+    expect(result.activeBandState).toBe('no-service');
+    expect(result.currentBandHeadwayMinutes).toBeNull();
   });
 
   it('3) returns blocked for blocked readiness', () => {
@@ -202,6 +220,8 @@ describe('projectLineServicePlanProjection coverage', () => {
 
     expect(morningResult.status).toBe('degraded');
     expect(middayResult.status).toBe('not-configured');
+    expect(morningResult.activeBandState).toBe('frequency');
+    expect(middayResult.activeBandState).toBe('unset');
     expect(morningResult.currentBandHeadwayMinutes).toBe(6);
     expect(middayResult.currentBandHeadwayMinutes).toBeNull();
   });

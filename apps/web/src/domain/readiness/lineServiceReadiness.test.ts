@@ -95,6 +95,31 @@ describe('evaluateLineServiceReadiness', () => {
     expect(issueCodes(result.issues)).toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY);
   });
 
+  it('treats no-service bands as configured service-plan bands', () => {
+    const line: Line = {
+      ...createFullyConfiguredLine(),
+      frequencyByTimeBand: {
+        ...createUnsetLineServiceByTimeBand(),
+        'morning-rush': { kind: 'no-service' },
+        'late-morning': { kind: 'no-service' },
+        midday: { kind: 'no-service' },
+        afternoon: { kind: 'no-service' },
+        'evening-rush': { kind: 'no-service' },
+        evening: { kind: 'no-service' },
+        night: { kind: 'no-service' }
+      }
+    };
+
+    const result = evaluateLineServiceReadiness(line, placedStops);
+
+    expect(result.status).toBe('ready');
+    expect(result.summary.configuredTimeBandCount).toBe(MVP_TIME_BAND_IDS.length);
+    expect(issueCodes(result.issues)).not.toContain(LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_CONFIGURED_FREQUENCY);
+    expect(issueCodes(result.issues)).not.toContain(
+      LINE_SERVICE_READINESS_ISSUE_CODES.MISSING_COMPLETE_TIME_BAND_CONFIGURATION
+    );
+  });
+
   it('returns partially-ready when frequencies are only partially configured', () => {
     const line: Line = {
       ...createFullyConfiguredLine(),

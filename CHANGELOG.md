@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## 2026-04-25
 
+- Slice 041: update line-service readiness semantics so canonical bands configured as `frequency` or `no-service` count as configured service-plan bands, while only `unset` bands are treated as missing.
+- Slice 041: preserve stable readiness issue codes while updating readiness messages to avoid treating explicit `no-service` plans as "missing frequency" configuration.
+- Slice 041: extend service-plan projection contracts with explicit active-band state (`unset`/`no-service`/`frequency`) and keep status derivation truthful for each state.
+- Slice 041: update departure schedule projection semantics to generate departures only for active-band `frequency`, and expose explicit unavailable reasons including active-band `no-service`.
+- Slice 041: ensure vehicle projection treats active-band `no-service` as zero-vehicle/zero-departure output without missing-configuration messaging.
+- Add ADR 0096 documenting active-band service-plan semantics for explicit `no-service` versus `unset` behavior.
+
 - Slice 040: add canonical branded `MinuteOfDay` and `TimeBandDefinition` domain contracts with validated `0..1439` constructor semantics.
 - Slice 040: replace split time-band id/label/range ownership with one canonical ordered `TIME_BAND_DEFINITIONS` source and derived `MVP_TIME_BAND_IDS`/display labels.
 - Slice 040: add pure time-band helpers for `HH:MM` formatting, formatted window labels, and canonical minute-to-band resolution with explicit midnight-wrap handling.

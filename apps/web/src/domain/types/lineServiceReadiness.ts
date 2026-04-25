@@ -54,7 +54,7 @@ export interface LineServiceReadinessSummary {
   readonly routeSegmentCount: number;
   /** Expected segment count derived from ordered-stop adjacency. */
   readonly expectedRouteSegmentCount: number;
-  /** Number of canonical time bands configured with usable frequency values. */
+  /** Number of canonical time bands configured with usable service-plan values (`frequency` or `no-service`). */
   readonly configuredTimeBandCount: number;
   /** Number of canonical time bands expected by this evaluation. */
   readonly canonicalTimeBandCount: number;
@@ -62,9 +62,9 @@ export interface LineServiceReadinessSummary {
   readonly warningIssueCount: number;
   /** Number of blocking error issues produced by evaluation. */
   readonly errorIssueCount: number;
-  /** Whether at least one canonical time band has a configured usable frequency. */
+  /** Whether at least one canonical time band has a configured usable service plan band. */
   readonly hasAtLeastOneConfiguredFrequency: boolean;
-  /** Whether every canonical time band has a configured usable frequency. */
+  /** Whether every canonical time band has a configured usable service plan band. */
   readonly hasAllCanonicalTimeBandsConfigured: boolean;
   /** Whether all known route segments are fallback-routed, if any segments exist. */
   readonly hasFallbackOnlyRouting: boolean;

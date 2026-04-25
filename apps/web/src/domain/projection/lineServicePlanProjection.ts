@@ -1,7 +1,8 @@
 import { TIME_BAND_DISPLAY_LABELS } from '../constants/timeBands';
 import { evaluateLineServiceReadiness } from '../readiness/lineServiceReadiness';
-import { resolveLineServiceBandHeadwayMinutes, type Line } from '../types/line';
+import { resolveLineServiceBandHeadwayMinutes, type Line, type LineServiceBandPlan } from '../types/line';
 import type {
+  LineServiceActiveBandState,
   LineServicePlanProjection,
   LineSelectedServiceInspectorProjection,
   LineServiceProjectionNote,
@@ -32,14 +33,18 @@ const toProjectionNotes = (
 
 const resolveProjectionStatus = (
   readinessStatus: LineServiceProjectionResult['readiness']['status'],
-  currentBandHeadwayMinutes: number | null
+  activeBandState: LineServiceActiveBandState
 ): LineServiceProjectionStatus => {
   if (readinessStatus === 'blocked') {
     return 'blocked';
   }
 
-  if (currentBandHeadwayMinutes === null) {
+  if (activeBandState === 'unset') {
     return 'not-configured';
+  }
+
+  if (activeBandState === 'no-service') {
+    return readinessStatus === 'partially-ready' ? 'degraded' : 'configured';
   }
 
   if (readinessStatus === 'partially-ready') {
@@ -61,9 +66,10 @@ const SERVICE_STATUS_LABELS: Readonly<Record<LineServiceProjectionStatus, string
  *
  * Status resolution order is deterministic:
  * 1) `blocked` when readiness has blockers,
- * 2) `not-configured` when non-blocked but active-band frequency is unset/invalid,
- * 3) `degraded` when active-band frequency is valid but readiness is warning-only (`partially-ready`),
- * 4) otherwise `configured`.
+ * 2) `not-configured` when non-blocked and the active-band plan is `unset`,
+ * 3) `configured`/`degraded` when non-blocked and the active-band plan is `no-service`,
+ * 4) `degraded` when active-band frequency is valid but readiness is warning-only (`partially-ready`),
+ * 5) otherwise `configured`.
  */
 export const projectLineServicePlanForLine = (
   line: Line,
@@ -71,7 +77,9 @@ export const projectLineServicePlanForLine = (
   activeTimeBandId: TimeBandId
 ): LineServiceProjectionResult => {
   const readiness = evaluateLineServiceReadiness(line, placedStops);
-  const rawHeadway = resolveLineServiceBandHeadwayMinutes(line.frequencyByTimeBand[activeTimeBandId]);
+  const activeBandPlan: LineServiceBandPlan = line.frequencyByTimeBand[activeTimeBandId];
+  const activeBandState: LineServiceActiveBandState = activeBandPlan.kind;
+  const rawHeadway = resolveLineServiceBandHeadwayMinutes(activeBandPlan);
   const currentBandHeadwayMinutes = isPositiveFiniteNumber(rawHeadway) ? rawHeadway : null;
   const theoreticalDeparturesPerHour =
     currentBandHeadwayMinutes === null ? null : 60 / currentBandHeadwayMinutes;
@@ -86,11 +94,12 @@ export const projectLineServicePlanForLine = (
     lineId: line.id,
     lineLabel: line.label,
     activeTimeBandId,
+    activeBandState,
     currentBandHeadwayMinutes,
     theoreticalDeparturesPerHour,
     routeSegmentCount: line.routeSegments.length,
     totalRouteTravelMinutes,
-    status: resolveProjectionStatus(readiness.status, currentBandHeadwayMinutes),
+    status: resolveProjectionStatus(readiness.status, activeBandState),
     readiness,
     ...(notes !== undefined ? { notes } : {})
   };
@@ -115,6 +124,7 @@ export const projectLineSelectedServiceInspector = (
   return {
     activeTimeBandId: lineProjection.activeTimeBandId,
     activeTimeBandLabel: TIME_BAND_DISPLAY_LABELS[lineProjection.activeTimeBandId],
+    activeBandState: lineProjection.activeBandState,
     status: lineProjection.status,
     statusLabel: SERVICE_STATUS_LABELS[lineProjection.status],
     currentBandHeadwayMinutes: lineProjection.currentBandHeadwayMinutes,

@@ -5,10 +5,16 @@ import type { TimeBandId } from './timeBand';
 /**
  * Current service projection status for one completed line in the active time band.
  *
- * `degraded` is used when a line has a valid current-band frequency but readiness is warning-only
- * (`partially-ready`) due to fallback-only routing and/or other non-blocking readiness warnings.
+ * `not-configured` is only used when the active band is `unset`.
+ * `configured`/`degraded` can still apply when the active band is explicitly `no-service`.
+ * `degraded` is used when readiness is warning-only (`partially-ready`).
  */
 export type LineServiceProjectionStatus = 'blocked' | 'not-configured' | 'configured' | 'degraded';
+
+/**
+ * Explicit active-band service plan kind resolved from one line's active time-band configuration.
+ */
+export type LineServiceActiveBandState = 'unset' | 'no-service' | 'frequency';
 
 /**
  * Optional projection note shape used to surface per-line warning/error diagnostics.
@@ -34,6 +40,8 @@ export interface LineServiceProjectionResult {
   readonly lineLabel: string;
   /** Active time band used for headway/frequency extraction. */
   readonly activeTimeBandId: TimeBandId;
+  /** Explicit active-band service plan kind (`unset`, `no-service`, or `frequency`). */
+  readonly activeBandState: LineServiceActiveBandState;
   /** Current active-band headway in minutes, or `null` when unset/invalid. */
   readonly currentBandHeadwayMinutes: number | null;
   /** Theoretical departures per hour (`60 / headway`) when headway is configured, otherwise `null`. */
@@ -56,6 +64,8 @@ export interface LineServiceProjectionResult {
 export interface LineSelectedServiceInspectorProjection {
   /** Active time-band identifier used for this inspector projection. */
   readonly activeTimeBandId: TimeBandId;
+  /** Explicit active-band service plan kind (`unset`, `no-service`, or `frequency`). */
+  readonly activeBandState: LineServiceActiveBandState;
   /** Active time-band display label for compact UI rendering. */
   readonly activeTimeBandLabel: string;
   /** Current line service projection status for the active band. */

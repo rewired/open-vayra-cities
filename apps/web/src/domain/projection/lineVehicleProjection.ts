@@ -97,6 +97,11 @@ const projectVehiclesForLine = (
   const status = departureLineProjection.status;
 
   if (status === 'unavailable' || totalRouteTimeMinutes <= 0) {
+    const unavailableReasonNote =
+      departureLineProjection.unavailableReason === 'active-band-no-service'
+        ? 'Unavailable: active time band is explicitly configured as no-service, so zero vehicles are required or projected.'
+        : 'Unavailable: no active departure/service projection is available for this line.';
+
     return {
       lineId: line.id,
       lineLabel: line.label,
@@ -105,7 +110,7 @@ const projectVehiclesForLine = (
       vehicles: [],
       note:
         status === 'unavailable'
-          ? 'Unavailable: no active departure/service projection is available for this line.'
+          ? unavailableReasonNote
           : 'Unavailable: total route travel minutes are not positive.'
     };
   }

@@ -8,6 +8,15 @@ import type { TimeBandId } from './timeBand';
 export type LineDepartureScheduleProjectionStatus = 'unavailable' | 'available' | 'degraded';
 
 /**
+ * Explicit semantic reason for an `unavailable` departure projection state.
+ */
+export type LineDepartureScheduleUnavailableReason =
+  | 'blocked-service'
+  | 'active-band-unset'
+  | 'active-band-no-service'
+  | 'missing-active-frequency';
+
+/**
  * Branded minute-of-day value used for projected theoretical departures.
  */
 export type DepartureMinute = number & { readonly __brand: 'DepartureMinute' };
@@ -29,6 +38,8 @@ export interface LineDepartureScheduleProjection {
   readonly activeTimeBandId: TimeBandId;
   /** Departure projection status for this line in the active time band. */
   readonly status: LineDepartureScheduleProjectionStatus;
+  /** Explicit semantic reason when status is `unavailable`, otherwise `null`. */
+  readonly unavailableReason: LineDepartureScheduleUnavailableReason | null;
   /** Current active-band headway in minutes, or `null` when unavailable. */
   readonly currentBandHeadwayMinutes: number | null;
   /** Canonical inclusive start minute for the active time-band window. */

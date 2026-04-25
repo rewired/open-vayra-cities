@@ -13,6 +13,7 @@ import type {
   DepartureMinute,
   LineDepartureScheduleNetworkProjection,
   LineDepartureScheduleProjection,
+  LineDepartureScheduleUnavailableReason,
   LineDepartureScheduleProjectionStatus,
   LineDepartureScheduleSummary,
   LineSelectedDepartureInspectorProjection,
@@ -84,18 +85,46 @@ const toMinutesUntilDeparture = (rawMinutes: number): MinutesUntilDeparture =>
   rawMinutes as MinutesUntilDeparture;
 
 const isServiceProjectionDepartureReady = (
-  serviceProjectionStatus: LineServiceProjectionResult['status']
-): serviceProjectionStatus is 'configured' | 'degraded' =>
-  serviceProjectionStatus === 'configured' || serviceProjectionStatus === 'degraded';
+  lineServiceProjection: LineServiceProjectionResult
+): boolean =>
+  (lineServiceProjection.status === 'configured' || lineServiceProjection.status === 'degraded') &&
+  lineServiceProjection.activeBandState === 'frequency';
+
+const deriveUnavailableReason = (
+  lineServiceProjection: LineServiceProjectionResult
+): LineDepartureScheduleUnavailableReason | null => {
+  if (lineServiceProjection.status === 'blocked') {
+    return 'blocked-service';
+  }
+
+  if (lineServiceProjection.activeBandState === 'unset') {
+    return 'active-band-unset';
+  }
+
+  if (lineServiceProjection.activeBandState === 'no-service') {
+    return 'active-band-no-service';
+  }
+
+  if (lineServiceProjection.currentBandHeadwayMinutes === null) {
+    return 'missing-active-frequency';
+  }
+
+  return null;
+};
 
 const deriveDepartureProjectionStatus = (
-  serviceProjectionStatus: LineServiceProjectionResult['status']
+  lineServiceProjection: LineServiceProjectionResult,
+  canProjectDepartures: boolean
 ): LineDepartureScheduleProjectionStatus => {
-  if (serviceProjectionStatus === 'degraded') {
+  if (!canProjectDepartures) {
+    return 'unavailable';
+  }
+
+  if (lineServiceProjection.status === 'degraded') {
     return 'degraded';
   }
 
-  if (serviceProjectionStatus === 'configured') {
+  if (lineServiceProjection.status === 'configured') {
     return 'available';
   }
 
@@ -129,7 +158,8 @@ export const projectLineDepartureScheduleForServiceProjection = (
     lineServiceProjection.activeTimeBandId,
     currentMinuteOfDay
   );
-  const canProjectDepartures = isServiceProjectionDepartureReady(lineServiceProjection.status);
+  const canProjectDepartures = isServiceProjectionDepartureReady(lineServiceProjection);
+  const unavailableReason = canProjectDepartures ? null : deriveUnavailableReason(lineServiceProjection);
   const headwayMinutes =
     canProjectDepartures && lineServiceProjection.currentBandHeadwayMinutes !== null
       ? lineServiceProjection.currentBandHeadwayMinutes
@@ -148,7 +178,8 @@ export const projectLineDepartureScheduleForServiceProjection = (
     lineId: lineServiceProjection.lineId,
     lineLabel: lineServiceProjection.lineLabel,
     activeTimeBandId: lineServiceProjection.activeTimeBandId,
-    status: deriveDepartureProjectionStatus(lineServiceProjection.status),
+    status: deriveDepartureProjectionStatus(lineServiceProjection, canProjectDepartures),
+    unavailableReason,
     currentBandHeadwayMinutes: headwayMinutes,
     timeBandStartMinute: startMinute,
     timeBandEndMinute: endMinuteExclusive,
