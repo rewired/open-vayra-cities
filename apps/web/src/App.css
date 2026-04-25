@@ -842,16 +842,24 @@ body {
 
 .inspector-compact-table th,
 .inspector-compact-table td {
-  text-align: left;
   vertical-align: top;
   padding: 4px 6px;
   border-top: 1px solid #2f415f;
 }
 
 .inspector-compact-table th {
+  text-align: left;
   width: 46%;
   color: #cfe0fb;
   font-weight: 600;
+}
+
+.inspector-compact-table td {
+  text-align: right;
+}
+
+.inspector-compact-table td.inspector-compact-table__value--left {
+  text-align: left;
 }
 
 .inspector-status-badge {

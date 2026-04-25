@@ -44,7 +44,9 @@ export function ProjectedVehiclesDialog({
                 </tr>
                 <tr>
                   <th scope="row">Projection status</th>
-                  <td>{selectedLineVehicleProjection.departureScheduleStatus}</td>
+                  <td className="inspector-compact-table__value--left">
+                    {selectedLineVehicleProjection.departureScheduleStatus}
+                  </td>
                 </tr>
               </tbody>
             </table>
