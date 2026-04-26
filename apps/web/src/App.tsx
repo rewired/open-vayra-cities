@@ -300,6 +300,8 @@ export default function App(): ReactElement {
         onFrequencyChange={sessionController.updateSelectedCompletedLineFrequency}
         onSelectedLineIdChange={handleLineInventorySelection}
         onStopSelectionChange={handleStopInventorySelection}
+        onStopRename={sessionController.renameStopLabel}
+        onLineRename={sessionController.renameLineLabel}
         openDialogIntent={sessionController.selectedLineDialogOpenIntent}
         onOpenDialogIntentConsumed={sessionController.setSelectedLineDialogOpenIntent}
       />

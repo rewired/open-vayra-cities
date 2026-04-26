@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ChangeEvent, type Dispatch, type Set
 import { useToast } from '../ui/toast/ToastProvider';
 
 import { MVP_TIME_BAND_IDS } from '../domain/constants/timeBands';
+import { normalizeAcceptedLineLabel } from '../domain/line/lineLabeling';
 import { applyLineFrequencyEditorAction } from './lineFrequencyEditorState';
 import { resolveLineServiceBandHeadwayMinutes, type Line, type LineServiceBandPlan } from '../domain/types/line';
 import { parseSelectedLineExportFile } from '../domain/export/selectedLineExportFileLoader';
@@ -52,6 +53,10 @@ export interface NetworkSessionStateController {
   readonly setSessionLines: Dispatch<SetStateAction<readonly Line[]>>;
   readonly setSelectedLineId: Dispatch<SetStateAction<Line['id'] | null>>;
   readonly setSelectedLineDialogOpenIntent: Dispatch<SetStateAction<SelectedLineDialogOpenIntent | null>>;
+  /** Commits a stop label rename for one stop id. */
+  readonly renameStopLabel: (stopId: Stop['id'], nextLabel: string) => void;
+  /** Commits a line label rename for one line id with accepted-symbol normalization. */
+  readonly renameLineLabel: (lineId: Line['id'], nextLabel: string) => void;
   readonly updateSelectedCompletedLineFrequency: (
     timeBandId: TimeBandId,
     rawInputValue: string,
@@ -147,6 +152,17 @@ export const useNetworkSessionState = (): NetworkSessionStateController => {
     setSessionLines,
     setSelectedLineId,
     setSelectedLineDialogOpenIntent,
+    renameStopLabel: (stopId, nextLabel) => {
+      setSessionStops((currentStops) =>
+        currentStops.map((stop) => (stop.id === stopId ? { ...stop, label: nextLabel } : stop))
+      );
+    },
+    renameLineLabel: (lineId, nextLabel) => {
+      const normalizedLabel = normalizeAcceptedLineLabel(nextLabel);
+      setSessionLines((currentLines) =>
+        currentLines.map((line) => (line.id === lineId ? { ...line, label: normalizedLabel } : line))
+      );
+    },
     updateSelectedCompletedLineFrequency: (timeBandId, rawInputValue, action = 'input-change') => {
       const nextEditorState = applyLineFrequencyEditorAction(rawInputValue, action);
 

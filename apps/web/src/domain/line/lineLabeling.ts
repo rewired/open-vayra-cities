@@ -81,3 +81,15 @@ export const generateUniqueLineLabel = (options: {
 
   return `${baseLabel} ${suffix}`;
 };
+
+/**
+ * Applies accepted route-name symbol normalization for arrow-like tokens.
+ * Replacements are global and order-sensitive to keep bidirectional markers intact.
+ */
+export const normalizeAcceptedLineLabel = (rawLabel: string): string =>
+  rawLabel
+    .replaceAll('<->', '↔')
+    .replaceAll('<>', '↔')
+    .replaceAll('->', '→')
+    .replaceAll('>', '→')
+    .trim();

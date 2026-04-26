@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generateLineLabel, generateUniqueLineLabel } from './lineLabeling';
+import { generateLineLabel, generateUniqueLineLabel, normalizeAcceptedLineLabel } from './lineLabeling';
 import { createLineId, createNoServiceLineServiceByTimeBand, type Line } from '../types/line';
 import { createStopId, type Stop } from '../types/stop';
 
@@ -77,7 +77,7 @@ describe('lineLabeling', () => {
     });
   });
 
-  describe('generateUniqueLineLabel', () => {
+describe('generateUniqueLineLabel', () => {
     const existingLines: Line[] = [
       {
         id: createLineId('line-1'),
@@ -117,5 +117,18 @@ describe('lineLabeling', () => {
       });
       expect(label).toBe('Millerntorplatz ↔ Reeperbahn 2');
     });
+  });
+});
+
+describe('normalizeAcceptedLineLabel', () => {
+  it('normalizes bidirectional and directional tokens in the required order', () => {
+    expect(normalizeAcceptedLineLabel('Hbf <-> Altona')).toBe('Hbf ↔ Altona');
+    expect(normalizeAcceptedLineLabel('Hbf <> Altona')).toBe('Hbf ↔ Altona');
+    expect(normalizeAcceptedLineLabel('Hbf -> HafenCity')).toBe('Hbf → HafenCity');
+    expect(normalizeAcceptedLineLabel('Hbf > HafenCity')).toBe('Hbf → HafenCity');
+  });
+
+  it('trims the final label after normalization', () => {
+    expect(normalizeAcceptedLineLabel('  Hbf -> HafenCity  ')).toBe('Hbf → HafenCity');
   });
 });

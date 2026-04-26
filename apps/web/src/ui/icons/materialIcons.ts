@@ -11,6 +11,7 @@ export type MaterialIconName =
   | 'restart_alt'
   | 'upload_file'
   | 'download'
+  | 'edit'
   | 'pace'
   | 'check'
   | 'error'

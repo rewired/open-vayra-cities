@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react';
 import type { Line } from '../domain/types/line';
 import type { Stop } from '../domain/types/stop';
+import { InlineRenameField } from './InlineRenameField';
 
 interface NetworkInventoryProps {
   /** List of all placed stops in the current session. */
@@ -11,6 +12,10 @@ interface NetworkInventoryProps {
   readonly onStopSelect: (stopId: Stop['id']) => void;
   /** Callback triggered when a line is selected from the inventory. */
   readonly onLineSelect: (lineId: Line['id']) => void;
+  /** Callback triggered when a stop rename is accepted. */
+  readonly onStopRename: (stopId: Stop['id'], nextLabel: string) => void;
+  /** Callback triggered when a line rename is accepted. */
+  readonly onLineRename: (lineId: Line['id'], nextLabel: string) => void;
 }
 
 /**
@@ -21,7 +26,9 @@ export function NetworkInventory({
   placedStops,
   completedLines,
   onStopSelect,
-  onLineSelect
+  onLineSelect,
+  onStopRename,
+  onLineRename
 }: NetworkInventoryProps): ReactElement {
   return (
     <div className="network-inventory">
@@ -31,14 +38,21 @@ export function NetworkInventory({
           <ul className="inspector-simple-list network-inventory__list" aria-label="Placed stops inventory">
             {placedStops.map((stop) => (
               <li key={stop.id} className="network-inventory__list-item">
-                <button
-                  type="button"
-                  className="network-inventory__item-button"
-                  onClick={() => onStopSelect(stop.id)}
-                  title={`Select and focus ${stop.label ?? stop.id}`}
-                >
-                  <span className="network-inventory__item-label">{stop.label ?? stop.id}</span>
-                </button>
+                <div className="network-inventory__list-row">
+                  <button
+                    type="button"
+                    className="network-inventory__item-button"
+                    onClick={() => onStopSelect(stop.id)}
+                    title={`Select and focus ${stop.label ?? stop.id}`}
+                  >
+                    <span className="network-inventory__item-label">{stop.label ?? stop.id}</span>
+                  </button>
+                  <InlineRenameField
+                    value={stop.label ?? stop.id}
+                    entityLabel="stop"
+                    onAccept={(nextValue) => onStopRename(stop.id, nextValue)}
+                  />
+                </div>
               </li>
             ))}
           </ul>
@@ -53,15 +67,22 @@ export function NetworkInventory({
           <ul className="inspector-simple-list network-inventory__list" aria-label="Completed lines inventory">
             {completedLines.map((line) => (
               <li key={line.id} className="network-inventory__list-item">
-                <button
-                  type="button"
-                  className="network-inventory__item-button"
-                  onClick={() => onLineSelect(line.id)}
-                  title={`Select and focus ${line.label}`}
-                >
-                  <span className="network-inventory__item-label">{line.label}</span>
+                <div className="network-inventory__list-row">
+                  <button
+                    type="button"
+                    className="network-inventory__item-button"
+                    onClick={() => onLineSelect(line.id)}
+                    title={`Select and focus ${line.label}`}
+                  >
+                    <span className="network-inventory__item-label">{line.label}</span>
+                  </button>
+                  <InlineRenameField
+                    value={line.label}
+                    entityLabel="line"
+                    onAccept={(nextValue) => onLineRename(line.id, nextValue)}
+                  />
                   <span className="network-inventory__item-id">{line.id}</span>
-                </button>
+                </div>
               </li>
             ))}
           </ul>

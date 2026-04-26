@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 070: Inline Rename for Stops and Routes
+- Added compact inline rename controls to inspector network inventory rows for both stops and completed lines, including explicit edit/check/cancel icon affordances.
+- Added keyboard editing controls for rename interactions: `Enter` accepts and `Escape` cancels, with no blur auto-commit behavior.
+- Enforced local rename validation to trim accepted input and reject empty post-trim names while preserving existing names on cancel/invalid input.
+- Added line-only accepted-name normalization (`<->`, `<>` to `↔`; `->`, `>` to `→`) in required order, applied only on accept.
+- Added ADR 0119 to document rename interaction boundaries and scoped normalization behavior.
+
 ### Slice 068b: Network Save Envelope Repair and Test Alignment
 - Hardened `validateSelectedLineExportPayload` to strictly require the `cityops.network-save` envelope at the root, rejecting raw v4 or v3 payloads with specific error messages.
 - Cleaned up `selectedLineExportValidation.ts` by removing unused `validateSegments` and obsolete v3-only validation codes.

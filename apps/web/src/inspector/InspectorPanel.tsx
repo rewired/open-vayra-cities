@@ -38,6 +38,8 @@ interface InspectorPanelProps {
   ) => void;
   readonly onSelectedLineIdChange: (lineId: Line['id']) => void;
   readonly onStopSelectionChange: (stopId: import('../domain/types/stop').StopId) => void;
+  readonly onStopRename: (stopId: import('../domain/types/stop').StopId, nextLabel: string) => void;
+  readonly onLineRename: (lineId: Line['id'], nextLabel: string) => void;
   readonly openDialogIntent: import('../session/sessionTypes').SelectedLineDialogOpenIntent | null;
   readonly onOpenDialogIntentConsumed: (intent: import('../session/sessionTypes').SelectedLineDialogOpenIntent | null) => void;
 }
@@ -75,6 +77,8 @@ export function InspectorPanel({
   onFrequencyChange,
   onSelectedLineIdChange,
   onStopSelectionChange,
+  onStopRename,
+  onLineRename,
   openDialogIntent,
   onOpenDialogIntentConsumed
 }: InspectorPanelProps): ReactElement {
@@ -163,6 +167,8 @@ export function InspectorPanel({
             completedLines={completedLines}
             onStopSelect={onStopSelectionChange}
             onLineSelect={onSelectedLineIdChange}
+            onStopRename={onStopRename}
+            onLineRename={onLineRename}
           />
 
           <h3 style={{ marginTop: '1.5rem' }}>Demand capture</h3>
