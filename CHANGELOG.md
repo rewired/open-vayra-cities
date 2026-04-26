@@ -31,6 +31,12 @@ All notable changes to this project will be documented in this file.
 - Removed the separate selected-line readiness card and kept the issue summary inline in the compact header.
 - Added ADR 0120 to document compact-header scope and non-goals.
 
+### Slice 070b: Line-Scoped Stop Rename and Inspector Density Cleanup
+- Shifted stop rename to line-scoped contexts, keeping rename entrypoints tied to selected-line and line-list workflows instead of global stop inventory usage.
+- Standardized badge-first selection affordances so compact id badges remain the primary select/focus target in dense inspector lists.
+- Reduced inspector row density by removing redundant inline controls and preserving readability-first label presentation.
+- Explicit non-goals: no stop or line deletion behavior, no topology/service-pattern editing changes, and no routing or simulation behavior changes.
+
 ### Slice 070: Inline Rename for Stops and Routes
 - Added compact inline rename controls to inspector network inventory rows for both stops and completed lines, including explicit edit/check/cancel icon affordances.
 - Added keyboard editing controls for rename interactions: `Enter` accepts and `Escape` cancels, with no blur auto-commit behavior.
