@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 071: Selected-Line Inspector Compact Header Summary
+- Replaced the selected-line top inspector table/KPI layout with a compact summary header that combines line badge, readable label, and inline line rename entrypoint.
+- Removed ordered-stop chip preview, `+N more`, and expandable stop-sequence disclosure from the selected-line top card.
+- Consolidated topology, service pattern, stop count, segment count, runtime, readiness, warning count, and blocker count into compact metadata rows sourced from existing inspector projections and panel state.
+- Removed the separate selected-line readiness card and kept the issue summary inline in the compact header.
+- Added ADR 0120 to document compact-header scope and non-goals.
+
 ### Slice 070: Inline Rename for Stops and Routes
 - Added compact inline rename controls to inspector network inventory rows for both stops and completed lines, including explicit edit/check/cancel icon affordances.
 - Added keyboard editing controls for rename interactions: `Enter` accepts and `Escape` cancels, with no blur auto-commit behavior.

@@ -707,97 +707,71 @@ body {
   margin-top: 12px;
 }
 
-.selected-line-inspector__pill-row {
+.selected-line-inspector__header-row {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
 }
 
-.selected-line-inspector__pill {
-  margin: 0;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid #425b83;
-  background: #1b2b44;
-  color: #d7e7ff;
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
-.selected-line-inspector__pill--issues {
-  border-color: #845a49;
-  background: #3a2a22;
-  color: #f6d5cb;
-}
-
-.selected-line-inspector__pill--readiness {
-  border-color: #386d5f;
-  background: #1c3a34;
-  color: #c4f0e5;
-}
-
-
-.selected-line-inspector__stop-chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.selected-line-inspector__stop-chip {
+.selected-line-inspector__line-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  justify-content: center;
+  min-width: 58px;
+  padding: 3px 10px;
   border: 1px solid #425b83;
   border-radius: 999px;
   background: #1b2b44;
   color: #d7e7ff;
-  font-size: 0.7rem;
-  line-height: 1.2;
+  font-size: 0.74rem;
+  font-weight: 700;
 }
 
-.selected-line-inspector__stop-chip--more {
-  border-style: dashed;
-  color: #b9d3fb;
+.selected-line-inspector__header-row .inline-rename-field {
+  flex: 1;
 }
 
-.selected-line-inspector__stop-sequence-details {
-  margin-top: 6px;
+.selected-line-inspector__header-row .inline-rename-field .network-inventory__item-label {
+  color: #edf3ff;
+  font-size: 0.82rem;
 }
 
-.selected-line-inspector__stop-sequence-details summary {
-  cursor: pointer;
+.selected-line-inspector__issue-summary {
+  margin: 8px 0 0;
+  color: #f6d5cb;
   font-size: 0.72rem;
-  color: #cfe0fb;
-  margin-bottom: 6px;
 }
 
-.selected-line-inspector__summary-stats {
+.selected-line-inspector__metadata-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
   margin-top: 8px;
 }
 
-.selected-line-inspector__summary-stat-card {
-  display: grid;
-  gap: 4px;
-  padding: 8px;
+.selected-line-inspector__metadata-item {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px;
   border: 1px solid #2f415f;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #16243a;
 }
 
-.selected-line-inspector__summary-stat-label {
+.selected-line-inspector__metadata-key {
   color: #cfe0fb;
   font-size: 0.68rem;
-  letter-spacing: 0.04em;
   text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-.selected-line-inspector__summary-stat-value {
+.selected-line-inspector__metadata-value {
   color: #ecf3ff;
-  font-size: 0.82rem;
-  line-height: 1.25;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-align: right;
 }
 
 .selected-line-inspector__actions-grid {

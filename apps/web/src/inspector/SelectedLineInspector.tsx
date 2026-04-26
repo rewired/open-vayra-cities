@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactElement } from 'react';
 
 import { DeparturesDialog } from './DeparturesDialog';
 import { FrequencyEditorDialog } from './FrequencyEditorDialog';
+import { InlineRenameField } from './InlineRenameField';
 import { ProjectedVehiclesDialog } from './ProjectedVehiclesDialog';
 import { ServicePlanDialog } from './ServicePlanDialog';
 import type {
@@ -25,6 +26,10 @@ interface SelectedLineInspectorProps {
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineSelectedServiceInspector> | null;
   readonly selectedLinePlanningVehicleProjection: ReturnType<typeof import('../domain/projection/linePlanningVehicleProjection').projectLinePlanningVehicles> | null;
   readonly selectedLineDemandProjection: import('../domain/demand/servedDemandProjection').LineBandDemandProjection | null;
+  readonly onLineRename: (
+    lineId: import('../domain/types/line').Line['id'],
+    nextLabel: string
+  ) => void;
   readonly onFrequencyChange: (
     timeBandId: TimeBandId,
     rawInputValue: string,
@@ -38,8 +43,6 @@ type SelectedLineDialogId = 'frequency' | 'service-plan' | 'departures' | 'proje
 
 const formatIssueSummaryLabel = (blockerCount: number, warningCount: number): string =>
   `${blockerCount} blocker${blockerCount === 1 ? '' : 's'} · ${warningCount} warning${warningCount === 1 ? '' : 's'}`;
-
-const MAX_VISIBLE_STOP_CHIPS = 4;
 
 /**
  * Renders compact selected-line summary actions and opens focused dialogs for detailed inspector sections.
@@ -56,6 +59,7 @@ export function SelectedLineInspector({
   selectedLineServiceInspectorProjection,
   selectedLinePlanningVehicleProjection,
   selectedLineDemandProjection,
+  onLineRename,
   onFrequencyChange,
   openDialogIntent,
   onOpenDialogIntentConsumed
@@ -68,9 +72,17 @@ export function SelectedLineInspector({
   const issueSummaryBlockerCount = Math.max(readinessBlockerCount, serviceBlockerCount);
   const issueSummaryWarningCount = Math.max(readinessWarningCount, serviceWarningCount);
   const orderedStopIds = panelState.selectedLine.stopIds;
-  const visibleStopIds = orderedStopIds.slice(0, MAX_VISIBLE_STOP_CHIPS);
-  const hasCollapsedStops = orderedStopIds.length > MAX_VISIBLE_STOP_CHIPS;
   const selectedLineId = panelState.selectedLine.id;
+  const segmentCountLabel =
+    panelState.selectedLine.servicePattern === 'bidirectional'
+      ? `F:${panelState.selectedLine.routeSegments.length} / R:${panelState.selectedLine.reverseRouteSegments?.length ?? 0}`
+      : `${panelState.selectedLine.routeSegments.length}`;
+  const runtimeLabel = selectedLineRouteBaseline
+    ? `${(selectedLineRouteBaseline.totalTravelTimeSeconds / 60).toFixed(2)} min`
+    : 'Unavailable';
+  const readinessStatusLabel = selectedLineServiceProjection
+    ? selectedLineServiceProjection.readiness.status
+    : 'Unavailable';
 
   useEffect(() => {
     if (
@@ -87,88 +99,51 @@ export function SelectedLineInspector({
     <div className="selected-line-inspector">
       <section className="inspector-card" aria-label="Selected line compact header">
         <h3>Selected line</h3>
-        <table className="inspector-compact-table">
-          <tbody>
-            <tr>
-              <th scope="row">ID / Label</th>
-              <td className="inspector-compact-table__value--left">{`${panelState.selectedLine.id} / ${panelState.selectedLine.label}`}</td>
-            </tr>
-            <tr>
-              <th scope="row">Ordered stops</th>
-              <td className="inspector-compact-table__value--left">
-                <div className="selected-line-inspector__stop-chip-row" aria-label="Ordered stops preview">
-                  {visibleStopIds.map((stopId) => (
-                    <span key={stopId} className="selected-line-inspector__stop-chip">
-                      {stopId}
-                    </span>
-                  ))}
-                  {hasCollapsedStops ? (
-                    <span className="selected-line-inspector__stop-chip selected-line-inspector__stop-chip--more">
-                      +{orderedStopIds.length - visibleStopIds.length} more
-                    </span>
-                  ) : null}
-                </div>
-                {hasCollapsedStops ? (
-                  <details className="selected-line-inspector__stop-sequence-details">
-                    <summary>Expand stop sequence</summary>
-                    <div className="selected-line-inspector__stop-chip-row" aria-label="Ordered stops full sequence">
-                      {orderedStopIds.map((stopId) => (
-                        <span key={`${stopId}-full`} className="selected-line-inspector__stop-chip">
-                          {stopId}
-                        </span>
-                      ))}
-                    </div>
-                  </details>
-                ) : null}
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">Topology</th>
-              <td className="inspector-compact-table__value--left">
-                <span className="selected-line-inspector__value-label">
-                  {panelState.selectedLine.topology === 'loop' ? 'Loop' : 'Linear'}
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">Service</th>
-              <td className="inspector-compact-table__value--left">
-                <span className="selected-line-inspector__value-label">
-                  {panelState.selectedLine.servicePattern === 'bidirectional' ? 'Both directions' : 'One-way'}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div className="selected-line-inspector__summary-stats" aria-label="Selected line route summary">
-          <div className="selected-line-inspector__summary-stat-card">
-            <span className="selected-line-inspector__summary-stat-label">Stops</span>
-            <strong className="selected-line-inspector__summary-stat-value">{orderedStopIds.length}</strong>
-          </div>
-          <div className="selected-line-inspector__summary-stat-card">
-            <span className="selected-line-inspector__summary-stat-label">Segments</span>
-            <strong className="selected-line-inspector__summary-stat-value">
-              {panelState.selectedLine.servicePattern === 'bidirectional' 
-                ? `F:${panelState.selectedLine.routeSegments.length} / R:${panelState.selectedLine.reverseRouteSegments?.length ?? 0}`
-                : panelState.selectedLine.routeSegments.length}
-            </strong>
-          </div>
-          <div className="selected-line-inspector__summary-stat-card">
-            <span className="selected-line-inspector__summary-stat-label">Runtime</span>
-            <strong className="selected-line-inspector__summary-stat-value">
-              {selectedLineRouteBaseline ? `${(selectedLineRouteBaseline.totalTravelTimeSeconds / 60).toFixed(2)} min` : 'Unavailable'}
-            </strong>
-          </div>
+        <div className="selected-line-inspector__header-row">
+          <span className="selected-line-inspector__line-badge">{panelState.selectedLine.id}</span>
+          <InlineRenameField
+            value={panelState.selectedLine.label}
+            entityLabel="line"
+            onAccept={(nextValue) => onLineRename(panelState.selectedLine.id, nextValue)}
+          />
         </div>
-      </section>
-
-      <section className="inspector-card" aria-label="Selected line readiness pills">
-        <div className="selected-line-inspector__pill-row">
-          <p className="selected-line-inspector__pill selected-line-inspector__pill--issues">
-            {formatIssueSummaryLabel(issueSummaryBlockerCount, issueSummaryWarningCount)}
+        <p className="selected-line-inspector__issue-summary">{formatIssueSummaryLabel(issueSummaryBlockerCount, issueSummaryWarningCount)}</p>
+        <div className="selected-line-inspector__metadata-grid" aria-label="Selected line metadata">
+          <p className="selected-line-inspector__metadata-item">
+            <span className="selected-line-inspector__metadata-key">Topology</span>
+            <span className="selected-line-inspector__metadata-value">
+              {panelState.selectedLine.topology === 'loop' ? 'Loop' : 'Linear'}
+            </span>
           </p>
-          <p className="selected-line-inspector__pill selected-line-inspector__pill--readiness">
-            {selectedLineServiceProjection ? `Readiness: ${selectedLineServiceProjection.readiness.status}` : 'Readiness: Unavailable'}
+          <p className="selected-line-inspector__metadata-item">
+            <span className="selected-line-inspector__metadata-key">Service</span>
+            <span className="selected-line-inspector__metadata-value">
+              {panelState.selectedLine.servicePattern === 'bidirectional' ? 'Both directions' : 'One-way'}
+            </span>
+          </p>
+          <p className="selected-line-inspector__metadata-item">
+            <span className="selected-line-inspector__metadata-key">Stops</span>
+            <span className="selected-line-inspector__metadata-value">{orderedStopIds.length}</span>
+          </p>
+          <p className="selected-line-inspector__metadata-item">
+            <span className="selected-line-inspector__metadata-key">Segments</span>
+            <span className="selected-line-inspector__metadata-value">{segmentCountLabel}</span>
+          </p>
+          <p className="selected-line-inspector__metadata-item">
+            <span className="selected-line-inspector__metadata-key">Runtime</span>
+            <span className="selected-line-inspector__metadata-value">{runtimeLabel}</span>
+          </p>
+          <p className="selected-line-inspector__metadata-item">
+            <span className="selected-line-inspector__metadata-key">Readiness</span>
+            <span className="selected-line-inspector__metadata-value">{readinessStatusLabel}</span>
+          </p>
+          <p className="selected-line-inspector__metadata-item">
+            <span className="selected-line-inspector__metadata-key">Warnings</span>
+            <span className="selected-line-inspector__metadata-value">{issueSummaryWarningCount}</span>
+          </p>
+          <p className="selected-line-inspector__metadata-item">
+            <span className="selected-line-inspector__metadata-key">Blockers</span>
+            <span className="selected-line-inspector__metadata-value">{issueSummaryBlockerCount}</span>
           </p>
         </div>
       </section>
