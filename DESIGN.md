@@ -38,7 +38,8 @@ What makes CityOps' visual language distinctive is its border philosophy. Rather
 ### Semantic Accent Colors
 - **Teal** (`#2a9d99`): Success states, positive indicators.
 - **Green** (`#1aae39`): Confirmation, completion badges.
-- **Orange** (`#dd5b00`): Warning states, attention indicators.
+- **Yellow** (`#e79d00`): Warning states, attention indicators.
+- **Red** (`#e71616`): Error states, destructive actions.
 - **Pink** (`#ff64c8`): Decorative accent, feature highlights.
 - **Purple** (`#391c57`): Premium features, deep accents.
 - **Brown** (`#523410`): Earthy accent, cold feature sections.
