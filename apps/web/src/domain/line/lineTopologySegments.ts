@@ -42,7 +42,11 @@ export const getExpectedForwardRouteSegmentStopPair = (
 
   // Handle loop closing segment
   if (topology === 'loop' && segmentIndex === stopCount - 1) {
-    return { fromStopId, toStopId: stopIds[0] };
+    const firstStopId = stopIds[0];
+    if (firstStopId === undefined) {
+      return null;
+    }
+    return { fromStopId, toStopId: firstStopId };
   }
 
   const toStopId = stopIds[segmentIndex + 1];

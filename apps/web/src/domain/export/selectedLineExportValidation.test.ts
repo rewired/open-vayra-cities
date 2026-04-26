@@ -72,8 +72,8 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
 
   it('fails when route segment count is below ordered stop chain minimum', () => {
     const payload = readFixturePayload();
-    (payload.line as any).routeSegments = payload.line.routeSegments.slice(0, -1);
-    (payload.metadata as any).routeSegmentCount = payload.line.routeSegments.length;
+    (payload.line as any).routeSegments = payload.line.routeSegments!.slice(0, -1);
+    (payload.metadata as any).routeSegmentCount = payload.line.routeSegments!.length;
 
     expectIssue(payload, 'route-segment-count-mismatch');
   });
@@ -88,10 +88,10 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
     }
 
     (payload.line.routeSegments as any)[0] = {
-      ...payload.line.routeSegments[0]!,
+      ...payload.line.routeSegments![0]!,
       toStopId: 'stop-3',
       orderedGeometry: [
-        payload.line.routeSegments[0]!.orderedGeometry[0]!,
+        payload.line.routeSegments![0]!.orderedGeometry[0]!,
         [stop3.position.lng, stop3.position.lat]
       ]
     };
@@ -102,7 +102,7 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
   it('fails on route segment line id mismatch', () => {
     const payload = readFixturePayload();
     (payload.line.routeSegments as any)[0] = {
-      ...payload.line.routeSegments[0]!,
+      ...payload.line.routeSegments![0]!,
       lineId: 'line-2'
     };
 
@@ -122,8 +122,8 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
   it('fails on invalid total travel time', () => {
     const payload = readFixturePayload();
     (payload.line.routeSegments as any)[0] = {
-      ...payload.line.routeSegments[0]!,
-      totalTravelMinutes: payload.line.routeSegments[0]!.inMotionTravelMinutes
+      ...payload.line.routeSegments![0]!,
+      totalTravelMinutes: payload.line.routeSegments![0]!.inMotionTravelMinutes
     };
 
     expectIssue(payload, 'route-segment-total-travel-minutes-mismatch');

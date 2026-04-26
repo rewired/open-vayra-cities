@@ -293,7 +293,7 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
       stopIds: payload.line.orderedStopIds,
       topology: (payload.line as any).topology ?? 'linear',
       servicePattern: (payload.line as any).servicePattern ?? 'one-way',
-      routeSegments: payload.line.routeSegments,
+      routeSegments: payload.line.routeSegments ?? [],
       frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 

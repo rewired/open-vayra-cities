@@ -321,7 +321,7 @@ export function MapWorkspaceSurface({
           const nextOrdinal = currentStops.length + 1;
           const nextStop = buildDeterministicStop(nextOrdinal, lng, lat, labelCandidate, currentStops);
           createdStop = nextStop;
-          setLastPlacedStopLabel(nextStop.label);
+          setLastPlacedStopLabel(nextStop.label ?? null);
           return [...currentStops, nextStop];
         });
 

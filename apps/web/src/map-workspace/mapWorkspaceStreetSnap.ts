@@ -417,7 +417,8 @@ export const resolveNearbyStreetLabelCandidate = (
         return a.label.localeCompare(b.label);
       });
 
-      return candidates[0].label;
+      const bestCandidate = candidates[0];
+      return bestCandidate?.label ?? null;
     }
   }
 

@@ -350,7 +350,7 @@ describe('evaluateLineServiceReadiness', () => {
       stopIds: payload.line.orderedStopIds,
       topology: payload.line.topology,
       servicePattern: payload.line.servicePattern,
-      routeSegments: payload.line.routeSegments,
+      routeSegments: payload.line.routeSegments ?? [],
       frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
