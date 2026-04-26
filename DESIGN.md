@@ -40,6 +40,7 @@ What makes CityOps' visual language distinctive is its border philosophy. Rather
 - **Green** (`#1aae39`): Confirmation, completion badges.
 - **Yellow** (`#e79d00`): Warning states, attention indicators.
 - **Red** (`#e71616`): Error states, destructive actions.
+- **Orange** (`#e85d04`): Decorative accents.
 - **Pink** (`#ff64c8`): Decorative accent, feature highlights.
 - **Purple** (`#391c57`): Premium features, deep accents.
 - **Brown** (`#523410`): Earthy accent, cold feature sections.
