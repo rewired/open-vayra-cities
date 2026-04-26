@@ -5,7 +5,10 @@ import {
   createRouteTravelMinutes,
   type LineRouteSegment
 } from '../types/lineRoute';
-import type { SelectedLineExportPayload } from '../types/selectedLineExport';
+import {
+  SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3,
+  type SelectedLineExportPayload
+} from '../types/selectedLineExport';
 import { createStopId, type Stop } from '../types/stop';
 
 /**
@@ -109,8 +112,12 @@ export const convertSelectedLineExportPayloadToSession = (
     topology: payload.line.topology,
     servicePattern: payload.line.servicePattern,
     frequencyByTimeBand: convertLineServiceByTimeBand(payload),
-    routeSegments: payload.line.routeSegments ? convertLineRouteSegments(payload.line.routeSegments) : [],
-    reverseRouteSegments: payload.line.reverseRouteSegments ? convertLineRouteSegments(payload.line.reverseRouteSegments) : undefined
+    routeSegments: payload.schemaVersion === SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3 && payload.line.routeSegments 
+      ? convertLineRouteSegments(payload.line.routeSegments) 
+      : [],
+    reverseRouteSegments: payload.schemaVersion === SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3 && payload.line.reverseRouteSegments 
+      ? convertLineRouteSegments(payload.line.reverseRouteSegments) 
+      : undefined
   };
 
   return {

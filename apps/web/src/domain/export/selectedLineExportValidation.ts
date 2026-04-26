@@ -8,7 +8,9 @@ import {
   SELECTED_LINE_EXPORT_KIND,
   SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3,
   SELECTED_LINE_EXPORT_SCHEMA_VERSION_V4,
-  type SelectedLineExportPayload
+  type SelectedLineExportPayload,
+  type SelectedLineExportPayloadV3,
+  type SelectedLineExportPayloadV4
 } from '../types/selectedLineExport';
 import type { TimeBandId } from '../types/timeBand';
 
@@ -638,8 +640,18 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
     };
   }
 
+  // At this point, the payload has been fully validated against the domain contract.
+  // We use narrow casts to the versioned payload types, justified by the exhaustive
+  // runtime checks performed above.
+  if (isV4) {
+    return {
+      ok: true,
+      payload: payload as unknown as SelectedLineExportPayloadV4
+    };
+  }
+
   return {
     ok: true,
-    payload: payload as unknown as SelectedLineExportPayload
+    payload: payload as unknown as SelectedLineExportPayloadV3
   };
 };

@@ -35,15 +35,21 @@ export type SelectedLineExportServiceBandPlan =
 export type SelectedLineExportServiceByTimeBand = Readonly<Record<TimeBandId, SelectedLineExportServiceBandPlan>>;
 
 /**
- * Selected line block emitted by the export builder with ordered stop ids and stored route segments.
+ * Base line shape shared across all selected-line export versions.
  */
-export interface SelectedLineExportLine {
+export interface SelectedLineExportLineBase {
   readonly id: LineId;
   readonly label: Line['label'];
   readonly orderedStopIds: readonly StopId[];
   readonly topology: LineTopology;
   readonly servicePattern: LineServicePattern;
   readonly frequencyByTimeBand: SelectedLineExportServiceByTimeBand;
+}
+
+/**
+ * Legacy v3 selected-line export line shape with cached route geometry.
+ */
+export interface SelectedLineExportLineV3 extends SelectedLineExportLineBase {
   /** 
    * Forward route segments from stop to stop. 
    * Optional derived cache; can be reconstructed from canonical line intent on load.
@@ -55,6 +61,17 @@ export interface SelectedLineExportLine {
    */
   readonly reverseRouteSegments?: readonly LineRouteSegment[] | undefined;
 }
+
+/**
+ * Modern v4 selected-line export line shape without route geometry.
+ */
+export type SelectedLineExportLineV4 = SelectedLineExportLineBase;
+
+/**
+ * Selected line block emitted by the export builder.
+ * @deprecated Use version-specific types where possible.
+ */
+export type SelectedLineExportLine = SelectedLineExportLineV3 | SelectedLineExportLineV4;
 
 /**
  * Exported stop shape containing only fields needed to reconstruct selected-line references.
@@ -72,17 +89,36 @@ export interface SelectedLineExportCountsMetadata {
 }
 
 /**
- * Root payload contract for a single selected-line export JSON document.
+ * Shared root payload fields for all selected-line export versions.
  */
-export interface SelectedLineExportPayload {
-  readonly schemaVersion: typeof SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3 | typeof SELECTED_LINE_EXPORT_SCHEMA_VERSION_V4;
+export interface SelectedLineExportPayloadBase {
   readonly exportKind: typeof SELECTED_LINE_EXPORT_KIND;
   readonly createdAtIsoUtc: string;
   readonly sourceMetadata: SelectedLineExportSourceMetadata;
-  readonly line: SelectedLineExportLine;
   readonly stops: readonly SelectedLineExportStop[];
   readonly metadata: SelectedLineExportCountsMetadata;
 }
+
+/**
+ * Legacy v3 selected-line export payload.
+ */
+export interface SelectedLineExportPayloadV3 extends SelectedLineExportPayloadBase {
+  readonly schemaVersion: typeof SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3;
+  readonly line: SelectedLineExportLineV3;
+}
+
+/**
+ * Modern v4 selected-line export payload.
+ */
+export interface SelectedLineExportPayloadV4 extends SelectedLineExportPayloadBase {
+  readonly schemaVersion: typeof SELECTED_LINE_EXPORT_SCHEMA_VERSION_V4;
+  readonly line: SelectedLineExportLineV4;
+}
+
+/**
+ * Discriminated union of supported selected-line export payloads.
+ */
+export type SelectedLineExportPayload = SelectedLineExportPayloadV3 | SelectedLineExportPayloadV4;
 
 /**
  * Input contract for building a selected-line export payload from canonical in-memory state.
@@ -95,14 +131,15 @@ export interface BuildSelectedLineExportPayloadInput {
 }
 
 /**
- * Builds a deterministic single-line export payload that excludes unrelated UI or transient shell state.
+ * Builds a deterministic single-line v4 export payload that excludes unrelated UI or transient shell state.
+ * Returns a typed v4 payload without cached route geometry.
  */
 export const buildSelectedLineExportPayload = ({
   selectedLine,
   placedStops,
   createdAtIsoUtc,
   sourceMetadata
-}: BuildSelectedLineExportPayloadInput): SelectedLineExportPayload => {
+}: BuildSelectedLineExportPayloadInput): SelectedLineExportPayloadV4 => {
   const referencedStopIds = new Set(selectedLine.stopIds);
   const stops = placedStops.filter((stop) => referencedStopIds.has(stop.id));
   const toExportServiceBandPlan = (bandPlan: LineServiceBandPlan): SelectedLineExportServiceBandPlan => {
@@ -119,10 +156,13 @@ export const buildSelectedLineExportPayload = ({
   const includedTimeBandIds = MVP_TIME_BAND_IDS;
 
   return {
-    schemaVersion: SELECTED_LINE_EXPORT_SCHEMA_VERSION,
+    schemaVersion: SELECTED_LINE_EXPORT_SCHEMA_VERSION_V4,
     exportKind: SELECTED_LINE_EXPORT_KIND,
     createdAtIsoUtc,
-    sourceMetadata: sourceMetadata ?? {},
+    sourceMetadata: {
+      source: 'cityops-web',
+      ...sourceMetadata
+    },
     line: {
       id: selectedLine.id,
       label: selectedLine.label,

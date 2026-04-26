@@ -122,7 +122,7 @@ export const formatSimulationMinuteOfDay = (minuteOfDay: SimulationMinuteOfDay):
 export const deriveSimulationWeekdayId = (dayIndex: SimulationDayIndex): SimulationWeekdayId => {
   // dayIndex starts at 1. Monday is at index 0 in SIMULATION_WEEKDAY_IDS.
   const index = (dayIndex - 1) % 7;
-  return SIMULATION_WEEKDAY_IDS[index];
+  return SIMULATION_WEEKDAY_IDS[index]!;
 };
 
 /**

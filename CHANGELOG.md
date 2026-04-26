@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-### [Unreleased]
+### Slice 065b: Selected-Line Export v4 Type Hygiene and Test Cleanup
+- Refactored `SelectedLineExportPayload` into a discriminated union of `SelectedLineExportPayloadV3` (legacy with geometry) and `SelectedLineExportPayloadV4` (slim without geometry), ensuring strict type safety for version-specific fields.
+- Updated `buildSelectedLineExportPayload` to return a strongly typed `SelectedLineExportPayloadV4` and omit cached route geometry at the type level.
+- Hardened `buildSelectedLineExportPayload` default `sourceMetadata` to include `{ source: 'cityops-web' }`, ensuring new exports are valid by default.
+- Improved `validateSelectedLineExportPayload` return type by replacing the broad `as unknown as SelectedLineExportPayload` cast with narrowed, runtime-guarded version-specific casts.
+- Removed all `as any` usage from `selectedLineExport.test.ts` and added JSON-level assertions to verify that `v4` exports are strictly geometry-free in their serialized form.
+- Fixed version-specific geometry access in `selectedLineExportSessionLoader.ts`, `lineDepartureScheduleProjection.test.ts`, and `lineServiceReadiness.test.ts` using type narrowing.
+- Resolved a minor TypeScript `undefined` warning in `simulationClock.ts` weekday derivation to ensure a clean `typecheck` baseline.
 
 ### Slice 065: Slim Selected-Line Export and Re-route on Import
 - Implemented slim selected-line export/import format (`v4`) that stores only the line definition (topology, stops, service plan) and omits routed geometry coordinates.

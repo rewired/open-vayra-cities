@@ -71,7 +71,11 @@ describe('buildSelectedLineExportPayload', () => {
     expect(payload.line.orderedStopIds).toEqual([stopAId, stopBId]);
     expect(payload.line.topology).toBe('linear');
     expect(payload.line.servicePattern).toBe('one-way');
-    expect((payload.line as any).routeSegments).toBeUndefined();
+    
+    // v4 line should not have route geometry fields at the type level or runtime
+    expect('routeSegments' in payload.line).toBe(false);
+    expect('reverseRouteSegments' in payload.line).toBe(false);
+
     expect(payload.stops.map((stop) => stop.id)).toEqual([stopAId, stopBId]);
     expect(payload.metadata).toEqual({
       lineCount: 1,
@@ -94,13 +98,27 @@ describe('buildSelectedLineExportPayload', () => {
     });
   });
 
-  it('defaults source metadata to an empty object when omitted', () => {
+  it('defaults source metadata to cityops-web when omitted', () => {
     const payload = buildSelectedLineExportPayload({
       selectedLine,
       placedStops,
       createdAtIsoUtc: '2026-04-24T12:00:00.000Z'
     });
 
-    expect(payload.sourceMetadata).toEqual({});
+    expect(payload.sourceMetadata).toEqual({ source: 'cityops-web' });
+  });
+
+  it('produces JSON output without route geometry fields for v4', () => {
+    const payload = buildSelectedLineExportPayload({
+      selectedLine,
+      placedStops,
+      createdAtIsoUtc: '2026-04-24T12:00:00.000Z'
+    });
+
+    const json = JSON.stringify(payload);
+    
+    expect(json).not.toContain('"routeSegments"');
+    expect(json).not.toContain('"reverseRouteSegments"');
+    expect(json).not.toContain('"orderedGeometry"');
   });
 });

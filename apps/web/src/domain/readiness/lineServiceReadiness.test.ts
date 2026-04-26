@@ -9,7 +9,10 @@ import {
   LINE_SERVICE_READINESS_ISSUE_SEVERITIES
 } from '../constants/lineServiceReadiness';
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
-import type { SelectedLineExportPayload } from '../types/selectedLineExport';
+import {
+  type SelectedLineExportPayload,
+  type SelectedLineExportPayloadV3
+} from '../types/selectedLineExport';
 import { createLineFrequencyMinutes, createLineId, createNoServiceLineServiceByTimeBand, type Line } from '../types/line';
 import {
   createLineSegmentId,
@@ -342,7 +345,7 @@ describe('evaluateLineServiceReadiness', () => {
       path.dirname(fileURLToPath(import.meta.url)),
       '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v3.json'
     );
-    const payload = JSON.parse(readFileSync(fixturePath, 'utf8')) as SelectedLineExportPayload;
+    const payload = JSON.parse(readFileSync(fixturePath, 'utf8')) as SelectedLineExportPayloadV3;
 
     const line: Line = {
       id: payload.line.id,

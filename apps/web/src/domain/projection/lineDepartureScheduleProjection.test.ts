@@ -4,7 +4,10 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import type { SelectedLineExportPayload } from '../types/selectedLineExport';
+import {
+  type SelectedLineExportPayload,
+  type SelectedLineExportPayloadV3
+} from '../types/selectedLineExport';
 import { createLineFrequencyMinutes, createLineId, createNoServiceLineServiceByTimeBand, type Line } from '../types/line';
 import {
   createLineSegmentId,
@@ -285,14 +288,14 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
       path.dirname(fileURLToPath(import.meta.url)),
       '../../../../../data/fixtures/selected-line-exports/hamburg-line-1.v3.json'
     );
-    const payload = JSON.parse(readFileSync(fixturePath, 'utf8')) as SelectedLineExportPayload;
+    const payload = JSON.parse(readFileSync(fixturePath, 'utf8')) as SelectedLineExportPayloadV3;
 
     const line: Line = {
       id: payload.line.id,
       label: payload.line.label,
       stopIds: payload.line.orderedStopIds,
-      topology: (payload.line as any).topology ?? 'linear',
-      servicePattern: (payload.line as any).servicePattern ?? 'one-way',
+      topology: payload.line.topology,
+      servicePattern: payload.line.servicePattern,
       routeSegments: payload.line.routeSegments ?? [],
       frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
