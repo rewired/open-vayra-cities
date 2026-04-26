@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 072: Selected-Line Route Sequence Stop Lookup and Inline Rename Flow
+- Added a selected-line route-sequence list that renders every stop in canonical route order from `selectedLine.stopIds`.
+- Built a stop lookup map keyed by stop id from `placedStops` to resolve labels safely per sequence row.
+- Added a compact clickable order badge (`[n]`) per row as the select/focus affordance while keeping stop label text as non-primary-click content.
+- Added inline stop rename affordances in the selected-line sequence using the existing `InlineRenameField`.
+- Threaded existing inspector callbacks so selected-line row actions use existing `onStopSelectionChange` and `onStopRename` paths without introducing new command routes.
+- Added safe fallback labels for missing stop ids (`Unknown stop (<id>)`) so rendering continues even when line references stale stop ids.
+
 ### Slice 071: Selected-Line Inspector Compact Header Summary
 - Replaced the selected-line top inspector table/KPI layout with a compact summary header that combines line badge, readable label, and inline line rename entrypoint.
 - Removed ordered-stop chip preview, `+N more`, and expandable stop-sequence disclosure from the selected-line top card.

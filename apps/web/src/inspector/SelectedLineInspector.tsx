@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useState, type ReactElement } from 'react';
 
 import { DeparturesDialog } from './DeparturesDialog';
 import { FrequencyEditorDialog } from './FrequencyEditorDialog';
@@ -30,6 +30,8 @@ interface SelectedLineInspectorProps {
     lineId: import('../domain/types/line').Line['id'],
     nextLabel: string
   ) => void;
+  readonly onStopSelectionChange: (stopId: import('../domain/types/stop').StopId) => void;
+  readonly onStopRename: (stopId: import('../domain/types/stop').StopId, nextLabel: string) => void;
   readonly onFrequencyChange: (
     timeBandId: TimeBandId,
     rawInputValue: string,
@@ -60,6 +62,8 @@ export function SelectedLineInspector({
   selectedLinePlanningVehicleProjection,
   selectedLineDemandProjection,
   onLineRename,
+  onStopSelectionChange,
+  onStopRename,
   onFrequencyChange,
   openDialogIntent,
   onOpenDialogIntentConsumed
@@ -72,6 +76,10 @@ export function SelectedLineInspector({
   const issueSummaryBlockerCount = Math.max(readinessBlockerCount, serviceBlockerCount);
   const issueSummaryWarningCount = Math.max(readinessWarningCount, serviceWarningCount);
   const orderedStopIds = panelState.selectedLine.stopIds;
+  const placedStopsById = useMemo(
+    () => new Map(placedStops.map((stop) => [stop.id, stop] as const)),
+    [placedStops]
+  );
   const selectedLineId = panelState.selectedLine.id;
   const segmentCountLabel =
     panelState.selectedLine.servicePattern === 'bidirectional'
@@ -211,6 +219,43 @@ export function SelectedLineInspector({
             Projected vehicles
           </button>
         </div>
+      </section>
+
+      <section className="inspector-card" aria-label="Selected line route sequence">
+        <h3>Route sequence</h3>
+        {orderedStopIds.length > 0 ? (
+          <ul className="selected-line-inspector__route-list" aria-label="Selected line route-ordered stop list">
+            {orderedStopIds.map((stopId, index) => {
+              const stop = placedStopsById.get(stopId);
+              const fallbackLabel = `Unknown stop (${stopId})`;
+              const stopLabel = stop?.label ?? fallbackLabel;
+
+              return (
+                <li key={`${stopId}-${index}`} className="selected-line-inspector__route-item">
+                  <button
+                    type="button"
+                    className="selected-line-inspector__route-order-badge"
+                    onClick={() => onStopSelectionChange(stopId)}
+                    title={`Select and focus ${stopLabel}`}
+                    aria-label={`Select stop ${index + 1}: ${stopLabel}`}
+                  >
+                    [{index + 1}]
+                  </button>
+                  <span className="selected-line-inspector__route-stop-label" title={stopLabel}>
+                    {stopLabel}
+                  </span>
+                  <InlineRenameField
+                    value={stopLabel}
+                    entityLabel="stop"
+                    onAccept={(nextValue) => onStopRename(stopId, nextValue)}
+                  />
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p>No stops in this line route.</p>
+        )}
       </section>
 
       <FrequencyEditorDialog

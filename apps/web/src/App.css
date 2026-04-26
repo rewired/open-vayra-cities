@@ -781,6 +781,51 @@ body {
   margin-top: 8px;
 }
 
+.selected-line-inspector__route-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.selected-line-inspector__route-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.selected-line-inspector__route-order-badge {
+  min-width: 28px;
+  height: 28px;
+  border: 1px solid #425b83;
+  border-radius: 999px;
+  background: #1b2b44;
+  color: #d7e7ff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.selected-line-inspector__route-order-badge:hover {
+  border-color: #f5c358;
+}
+
+.selected-line-inspector__route-stop-label {
+  min-width: 0;
+  color: #e6f0ff;
+  font-size: 0.76rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.selected-line-inspector__route-item .inline-rename-field .network-inventory__item-label {
+  display: none;
+}
+
 .inspector-dialog {
   position: fixed;
   inset: 0;
