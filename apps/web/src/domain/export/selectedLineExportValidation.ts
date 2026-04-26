@@ -1,9 +1,4 @@
-import {
-  SELECTED_LINE_EXPORT_ROUTE_CACHE_ENDPOINT_TOLERANCE_DEGREES,
-  SELECTED_LINE_EXPORT_TRAVEL_MINUTES_TOLERANCE
-} from '../constants/selectedLineExportValidation';
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
-import { ROUTE_STATUSES } from '../types/lineRoute';
 import { NETWORK_SAVE_SCHEMA, NETWORK_SAVE_SCHEMA_VERSION } from '../types/networkSave';
 import {
   SELECTED_LINE_EXPORT_KIND,
@@ -35,13 +30,9 @@ export type SelectedLineExportValidationIssueCode =
   | 'invalid-line-topology'
   | 'invalid-line-service-pattern'
   | 'invalid-line-frequency-map'
-  | 'invalid-line-frequency-map'
   | 'invalid-frequency-time-band-id'
   | 'invalid-frequency-value'
   | 'invalid-route-segments'
-  | 'invalid-route-status'
-  | 'invalid-geometry'
-  | 'invalid-geometry-coordinate'
   | 'invalid-stops'
   | 'invalid-stop-shape'
   | 'invalid-stop-id'
@@ -53,7 +44,11 @@ export type SelectedLineExportValidationIssueCode =
   | 'invalid-metadata-included-time-band-ids'
   | 'metadata-included-time-band-order-mismatch'
   | 'unsupported-legacy-v3'
-  | 'invalid-envelope';
+  | 'invalid-envelope'
+  | 'invalid-envelope-exported-at'
+  | 'invalid-envelope-app'
+  | 'invalid-envelope-app-name'
+  | 'invalid-envelope-app-build';
 
 /**
  * One typed issue produced while validating a selected-line export payload candidate.
@@ -81,7 +76,6 @@ export type SelectedLineExportValidationResult =
     };
 
 const CANONICAL_TIME_BAND_IDS_SET = new Set<string>(MVP_TIME_BAND_IDS);
-const ROUTE_STATUS_SET = new Set<string>(ROUTE_STATUSES);
 
 /** Legacy v3 schema version string for explicit rejection. */
 const SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3 = 'cityops-selected-line-export-v3';
@@ -89,25 +83,12 @@ const SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3 = 'cityops-selected-line-export-v3'
 /** Human-readable message for unsupported v3 imports. */
 export const UNSUPPORTED_LEGACY_V3_MESSAGE = 'This CityOps save format is no longer supported.';
 
-const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
 
 const isFiniteNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
 
 const isStopCoordinateInRange = (lng: number, lat: number): boolean =>
   lng >= -180 && lng <= 180 && lat >= -90 && lat <= 90;
-
-const numbersCloseEnough = (left: number, right: number, tolerance: number): boolean =>
-  Math.abs(left - right) <= tolerance;
-
-const coordinatesCloseEnough = (
-  left: readonly [number, number],
-  right: readonly [number, number],
-  tolerance: number
-): boolean => {
-  const lngDiff = Math.abs(left[0] - right[0]);
-  const latDiff = Math.abs(left[1] - right[1]);
-  return lngDiff <= tolerance && latDiff <= tolerance;
-};
 
 const parseIsoTimestamp = (value: unknown): value is string => {
   if (typeof value !== 'string') {
@@ -151,8 +132,27 @@ export const validateSelectedLineExportPayload = (payloadCandidate: unknown): Se
     return { ok: false, issues };
   }
 
+  if (!parseIsoTimestamp(payloadCandidate.exportedAt)) {
+    addIssue('invalid-envelope-exported-at', '$.exportedAt', 'exportedAt must be a parseable ISO timestamp string.');
+  }
+
+  const app = payloadCandidate.app;
+  if (!isRecord(app)) {
+    addIssue('invalid-envelope-app', '$.app', 'Envelope app metadata must be an object.');
+  } else {
+    if (app.name !== 'CityOps') {
+      addIssue('invalid-envelope-app-name', '$.app.name', 'app.name must equal "CityOps".');
+    }
+    if (app.build !== undefined && typeof app.build !== 'string') {
+      addIssue('invalid-envelope-app-build', '$.app.build', 'app.build must be a string when present.');
+    }
+  }
+
   if (!isRecord(payloadCandidate.payload)) {
     addIssue('invalid-envelope', '$.payload', 'Envelope payload must be an object.');
+  }
+
+  if (issues.length > 0) {
     return { ok: false, issues };
   }
 

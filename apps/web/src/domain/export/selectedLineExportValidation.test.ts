@@ -294,9 +294,9 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
     expectIssueInEnvelope(payload, 'invalid-metadata-counts');
   });
 
-  it('rejects envelope with invalid schema version', () => {
+  it('rejects envelope with non-object payload', () => {
     const envelope = wrapInEnvelope(cloneFixturePayload());
-    envelope['schemaVersion'] = 999;
+    envelope['payload'] = 'not-an-object';
 
     const result = validateSelectedLineExportPayload(envelope);
     expect(result.ok).toBe(false);
@@ -305,9 +305,116 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
     }
   });
 
-  it('rejects envelope with non-object payload', () => {
+  it('rejects envelope missing exportedAt', () => {
     const envelope = wrapInEnvelope(cloneFixturePayload());
-    envelope['payload'] = 'not-an-object';
+    delete envelope['exportedAt'];
+
+    const result = validateSelectedLineExportPayload(envelope);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some(i => i.code === 'invalid-envelope-exported-at')).toBe(true);
+    }
+  });
+
+  it('rejects envelope with non-string exportedAt', () => {
+    const envelope = wrapInEnvelope(cloneFixturePayload());
+    envelope['exportedAt'] = 12345;
+
+    const result = validateSelectedLineExportPayload(envelope);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some(i => i.code === 'invalid-envelope-exported-at')).toBe(true);
+    }
+  });
+
+  it('rejects envelope with unparseable exportedAt', () => {
+    const envelope = wrapInEnvelope(cloneFixturePayload());
+    envelope['exportedAt'] = 'not-a-date';
+
+    const result = validateSelectedLineExportPayload(envelope);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some(i => i.code === 'invalid-envelope-exported-at')).toBe(true);
+    }
+  });
+
+  it('rejects envelope missing app', () => {
+    const envelope = wrapInEnvelope(cloneFixturePayload());
+    delete envelope['app'];
+
+    const result = validateSelectedLineExportPayload(envelope);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some(i => i.code === 'invalid-envelope-app')).toBe(true);
+    }
+  });
+
+  it('rejects envelope with non-object app', () => {
+    const envelope = wrapInEnvelope(cloneFixturePayload());
+    envelope['app'] = 'CityOps';
+
+    const result = validateSelectedLineExportPayload(envelope);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some(i => i.code === 'invalid-envelope-app')).toBe(true);
+    }
+  });
+
+  it('rejects envelope missing app.name', () => {
+    const envelope = wrapInEnvelope(cloneFixturePayload());
+    envelope['app'] = {};
+
+    const result = validateSelectedLineExportPayload(envelope);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some(i => i.code === 'invalid-envelope-app-name')).toBe(true);
+    }
+  });
+
+  it('rejects envelope with app.name !== "CityOps"', () => {
+    const envelope = wrapInEnvelope(cloneFixturePayload());
+    envelope['app'] = { name: 'NotCityOps' };
+
+    const result = validateSelectedLineExportPayload(envelope);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some(i => i.code === 'invalid-envelope-app-name')).toBe(true);
+    }
+  });
+
+  it('rejects envelope with non-string app.build', () => {
+    const envelope = wrapInEnvelope(cloneFixturePayload());
+    envelope['app'] = { name: 'CityOps', build: 123 };
+
+    const result = validateSelectedLineExportPayload(envelope);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some(i => i.code === 'invalid-envelope-app-build')).toBe(true);
+    }
+  });
+
+  it('accepts envelope with valid string app.build', () => {
+    const envelope = wrapInEnvelope(cloneFixturePayload());
+    envelope['app'] = { name: 'CityOps', build: 'v1.2.3-abcd' };
+
+    const result = validateSelectedLineExportPayload(envelope);
+    expect(result.ok).toBe(true);
+  });
+
+  it('rejects envelope with unknown schema', () => {
+    const envelope = wrapInEnvelope(cloneFixturePayload());
+    envelope['schema'] = 'unknown-schema';
+
+    const result = validateSelectedLineExportPayload(envelope);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues.some(i => i.code === 'invalid-envelope')).toBe(true);
+    }
+  });
+
+  it('rejects envelope with unsupported schema version', () => {
+    const envelope = wrapInEnvelope(cloneFixturePayload());
+    envelope['schemaVersion'] = 999;
 
     const result = validateSelectedLineExportPayload(envelope);
     expect(result.ok).toBe(false);
