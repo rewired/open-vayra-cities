@@ -39,6 +39,8 @@ interface InspectorPanelProps {
   ) => void;
   readonly onSelectedLineIdChange: (lineId: Line['id']) => void;
   readonly onStopSelectionChange: (stopId: import('../domain/types/stop').StopId) => void;
+  /** Callback for line-context stop focus (focuses on map without leaving selected-line inspector). */
+  readonly onLineSequenceStopFocus: (stopId: import('../domain/types/stop').StopId) => void;
   readonly onStopRename: (stopId: import('../domain/types/stop').StopId, nextLabel: string) => void;
   readonly onLineRename: (lineId: Line['id'], nextLabel: string) => void;
   readonly openDialogIntent: import('../session/sessionTypes').SelectedLineDialogOpenIntent | null;
@@ -78,6 +80,7 @@ export function InspectorPanel({
   onFrequencyChange,
   onSelectedLineIdChange,
   onStopSelectionChange,
+  onLineSequenceStopFocus,
   onStopRename,
   onLineRename,
   openDialogIntent,
@@ -194,7 +197,7 @@ export function InspectorPanel({
       ) : null}
 
       {activeTabId === 'lines' ? (
-        <section className="inspector-card inspector-lines-tab" aria-label="Lines">
+        <section className="inspector-lines-tab" aria-label="Lines">
           <h3>Lines</h3>
           {linesViewMode === 'list' ? (
             completedLines.length > 0 ? (
@@ -253,6 +256,7 @@ export function InspectorPanel({
                   selectedLinePlanningVehicleProjection={selectedLinePlanningVehicleProjection}
                   selectedLineDemandProjection={selectedLineDemandProjection}
                   onLineRename={onLineRename}
+                  onLineSequenceStopFocus={onLineSequenceStopFocus}
                   onStopRename={onStopRename}
                   onStopSelectionChange={onStopSelectionChange}
                   onFrequencyChange={onFrequencyChange}

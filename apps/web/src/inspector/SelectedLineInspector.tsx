@@ -5,6 +5,7 @@ import { FrequencyEditorDialog } from './FrequencyEditorDialog';
 import { InlineRenameField } from './InlineRenameField';
 import { ProjectedVehiclesDialog } from './ProjectedVehiclesDialog';
 import { ServicePlanDialog } from './ServicePlanDialog';
+import { MaterialIcon } from '../ui/icons/MaterialIcon';
 import type {
   LineFrequencyControlByTimeBand,
   LineFrequencyInputByTimeBand,
@@ -30,6 +31,8 @@ interface SelectedLineInspectorProps {
     lineId: import('../domain/types/line').Line['id'],
     nextLabel: string
   ) => void;
+  /** Callback for line-context stop focus (does not clear selected line). */
+  readonly onLineSequenceStopFocus: (stopId: import('../domain/types/stop').StopId) => void;
   readonly onStopSelectionChange: (stopId: import('../domain/types/stop').StopId) => void;
   readonly onStopRename: (stopId: import('../domain/types/stop').StopId, nextLabel: string) => void;
   readonly onFrequencyChange: (
@@ -62,6 +65,7 @@ export function SelectedLineInspector({
   selectedLinePlanningVehicleProjection,
   selectedLineDemandProjection,
   onLineRename,
+  onLineSequenceStopFocus,
   onStopSelectionChange,
   onStopRename,
   onFrequencyChange,
@@ -105,7 +109,7 @@ export function SelectedLineInspector({
 
   return (
     <div className="selected-line-inspector">
-      <section className="inspector-card" aria-label="Selected line compact header">
+      <section className="selected-line-inspector__summary" aria-label="Selected line summary">
         <h3>Selected line</h3>
         <div className="selected-line-inspector__header-row">
           <span className="selected-line-inspector__line-badge">{panelState.selectedLine.id}</span>
@@ -116,48 +120,40 @@ export function SelectedLineInspector({
           />
         </div>
         <p className="selected-line-inspector__issue-summary">{formatIssueSummaryLabel(issueSummaryBlockerCount, issueSummaryWarningCount)}</p>
-        <div className="selected-line-inspector__metadata-grid" aria-label="Selected line metadata">
-          <p className="selected-line-inspector__metadata-item">
-            <span className="selected-line-inspector__metadata-key">Topology</span>
-            <span className="selected-line-inspector__metadata-value">
+        <div className="selected-line-inspector__metadata-chips">
+          <span className="selected-line-inspector__metadata-chip">
+            <span className="selected-line-inspector__metadata-chip-key">Topology</span>
+            <span className="selected-line-inspector__metadata-chip-value">
               {panelState.selectedLine.topology === 'loop' ? 'Loop' : 'Linear'}
             </span>
-          </p>
-          <p className="selected-line-inspector__metadata-item">
-            <span className="selected-line-inspector__metadata-key">Service</span>
-            <span className="selected-line-inspector__metadata-value">
-              {panelState.selectedLine.servicePattern === 'bidirectional' ? 'Both directions' : 'One-way'}
+          </span>
+          <span className="selected-line-inspector__metadata-chip">
+            <span className="selected-line-inspector__metadata-chip-key">Service</span>
+            <span className="selected-line-inspector__metadata-chip-value">
+              {panelState.selectedLine.servicePattern === 'bidirectional' ? 'Both' : 'One-way'}
             </span>
-          </p>
-          <p className="selected-line-inspector__metadata-item">
-            <span className="selected-line-inspector__metadata-key">Stops</span>
-            <span className="selected-line-inspector__metadata-value">{orderedStopIds.length}</span>
-          </p>
-          <p className="selected-line-inspector__metadata-item">
-            <span className="selected-line-inspector__metadata-key">Segments</span>
-            <span className="selected-line-inspector__metadata-value">{segmentCountLabel}</span>
-          </p>
-          <p className="selected-line-inspector__metadata-item">
-            <span className="selected-line-inspector__metadata-key">Runtime</span>
-            <span className="selected-line-inspector__metadata-value">{runtimeLabel}</span>
-          </p>
-          <p className="selected-line-inspector__metadata-item">
-            <span className="selected-line-inspector__metadata-key">Readiness</span>
-            <span className="selected-line-inspector__metadata-value">{readinessStatusLabel}</span>
-          </p>
-          <p className="selected-line-inspector__metadata-item">
-            <span className="selected-line-inspector__metadata-key">Warnings</span>
-            <span className="selected-line-inspector__metadata-value">{issueSummaryWarningCount}</span>
-          </p>
-          <p className="selected-line-inspector__metadata-item">
-            <span className="selected-line-inspector__metadata-key">Blockers</span>
-            <span className="selected-line-inspector__metadata-value">{issueSummaryBlockerCount}</span>
-          </p>
+          </span>
+          <span className="selected-line-inspector__metadata-chip">
+            <span className="selected-line-inspector__metadata-chip-key">Stops</span>
+            <span className="selected-line-inspector__metadata-chip-value">{orderedStopIds.length}</span>
+          </span>
+          <span className="selected-line-inspector__metadata-chip">
+            <span className="selected-line-inspector__metadata-chip-key">Runtime</span>
+            <span className="selected-line-inspector__metadata-chip-value">{runtimeLabel}</span>
+          </span>
+          <span className="selected-line-inspector__metadata-chip">
+            <span className="selected-line-inspector__metadata-chip-key">Status</span>
+            <span className="selected-line-inspector__metadata-chip-value">{readinessStatusLabel}</span>
+          </span>
+          <span className="selected-line-inspector__metadata-chip">
+            <span className="selected-line-inspector__metadata-chip-key">Issues</span>
+            <span className="selected-line-inspector__metadata-chip-value">{issueSummaryWarningCount + issueSummaryBlockerCount}</span>
+          </span>
         </div>
       </section>
 
       {selectedLineDemandProjection ? (
-        <section className="inspector-card" aria-label="Selected line demand summary">
+        <section className="selected-line-inspector__demand" aria-label="Line demand">
           <h3>Line demand</h3>
           <table className="inspector-compact-table">
             <tbody>
@@ -199,29 +195,48 @@ export function SelectedLineInspector({
         </section>
       ) : null}
 
-      <section className="inspector-card" aria-label="Selected line actions">
-        <h3>Actions</h3>
-        <div className="selected-line-inspector__actions-grid">
-          <button type="button" className="inspector-lines-tab__action" onClick={() => setActiveDialogId('frequency')}>
-            Edit frequency
-          </button>
-          <button type="button" className="inspector-lines-tab__action" onClick={() => setActiveDialogId('service-plan')}>
-            Service plan
-          </button>
-          <button type="button" className="inspector-lines-tab__action" onClick={() => setActiveDialogId('departures')}>
-            Departures
+      <section className="selected-line-inspector__actions" aria-label="Line actions">
+        <div className="selected-line-inspector__actions-row">
+          <button
+            type="button"
+            className="selected-line-inspector__action-icon"
+            onClick={() => setActiveDialogId('frequency')}
+            title="Edit frequency"
+            aria-label="Edit frequency"
+          >
+            <MaterialIcon name="pace" />
           </button>
           <button
             type="button"
-            className="inspector-lines-tab__action"
-            onClick={() => setActiveDialogId('projected-vehicles')}
+            className="selected-line-inspector__action-icon"
+            onClick={() => setActiveDialogId('service-plan')}
+            title="Service plan"
+            aria-label="Service plan"
           >
-            Projected vehicles
+            <MaterialIcon name="route" />
+          </button>
+          <button
+            type="button"
+            className="selected-line-inspector__action-icon"
+            onClick={() => setActiveDialogId('departures')}
+            title="Departures"
+            aria-label="Departures"
+          >
+            <MaterialIcon name="schedule" />
+          </button>
+          <button
+            type="button"
+            className="selected-line-inspector__action-icon"
+            onClick={() => setActiveDialogId('projected-vehicles')}
+            title="Projected vehicles"
+            aria-label="Projected vehicles"
+          >
+            <MaterialIcon name="directions_bus" />
           </button>
         </div>
       </section>
 
-      <section className="inspector-card" aria-label="Selected line route sequence">
+      <section className="selected-line-inspector__route-sequence" aria-label="Selected line route sequence">
         <h3>Route sequence</h3>
         {orderedStopIds.length > 0 ? (
           <ul className="selected-line-inspector__route-list" aria-label="Selected line route-ordered stop list">
@@ -235,11 +250,11 @@ export function SelectedLineInspector({
                   <button
                     type="button"
                     className="selected-line-inspector__route-order-badge"
-                    onClick={() => onStopSelectionChange(stopId)}
-                    title={`Select and focus ${stopLabel}`}
-                    aria-label={`Select stop ${index + 1}: ${stopLabel}`}
+                    onClick={() => onLineSequenceStopFocus(stopId)}
+                    title={`Focus ${stopLabel} on map`}
+                    aria-label={`Focus stop ${index + 1}: ${stopLabel}`}
                   >
-                    [{index + 1}]
+                    {index + 1}
                   </button>
                   <span className="selected-line-inspector__route-stop-label" title={stopLabel}>
                     {stopLabel}
@@ -247,6 +262,7 @@ export function SelectedLineInspector({
                   <InlineRenameField
                     value={stopLabel}
                     entityLabel="stop"
+                    idleDisplayMode="edit-only"
                     onAccept={(nextValue) => onStopRename(stopId, nextValue)}
                   />
                 </li>

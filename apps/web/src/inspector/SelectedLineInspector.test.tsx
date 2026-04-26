@@ -97,6 +97,7 @@ const renderInspector = (): RenderResult => {
         selectedLinePlanningVehicleProjection={null}
         selectedLineDemandProjection={null}
         onLineRename={vi.fn()}
+        onLineSequenceStopFocus={vi.fn()}
         onStopSelectionChange={vi.fn()}
         onStopRename={onStopRename}
         onFrequencyChange={vi.fn()}
@@ -124,17 +125,64 @@ afterEach(() => {
 });
 
 describe('SelectedLineInspector route sequence', () => {
-  it('renders ordered stop rows and resolves labels from placedStops with fallback for missing stops', () => {
+  it('renders ordered stop badges and resolves labels from placedStops with fallback for missing stops', () => {
     mounted = renderInspector();
 
     const routeItems = mounted.container.querySelectorAll('.selected-line-inspector__route-item');
-    expect(routeItems).toHaveLength(3);
-    expect(routeItems[0].textContent).toContain('[1]');
-    expect(routeItems[0].textContent).toContain('Alpha');
-    expect(routeItems[1].textContent).toContain('[2]');
-    expect(routeItems[1].textContent).toContain('Unknown stop (stop-missing)');
-    expect(routeItems[2].textContent).toContain('[3]');
-    expect(routeItems[2].textContent).toContain('Bravo');
+    expect(routeItems.length).toBe(3);
+    expect(routeItems[0]?.textContent).toContain('1');
+    expect(routeItems[0]?.textContent).toContain('Alpha');
+    expect(routeItems[1]?.textContent).toContain('2');
+    expect(routeItems[1]?.textContent).toContain('Unknown stop (stop-missing)');
+    expect(routeItems[2]?.textContent).toContain('3');
+    expect(routeItems[2]?.textContent).toContain('Bravo');
+  });
+
+  it('wires line-context stop focus callback when badge is clicked', () => {
+    const onLineSequenceStopFocus = vi.fn();
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(
+        <SelectedLineInspector
+          panelState={{ mode: 'line-selected', selectedLine: line }}
+          selectedLineRouteBaseline={null}
+          placedStops={placedStops}
+          activeTimeBandId="morning-rush"
+          lineFrequencyInputByTimeBand={createInputState('')}
+          lineFrequencyControlByTimeBand={createControlState('no-service')}
+          lineFrequencyValidationByTimeBand={createValidationState(null)}
+          selectedLineServiceProjection={null}
+          selectedLineServiceInspectorProjection={null}
+          selectedLinePlanningVehicleProjection={null}
+          selectedLineDemandProjection={null}
+          onLineRename={vi.fn()}
+          onLineSequenceStopFocus={onLineSequenceStopFocus}
+          onStopSelectionChange={vi.fn()}
+          onStopRename={vi.fn()}
+          onFrequencyChange={vi.fn()}
+          openDialogIntent={null}
+          onOpenDialogIntentConsumed={vi.fn()}
+        />
+      );
+    });
+
+    const badges = container.querySelectorAll('.selected-line-inspector__route-order-badge');
+    const firstBadge = badges.item(0);
+    expect(firstBadge).not.toBeNull();
+
+    act(() => {
+      (firstBadge as HTMLElement).click();
+    });
+
+    expect(onLineSequenceStopFocus).toHaveBeenCalledWith(stopA);
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
   });
 
   it('wires stop rename callback from route-row inline rename control', () => {

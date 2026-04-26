@@ -190,6 +190,13 @@ export default function App(): ReactElement {
     [sessionController]
   );
 
+  const handleLineSequenceStopFocus = useCallback(
+    (stopId: import('./domain/types/stop').StopId) => {
+      setMapFocusIntent({ target: { type: 'stop', id: stopId }, requestId: Date.now() });
+    },
+    []
+  );
+
   return (
     <div className="app-shell" data-app-surface="desktop-shell">
       <SimulationControlBar
@@ -300,6 +307,7 @@ export default function App(): ReactElement {
         onFrequencyChange={sessionController.updateSelectedCompletedLineFrequency}
         onSelectedLineIdChange={handleLineInventorySelection}
         onStopSelectionChange={handleStopInventorySelection}
+        onLineSequenceStopFocus={handleLineSequenceStopFocus}
         onStopRename={sessionController.renameStopLabel}
         onLineRename={sessionController.renameLineLabel}
         openDialogIntent={sessionController.selectedLineDialogOpenIntent}

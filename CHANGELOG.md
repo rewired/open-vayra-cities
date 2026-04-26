@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 070c: Inspector Flattening and Route Sequence Interaction Fix
+- Flattened the Lines tab and selected-line detail layout, removing nested `inspector-card` wrappers from selected-line sections.
+- Replaced the metadata grid with compact chip-based metadata display.
+- Fixed route-sequence stop badge text from `[1]` to `1`, and similar for all badges.
+- Added a line-context stop focus callback (`onLineSequenceStopFocus`) so clicking a route-sequence stop badge focuses the map without leaving selected-line inspector context.
+- Route sequence now uses `idleDisplayMode="edit-only"` for inline rename fields, with CSS override to remove default min-width.
+- Added internal scroll area to route sequence with `max-height: clamp(180px, 34vh, 320px)`.
+- Converted action buttons to compact icon-led buttons using Material icons (`pace`, `route`, `schedule`, `directions_bus`).
+- Added `schedule` Material icon to approved icon set.
+- Created ADR 0124 to document flatten scope, route sequence interactions, and non-goals.
+- Non-goals: no delete/stop removal/route topology editing, no routing/simulation/persistence changes.
+
 ### Slice 074: Network Inventory Summary-First Stop UX
 - Refactored the Network tab inventory to be summary-first for stops, replacing full global stop rows with compact stop summary KPIs.
 - Removed inline stop rename controls from the Network inventory so stop rename is no longer presented as a primary global workflow.

@@ -22,7 +22,8 @@ export type MaterialIconName =
   | 'tram'
   | 'subway'
   | 'train'
-  | 'directions_boat';
+  | 'directions_boat'
+  | 'schedule';
 
 /**
  * Canonical Material icon name mapping for workspace mode controls.
