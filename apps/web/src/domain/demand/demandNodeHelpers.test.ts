@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { createDemandNodeId, createDemandWeight, type DemandNode } from '../types/demandNode';
+import { createDemandNodeId, createDemandWeight, createZeroDemandWeightByTimeBand, type DemandNode } from '../types/demandNode';
 import type { TimeBandId } from '../types/timeBand';
 import { summarizeDemandNodes, getActiveDemandNodes } from './demandNodeHelpers';
 
@@ -13,10 +13,11 @@ describe('demandNodeHelpers', () => {
       role: 'origin',
       demandClass: 'residential',
       weightByTimeBand: {
+        ...createZeroDemandWeightByTimeBand(),
         'morning-rush': createDemandWeight(10),
         'midday': createDemandWeight(5),
         'afternoon': createDemandWeight(0)
-      } as Record<TimeBandId, any>
+      }
     },
     {
       id: createDemandNodeId('res-2'),
@@ -25,9 +26,10 @@ describe('demandNodeHelpers', () => {
       role: 'origin',
       demandClass: 'residential',
       weightByTimeBand: {
+        ...createZeroDemandWeightByTimeBand(),
         'morning-rush': createDemandWeight(15),
         'night': createDemandWeight(2)
-      } as Record<TimeBandId, any>
+      }
     },
     {
       id: createDemandNodeId('work-1'),
@@ -36,10 +38,11 @@ describe('demandNodeHelpers', () => {
       role: 'destination',
       demandClass: 'workplace',
       weightByTimeBand: {
+        ...createZeroDemandWeightByTimeBand(),
         'morning-rush': createDemandWeight(20),
         'afternoon': createDemandWeight(5),
         'night': createDemandWeight(0)
-      } as Record<TimeBandId, any>
+      }
     }
   ];
 
