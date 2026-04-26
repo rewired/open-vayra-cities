@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 068b: Network Save Envelope Repair and Test Alignment
+- Hardened `validateSelectedLineExportPayload` to strictly require the `cityops.network-save` envelope at the root, rejecting raw v4 or v3 payloads with specific error messages.
+- Cleaned up `selectedLineExportValidation.ts` by removing unused `validateSegments` and obsolete v3-only validation codes.
+- Updated `hamburg-line-1.v4.json` fixture to be a valid enveloped file and created `hamburg-line-1.v4.raw-legacy.json` for rejection testing.
+- Aligned `selectedLineExport.test.ts`, `selectedLineExportValidation.test.ts`, and `selectedLineExportSessionLoader.test.ts` with the strict envelope requirement and verified all tests pass.
+- Ensured type safety across the save boundary by centralizing envelope and payload types in `networkSave.ts` and `selectedLineExport.ts`.
+
 ### Slice 068: Network Save Envelope and Legacy Import Cleanup
 - Introduced the `NetworkSaveEnvelope` canonical wrapper for all network-level exports, including schema metadata (`schema`, `schemaVersion`, `timestamp`, `sourceMetadata`).
 - Formalized the transition to slim network saves where route geometry is omitted and reconstructed on import; removed all legacy `v3` import support and reconstruction logic.

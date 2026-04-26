@@ -53,8 +53,8 @@ const placedStops: readonly Stop[] = [
 ];
 
 describe('buildSelectedLineExportPayload', () => {
-  it('exports only selected line data with referenced stops and summary metadata', () => {
-    const payload = buildSelectedLineExportPayload({
+  it('exports only selected line data with referenced stops and summary metadata wrapped in a network save envelope', () => {
+    const envelope = buildSelectedLineExportPayload({
       selectedLine,
       placedStops,
       createdAtIsoUtc: '2026-04-24T12:00:00.000Z',
@@ -64,6 +64,14 @@ describe('buildSelectedLineExportPayload', () => {
       }
     });
 
+    // Verify envelope
+    expect(envelope.schema).toBe('cityops.network-save');
+    expect(envelope.schemaVersion).toBe(1);
+    expect(envelope.exportedAt).toBe('2026-04-24T12:00:00.000Z');
+    expect(envelope.app.name).toBe('CityOps');
+
+    // Verify nested payload
+    const payload = envelope.payload;
     expect(payload.schemaVersion).toBe('cityops-selected-line-export-v4');
     expect(payload.exportKind).toBe('single-line');
     expect(payload.createdAtIsoUtc).toBe('2026-04-24T12:00:00.000Z');
@@ -99,26 +107,30 @@ describe('buildSelectedLineExportPayload', () => {
   });
 
   it('defaults source metadata to cityops-web when omitted', () => {
-    const payload = buildSelectedLineExportPayload({
+    const envelope = buildSelectedLineExportPayload({
       selectedLine,
       placedStops,
       createdAtIsoUtc: '2026-04-24T12:00:00.000Z'
     });
 
-    expect(payload.sourceMetadata).toEqual({ source: 'cityops-web' });
+    expect(envelope.payload.sourceMetadata).toEqual({ source: 'cityops-web' });
   });
 
   it('produces JSON output without route geometry fields for v4', () => {
-    const payload = buildSelectedLineExportPayload({
+    const envelope = buildSelectedLineExportPayload({
       selectedLine,
       placedStops,
       createdAtIsoUtc: '2026-04-24T12:00:00.000Z'
     });
 
-    const json = JSON.stringify(payload);
+    const json = JSON.stringify(envelope);
     
     expect(json).not.toContain('"routeSegments"');
     expect(json).not.toContain('"reverseRouteSegments"');
     expect(json).not.toContain('"orderedGeometry"');
+    
+    // Ensure envelope fields are present in JSON
+    expect(json).toContain('"schema":"cityops.network-save"');
+    expect(json).toContain('"schemaVersion":1');
   });
 });

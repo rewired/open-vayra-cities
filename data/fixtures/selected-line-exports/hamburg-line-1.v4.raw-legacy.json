@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "cityops-selected-line-export-v4",
+  "exportKind": "single-line",
+  "createdAtIsoUtc": "2026-04-26T10:18:20.000Z",
+  "sourceMetadata": {
+    "source": "cityops-web"
+  },
+  "line": {
+    "id": "line-1",
+    "label": "Line 1",
+    "orderedStopIds": [
+      "stop-1",
+      "stop-2",
+      "stop-3",
+      "stop-4",
+      "stop-5",
+      "stop-6",
+      "stop-7",
+      "stop-8",
+      "stop-9"
+    ],
+    "topology": "loop",
+    "servicePattern": "one-way",
+    "frequencyByTimeBand": {
+      "morning-rush": {
+        "kind": "frequency",
+        "headwayMinutes": 5
+      },
+      "late-morning": {
+        "kind": "frequency",
+        "headwayMinutes": 15
+      },
+      "midday": {
+        "kind": "frequency",
+        "headwayMinutes": 10
+      },
+      "afternoon": {
+        "kind": "frequency",
+        "headwayMinutes": 15
+      },
+      "evening-rush": {
+        "kind": "frequency",
+        "headwayMinutes": 5
+      },
+      "evening": {
+        "kind": "frequency",
+        "headwayMinutes": 15
+      },
+      "night": {
+        "kind": "frequency",
+        "headwayMinutes": 30
+      }
+    }
+  },
+  "stops": [
+    {
+      "id": "stop-1",
+      "position": {
+        "lng": 10.008666503407309,
+        "lat": 53.553002016522704
+      },
+      "label": "Hamburg HBF (Kirchenallee)"
+    },
+    {
+      "id": "stop-2",
+      "position": {
+        "lng": 9.990568007028328,
+        "lat": 53.56103009619573
+      },
+      "label": "Theodor-Heuss-Platz"
+    },
+    {
+      "id": "stop-3",
+      "position": {
+        "lng": 9.976403257590558,
+        "lat": 53.56302597787623
+      },
+      "label": "Messeplatz"
+    },
+    {
+      "id": "stop-4",
+      "position": {
+        "lng": 9.970599562087582,
+        "lat": 53.55724544117873
+      },
+      "label": "Feldstraße"
+    },
+    {
+      "id": "stop-5",
+      "position": {
+        "lng": 9.957711652434186,
+        "lat": 53.56072521789804
+      },
+      "label": "Stresemannstraße"
+    },
+    {
+      "id": "stop-6",
+      "position": {
+        "lng": 9.935860029654844,
+        "lat": 53.55343548898613
+      },
+      "label": "Altona (Bahnhof)"
+    },
+    {
+      "id": "stop-7",
+      "position": {
+        "lng": 9.93606673523289,
+        "lat": 53.546932199067435
+      },
+      "label": "Max-Brauer-Allee"
+    },
+    {
+      "id": "stop-8",
+      "position": {
+        "lng": 9.966700183461606,
+        "lat": 53.54626811841141
+      },
+      "label": "Landungsbrücken"
+    },
+    {
+      "id": "stop-9",
+      "position": {
+        "lng": 9.990466475320135,
+        "lat": 53.544714080798
+      },
+      "label": "Bei den Mühren"
+    }
+  ],
+  "metadata": {
+    "lineCount": 1,
+    "stopCount": 9,
+    "routeSegmentCount": 0,
+    "includedTimeBandIds": [
+      "morning-rush",
+      "late-morning",
+      "midday",
+      "afternoon",
+      "evening-rush",
+      "evening",
+      "night"
+    ]
+  }
+}

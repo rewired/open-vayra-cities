@@ -39,16 +39,6 @@ export type SelectedLineExportValidationIssueCode =
   | 'invalid-frequency-time-band-id'
   | 'invalid-frequency-value'
   | 'invalid-route-segments'
-  | 'invalid-route-segment-shape'
-  | 'invalid-route-segment-id'
-  | 'duplicate-route-segment-id'
-  | 'invalid-route-segment-line-id'
-  | 'route-segment-line-id-mismatch'
-  | 'route-segment-count-mismatch'
-  | 'route-segment-adjacency-mismatch'
-  | 'route-segment-endpoint-mismatch'
-  | 'route-segment-total-travel-minutes-mismatch'
-  | 'invalid-route-segment-stop-reference'
   | 'invalid-route-status'
   | 'invalid-geometry'
   | 'invalid-geometry-coordinate'
@@ -130,8 +120,8 @@ const parseIsoTimestamp = (value: unknown): value is string => {
 
 /**
  * Validates unknown JSON payload input against the selected-line export domain contract.
- * Supports both wrapped NetworkSaveEnvelope and modern raw SelectedLineExportPayloadV4.
- * Explicitly rejects legacy v3 payloads.
+ * Strictly requires a wrapped NetworkSaveEnvelope root.
+ * Explicitly rejects raw payloads and legacy v3 payloads.
  */
 export const validateSelectedLineExportPayload = (payloadCandidate: unknown): SelectedLineExportValidationResult => {
   const issues: SelectedLineExportValidationIssue[] = [];
@@ -144,24 +134,30 @@ export const validateSelectedLineExportPayload = (payloadCandidate: unknown): Se
     return { ok: false, issues };
   }
 
-  // Detect envelope vs raw payload
-  let payload: Record<string, unknown>;
-  let pathPrefix = '$';
-
-  if (payloadCandidate.schema === NETWORK_SAVE_SCHEMA) {
-    if (payloadCandidate.schemaVersion !== NETWORK_SAVE_SCHEMA_VERSION) {
-      addIssue('invalid-envelope', '$.schemaVersion', `Unsupported envelope version ${payloadCandidate.schemaVersion}.`);
-      return { ok: false, issues };
+  // Strictly require NetworkSaveEnvelope
+  if (payloadCandidate.schema !== NETWORK_SAVE_SCHEMA) {
+    // If it looks like a raw selected-line payload, we can give a more specific message
+    const isRawPayload = isRecord(payloadCandidate) && ('schemaVersion' in payloadCandidate || 'exportKind' in payloadCandidate);
+    if (isRawPayload && payloadCandidate.schemaVersion === SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3) {
+      addIssue('unsupported-legacy-v3', '$.schemaVersion', UNSUPPORTED_LEGACY_V3_MESSAGE);
+    } else {
+      addIssue('invalid-envelope', '$.schema', `Payload must be wrapped in a "${NETWORK_SAVE_SCHEMA}" envelope.`);
     }
-    if (!isRecord(payloadCandidate.payload)) {
-      addIssue('invalid-envelope', '$.payload', 'Envelope payload must be an object.');
-      return { ok: false, issues };
-    }
-    payload = payloadCandidate.payload as Record<string, unknown>;
-    pathPrefix = '$.payload';
-  } else {
-    payload = payloadCandidate;
+    return { ok: false, issues };
   }
+
+  if (payloadCandidate.schemaVersion !== NETWORK_SAVE_SCHEMA_VERSION) {
+    addIssue('invalid-envelope', '$.schemaVersion', `Unsupported envelope version ${payloadCandidate.schemaVersion}.`);
+    return { ok: false, issues };
+  }
+
+  if (!isRecord(payloadCandidate.payload)) {
+    addIssue('invalid-envelope', '$.payload', 'Envelope payload must be an object.');
+    return { ok: false, issues };
+  }
+
+  const payload = payloadCandidate.payload as Record<string, unknown>;
+  const pathPrefix = '$.payload';
 
   const requiredRootFields = [
     'schemaVersion',
@@ -354,196 +350,7 @@ export const validateSelectedLineExportPayload = (payloadCandidate: unknown): Se
       configuredTimeBandIds = MVP_TIME_BAND_IDS.filter((timeBandId) => included.includes(timeBandId));
     }
 
-    const validateSegments = (
-      segments: unknown,
-      segmentsKey: string,
-      expectedOrderedStopIds: readonly string[]
-    ): void => {
-      if (segments === undefined) {
-        return;
-      }
 
-      const segmentsPath = `${pathPrefix}.line.${segmentsKey}`;
-      if (!Array.isArray(segments)) {
-        addIssue('invalid-route-segments', segmentsPath, `line.${segmentsKey} must be an array.`);
-        return;
-      }
-
-      const isLoop = line.topology === 'loop';
-      const segmentIds = new Set<string>();
-      const stopOrderIndex = new Map<string, number>();
-      expectedOrderedStopIds.forEach((stopId, index) => stopOrderIndex.set(stopId, index));
-
-      for (let segmentIndex = 0; segmentIndex < segments.length; segmentIndex += 1) {
-        const segment = segments[segmentIndex];
-        const segmentPath = `${segmentsPath}[${segmentIndex}]`;
-
-        if (!isRecord(segment)) {
-          addIssue('invalid-route-segment-shape', segmentPath, 'Each route segment must be an object.');
-          continue;
-        }
-
-        if (typeof segment.id !== 'string' || segment.id.length === 0) {
-          addIssue('invalid-route-segment-id', `${segmentPath}.id`, 'route segment id must be a non-empty string.');
-        } else if (segmentIds.has(segment.id)) {
-          addIssue('duplicate-route-segment-id', `${segmentPath}.id`, `Duplicate route segment id "${segment.id}".`);
-        } else {
-          segmentIds.add(segment.id);
-        }
-
-        if (typeof segment.lineId !== 'string' || segment.lineId.length === 0) {
-          addIssue('invalid-route-segment-line-id', `${segmentPath}.lineId`, 'route segment lineId must be a non-empty string.');
-        } else if (typeof line.id === 'string' && line.id.length > 0 && segment.lineId !== line.id) {
-          addIssue(
-            'route-segment-line-id-mismatch',
-            `${segmentPath}.lineId`,
-            `route segment lineId "${segment.lineId}" does not match line.id "${line.id}".`
-          );
-        }
-
-        if (typeof segment.fromStopId !== 'string' || segment.fromStopId.length === 0) {
-          addIssue('invalid-route-segment-stop-reference', `${segmentPath}.fromStopId`, 'fromStopId must be a non-empty string.');
-        }
-
-        if (typeof segment.toStopId !== 'string' || segment.toStopId.length === 0) {
-          addIssue('invalid-route-segment-stop-reference', `${segmentPath}.toStopId`, 'toStopId must be a non-empty string.');
-        }
-
-        if (typeof segment.fromStopId === 'string' && typeof segment.toStopId === 'string') {
-          const fromIndex = stopOrderIndex.get(segment.fromStopId);
-          const toIndex = stopOrderIndex.get(segment.toStopId);
-
-          if (fromIndex === undefined || toIndex === undefined) {
-            addIssue(
-              'route-segment-endpoint-mismatch',
-              segmentPath,
-              'Route segment endpoints must reference stops from line.orderedStopIds.'
-            );
-          } else {
-            const isLastSegment = segmentIndex === segments.length - 1;
-            const isLoopClosure = isLoop && isLastSegment;
-            
-            const isValidAdjacency = isLoopClosure 
-              ? (fromIndex === expectedOrderedStopIds.length - 1 && toIndex === 0)
-              : (toIndex - fromIndex === 1);
-
-            if (!isValidAdjacency) {
-              addIssue(
-                'route-segment-adjacency-mismatch',
-                segmentPath,
-                'Route segments must connect adjacent stops in expected order (or close the loop).'
-              );
-            }
-          }
-        }
-
-        const orderedGeometry = segment.orderedGeometry;
-        if (!Array.isArray(orderedGeometry) || orderedGeometry.length < 2) {
-          addIssue(
-            'invalid-geometry',
-            `${segmentPath}.orderedGeometry`,
-            'orderedGeometry must be an array with at least two [lng, lat] coordinates.'
-          );
-        } else {
-          let geometryCoordinatesAreValid = true;
-          for (let coordinateIndex = 0; coordinateIndex < orderedGeometry.length; coordinateIndex += 1) {
-            const coordinate = orderedGeometry[coordinateIndex];
-            if (!Array.isArray(coordinate) || coordinate.length !== 2) {
-              geometryCoordinatesAreValid = false;
-              addIssue(
-                'invalid-geometry-coordinate',
-                `${segmentPath}.orderedGeometry[${coordinateIndex}]`,
-                'Each geometry coordinate must be a [lng, lat] tuple.'
-              );
-              continue;
-            }
-
-            const [lng, lat] = coordinate;
-            if (!isFiniteNumber(lng) || !isFiniteNumber(lat) || !isStopCoordinateInRange(lng, lat)) {
-              geometryCoordinatesAreValid = false;
-              addIssue(
-                'invalid-geometry-coordinate',
-                `${segmentPath}.orderedGeometry[${coordinateIndex}]`,
-                'Geometry coordinates must be finite WGS84 lng/lat values.'
-              );
-            }
-          }
-
-          if (
-            geometryCoordinatesAreValid &&
-            typeof segment.fromStopId === 'string' &&
-            typeof segment.toStopId === 'string' &&
-            stopsById.has(segment.fromStopId) &&
-            stopsById.has(segment.toStopId)
-          ) {
-            const start = orderedGeometry[0] as readonly [number, number];
-            const end = orderedGeometry[orderedGeometry.length - 1] as readonly [number, number];
-            const fromStopPosition = stopsById.get(segment.fromStopId);
-            const toStopPosition = stopsById.get(segment.toStopId);
-
-            if (fromStopPosition && !coordinatesCloseEnough(start, fromStopPosition, SELECTED_LINE_EXPORT_ROUTE_CACHE_ENDPOINT_TOLERANCE_DEGREES)) {
-              addIssue(
-                'route-segment-endpoint-mismatch',
-                `${segmentPath}.orderedGeometry[0]`,
-                'First orderedGeometry coordinate must match fromStopId position within tolerance.'
-              );
-            }
-
-            if (toStopPosition && !coordinatesCloseEnough(end, toStopPosition, SELECTED_LINE_EXPORT_ROUTE_CACHE_ENDPOINT_TOLERANCE_DEGREES)) {
-              addIssue(
-                'route-segment-endpoint-mismatch',
-                `${segmentPath}.orderedGeometry[last]`,
-                'Last orderedGeometry coordinate must match toStopId position within tolerance.'
-              );
-            }
-          }
-        }
-
-        const inMotion = segment.inMotionTravelMinutes;
-        const dwell = segment.dwellMinutes;
-        const total = segment.totalTravelMinutes;
-        if (!isFiniteNumber(inMotion) || inMotion < 0 || !isFiniteNumber(dwell) || dwell < 0 || !isFiniteNumber(total) || total < 0) {
-          addIssue(
-            'invalid-route-segment-shape',
-            segmentPath,
-            'Route segment travel-minute fields must be non-negative finite numbers.'
-          );
-        } else {
-          const expectedTotal = inMotion + dwell;
-          if (!numbersCloseEnough(total, expectedTotal, SELECTED_LINE_EXPORT_TRAVEL_MINUTES_TOLERANCE)) {
-            addIssue(
-              'route-segment-total-travel-minutes-mismatch',
-              `${segmentPath}.totalTravelMinutes`,
-              'totalTravelMinutes must equal inMotionTravelMinutes + dwellMinutes within tolerance.'
-            );
-          }
-        }
-
-        if (!isFiniteNumber(segment.distanceMeters) || segment.distanceMeters < 0) {
-          addIssue(
-            'invalid-route-segment-shape',
-            `${segmentPath}.distanceMeters`,
-            'distanceMeters must be a non-negative finite number.'
-          );
-        }
-
-        if (typeof segment.status !== 'string' || !ROUTE_STATUS_SET.has(segment.status)) {
-          addIssue('invalid-route-status', `${segmentPath}.status`, 'status must be a canonical RouteStatus value.');
-        }
-      }
-
-      const expectedRouteSegmentCount = isLoop 
-        ? Math.max(expectedOrderedStopIds.length, 0)
-        : Math.max(expectedOrderedStopIds.length - 1, 0);
-
-      if (Array.isArray(segments) && segments.length !== expectedRouteSegmentCount) {
-        addIssue(
-          'route-segment-count-mismatch',
-          segmentsPath,
-          `${segmentsKey} length must equal ${expectedRouteSegmentCount} for ${line.topology} topology.`
-        );
-      }
-    };
 
     if (isV4) {
       if (line.routeSegments !== undefined) {

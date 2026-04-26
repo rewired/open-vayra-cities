@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { convertSelectedLineExportPayloadToSession } from './selectedLineExportSessionLoader';
 import { validateSelectedLineExportPayload } from './selectedLineExportValidation';
+import { NETWORK_SAVE_SCHEMA, NETWORK_SAVE_SCHEMA_VERSION } from '../types/networkSave';
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirPath = dirname(currentFilePath);
@@ -58,7 +59,13 @@ describe('convertSelectedLineExportPayloadToSession', () => {
       }
     };
 
-    const validationResult = validateSelectedLineExportPayload(noServicePayload);
+    const validationResult = validateSelectedLineExportPayload({
+      schema: NETWORK_SAVE_SCHEMA,
+      schemaVersion: NETWORK_SAVE_SCHEMA_VERSION,
+      exportedAt: new Date().toISOString(),
+      app: { name: 'CityOps' },
+      payload: noServicePayload
+    });
     expect(validationResult.ok).toBe(true);
     if (!validationResult.ok) {
       return;
