@@ -13,6 +13,12 @@ body {
   color: #e8eef9;
 }
 
+.u-technical-numeric {
+  font-family: 'Datatype', 'SFMono-Regular', 'Cascadia Mono', 'Roboto Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
 .app-shell {
   display: grid;
   grid-template-columns: 92px 1fr 300px;
@@ -546,9 +552,35 @@ body {
 
 .simulation-control-bar__clock-readout {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 2px;
+  width: 110px;
+  flex-shrink: 0;
   color: #d9e7fd;
+  line-height: 1.1;
+}
+
+.simulation-control-bar__clock-day {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #adc2e2;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.simulation-control-bar__clock-time {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e8eef9;
+}
+
+.simulation-control-bar__clock-time-band {
+  font-size: 0.65rem;
+  color: #8da4c7;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .simulation-control-bar__controls {
@@ -996,13 +1028,27 @@ body {
 }
 
 .inspector-dialog__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   border: 1px solid #425b83;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #1d2a3f;
   color: #e8eef9;
-  padding: 4px 8px;
-  font-size: 0.74rem;
   cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.inspector-dialog__close:hover {
+  border-color: #5379ad;
+  background: #243653;
+}
+
+.inspector-dialog__close .app-material-icon {
+  font-size: 1.25rem;
 }
 
 .inspector-dialog__note,

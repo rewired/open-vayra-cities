@@ -1,5 +1,6 @@
 import { useState, type ReactElement } from 'react';
 import type { LineServicePattern, LineTopology } from '../domain/types/line';
+import { MaterialIcon } from '../ui/icons/MaterialIcon';
 
 interface LineCompletionDialogProps {
   readonly open: boolean;
@@ -29,8 +30,8 @@ export function LineCompletionDialog({
       <div className="inspector-dialog__surface inspector-dialog__surface--completion">
         <header className="inspector-dialog__header">
           <h3>Complete Line</h3>
-          <button type="button" className="inspector-dialog__close" onClick={onCancel} disabled={isProcessing}>
-            Close
+          <button type="button" className="inspector-dialog__close" onClick={onCancel} disabled={isProcessing} aria-label="Close line completion dialog" title="Close line completion dialog">
+            <MaterialIcon name="close" />
           </button>
         </header>
 

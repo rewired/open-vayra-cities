@@ -2,7 +2,11 @@ import type { ReactElement } from 'react';
 
 import { SIMULATION_SPEED_DEFINITIONS } from '../domain/constants/simulationClock';
 import { TIME_BAND_DISPLAY_LABELS } from '../domain/constants/timeBands';
-import { formatSimulationMinuteOfDay } from '../domain/simulation/simulationClock';
+import {
+  formatSimulationMinuteOfDay,
+  deriveSimulationWeekdayId,
+  formatSimulationWeekdayShort
+} from '../domain/simulation/simulationClock';
 import type { SimulationClockController } from './useSimulationClockController';
 import { MaterialIcon } from '../ui/icons/MaterialIcon';
 
@@ -23,9 +27,16 @@ export function SimulationControlBar({ clockController, sessionActions, debugAct
       </div>
 
       <div className="simulation-control-bar__clock-readout" aria-label="Simulation day and time">
-        <strong>Day {clockController.simulationClockState.timestamp.dayIndex}</strong>
-        <strong>{formatSimulationMinuteOfDay(clockController.currentSimulationMinuteOfDay)}</strong>
-        <span>{TIME_BAND_DISPLAY_LABELS[clockController.activeSimulationTimeBandId]}</span>
+        <span className="simulation-control-bar__clock-day">
+          Day {clockController.simulationClockState.timestamp.dayIndex},{' '}
+          {formatSimulationWeekdayShort(deriveSimulationWeekdayId(clockController.simulationClockState.timestamp.dayIndex))}
+        </span>
+        <strong className="simulation-control-bar__clock-time u-technical-numeric">
+          {formatSimulationMinuteOfDay(clockController.currentSimulationMinuteOfDay)}
+        </strong>
+        <span className="simulation-control-bar__clock-time-band">
+          {TIME_BAND_DISPLAY_LABELS[clockController.activeSimulationTimeBandId]}
+        </span>
       </div>
 
       <div className="simulation-control-bar__controls" role="group" aria-label="Simulation controls">

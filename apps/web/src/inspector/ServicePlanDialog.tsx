@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 import { TIME_BAND_DEFINITIONS, formatTimeBandWindow } from '../domain/constants/timeBands';
+import { MaterialIcon } from '../ui/icons/MaterialIcon';
 
 interface ServicePlanDialogProps {
   readonly open: boolean;
@@ -39,8 +40,8 @@ export function ServicePlanDialog({
       <div className="inspector-dialog__surface inspector-dialog__surface--medium">
         <header className="inspector-dialog__header">
           <h3>Service plan</h3>
-          <button type="button" className="inspector-dialog__close" onClick={onClose}>
-            Close
+          <button type="button" className="inspector-dialog__close" onClick={onClose} aria-label="Close service plan dialog" title="Close service plan dialog">
+            <MaterialIcon name="close" />
           </button>
         </header>
 

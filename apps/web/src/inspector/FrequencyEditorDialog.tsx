@@ -17,6 +17,7 @@ import type {
   LineFrequencyValidationByTimeBand,
   SelectedLineFrequencyUpdateAction
 } from '../session/useNetworkSessionState';
+import { MaterialIcon } from '../ui/icons/MaterialIcon';
 
 interface FrequencyEditorDialogProps {
   readonly open: boolean;
@@ -55,8 +56,8 @@ export function FrequencyEditorDialog({
       <div className="inspector-dialog__surface inspector-dialog__surface--service-plan">
         <header className="inspector-dialog__header">
           <h3>Edit service plan</h3>
-          <button type="button" className="inspector-dialog__close" onClick={onClose}>
-            Close
+          <button type="button" className="inspector-dialog__close" onClick={onClose} aria-label="Close service plan editor" title="Close service plan editor">
+            <MaterialIcon name="close" />
           </button>
         </header>
         <p className="inspector-frequency-editor__note">

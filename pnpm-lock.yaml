@@ -17,6 +17,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@fontsource/datatype':
+        specifier: ^5.2.1
+        version: 5.2.1
       '@fontsource/inter':
         specifier: ^5.2.8
         version: 5.2.8
@@ -292,6 +295,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@fontsource/datatype@5.2.1':
+    resolution: {integrity: sha512-pTnQOgcQzuq/JJKaQqCPngLW6PiEK8LQlpm21XXEpRpoDhKYB2duabcew3YyBNKCacYUFuTtuPJHzgds02eSQA==}
 
   '@fontsource/inter@5.2.8':
     resolution: {integrity: sha512-P6r5WnJoKiNVV+zvW2xM13gNdFhAEpQ9dQJHt3naLvfg+LkF2ldgSLiF4T41lf1SQCM9QmkqPTn4TH568IRagg==}
@@ -1031,6 +1037,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.7':
     optional: true
+
+  '@fontsource/datatype@5.2.1': {}
 
   '@fontsource/inter@5.2.8': {}
 

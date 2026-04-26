@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+### [Unreleased]
+
+### Slice 064e: Modal Close Icons, Stable Clock Display, Weekday Label, and Timetable Numeric Typography
+- Replaced all "Close" text buttons in modals with a Material `close` icon button for a cleaner, consistent UI.
+- Updated the simulation clock readout to show `Day X, Weekday` above `HH:MM`, with internal centering and fixed-width layout to prevent top-bar "wobble".
+- Implemented deterministic weekday derivation (Day 1 → Mon, Day 8 → Mon, etc.) with shared domain constants and tested logic.
+- Integrated Google Font `Datatype` for technical numeric displays, specifically applying it to the simulation clock and the departures timetable minutes.
+- Enforced simulation start at Monday 06:00 (Day 1) via initial clock constants.
 
 ### Slice 064d: Toast Feedback and Layout Safety Repair
 - Implemented a reusable Toast feedback system with four variants (success, error, warning, info).

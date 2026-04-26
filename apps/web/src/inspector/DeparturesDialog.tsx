@@ -4,6 +4,7 @@ import { projectLineDepartureTimetable } from '../domain/projection/lineDepartur
 import type { Line } from '../domain/types/line';
 import type { Stop } from '../domain/types/stop';
 import type { TimeBandId } from '../domain/types/timeBand';
+import { MaterialIcon } from '../ui/icons/MaterialIcon';
 
 interface DeparturesDialogProps {
   readonly open: boolean;
@@ -20,7 +21,7 @@ const renderDepartureMinutes = (labels: readonly string[]): ReactElement => {
     chunks.push(labels.slice(i, i + 4));
   }
   return (
-    <div className="departures-dialog__cell-minutes">
+    <div className="departures-dialog__cell-minutes u-technical-numeric">
       {chunks.map((chunk, index) => (
         <div key={index}>{chunk.join(' ')}</div>
       ))}
@@ -53,8 +54,8 @@ export function DeparturesDialog({
       <div className="inspector-dialog__surface inspector-dialog__surface--large" style={{ maxWidth: 'min(96vw, 1440px)' }}>
         <header className="inspector-dialog__header">
           <h3>Departures</h3>
-          <button type="button" className="inspector-dialog__close" onClick={onClose}>
-            Close
+          <button type="button" className="inspector-dialog__close" onClick={onClose} aria-label="Close departures dialog" title="Close departures dialog">
+            <MaterialIcon name="close" />
           </button>
         </header>
 

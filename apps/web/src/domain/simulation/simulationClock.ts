@@ -8,7 +8,9 @@ import {
   SIMULATION_MINUTES_PER_DAY,
   SIMULATION_SECONDS_PER_DAY,
   SIMULATION_SECONDS_PER_MINUTE,
-  SIMULATION_SPEED_DEFINITIONS
+  SIMULATION_SPEED_DEFINITIONS,
+  SIMULATION_WEEKDAY_IDS,
+  SIMULATION_WEEKDAY_SHORT_LABELS
 } from '../constants/simulationClock';
 import {
   TIME_BAND_DEFINITIONS,
@@ -24,7 +26,8 @@ import type {
   SimulationSecondOfDay,
   SimulationRunningState,
   SimulationSpeedDefinition,
-  SimulationSpeedId
+  SimulationSpeedId,
+  SimulationWeekdayId
 } from '../types/simulationClock';
 import { createMinuteOfDay, type TimeBandId } from '../types/timeBand';
 
@@ -111,6 +114,22 @@ export const deriveTimeBandIdFromMinuteOfDay = (minuteOfDay: SimulationMinuteOfD
  */
 export const formatSimulationMinuteOfDay = (minuteOfDay: SimulationMinuteOfDay): string =>
   formatMinuteOfDayToClock(createMinuteOfDay(minuteOfDay));
+
+/**
+ * Derives the deterministic simulation weekday from a simulation day index.
+ * Day 1 is Monday.
+ */
+export const deriveSimulationWeekdayId = (dayIndex: SimulationDayIndex): SimulationWeekdayId => {
+  // dayIndex starts at 1. Monday is at index 0 in SIMULATION_WEEKDAY_IDS.
+  const index = (dayIndex - 1) % 7;
+  return SIMULATION_WEEKDAY_IDS[index];
+};
+
+/**
+ * Resolves the short English display label for a simulation weekday.
+ */
+export const formatSimulationWeekdayShort = (weekdayId: SimulationWeekdayId): string =>
+  SIMULATION_WEEKDAY_SHORT_LABELS[weekdayId];
 
 /**
  * Derives the continuous simulation second-of-day for smooth projection from clock state.

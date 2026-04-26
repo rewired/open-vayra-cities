@@ -10,6 +10,8 @@ import {
   deriveSimulationSecondOfDay,
   deriveTimeBandIdFromMinuteOfDay,
   formatSimulationMinuteOfDay,
+  deriveSimulationWeekdayId,
+  formatSimulationWeekdayShort,
   setSimulationSpeed,
   setSimulationSpeedFromUnknown
 } from './simulationClock';
@@ -151,6 +153,22 @@ describe('simulationClock', () => {
     expect(formatSimulationMinuteOfDay(createSimulationMinuteOfDay(0))).toBe('00:00');
     expect(formatSimulationMinuteOfDay(createSimulationMinuteOfDay(65))).toBe('01:05');
     expect(formatSimulationMinuteOfDay(createSimulationMinuteOfDay(1439))).toBe('23:59');
+  });
+
+  it('derives deterministic weekdays from day index (Day 1 = Monday)', () => {
+    expect(deriveSimulationWeekdayId(createSimulationDayIndex(1))).toBe('monday');
+    expect(deriveSimulationWeekdayId(createSimulationDayIndex(2))).toBe('tuesday');
+    expect(deriveSimulationWeekdayId(createSimulationDayIndex(3))).toBe('wednesday');
+    expect(deriveSimulationWeekdayId(createSimulationDayIndex(4))).toBe('thursday');
+    expect(deriveSimulationWeekdayId(createSimulationDayIndex(5))).toBe('friday');
+    expect(deriveSimulationWeekdayId(createSimulationDayIndex(6))).toBe('saturday');
+    expect(deriveSimulationWeekdayId(createSimulationDayIndex(7))).toBe('sunday');
+    expect(deriveSimulationWeekdayId(createSimulationDayIndex(8))).toBe('monday');
+  });
+
+  it('formats simulation weekday short labels correctly', () => {
+    expect(formatSimulationWeekdayShort('monday')).toBe('Mon');
+    expect(formatSimulationWeekdayShort('sunday')).toBe('Sun');
   });
 
   it('keeps state unchanged for invalid speed ids via safe fallback helper', () => {

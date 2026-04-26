@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/datatype": "^5.2.1",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/material-symbols-outlined": "^5.2.31",
     "react": "^19.0.0",

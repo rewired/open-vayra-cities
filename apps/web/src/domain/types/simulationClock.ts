@@ -63,6 +63,11 @@ export type SimulationClockCommand =
   | { readonly type: 'advance-elapsed'; readonly elapsedRealMilliseconds: number };
 
 /**
+ * Stable identifier for one simulation weekday.
+ */
+export type SimulationWeekdayId = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+
+/**
  * Structured result from applying a clock transition.
  */
 export interface SimulationClockUpdateResult {

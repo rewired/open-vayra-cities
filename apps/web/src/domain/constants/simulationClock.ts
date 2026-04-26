@@ -2,7 +2,8 @@ import type {
   SimulationDayIndex,
   SimulationMinuteOfDay,
   SimulationSpeedDefinition,
-  SimulationSpeedId
+  SimulationSpeedId,
+  SimulationWeekdayId
 } from '../types/simulationClock';
 
 /**
@@ -62,3 +63,35 @@ export const SIMULATION_SPEED_DEFINITIONS: readonly SimulationSpeedDefinition[] 
   { id: '10x', label: '10×', multiplier: 10 },
   { id: '20x', label: '20×', multiplier: 20 }
 ] as const satisfies readonly SimulationSpeedDefinition[];
+
+/**
+ * Canonical ordered list of simulation weekday identifiers.
+ * Day 1 maps to the first element (Monday).
+ */
+export const SIMULATION_WEEKDAY_IDS: readonly SimulationWeekdayId[] = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday'
+] as const;
+
+/**
+ * Canonical mapping from simulation weekday identifiers to short English display labels.
+ */
+export const SIMULATION_WEEKDAY_SHORT_LABELS: Readonly<Record<SimulationWeekdayId, string>> = {
+  monday: 'Mon',
+  tuesday: 'Tue',
+  wednesday: 'Wed',
+  thursday: 'Thu',
+  friday: 'Fri',
+  saturday: 'Sat',
+  sunday: 'Sun'
+};
+
+/**
+ * Canonical simulation weekday identifier used for the initial simulation state (Day 1).
+ */
+export const INITIAL_SIMULATION_WEEKDAY_ID: SimulationWeekdayId = 'monday';

@@ -7,6 +7,7 @@ import type { WorkspaceToolMode } from '../session/sessionTypes';
 type DebugModalTabId = 'overview' | 'routing' | 'service' | 'raw-state';
 
 import type { DemandNodeSummary } from '../domain/demand/demandNodeHelpers';
+import { MaterialIcon } from './icons/MaterialIcon';
 
 /** Immutable shell/session identity and count diagnostics for debug overview rendering. */
 export interface DebugModalOverviewDiagnostics {
@@ -107,8 +108,8 @@ export function DebugModal({
       <section className="app-debug-modal__panel">
         <header className="app-debug-modal__header">
           <h2>Map workspace debug details</h2>
-          <button type="button" onClick={onClose} aria-label="Close debug modal">
-            Close
+          <button type="button" className="inspector-dialog__close" onClick={onClose} aria-label="Close debug modal" title="Close debug modal">
+            <MaterialIcon name="close" />
           </button>
         </header>
 

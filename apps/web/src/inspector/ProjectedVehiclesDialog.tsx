@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import { TIME_BAND_DEFINITIONS, formatTimeBandWindow } from '../domain/constants/timeBands';
 import type { LineBandVehicleProjection, LinePlanningVehicleProjection } from '../domain/types/linePlanningVehicleProjection';
 import type { TimeBandId } from '../domain/types/timeBand';
+import { MaterialIcon } from '../ui/icons/MaterialIcon';
 
 interface ProjectedVehiclesDialogProps {
   readonly open: boolean;
@@ -41,8 +42,8 @@ export function ProjectedVehiclesDialog({
       <div className="inspector-dialog__surface inspector-dialog__surface--large" style={{ maxWidth: '1000px' }}>
         <header className="inspector-dialog__header">
           <h3>Projected vehicles</h3>
-          <button type="button" className="inspector-dialog__close" onClick={onClose}>
-            Close
+          <button type="button" className="inspector-dialog__close" onClick={onClose} aria-label="Close projected vehicles dialog" title="Close projected vehicles dialog">
+            <MaterialIcon name="close" />
           </button>
         </header>
         
