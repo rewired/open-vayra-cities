@@ -4,12 +4,12 @@ import type { LineRouteBaselineStatus } from './routeBaseline';
 import type { TimeBandId } from './timeBand';
 
 /**
- * Branded identifier for one projected vehicle marker instance in the current simulation minute.
+ * Branded identifier for one projected vehicle marker instance in the current projection run.
  */
 export type LineVehicleProjectionId = string & { readonly __brand: 'LineVehicleProjectionId' };
 
 /**
- * Projection status used for map-ready vehicle markers in the current simulation minute.
+ * Projection status used for map-ready vehicle markers in the current projection run.
  */
 export type LineVehicleProjectionStatus = 'projected' | 'degraded-projected' | 'unavailable';
 
@@ -33,7 +33,7 @@ export interface LineVehicleProjection {
   readonly direction: 'outbound' | 'return';
   /** Current projected marker coordinate, or `null` when unavailable. */
   readonly coordinate: RouteGeometryCoordinate | null;
-  /** Projection status for this vehicle marker in the current simulation minute. */
+  /** Projection status for this vehicle marker in the current projection run. */
   readonly status: LineVehicleProjectionStatus;
   /** Optional degraded/unavailable note for diagnostics without forcing marker rendering. */
   readonly degradedNote?: string;
@@ -60,7 +60,7 @@ export interface LineVehicleProjectionForLine {
 }
 
 /**
- * Network summary counters for current-minute line vehicle projections.
+ * Network summary counters for continuous-time line vehicle projections.
  */
 export interface LineVehicleProjectionSummary {
   /** Total number of projected vehicles with `projected` status. */
@@ -74,10 +74,10 @@ export interface LineVehicleProjectionSummary {
 }
 
 /**
- * Full network-level current-minute line vehicle projection output.
+ * Full network-level continuous-time line vehicle projection output.
  */
 export interface LineVehicleNetworkProjection {
-  /** Per-line current-minute vehicle projection results in input order. */
+  /** Per-line continuous-time vehicle projection results in input order. */
   readonly lines: readonly LineVehicleProjectionForLine[];
   /** Aggregate network summary derived from all projected line results. */
   readonly summary: LineVehicleProjectionSummary;

@@ -1,3 +1,4 @@
+import type { MaterialIconName } from '../../ui/icons/materialIcons';
 import type { TimeBandId } from './timeBand';
 
 /**
@@ -31,7 +32,7 @@ export type SimulationRunningState = 'paused' | 'running';
 /**
  * Stable identifier for one selectable simulation speed option.
  */
-export type SimulationSpeedId = '1x' | '5x' | '10x' | '20x';
+export type SimulationSpeedId = '0.5x' | '1x' | '5x' | '10x' | '20x';
 
 /**
  * Canonical simulation speed definition shown in controls and used by progression helpers.
@@ -40,6 +41,7 @@ export interface SimulationSpeedDefinition {
   readonly id: SimulationSpeedId;
   readonly label: string;
   readonly multiplier: number;
+  readonly iconName?: MaterialIconName;
 }
 
 /**

@@ -6,6 +6,7 @@ import {
   MIN_SIMULATION_MINUTE_OF_DAY,
   REAL_MILLISECONDS_PER_SIMULATION_MINUTE,
   SIMULATION_MINUTES_PER_DAY,
+  SIMULATION_SECONDS_PER_DAY,
   SIMULATION_SECONDS_PER_MINUTE,
   SIMULATION_SPEED_DEFINITIONS
 } from '../constants/simulationClock';
@@ -64,6 +65,10 @@ export const createSimulationMinuteOfDay = (rawMinuteOfDay: number): SimulationM
 export const createSimulationSecondOfDay = (rawSecondOfDay: number): SimulationSecondOfDay => {
   if (!Number.isFinite(rawSecondOfDay)) {
     throw new Error('Simulation second of day must be a finite number.');
+  }
+
+  if (rawSecondOfDay < 0 || rawSecondOfDay >= SIMULATION_SECONDS_PER_DAY) {
+    throw new Error(`Simulation second of day must be within 0..${SIMULATION_SECONDS_PER_DAY - 1}.`);
   }
 
   return rawSecondOfDay as SimulationSecondOfDay;

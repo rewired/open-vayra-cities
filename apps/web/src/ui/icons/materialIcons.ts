@@ -10,7 +10,8 @@ export type MaterialIconName =
   | 'pause'
   | 'restart_alt'
   | 'upload_file'
-  | 'download';
+  | 'download'
+  | 'pace';
 
 /**
  * Canonical Material icon name mapping for workspace mode controls.

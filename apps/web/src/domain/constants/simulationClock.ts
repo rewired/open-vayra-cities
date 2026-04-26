@@ -54,8 +54,9 @@ export const DEFAULT_SIMULATION_SPEED_ID: SimulationSpeedId = '1x';
  * Canonical small speed-set for the MVP clock baseline.
  */
 export const SIMULATION_SPEED_DEFINITIONS: readonly SimulationSpeedDefinition[] = [
-  { id: '1x', label: '1x', multiplier: 1 },
-  { id: '5x', label: '5x', multiplier: 5 },
-  { id: '10x', label: '10x', multiplier: 10 },
-  { id: '20x', label: '20x', multiplier: 20 }
+  { id: '0.5x', label: '0.5×', multiplier: 0.5 },
+  { id: '1x', label: '1×', multiplier: 1 },
+  { id: '5x', label: '5×', multiplier: 5 },
+  { id: '10x', label: '10×', multiplier: 10 },
+  { id: '20x', label: '20×', multiplier: 20 }
 ] as const satisfies readonly SimulationSpeedDefinition[];

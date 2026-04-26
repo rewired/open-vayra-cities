@@ -124,9 +124,19 @@ describe('simulationClock', () => {
   });
 
   describe('SimulationSecondOfDay', () => {
-    it('creates branded seconds from finite numbers', () => {
+    it('creates branded seconds from finite numbers within day range', () => {
       expect(createSimulationSecondOfDay(3600)).toBe(3600);
       expect(createSimulationSecondOfDay(3600.5)).toBe(3600.5);
+      expect(createSimulationSecondOfDay(0)).toBe(0);
+      expect(createSimulationSecondOfDay(86399.999)).toBe(86399.999);
+    });
+
+    it('rejects non-finite, negative, or out-of-range seconds', () => {
+      expect(() => createSimulationSecondOfDay(NaN)).toThrow();
+      expect(() => createSimulationSecondOfDay(Infinity)).toThrow();
+      expect(() => createSimulationSecondOfDay(-1)).toThrow();
+      expect(() => createSimulationSecondOfDay(86400)).toThrow();
+      expect(() => createSimulationSecondOfDay(90000)).toThrow();
     });
 
     it('derives continuous seconds from clock state including carryover', () => {
@@ -146,6 +156,21 @@ describe('simulationClock', () => {
     it('handles zero carryover correctly', () => {
       const state = createInitialSimulationClockState();
       expect(deriveSimulationSecondOfDay(state)).toBe(360 * 60);
+    });
+
+    it('remains below day boundary even for maximum minute and carryover', () => {
+      const state = {
+        ...createInitialSimulationClockState(),
+        timestamp: {
+          dayIndex: createSimulationDayIndex(1),
+          minuteOfDay: createSimulationMinuteOfDay(1439)
+        },
+        carryoverScaledRealMilliseconds: 999.999
+      };
+
+      const result = deriveSimulationSecondOfDay(state);
+      expect(result).toBeLessThan(86400);
+      expect(result).toBeGreaterThan(86399);
     });
   });
 });

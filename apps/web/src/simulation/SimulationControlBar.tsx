@@ -12,7 +12,7 @@ interface SimulationControlBarProps {
   readonly debugAction: ReactElement;
 }
 
-const CANONICAL_SIMULATION_SPEED_IDS = ['1x', '5x', '10x', '20x'] as const;
+const CANONICAL_SIMULATION_SPEED_IDS = ['0.5x', '1x', '5x', '10x', '20x'] as const;
 
 /** Renders the integrated top bar with brand, simulation clock controls, speed controls, and compact session actions. */
 export function SimulationControlBar({ clockController, sessionActions, debugAction }: SimulationControlBarProps): ReactElement {
@@ -72,7 +72,7 @@ export function SimulationControlBar({ clockController, sessionActions, debugAct
                 clockController.handleSpeedSelection(definition.id);
               }}
             >
-              {definition.label}
+              {definition.iconName ? <MaterialIcon name={definition.iconName} /> : definition.label}
             </button>
           ))}
         </div>

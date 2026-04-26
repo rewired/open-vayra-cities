@@ -73,6 +73,13 @@ All notable changes to this project will be documented in this file.
 - Resolve strict TypeScript issues in demand domain by introducing `createZeroDemandWeightByTimeBand` factory and enforcing complete `Record<TimeBandId, T>` map initialization.
 - Align test suites with canonical MVP time bands and hardened type safety requirements.
 
+- **Slice 064b**: Projection Second Guardrails & Speed Polish (Repair).
+- Enforced `0 <= seconds < 86400` range validation for `SimulationSecondOfDay`.
+- Updated stale "current-minute" documentation in vehicle projection types to reflect continuous time.
+- Added `0.5×` simulation speed option.
+- Updated all simulation speed labels to use the multiplication sign `×`.
+- Added Material Symbols icon support for "Realtime" speed in the control bar.
+
 - **Slice 064**: Vehicle Projection Continuity + Smooth Movement.
 - Continuous simulation-second projection input for smooth vehicle movement using `SimulationSecondOfDay` branded type.
 - `deriveSimulationSecondOfDay` helper for animation-frame cadence clock reads.
