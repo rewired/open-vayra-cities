@@ -168,7 +168,6 @@ export function InspectorPanel({
             completedLines={completedLines}
             onStopSelect={onStopSelectionChange}
             onLineSelect={onSelectedLineIdChange}
-            onStopRename={onStopRename}
             onLineRename={onLineRename}
           />
 
@@ -254,8 +253,8 @@ export function InspectorPanel({
                   selectedLinePlanningVehicleProjection={selectedLinePlanningVehicleProjection}
                   selectedLineDemandProjection={selectedLineDemandProjection}
                   onLineRename={onLineRename}
-                  onStopSelectionChange={onStopSelectionChange}
                   onStopRename={onStopRename}
+                  onStopSelectionChange={onStopSelectionChange}
                   onFrequencyChange={onFrequencyChange}
                   openDialogIntent={openDialogIntent}
                   onOpenDialogIntentConsumed={onOpenDialogIntentConsumed}

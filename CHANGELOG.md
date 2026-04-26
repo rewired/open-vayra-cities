@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 074: Network Inventory Summary-First Stop UX
+- Refactored the Network tab inventory to be summary-first for stops, replacing full global stop rows with compact stop summary KPIs.
+- Removed inline stop rename controls from the Network inventory so stop rename is no longer presented as a primary global workflow.
+- Added a compact stop selection/debug list limited to a small subset, including hidden-count feedback for large stop sets.
+- Preserved line-related inventory rows and inline line rename controls to align rename entrypoints with line context.
+- Added ADR 0122 to document scope, decision boundaries, and non-goals for summary-first network inventory behavior.
+
 ### Slice 073: Lines-Tab List Row Selection and Inline Rename Refactor
 - Refactored completed-line rows in the Lines tab list mode to use a compact line-id badge button as the primary select/focus affordance.
 - Moved line label text to a non-primary, readability-focused span so label copy is no longer the primary click target.
