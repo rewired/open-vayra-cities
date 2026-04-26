@@ -58,6 +58,7 @@ export interface NetworkPlanningProjections {
   readonly networkServicePlanProjection: ReturnType<typeof projectLineServicePlan>;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof projectLineSelectedServiceInspector> | null;
   readonly selectedLineDemandProjection: LineBandDemandProjection | null;
+  readonly networkDemandProjection: import('./demandCatchmentProjection').NetworkDemandProjection;
 }
 
 const projectStaticNetworkSummaryKpis = (
@@ -91,6 +92,7 @@ const projectStaticNetworkSummaryKpis = (
 
 import { calculateStopCatchments } from '../demand/demandCatchment';
 import { projectLineBandDemand } from '../demand/servedDemandProjection';
+import { projectNetworkDemand } from './demandCatchmentProjection';
 import type { DemandNode } from '../types/demandNode';
 
 /** Aggregates shell planning projections from canonical domain projection helpers without owning session state. */
@@ -159,6 +161,14 @@ export const useNetworkPlanningProjections = (
       )
     : null;
 
+  const networkDemandProjection = projectNetworkDemand(
+    sessionDemandNodes,
+    sessionStops,
+    sessionLines,
+    networkServicePlanProjection,
+    activeSimulationTimeBandId
+  );
+
   const selectedLinePlanningVehicleProjection = selectedLine
     ? projectLinePlanningVehicles(selectedLine, selectedLineRouteBaseline)
     : null;
@@ -174,6 +184,7 @@ export const useNetworkPlanningProjections = (
     selectedLinePlanningVehicleProjection,
     networkServicePlanProjection,
     selectedLineServiceInspectorProjection,
-    selectedLineDemandProjection
+    selectedLineDemandProjection,
+    networkDemandProjection
   };
 };

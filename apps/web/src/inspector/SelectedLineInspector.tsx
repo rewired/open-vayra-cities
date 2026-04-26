@@ -174,17 +174,45 @@ export function SelectedLineInspector({
       </section>
 
       {selectedLineDemandProjection ? (
-        <section className="inspector-card" aria-label="Selected line demand pills">
-          <div className="selected-line-inspector__pill-row">
-            <p className="selected-line-inspector__pill">
-              {`Demand status: ${selectedLineDemandProjection.status}`}
-            </p>
-            {selectedLineDemandProjection.status === 'served' ? (
-              <p className="selected-line-inspector__pill">
-                {`Served weight: ${selectedLineDemandProjection.servedDemandWeight}`}
-              </p>
-            ) : null}
-          </div>
+        <section className="inspector-card" aria-label="Selected line demand summary">
+          <h3>Line demand</h3>
+          <table className="inspector-compact-table">
+            <tbody>
+              <tr>
+                <th scope="row">Status</th>
+                <td className="inspector-compact-table__value--left">
+                  <span className={`selected-line-inspector__value-label selected-line-inspector__value-label--${selectedLineDemandProjection.status}`}>
+                    {selectedLineDemandProjection.status === 'served' ? 'Active' : selectedLineDemandProjection.status}
+                  </span>
+                </td>
+              </tr>
+              {selectedLineDemandProjection.status === 'served' ? (
+                <>
+                  <tr>
+                    <th scope="row">Structural coverage</th>
+                    <td className="inspector-compact-table__value--left">
+                      {`${selectedLineDemandProjection.capturedOriginWeight} homes · ${selectedLineDemandProjection.capturedDestinationWeight} jobs`}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Served demand</th>
+                    <td className="inspector-compact-table__value--highlight">
+                      {selectedLineDemandProjection.servedDemandWeight}
+                    </td>
+                  </tr>
+                </>
+              ) : null}
+            </tbody>
+          </table>
+          {selectedLineDemandProjection.warnings.length > 0 ? (
+            <div className="selected-line-inspector__demand-warnings">
+              {selectedLineDemandProjection.warnings.map((w, idx) => (
+                <p key={idx} className="selected-line-inspector__warning-text">
+                  {`⚠ ${w.message}`}
+                </p>
+              ))}
+            </div>
+          ) : null}
         </section>
       ) : null}
 

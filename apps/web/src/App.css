@@ -1375,3 +1375,27 @@ body {
 .departures-dialog__table td[data-state='unconfigured'] {
   color: #f4d7a6;
 }
+.selected-line-inspector__value-label--served {
+  color: #9fe3ad;
+  font-weight: 600;
+}
+
+.selected-line-inspector__value-label--no-service,
+.selected-line-inspector__value-label--unconfigured {
+  color: #ffb5b5;
+}
+
+.selected-line-inspector__demand-warnings {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid #634343;
+  border-radius: 6px;
+  background: #2b1f1f;
+}
+
+.selected-line-inspector__warning-text {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #ffb5b5;
+  line-height: 1.4;
+}

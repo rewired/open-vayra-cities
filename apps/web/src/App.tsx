@@ -271,6 +271,7 @@ export default function App(): ReactElement {
         selectedLineServiceInspectorProjection={projections.selectedLineServiceInspectorProjection}
         selectedLinePlanningVehicleProjection={projections.selectedLinePlanningVehicleProjection}
         selectedLineDemandProjection={projections.selectedLineDemandProjection}
+        networkDemandProjection={projections.networkDemandProjection}
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
         lineFrequencyControlByTimeBand={sessionController.lineFrequencyControlByTimeBand}
         lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}

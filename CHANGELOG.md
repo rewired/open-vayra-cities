@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 066: Demand Capture and Served Demand UI Projection
+- Implemented network-wide demand capture projection for residential origins and workplace destinations using a centralized 400m catchment radius.
+- Added a first truthful "Served now" projection that calculates residential demand structurally connected to workplaces by active bus lines in the current time band.
+- Enforced directional connectivity rules: a residential node is served only if the capturing stop appears before a workplace-capturing stop in the line's sequence (respecting topology and bidirectional service).
+- Updated the Network inspector with a "Demand capture" section showing homes/jobs coverage and actively served demand.
+- Refined the Selected Line inspector to show line-specific structural coverage, active served demand, and actionable warnings for missing service or demand.
+- Added `demandCatchmentProjection.ts` and associated unit tests for deterministic network-wide demand aggregates.
+- Integrated demand projections into the main `useNetworkPlanningProjections` hook.
+
 ### Slice 065b: Selected-Line Export v4 Type Hygiene and Test Cleanup
 - Refactored `SelectedLineExportPayload` into a discriminated union of `SelectedLineExportPayloadV3` (legacy with geometry) and `SelectedLineExportPayloadV4` (slim without geometry), ensuring strict type safety for version-specific fields.
 - Updated `buildSelectedLineExportPayload` to return a strongly typed `SelectedLineExportPayloadV4` and omit cached route geometry at the type level.
