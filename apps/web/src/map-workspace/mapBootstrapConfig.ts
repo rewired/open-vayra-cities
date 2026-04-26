@@ -24,3 +24,10 @@ export const MAP_WORKSPACE_BOOTSTRAP_CONFIG: MapBootstrapConfig = {
   minZoom: 10,
   maxZoom: 18
 };
+ 
+/** Zoom level used when focusing the map on a single stop from the inspector. */
+export const MAP_FOCUS_ZOOM_STOP = 15.5;
+
+/** Screen-space padding in pixels applied when fitting a line into the map viewport. */
+export const MAP_FOCUS_PADDING = 64;
+

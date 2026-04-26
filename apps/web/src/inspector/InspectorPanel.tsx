@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { TIME_BAND_DISPLAY_LABELS } from '../domain/constants/timeBands';
 import type { Line } from '../domain/types/line';
 import { SelectedLineInspector } from './SelectedLineInspector';
+import { NetworkInventory } from './NetworkInventory';
 import { INSPECTOR_TAB_IDS, INSPECTOR_TAB_LABELS, type InspectorTabId } from './inspectorTabs';
 import type { InspectorPanelState } from './types';
 import type {
@@ -36,6 +37,7 @@ interface InspectorPanelProps {
     action?: SelectedLineFrequencyUpdateAction
   ) => void;
   readonly onSelectedLineIdChange: (lineId: Line['id']) => void;
+  readonly onStopSelectionChange: (stopId: import('../domain/types/stop').StopId) => void;
   readonly openDialogIntent: import('../session/sessionTypes').SelectedLineDialogOpenIntent | null;
   readonly onOpenDialogIntentConsumed: (intent: import('../session/sessionTypes').SelectedLineDialogOpenIntent | null) => void;
 }
@@ -72,6 +74,7 @@ export function InspectorPanel({
   lineFrequencyValidationByTimeBand,
   onFrequencyChange,
   onSelectedLineIdChange,
+  onStopSelectionChange,
   openDialogIntent,
   onOpenDialogIntentConsumed
 }: InspectorPanelProps): ReactElement {
@@ -154,6 +157,13 @@ export function InspectorPanel({
               </tr>
             </tbody>
           </table>
+
+          <NetworkInventory
+            placedStops={placedStops}
+            completedLines={completedLines}
+            onStopSelect={onStopSelectionChange}
+            onLineSelect={onSelectedLineIdChange}
+          />
 
           <h3 style={{ marginTop: '1.5rem' }}>Demand capture</h3>
           <table className="inspector-compact-table">

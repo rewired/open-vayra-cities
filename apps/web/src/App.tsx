@@ -20,6 +20,7 @@ import {
 import { summarizeDemandNodes } from './domain/demand/demandNodeHelpers';
 import { MVP_DEMAND_SCENARIO } from './domain/demand/mvpDemandScenario';
 import { WORKSPACE_MODE_ICONS } from './ui/icons/materialIcons';
+import type { MapFocusIntent } from './session/sessionTypes';
 
 import './App.css';
 
@@ -91,6 +92,7 @@ export default function App(): ReactElement {
   const [mapWorkspaceDebugSnapshot, setMapWorkspaceDebugSnapshot] = useState<MapWorkspaceDebugSnapshot>(
     INITIAL_MAP_WORKSPACE_DEBUG_SNAPSHOT
   );
+  const [mapFocusIntent, setMapFocusIntent] = useState<MapFocusIntent | null>(null);
 
   const projections = useNetworkPlanningProjections(
     sessionController.sessionLines,
@@ -169,6 +171,24 @@ export default function App(): ReactElement {
     networkBlockedLineCount: projections.networkServicePlanProjection.summary.blockedLineCount,
     networkDegradedLineCount: projections.networkServicePlanProjection.summary.degradedLineCount
   };
+
+  const handleStopInventorySelection = useCallback(
+    (stopId: import('./domain/types/stop').StopId) => {
+      sessionController.setSelectedLineId(null);
+      sessionController.setSelectedStop({ selectedStopId: stopId });
+      setMapFocusIntent({ target: { type: 'stop', id: stopId }, requestId: Date.now() });
+    },
+    [sessionController]
+  );
+
+  const handleLineInventorySelection = useCallback(
+    (lineId: import('./domain/types/line').LineId) => {
+      sessionController.setSelectedStop(null);
+      sessionController.setSelectedLineId(lineId);
+      setMapFocusIntent({ target: { type: 'line', id: lineId }, requestId: Date.now() });
+    },
+    [sessionController]
+  );
 
   return (
     <div className="app-shell" data-app-surface="desktop-shell">
@@ -254,6 +274,8 @@ export default function App(): ReactElement {
           onSessionLinesChange={sessionController.setSessionLines}
           onSelectedLineIdChange={sessionController.setSelectedLineId}
           onSelectedLineDialogOpenIntentChange={sessionController.setSelectedLineDialogOpenIntent}
+          mapFocusIntent={mapFocusIntent}
+          onMapFocusIntentConsumed={setMapFocusIntent}
           onDebugSnapshotChange={handleMapDebugSnapshotChange}
         />
       </main>
@@ -276,7 +298,8 @@ export default function App(): ReactElement {
         lineFrequencyControlByTimeBand={sessionController.lineFrequencyControlByTimeBand}
         lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}
         onFrequencyChange={sessionController.updateSelectedCompletedLineFrequency}
-        onSelectedLineIdChange={sessionController.setSelectedLineId}
+        onSelectedLineIdChange={handleLineInventorySelection}
+        onStopSelectionChange={handleStopInventorySelection}
         openDialogIntent={sessionController.selectedLineDialogOpenIntent}
         onOpenDialogIntentConsumed={sessionController.setSelectedLineDialogOpenIntent}
       />

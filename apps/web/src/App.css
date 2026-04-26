@@ -1419,3 +1419,87 @@ body {
   color: #ffb5b5;
   line-height: 1.4;
 }
+
+/* --- Network Inventory --- */
+
+.network-inventory {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.network-inventory__section {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.network-inventory__title {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #9eb4d7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.network-inventory__list {
+  margin-top: 0;
+  padding-left: 0;
+  list-style: none;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #2f415f;
+  border-radius: 8px;
+  background: #121b2b;
+}
+
+.network-inventory__list-item {
+  border-bottom: 1px solid #233147;
+}
+
+.network-inventory__list-item:last-child {
+  border-bottom: none;
+}
+
+.network-inventory__item-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  color: #d7e7ff;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.network-inventory__item-button:hover {
+  background: #1d2a42;
+  color: #ffffff;
+}
+
+.network-inventory__item-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.network-inventory__item-id {
+  font-size: 0.65rem;
+  color: #7995bc;
+  font-family: 'Datatype', monospace;
+}
+
+.network-inventory__empty {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #647b9e;
+  font-style: italic;
+  padding: 4px 2px;
+}

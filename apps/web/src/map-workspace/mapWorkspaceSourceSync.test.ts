@@ -39,7 +39,9 @@ const createMapWithPresentLayers = (presentLayerIds: readonly string[]): MapLibr
         : undefined,
     addLayer: () => undefined,
     moveLayer: () => undefined,
-    isStyleLoaded: () => true
+    isStyleLoaded: () => true,
+    easeTo: () => undefined,
+    fitBounds: () => undefined
   };
 };
 

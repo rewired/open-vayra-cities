@@ -1,4 +1,5 @@
 import type { StopId } from '../domain/types/stop';
+import type { LineId } from '../domain/types/line';
 
 /** Defines the workspace tool modes available in the desktop shell. */
 export type WorkspaceToolMode = 'inspect' | 'place-stop' | 'build-line';
@@ -13,7 +14,13 @@ export interface LineBuildSelectionState {
  * Used for post-creation workflow automation.
  */
 export interface SelectedLineDialogOpenIntent {
-  readonly lineId: import('../domain/types/line').LineId;
+  readonly lineId: LineId;
   readonly dialogId: 'frequency';
+  readonly requestId: number;
+}
+
+/** Carries a programmatic map-focus request for a stop or line. */
+export interface MapFocusIntent {
+  readonly target: { type: 'stop'; id: StopId } | { type: 'line'; id: LineId };
   readonly requestId: number;
 }

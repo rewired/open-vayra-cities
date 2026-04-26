@@ -4,6 +4,10 @@ import {
   LINE_BUILD_PLACEHOLDER_LABEL_PREFIX,
   MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE
 } from '../domain/constants/lineBuilding';
+import {
+  MAP_FOCUS_PADDING,
+  MAP_FOCUS_ZOOM_STOP
+} from './mapBootstrapConfig';
 import { completeLineRouting } from '../domain/routing/completeLineRouting';
 import { getDefaultRoutingAdapter } from '../domain/routing/defaultRoutingAdapter';
 import type { Line } from '../domain/types/line';
@@ -13,7 +17,7 @@ import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
 import { createUniqueStopLabel } from '../domain/stop/stopLabeling';
 import { generateLineLabel, generateUniqueLineLabel } from '../domain/line/lineLabeling';
-import type { LineBuildSelectionState, WorkspaceToolMode } from '../session/sessionTypes';
+import type { LineBuildSelectionState, MapFocusIntent, WorkspaceToolMode } from '../session/sessionTypes';
 import {
   MAP_LAYER_ID_COMPLETED_LINES,
   MAP_LAYER_ID_DRAFT_LINE,
@@ -66,6 +70,8 @@ interface MapWorkspaceSurfaceProps {
   readonly onSessionLinesChange: (updater: (currentLines: readonly Line[]) => readonly Line[]) => void;
   readonly onSelectedLineIdChange: (nextSelectedLineId: Line['id'] | null) => void;
   readonly onSelectedLineDialogOpenIntentChange: (intent: import('../session/sessionTypes').SelectedLineDialogOpenIntent | null) => void;
+  readonly mapFocusIntent: MapFocusIntent | null;
+  readonly onMapFocusIntentConsumed: (intent: MapFocusIntent | null) => void;
   readonly onDebugSnapshotChange: (nextSnapshot: MapWorkspaceDebugSnapshot) => void;
 }
 
@@ -152,6 +158,8 @@ export function MapWorkspaceSurface({
   onSessionLinesChange,
   onSelectedLineIdChange,
   onSelectedLineDialogOpenIntentChange,
+  mapFocusIntent,
+  onMapFocusIntentConsumed,
   onDebugSnapshotChange
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -637,6 +645,66 @@ export function MapWorkspaceSurface({
     stopSelectionSummary,
     vehicleDiagnosticsSummary
   ]);
+
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !mapFocusIntent) {
+      return;
+    }
+
+    const { target } = mapFocusIntent;
+
+    if (target.type === 'stop') {
+      const stop = placedStopsRef.current.find((s) => s.id === target.id);
+      if (stop) {
+        map.easeTo({
+          center: [stop.position.lng, stop.position.lat],
+          zoom: MAP_FOCUS_ZOOM_STOP
+        });
+      }
+    } else if (target.type === 'line') {
+      const line = sessionLinesRef.current.find((l) => l.id === target.id);
+      if (line) {
+        const coordinates: [number, number][] = [];
+
+        // Collect all geometry coordinates if available
+        line.routeSegments.forEach((segment) => {
+          segment.orderedGeometry.forEach((coord) => {
+            coordinates.push([coord[0], coord[1]]);
+          });
+        });
+
+        // Fallback to stop positions if geometry is empty
+        if (coordinates.length === 0) {
+          line.stopIds.forEach((stopId) => {
+            const stop = stopsByIdRef.current.get(stopId);
+            if (stop) {
+              coordinates.push([stop.position.lng, stop.position.lat]);
+            }
+          });
+        }
+
+        if (coordinates.length > 0) {
+          const lats = coordinates.map((c) => c[1]);
+          const lngs = coordinates.map((c) => c[0]);
+          const minLat = Math.min(...lats);
+          const maxLat = Math.max(...lats);
+          const minLng = Math.min(...lngs);
+          const maxLng = Math.max(...lngs);
+
+          map.fitBounds(
+            [
+              [minLng, minLat],
+              [maxLng, maxLat]
+            ],
+            { padding: MAP_FOCUS_PADDING }
+          );
+        }
+      }
+    }
+
+    onMapFocusIntentConsumed(null);
+  }, [mapFocusIntent, onMapFocusIntentConsumed]);
 
   const handleDraftCancel = (): void => {
     setDraftLineState(INITIAL_DRAFT_LINE_STATE);
