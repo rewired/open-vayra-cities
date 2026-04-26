@@ -646,12 +646,12 @@ export const validateSelectedLineExportPayload = (payload: unknown): SelectedLin
   if (isV4) {
     return {
       ok: true,
-      payload: payload as unknown as SelectedLineExportPayloadV4
+      payload: (payload as unknown) as SelectedLineExportPayloadV4
     };
   }
 
   return {
     ok: true,
-    payload: payload as unknown as SelectedLineExportPayloadV3
+    payload: (payload as unknown) as SelectedLineExportPayloadV3
   };
 };

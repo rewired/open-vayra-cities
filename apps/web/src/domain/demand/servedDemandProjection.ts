@@ -1,9 +1,9 @@
-import { createDemandWeight, type DemandWeight } from '../types/demandNode';
-import type { LineId } from '../types/line';
+import type { StopDemandCatchment } from './demandCatchment';
+import { type DemandNode, type DemandNodeId, type DemandWeight, createDemandWeight } from '../types/demandNode';
+import type { LineId, LineServicePattern, LineTopology } from '../types/line';
 import type { LineServiceActiveBandState } from '../types/lineServicePlanProjection';
 import type { StopId } from '../types/stop';
 import type { TimeBandId } from '../types/timeBand';
-import type { StopDemandCatchment } from './demandCatchment';
 
 export type DemandProjectionStatus =
   | 'served'
@@ -30,19 +30,22 @@ export interface LineBandDemandProjection {
 
 /**
  * Projects the served demand for a single line in a specific time band.
- * Enforces the MVP outbound-direction pairing rule:
- * - A completed line serves residential-to-workplace demand when at least one captured residential origin
- *   appears before at least one captured workplace destination in the ordered stop sequence.
- * - `capturedOriginWeight` is only drawn from origin stops that have a subsequent destination stop.
- * - `capturedDestinationWeight` is only drawn from destination stops that have a preceding origin stop.
- * - Return direction is explicitly not modeled in this slice.
+ * Evaluates line topology (linear/loop) and service pattern (one-way/bidirectional)
+ * to determine connectivity between captured residential origins and workplace destinations.
+ *
+ * Deduplicates demand nodes by identity so that a node captured by multiple stops on the same
+ * line is counted exactly once in the line's served demand aggregate.
  */
 export const projectLineBandDemand = (
   lineId: LineId,
   orderedStopIds: readonly StopId[],
+  topology: LineTopology,
+  servicePattern: LineServicePattern,
   timeBandId: TimeBandId,
   serviceState: LineServiceActiveBandState | 'unset',
-  catchmentLookup: ReadonlyMap<StopId, StopDemandCatchment>
+  catchmentLookup: ReadonlyMap<StopId, StopDemandCatchment>,
+  residentialNodeMap: ReadonlyMap<DemandNodeId, DemandNode>,
+  workplaceNodeMap: ReadonlyMap<DemandNodeId, DemandNode>
 ): LineBandDemandProjection => {
   const warnings: DemandProjectionWarning[] = [];
   const ZERO_WEIGHT = createDemandWeight(0);
@@ -73,62 +76,110 @@ export const projectLineBandDemand = (
     };
   }
 
-  // Calculate weights for the specific time band from stop catchments
-  const stopOriginWeights = orderedStopIds.map((stopId) => {
+  // 1. Identify all nodes captured by this line
+  const stopCaptures = orderedStopIds.map(stopId => {
     const catchment = catchmentLookup.get(stopId);
-    return catchment?.residentialOriginWeightByTimeBand[timeBandId] ?? 0;
+    if (!catchment) return { residentialIds: [], workplaceIds: [] };
+    
+    return {
+      residentialIds: catchment.capturedDemandNodeIds.filter(id => residentialNodeMap.has(id)),
+      workplaceIds: catchment.capturedDemandNodeIds.filter(id => workplaceNodeMap.has(id))
+    };
   });
 
-  const stopDestinationWeights = orderedStopIds.map((stopId) => {
-    const catchment = catchmentLookup.get(stopId);
-    return catchment?.workplaceDestinationWeightByTimeBand[timeBandId] ?? 0;
-  });
+  const stopHasWorkplace = stopCaptures.map(c => c.workplaceIds.length > 0);
+  const anyWorkplaceOnLine = stopHasWorkplace.some(has => has);
+  const anyResidentialOnLine = stopCaptures.some(c => c.residentialIds.length > 0);
 
-  // Determine valid pairs according to the directionality rule
-  let capturedOriginRaw = 0;
-  let capturedDestinationRaw = 0;
+  const isLoop = topology === 'loop';
+  const isBidirectional = servicePattern === 'bidirectional';
+
+  // 2. Determine which residential nodes are "served" (can reach at least one workplace)
+  const servedResidentialNodeIds = new Set<DemandNodeId>();
+  const pairedWorkplaceNodeIds = new Set<DemandNodeId>();
 
   for (let i = 0; i < orderedStopIds.length; i++) {
-    const originWeight = stopOriginWeights[i]!;
-    const destWeight = stopDestinationWeights[i]!;
+    const { residentialIds, workplaceIds } = stopCaptures[i]!;
 
-    // For origin: is there a destination after it?
-    if (originWeight > 0) {
-      let hasSubsequentDestination = false;
-      for (let j = i + 1; j < orderedStopIds.length; j++) {
-        if (stopDestinationWeights[j]! > 0) {
-          hasSubsequentDestination = true;
-          break;
+    // Check connectivity for residential nodes at this stop
+    if (residentialIds.length > 0) {
+      let canReachWorkplace = false;
+      if (isLoop || isBidirectional) {
+        canReachWorkplace = anyWorkplaceOnLine;
+      } else {
+        // One-way linear: must appear before
+        for (let j = i + 1; j < orderedStopIds.length; j++) {
+          if (stopHasWorkplace[j]) {
+            canReachWorkplace = true;
+            break;
+          }
         }
       }
-      if (hasSubsequentDestination) {
-        capturedOriginRaw += originWeight;
+
+      if (canReachWorkplace) {
+        for (const id of residentialIds) {
+          servedResidentialNodeIds.add(id);
+        }
       }
     }
 
-    // For destination: is there an origin before it?
-    if (destWeight > 0) {
-      let hasPrecedingOrigin = false;
-      for (let j = 0; j < i; j++) {
-        if (stopOriginWeights[j]! > 0) {
-          hasPrecedingOrigin = true;
-          break;
+    // Check connectivity for workplace nodes at this stop
+    if (workplaceIds.length > 0) {
+      let canBeReachedByOrigin = false;
+      if (isLoop || isBidirectional) {
+        canBeReachedByOrigin = anyResidentialOnLine;
+      } else {
+        // One-way linear: must have origin before
+        for (let j = 0; j < i; j++) {
+          if (stopCaptures[j]!.residentialIds.length > 0) {
+            canBeReachedByOrigin = true;
+            break;
+          }
         }
       }
-      if (hasPrecedingOrigin) {
-        capturedDestinationRaw += destWeight;
+
+      if (canBeReachedByOrigin) {
+        for (const id of workplaceIds) {
+          pairedWorkplaceNodeIds.add(id);
+        }
       }
     }
   }
+
+  // 3. Aggregate weights without double counting
+  const capturedOriginRaw = Array.from(servedResidentialNodeIds).reduce((sum, id) => {
+    const node = residentialNodeMap.get(id);
+    return sum + ((node?.weightByTimeBand as any)?.[timeBandId] ?? 0);
+  }, 0);
+
+  const capturedDestinationRaw = Array.from(pairedWorkplaceNodeIds).reduce((sum, id) => {
+    const node = workplaceNodeMap.get(id);
+    return sum + ((node?.weightByTimeBand as any)?.[timeBandId] ?? 0);
+  }, 0);
 
   const capturedOriginWeight = createDemandWeight(capturedOriginRaw);
   const capturedDestinationWeight = createDemandWeight(capturedDestinationRaw);
   const servedDemandWeight = createDemandWeight(Math.min(capturedOriginRaw, capturedDestinationRaw));
 
+  // 4. Determine status and warnings
   let status: DemandProjectionStatus = 'served';
 
-  const totalOriginRaw = (stopOriginWeights as readonly number[]).reduce((sum, w) => sum + w, 0);
-  const totalDestRaw = (stopDestinationWeights as readonly number[]).reduce((sum, w) => sum + w, 0);
+  const totalOriginIds = new Set<DemandNodeId>();
+  const totalDestIds = new Set<DemandNodeId>();
+  for (const { residentialIds, workplaceIds } of stopCaptures) {
+    residentialIds.forEach(id => totalOriginIds.add(id));
+    workplaceIds.forEach(id => totalDestIds.add(id));
+  }
+
+  const totalOriginRaw = Array.from(totalOriginIds).reduce((sum, id) => {
+    const node = residentialNodeMap.get(id);
+    return sum + ((node?.weightByTimeBand as any)?.[timeBandId] ?? 0);
+  }, 0);
+
+  const totalDestRaw = Array.from(totalDestIds).reduce((sum, id) => {
+    const node = workplaceNodeMap.get(id);
+    return sum + ((node?.weightByTimeBand as any)?.[timeBandId] ?? 0);
+  }, 0);
 
   if (totalOriginRaw === 0 && totalDestRaw === 0) {
     status = 'no-demand';

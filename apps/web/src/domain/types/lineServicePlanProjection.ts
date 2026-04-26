@@ -109,6 +109,10 @@ export interface LineServiceProjectionSummary {
   readonly configuredLineCount: number;
   /** Number of lines in `degraded` status. */
   readonly degradedLineCount: number;
+  /** Number of lines in `configured` or `degraded` status. */
+  readonly availableLineCount: number;
+  /** Number of lines in `blocked` status. */
+  readonly unavailableLineCount: number;
   /** Sum of route segment counts across all projected lines. */
   readonly totalRouteSegmentCount: number;
   /** Sum of projected total route minutes across all projected lines. */

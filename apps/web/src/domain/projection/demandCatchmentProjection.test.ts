@@ -1,12 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { projectNetworkDemand } from './demandCatchmentProjection';
-import { createDemandNodeId, createDemandWeight, type DemandNode } from '../types/demandNode';
+import { createDemandNodeId, createDemandWeight, createZeroDemandWeightByTimeBand, type DemandNode, type DemandWeight } from '../types/demandNode';
 import { createStopId, type Stop } from '../types/stop';
-import { createLineId, type Line } from '../types/line';
-import type { LineServicePlanProjection } from '../types/lineServicePlanProjection';
+import { createLineFrequencyMinutes, createLineId, createNoServiceLineServiceByTimeBand, type Line } from '../types/line';
+import type { LineServicePlanProjection, LineServiceProjectionResult } from '../types/lineServicePlanProjection';
+import type { TimeBandId } from '../types/timeBand';
 
 describe('demandCatchmentProjection', () => {
-  const activeTimeBandId = 'morning-rush';
+  const activeTimeBandId: TimeBandId = 'morning-rush';
+
+  const createWeights = (band: TimeBandId, weight: number): Record<TimeBandId, DemandWeight> => {
+    const weights = createZeroDemandWeightByTimeBand();
+    weights[band] = createDemandWeight(weight);
+    return weights;
+  };
 
   const resNode: DemandNode = {
     id: createDemandNodeId('res-1'),
@@ -14,7 +21,7 @@ describe('demandCatchmentProjection', () => {
     position: { lng: 10, lat: 50 },
     role: 'origin',
     demandClass: 'residential',
-    weightByTimeBand: { [activeTimeBandId]: createDemandWeight(100) } as any
+    weightByTimeBand: createWeights(activeTimeBandId, 100)
   };
 
   const workNode: DemandNode = {
@@ -23,13 +30,13 @@ describe('demandCatchmentProjection', () => {
     position: { lng: 10.01, lat: 50.01 },
     role: 'destination',
     demandClass: 'workplace',
-    weightByTimeBand: { [activeTimeBandId]: createDemandWeight(200) } as any
+    weightByTimeBand: createWeights(activeTimeBandId, 200)
   };
 
   const stop1: Stop = { id: createStopId('stop-1'), position: { lng: 10, lat: 50 } };
   const stop2: Stop = { id: createStopId('stop-2'), position: { lng: 10.01, lat: 50.01 } };
 
-  const createMockProjectionResult = (lineId: string, activeBandState: 'frequency' | 'no-service' = 'frequency'): any => ({
+  const createMockProjectionResult = (lineId: string, activeBandState: 'frequency' | 'no-service' = 'frequency'): LineServiceProjectionResult => ({
     lineId: createLineId(lineId),
     activeBandState,
     lineLabel: `Line ${lineId}`,
@@ -39,7 +46,23 @@ describe('demandCatchmentProjection', () => {
     routeSegmentCount: 2,
     totalRouteTravelMinutes: 10,
     status: 'configured',
-    readiness: { status: 'ready', summary: { errorIssueCount: 0, warningIssueCount: 0 } as any, issues: [] }
+    readiness: { 
+      status: 'ready', 
+      summary: { 
+        orderedStopCount: 2,
+        routeSegmentCount: 2,
+        expectedRouteSegmentCount: 2,
+        errorIssueCount: 0, 
+        warningIssueCount: 0,
+        configuredTimeBandCount: 7,
+        canonicalTimeBandCount: 7,
+        hasAllCanonicalTimeBandsConfigured: true,
+        hasAtLeastOneConfiguredFrequency: true,
+        hasFallbackOnlyRouting: false,
+        isBlocked: false
+      }, 
+      issues: [] 
+    }
   });
 
   const mockServicePlan: LineServicePlanProjection = {
@@ -50,6 +73,8 @@ describe('demandCatchmentProjection', () => {
       totalCompletedLineCount: 1,
       totalLineCount: 1,
       configuredLineCount: 1,
+      availableLineCount: 1,
+      unavailableLineCount: 0,
       totalRouteSegmentCount: 2,
       totalRouteTravelMinutes: 10,
       totalTheoreticalDeparturesPerHour: 6
@@ -83,7 +108,7 @@ describe('demandCatchmentProjection', () => {
       routeSegments: [],
       topology: 'linear',
       servicePattern: 'one-way',
-      frequencyByTimeBand: {} as any
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     const projection = projectNetworkDemand(
@@ -105,7 +130,7 @@ describe('demandCatchmentProjection', () => {
       routeSegments: [],
       topology: 'linear',
       servicePattern: 'one-way',
-      frequencyByTimeBand: {} as any
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     const projection = projectNetworkDemand(
@@ -127,7 +152,7 @@ describe('demandCatchmentProjection', () => {
       routeSegments: [],
       topology: 'loop',
       servicePattern: 'one-way',
-      frequencyByTimeBand: {} as any
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     const projection = projectNetworkDemand(
@@ -149,7 +174,7 @@ describe('demandCatchmentProjection', () => {
       routeSegments: [],
       topology: 'linear',
       servicePattern: 'bidirectional',
-      frequencyByTimeBand: {} as any
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     const projection = projectNetworkDemand(
@@ -171,7 +196,7 @@ describe('demandCatchmentProjection', () => {
       routeSegments: [],
       topology: 'linear',
       servicePattern: 'one-way',
-      frequencyByTimeBand: {} as any
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
     const line2: Line = {
       id: createLineId('line-2'),
@@ -180,7 +205,7 @@ describe('demandCatchmentProjection', () => {
       routeSegments: [],
       topology: 'linear',
       servicePattern: 'one-way',
-      frequencyByTimeBand: {} as any
+      frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
     const servicePlan: LineServicePlanProjection = {

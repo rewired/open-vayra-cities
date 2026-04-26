@@ -52,6 +52,11 @@ export interface DemandNode {
 /**
  * Creates an initialized per-time-band demand weight map with every canonical band set to 0.
  */
-export const createZeroDemandWeightByTimeBand = (): Record<TimeBandId, DemandWeight> =>
-  Object.fromEntries(MVP_TIME_BAND_IDS.map((timeBandId) => [timeBandId, createDemandWeight(0)])) as Record<TimeBandId, DemandWeight>;
+export const createZeroDemandWeightByTimeBand = (): Record<TimeBandId, DemandWeight> => {
+  const result = {} as Record<TimeBandId, DemandWeight>;
+  for (const timeBandId of MVP_TIME_BAND_IDS) {
+    result[timeBandId] = createDemandWeight(0);
+  }
+  return result;
+};
 

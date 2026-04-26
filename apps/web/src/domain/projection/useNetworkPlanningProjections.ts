@@ -151,13 +151,20 @@ export const useNetworkPlanningProjections = (
   const catchments = calculateStopCatchments(sessionStops, sessionDemandNodes);
   const catchmentLookup = new Map(catchments.map((c) => [c.stopId, c]));
   
+  const residentialNodeMap = new Map(sessionDemandNodes.filter(n => n.demandClass === 'residential').map(n => [n.id, n]));
+  const workplaceNodeMap = new Map(sessionDemandNodes.filter(n => n.demandClass === 'workplace').map(n => [n.id, n]));
+
   const selectedLineDemandProjection = selectedLine && selectedLineServiceProjection
     ? projectLineBandDemand(
         selectedLine.id,
         selectedLine.stopIds,
+        selectedLine.topology,
+        selectedLine.servicePattern,
         activeSimulationTimeBandId,
         selectedLineServiceProjection.activeBandState,
-        catchmentLookup
+        catchmentLookup,
+        residentialNodeMap,
+        workplaceNodeMap
       )
     : null;
 

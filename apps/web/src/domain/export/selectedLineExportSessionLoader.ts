@@ -105,6 +105,18 @@ export const convertSelectedLineExportPayloadToSession = (
     }
   }
 
+  let routeSegments: readonly LineRouteSegment[] = [];
+  let reverseRouteSegments: readonly LineRouteSegment[] | undefined = undefined;
+
+  if (payload.schemaVersion === SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3) {
+    if (payload.line.routeSegments) {
+      routeSegments = convertLineRouteSegments(payload.line.routeSegments);
+    }
+    if (payload.line.reverseRouteSegments) {
+      reverseRouteSegments = convertLineRouteSegments(payload.line.reverseRouteSegments);
+    }
+  }
+
   const line: Line = {
     id: createLineId(payload.line.id),
     label: payload.line.label,
@@ -112,12 +124,8 @@ export const convertSelectedLineExportPayloadToSession = (
     topology: payload.line.topology,
     servicePattern: payload.line.servicePattern,
     frequencyByTimeBand: convertLineServiceByTimeBand(payload),
-    routeSegments: payload.schemaVersion === SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3 && payload.line.routeSegments 
-      ? convertLineRouteSegments(payload.line.routeSegments) 
-      : [],
-    reverseRouteSegments: payload.schemaVersion === SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3 && payload.line.reverseRouteSegments 
-      ? convertLineRouteSegments(payload.line.reverseRouteSegments) 
-      : undefined
+    routeSegments,
+    reverseRouteSegments
   };
 
   return {

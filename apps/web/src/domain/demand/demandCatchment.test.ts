@@ -1,12 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { calculateStopCatchments } from './demandCatchment';
-import type { DemandNode } from '../types/demandNode';
-import { createDemandNodeId, createDemandWeight } from '../types/demandNode';
+import type { DemandNode, DemandWeight } from '../types/demandNode';
+import { createDemandNodeId, createDemandWeight, createZeroDemandWeightByTimeBand } from '../types/demandNode';
 import type { Stop } from '../types/stop';
 import { createStopId } from '../types/stop';
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
+import type { TimeBandId } from '../types/timeBand';
 
 describe('demandCatchment', () => {
+  const createWeights = (overrides: Partial<Record<TimeBandId, number>>): Record<TimeBandId, DemandWeight> => {
+    const weights = createZeroDemandWeightByTimeBand();
+    for (const [bandId, weight] of Object.entries(overrides)) {
+      weights[bandId as TimeBandId] = createDemandWeight(weight);
+    }
+    return weights;
+  };
+
   describe('calculateStopCatchments', () => {
     it('captures demand nodes within radius and ignores those outside', () => {
       const stop: Stop = {
@@ -20,9 +29,7 @@ describe('demandCatchment', () => {
         position: { lng: 13.4, lat: 52.5 }, // Same position, dist = 0
         role: 'origin',
         demandClass: 'residential',
-        weightByTimeBand: {
-          'morning-rush': createDemandWeight(10)
-        } as any
+        weightByTimeBand: createWeights({ 'morning-rush': 10 })
       };
 
       const farNode: DemandNode = {
@@ -31,9 +38,7 @@ describe('demandCatchment', () => {
         position: { lng: 13.5, lat: 52.6 }, // Far away
         role: 'origin',
         demandClass: 'residential',
-        weightByTimeBand: {
-          'morning-rush': createDemandWeight(5)
-        } as any
+        weightByTimeBand: createWeights({ 'morning-rush': 5 })
       };
 
       const catchments = calculateStopCatchments([stop], [closeNode, farNode]);
@@ -58,10 +63,10 @@ describe('demandCatchment', () => {
         position: { lng: 13.4, lat: 52.5 },
         role: 'origin',
         demandClass: 'residential',
-        weightByTimeBand: {
-          'morning-rush': createDemandWeight(10),
-          'evening-rush': createDemandWeight(2)
-        } as any
+        weightByTimeBand: createWeights({
+          'morning-rush': 10,
+          'evening-rush': 2
+        })
       };
 
       const res2: DemandNode = {
@@ -70,9 +75,7 @@ describe('demandCatchment', () => {
         position: { lng: 13.401, lat: 52.5 }, // Very close
         role: 'origin',
         demandClass: 'residential',
-        weightByTimeBand: {
-          'morning-rush': createDemandWeight(5)
-        } as any
+        weightByTimeBand: createWeights({ 'morning-rush': 5 })
       };
 
       const work1: DemandNode = {
@@ -81,9 +84,7 @@ describe('demandCatchment', () => {
         position: { lng: 13.402, lat: 52.501 }, // Very close
         role: 'destination',
         demandClass: 'workplace',
-        weightByTimeBand: {
-          'morning-rush': createDemandWeight(20)
-        } as any
+        weightByTimeBand: createWeights({ 'morning-rush': 20 })
       };
 
       const catchments = calculateStopCatchments([stop], [res1, res2, work1]);

@@ -151,18 +151,25 @@ export const projectLineServicePlan = (
   const lines = completedLines.map((line) => projectLineServicePlanForLine(line, placedStops, activeTimeBandId));
 
   const summary = lines.reduce<LineServiceProjectionSummary>(
-    (accumulator, lineResult) => ({
-      activeTimeBandId,
-      totalCompletedLineCount: accumulator.totalCompletedLineCount + 1,
-      totalLineCount: accumulator.totalLineCount + 1,
-      blockedLineCount: accumulator.blockedLineCount + (lineResult.status === 'blocked' ? 1 : 0),
-      configuredLineCount: accumulator.configuredLineCount + (lineResult.status === 'configured' ? 1 : 0),
-      degradedLineCount: accumulator.degradedLineCount + (lineResult.status === 'degraded' ? 1 : 0),
-      totalRouteSegmentCount: accumulator.totalRouteSegmentCount + lineResult.routeSegmentCount,
-      totalRouteTravelMinutes: accumulator.totalRouteTravelMinutes + lineResult.totalRouteTravelMinutes,
-      totalTheoreticalDeparturesPerHour:
-        accumulator.totalTheoreticalDeparturesPerHour + (lineResult.theoreticalDeparturesPerHour ?? 0)
-    }),
+    (accumulator, lineResult) => {
+      const isAvailable = lineResult.status === 'configured' || lineResult.status === 'degraded';
+      const isUnavailable = lineResult.status === 'blocked';
+      
+      return {
+        activeTimeBandId,
+        totalCompletedLineCount: accumulator.totalCompletedLineCount + 1,
+        totalLineCount: accumulator.totalLineCount + 1,
+        blockedLineCount: accumulator.blockedLineCount + (isUnavailable ? 1 : 0),
+        configuredLineCount: accumulator.configuredLineCount + (lineResult.status === 'configured' ? 1 : 0),
+        degradedLineCount: accumulator.degradedLineCount + (lineResult.status === 'degraded' ? 1 : 0),
+        availableLineCount: accumulator.availableLineCount + (isAvailable ? 1 : 0),
+        unavailableLineCount: accumulator.unavailableLineCount + (isUnavailable ? 1 : 0),
+        totalRouteSegmentCount: accumulator.totalRouteSegmentCount + lineResult.routeSegmentCount,
+        totalRouteTravelMinutes: accumulator.totalRouteTravelMinutes + lineResult.totalRouteTravelMinutes,
+        totalTheoreticalDeparturesPerHour:
+          accumulator.totalTheoreticalDeparturesPerHour + (lineResult.theoreticalDeparturesPerHour ?? 0)
+      };
+    },
     {
       activeTimeBandId,
       totalCompletedLineCount: 0,
@@ -170,6 +177,8 @@ export const projectLineServicePlan = (
       blockedLineCount: 0,
       configuredLineCount: 0,
       degradedLineCount: 0,
+      availableLineCount: 0,
+      unavailableLineCount: 0,
       totalRouteSegmentCount: 0,
       totalRouteTravelMinutes: 0,
       totalTheoreticalDeparturesPerHour: 0

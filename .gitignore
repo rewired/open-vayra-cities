@@ -17,6 +17,7 @@ coverage/
 # These are generated locally during diagnosis and must not be committed.
 apps/*/tsc_output*.txt
 **/tsc_output*.txt
+**/typecheck_output*.txt
 **/test_output*.txt
 
 # Environment

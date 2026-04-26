@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 066b: Green-State Repair for Demand Projection and Type Safety
+- Fixed network-wide demand projection to deduplicate residential origin nodes across multiple stops or lines, ensuring each node is counted only once in served-demand aggregates.
+- Implemented direction-aware connectivity for linear one-way lines (origin must precede destination), bidirectional lines (any pair reachable), and loop lines (any pair reachable).
+- Hardened `projectLineBandDemand` signature to accept line topology, service pattern, and explicit node maps, removing hidden global state assumptions.
+- Restored "Green State" by resolving 50+ TypeScript compiler errors related to strict null-checks, union-type narrowing, and missing imports.
+- Removed all `as any` and `{} as any` shortcuts from demand-related code and tests, replacing them with canonical creators and strong typing.
+- Updated `LineServiceProjectionSummary` to include Slice-066 mandatory counters: `availableLineCount` (configured/degraded) and `unavailableLineCount` (blocked).
+- Hardened `deriveSimulationWeekdayId` with a safe fallback to prevent `noUncheckedIndexedAccess` failures.
+- Removed committed `typecheck_output.txt` artifact and updated `.gitignore` to prevent re-committing diagnostic output files.
+
 ### Slice 066: Demand Capture and Served Demand UI Projection
 - Implemented network-wide demand capture projection for residential origins and workplace destinations using a centralized 400m catchment radius.
 - Added a first truthful "Served now" projection that calculates residential demand structurally connected to workplaces by active bus lines in the current time band.

@@ -1,4 +1,4 @@
-import type { DemandNode, DemandWeight } from '../types/demandNode';
+import { type DemandNode, type DemandNodeId, type DemandWeight } from '../types/demandNode';
 import { createDemandWeight } from '../types/demandNode';
 import type { TimeBandId } from '../types/timeBand';
 import type { Stop, StopId } from '../types/stop';
@@ -122,7 +122,7 @@ export const projectNetworkDemand = (
   }
 
   const activelyServedResidentialWeight = Array.from(servedResidentialNodeIds).reduce((sum, nodeId) => {
-    const node = residentialNodeMap.get(nodeId as any);
+    const node = residentialNodeMap.get(nodeId as DemandNodeId);
     return sum + (node?.weightByTimeBand[activeTimeBandId] || 0);
   }, 0);
 

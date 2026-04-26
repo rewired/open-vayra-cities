@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import {
+  type SelectedLineExportLineV3,
   type SelectedLineExportPayload,
   type SelectedLineExportPayloadV3
 } from '../types/selectedLineExport';
@@ -290,13 +291,14 @@ describe('projectLineDepartureScheduleProjection coverage', () => {
     );
     const payload = JSON.parse(readFileSync(fixturePath, 'utf8')) as SelectedLineExportPayloadV3;
 
+    const lineV3 = payload.line as SelectedLineExportLineV3;
     const line: Line = {
-      id: payload.line.id,
-      label: payload.line.label,
-      stopIds: payload.line.orderedStopIds,
-      topology: payload.line.topology,
-      servicePattern: payload.line.servicePattern,
-      routeSegments: payload.line.routeSegments ?? [],
+      id: lineV3.id,
+      label: lineV3.label,
+      stopIds: lineV3.orderedStopIds,
+      topology: lineV3.topology,
+      servicePattern: lineV3.servicePattern,
+      routeSegments: lineV3.routeSegments ?? [],
       frequencyByTimeBand: createNoServiceLineServiceByTimeBand()
     };
 
