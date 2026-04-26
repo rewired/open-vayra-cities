@@ -10,7 +10,6 @@ import { useNetworkSessionState } from './session/useNetworkSessionState';
 import { SimulationControlBar } from './simulation/SimulationControlBar';
 import { useSimulationClockController } from './simulation/useSimulationClockController';
 import { MaterialIcon } from './ui/icons/MaterialIcon';
-import { ToastProvider } from './ui/toast/ToastProvider';
 import { ToastHost } from './ui/toast/ToastHost';
 import {
   DebugModal,
@@ -172,8 +171,7 @@ export default function App(): ReactElement {
   };
 
   return (
-    <ToastProvider>
-      <div className="app-shell" data-app-surface="desktop-shell">
+    <div className="app-shell" data-app-surface="desktop-shell">
       <SimulationControlBar
         clockController={clockController}
         debugAction={
@@ -298,6 +296,5 @@ export default function App(): ReactElement {
       />
       <ToastHost />
     </div>
-  </ToastProvider>
 );
 }

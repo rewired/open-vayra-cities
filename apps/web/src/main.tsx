@@ -6,6 +6,7 @@ import '@fontsource/inter/600.css';
 import '@fontsource/material-symbols-outlined/400.css';
 
 import App from './App';
+import { ToastProvider } from './ui/toast/ToastProvider';
 
 const rootElement = document.getElementById('root');
 
@@ -15,6 +16,8 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <ToastProvider>
+      <App />
+    </ToastProvider>
   </StrictMode>
 );
