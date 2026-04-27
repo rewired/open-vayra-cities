@@ -11,8 +11,7 @@ import {
   MAP_LAYER_ID_STOPS_CIRCLE,
   MAP_LAYER_ID_STOPS_LABEL,
   MAP_LAYER_ID_VEHICLES,
-  MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
-  MAP_LAYER_ID_OSM_STOP_CANDIDATES_LABEL
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE
 } from './mapRenderConstants';
 import type { MapLibreLayerSpecification, MapLibreMap } from './maplibreGlobal';
 
@@ -54,7 +53,6 @@ describe('mapWorkspaceSourceSync custom-layer helpers', () => {
       MAP_LAYER_ID_COMPLETED_LINES,
       MAP_LAYER_ID_DRAFT_LINE,
       MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
-      MAP_LAYER_ID_OSM_STOP_CANDIDATES_LABEL,
       MAP_LAYER_ID_STOPS_CIRCLE,
       MAP_LAYER_ID_STOPS_LABEL,
       MAP_LAYER_ID_VEHICLES

@@ -5,7 +5,8 @@ import { createStopId } from '../domain/types/stop';
 import type { WorkspaceToolMode } from '../session/sessionTypes';
 import {
   MAP_LAYER_ID_COMPLETED_LINES,
-  MAP_LAYER_ID_STOPS_CIRCLE
+  MAP_LAYER_ID_STOPS_CIRCLE,
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE
 } from './mapRenderConstants';
 import {
   type MapLibreInteractionEvent,
@@ -74,6 +75,7 @@ export interface MapWorkspaceSurfaceInteractionsContracts {
   readonly onStopHoverChange: (nextHover: { stopId: StopId; x: number; y: number } | null) => void;
   readonly onValidPlacement: (lng: number, lat: number, labelCandidate: string | null) => Stop;
   readonly buildLineContracts: BuildLineModeMapClickContracts;
+  readonly onOsmCandidateHoverChange?: (nextHover: { candidateId: string; label: string; kind: string; x: number; y: number } | null) => void;
 }
 
 /** Disposable interaction binding returned by workspace map setup helpers. */
@@ -188,7 +190,8 @@ export const setupMapWorkspaceInteractions = ({
   onStopSelectionChange,
   onStopHoverChange,
   onValidPlacement,
-  buildLineContracts
+  buildLineContracts,
+  onOsmCandidateHoverChange
 }: MapWorkspaceSurfaceInteractionsContracts): MapWorkspaceInteractionBinding => {
   const neutralTelemetryHandlers = createNeutralMapTelemetryHandlers({ setInteractionState });
 
@@ -219,10 +222,34 @@ export const setupMapWorkspaceInteractions = ({
     onStopHoverChange(null);
   };
 
+  const onOsmCandidateMouseEnter = (event: MapLibreInteractionEvent): void => {
+    if (!onOsmCandidateHoverChange) return;
+    const feature = event.features?.[0];
+    const props = feature?.properties;
+    if (props?.candidateId && props?.label && props?.kind) {
+      onOsmCandidateHoverChange({
+        candidateId: props.candidateId as string,
+        label: props.label as string,
+        kind: props.kind as string,
+        x: event.point.x,
+        y: event.point.y
+      });
+    }
+  };
+
+  const onOsmCandidateMouseLeave = (): void => {
+    if (!onOsmCandidateHoverChange) return;
+    onOsmCandidateHoverChange(null);
+  };
+
   map.on('mousemove', neutralTelemetryHandlers.onPointerMove);
   map.on('click', onMapClick);
   map.on('mouseenter', MAP_LAYER_ID_STOPS_CIRCLE, onStopMouseEnter);
   map.on('mouseleave', MAP_LAYER_ID_STOPS_CIRCLE, onStopMouseLeave);
+  if (onOsmCandidateHoverChange) {
+    map.on('mouseenter', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseEnter);
+    map.on('mouseleave', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseLeave);
+  }
 
   return {
     dispose: () => {
@@ -230,6 +257,10 @@ export const setupMapWorkspaceInteractions = ({
       map.off('click', onMapClick);
       map.off('mouseenter', MAP_LAYER_ID_STOPS_CIRCLE, onStopMouseEnter);
       map.off('mouseleave', MAP_LAYER_ID_STOPS_CIRCLE, onStopMouseLeave);
+      if (onOsmCandidateHoverChange) {
+        map.off('mouseenter', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseEnter);
+        map.off('mouseleave', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseLeave);
+      }
     }
   };
 };

@@ -174,14 +174,9 @@ export const MAP_SOURCE_ID_OSM_STOP_CANDIDATES = 'osm-stop-candidates';
 export const MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE = 'osm-stop-candidates-circle';
 
 /**
- * Canonical symbol layer id for OSM stop candidate label rendering.
- */
-export const MAP_LAYER_ID_OSM_STOP_CANDIDATES_LABEL = 'osm-stop-candidates-label';
-
-/**
  * Canonical style layer ids for OSM stop candidate rendering in deterministic order.
  */
-export const MAP_OSM_STOP_CANDIDATE_LAYER_IDS = [MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, MAP_LAYER_ID_OSM_STOP_CANDIDATES_LABEL] as const;
+export const MAP_OSM_STOP_CANDIDATE_LAYER_IDS = [MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE] as const;
 
 /**
  * Subdued circle layer paint for OSM stop candidates, visually distinct from CityOS stops.
@@ -191,24 +186,4 @@ export const MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT = {
   'circle-color': '#6b7280',
   'circle-stroke-width': 1,
   'circle-stroke-color': '#9ca3af'
-} as const;
-
-/**
- * Symbol layer layout for OSM stop candidate label placement.
- */
-export const MAP_OSM_STOP_CANDIDATE_LABEL_LAYER_LAYOUT = {
-  'text-field': ['get', 'label'],
-  'text-size': 12,
-  'text-offset': [0, 1],
-  'text-allow-overlap': false,
-  'text-ignore-placement': false
-} as const;
-
-/**
- * Symbol layer paint for OSM stop candidate label foreground and halo.
- */
-export const MAP_OSM_STOP_CANDIDATE_LABEL_LAYER_PAINT = {
-  'text-color': '#4b5563',
-  'text-halo-color': 'rgba(255, 255, 255, 0.75)',
-  'text-halo-width': 1
 } as const;

@@ -15,7 +15,7 @@ import { createLineId, createNoServiceLineServiceByTimeBand, type LineTopology, 
 import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
-import { HAMBURG_OSM_STOP_CANDIDATES } from '../domain/osm/hamburgOsmStopCandidates';
+import { loadOsmStopCandidates } from '../domain/osm/osmStopCandidateSource';
 import type { OsmStopCandidate } from '../domain/types/osmStopCandidate';
 import { createUniqueStopLabel } from '../domain/stop/stopLabeling';
 import { generateLineLabel, generateUniqueLineLabel } from '../domain/line/lineLabeling';
@@ -38,6 +38,7 @@ import {
   type StopSelectionState
 } from './mapWorkspaceInteractions';
 import { StopHoverTooltip } from './StopHoverTooltip';
+import { OsmStopCandidateHoverTooltip } from './OsmStopCandidateHoverTooltip';
 import { LineCompletionDialog } from './LineCompletionDialog';
 import {
   buildLineModeUiFeedback,
@@ -75,6 +76,7 @@ interface MapWorkspaceSurfaceProps {
   readonly mapFocusIntent: MapFocusIntent | null;
   readonly onMapFocusIntentConsumed: (intent: MapFocusIntent | null) => void;
   readonly onDebugSnapshotChange: (nextSnapshot: MapWorkspaceDebugSnapshot) => void;
+  readonly onOsmCandidateHoverChange?: (nextHover: { candidateId: string; label: string; kind: string; x: number; y: number } | null) => void;
 }
 
 /** Canonical map diagnostics payload surfaced to shell-owned debug modal state. */
@@ -173,6 +175,7 @@ export function MapWorkspaceSurface({
   });
   const [placementAttemptResult, setPlacementAttemptResult] = useState<PlacementAttemptResult>('none');
   const [hoveredStop, setHoveredStop] = useState<{ stopId: StopId; x: number; y: number } | null>(null);
+  const [hoveredOsmCandidate, setHoveredOsmCandidate] = useState<{ candidateId: string; label: string; kind: string; x: number; y: number } | null>(null);
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
   const [featureDiagnostics, setFeatureDiagnostics] = useState<MapWorkspaceFeatureDiagnostics>(
     INITIAL_MAP_WORKSPACE_FEATURE_DIAGNOSTICS
@@ -192,6 +195,7 @@ export function MapWorkspaceSurface({
   const draftStopIdsRef = useRef<readonly StopId[]>(draftLineState.stopIds);
   const draftStopIdSetRef = useRef<ReadonlySet<StopId>>(draftStopIdSet);
   const stopsByIdRef = useRef<ReadonlyMap<StopId, Stop>>(new Map());
+  const [osmStopCandidates, setOsmStopCandidates] = useState<readonly OsmStopCandidate[]>([]);
 
   const clearSelectedCompletedLine = (): void => {
     onSelectedLineIdChange(null);
@@ -239,6 +243,23 @@ export function MapWorkspaceSurface({
   }, [draftStopIdSet]);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const loadCandidates = async (): Promise<void> => {
+      const candidates = await loadOsmStopCandidates();
+      if (!cancelled) {
+        setOsmStopCandidates(candidates);
+      }
+    };
+
+    loadCandidates();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     const containerElement = mapContainerRef.current;
 
     if (!containerElement || mapInstanceRef.current) {
@@ -266,7 +287,7 @@ export function MapWorkspaceSurface({
         vehicleSync: {
           vehicleNetworkProjection: vehicleNetworkProjectionRef.current
         },
-        osmStopCandidateSync: HAMBURG_OSM_STOP_CANDIDATES
+        osmStopCandidateSync: osmStopCandidates
       });
 
       setFeatureDiagnostics((currentDiagnostics) => ({
@@ -327,6 +348,7 @@ export function MapWorkspaceSurface({
           clearSelectedCompletedLine();
         }
       },
+      onOsmCandidateHoverChange: setHoveredOsmCandidate,
       onValidPlacement: (lng, lat, labelCandidate) => {
         let createdStop!: Stop;
         onPlacedStopsChange((currentStops) => {
@@ -362,7 +384,7 @@ export function MapWorkspaceSurface({
         isBuildLineModeActive: activeToolMode === 'build-line',
         selectedLine: sessionLines.find(l => l.id === selectedLineId) ?? null
       },
-      osmStopCandidateSync: HAMBURG_OSM_STOP_CANDIDATES
+      osmStopCandidateSync: osmStopCandidates
     });
 
     if (sourceSyncDiagnostics) {
@@ -379,7 +401,7 @@ export function MapWorkspaceSurface({
           isBuildLineModeActive: activeToolMode === 'build-line',
           selectedLine: sessionLines.find(l => l.id === selectedLineId) ?? null
         },
-        osmStopCandidateSync: HAMBURG_OSM_STOP_CANDIDATES
+        osmStopCandidateSync: osmStopCandidates
       });
     });
   }, [activeToolMode, draftStopIdSet, placedStops, selectedStopId]);
@@ -399,7 +421,7 @@ export function MapWorkspaceSurface({
         draftStopIds: draftLineState.stopIds,
         stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
       },
-      osmStopCandidateSync: HAMBURG_OSM_STOP_CANDIDATES
+      osmStopCandidateSync: osmStopCandidates
     });
 
     if (sourceSyncDiagnostics) {
@@ -423,7 +445,7 @@ export function MapWorkspaceSurface({
           draftStopIds: draftLineState.stopIds,
           stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
         },
-        osmStopCandidateSync: HAMBURG_OSM_STOP_CANDIDATES
+        osmStopCandidateSync: osmStopCandidates
       });
 
       setFeatureDiagnostics((currentDiagnostics) => ({
@@ -450,7 +472,7 @@ export function MapWorkspaceSurface({
       vehicleSync: {
         vehicleNetworkProjection
       },
-      osmStopCandidateSync: HAMBURG_OSM_STOP_CANDIDATES
+      osmStopCandidateSync: osmStopCandidates
     });
 
     if (sourceSyncDiagnostics) {
@@ -471,7 +493,7 @@ export function MapWorkspaceSurface({
         vehicleSync: {
           vehicleNetworkProjection
         },
-        osmStopCandidateSync: HAMBURG_OSM_STOP_CANDIDATES
+        osmStopCandidateSync: osmStopCandidates
       });
 
       setFeatureDiagnostics((currentDiagnostics) => ({
@@ -639,7 +661,7 @@ export function MapWorkspaceSurface({
       draftOverlayNote: LINE_OVERLAY_COPY.draft,
       draftMetadataSummary,
       lastPlacedStopLabel,
-      osmStopCandidateCount: HAMBURG_OSM_STOP_CANDIDATES.length
+      osmStopCandidateCount: osmStopCandidates.length
     });
   }, [
     buildLineUiFeedback.minimumStopRequirement,
@@ -840,6 +862,16 @@ export function MapWorkspaceSurface({
           y={hoveredStop.y}
           sessionLines={sessionLines}
           selectedLineId={selectedLineId}
+        />
+      )}
+
+      {hoveredOsmCandidate && (
+        <OsmStopCandidateHoverTooltip
+          candidateId={hoveredOsmCandidate.candidateId}
+          label={hoveredOsmCandidate.label}
+          kind={hoveredOsmCandidate.kind}
+          x={hoveredOsmCandidate.x}
+          y={hoveredOsmCandidate.y}
         />
       )}
 
