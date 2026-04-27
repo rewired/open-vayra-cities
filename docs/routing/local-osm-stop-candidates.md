@@ -68,3 +68,4 @@ This file is consumed by the web app to render candidate markers on the map.
 - **Multiple PBF files**: Use the `-InputPbf` parameter to resolve ambiguity.
 - **No PBF file found**: Ensure the file has a `.pbf` or `.osm.pbf` extension and is located in `data/osm/`.
 - **Tooling image missing**: Run the setup script again.
+- **Invalid JSON line warnings**: If you see `Skipped invalid JSON lines/records`, it usually means some records in the intermediate file were malformed. The normalizer automatically handles GeoJSONSeq with Record Separator (`\u001e`) prefixes and plain NDJSON. If you see many skips, check if your OSM data extract is valid.
