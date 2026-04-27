@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-### Slice 070c: Inspector Flattening and Route Sequence Interaction Fix
+### Slice 103: Blocking Data Operation Modal
+- Implemented a reusable `BlockingDataOperationModal` for app-runtime data operations (e.g., loading and consolidating OSM stop candidates).
+- Added shell-level `.app-shell--blocked` state in `App.tsx` and `App.css` to dim and blur the background while blocking interactions.
+- Integrated phase-based progress reporting into the initial OSM candidate loading flow in `MapWorkspaceSurface.tsx`.
+- Added unit tests for the modal component and verified progress clamping and rendering behavior.
+- Added ADR 0129 documenting the boundary and rationale for blocking app-runtime modals.
+
 - Flattened the Lines tab and selected-line detail layout, removing nested `inspector-card` wrappers from selected-line sections.
 - Replaced the metadata grid with compact chip-based metadata display.
 - Fixed route-sequence stop badge text from `[1]` to `1`, and similar for all badges.

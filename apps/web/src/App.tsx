@@ -21,6 +21,8 @@ import { summarizeDemandNodes } from './domain/demand/demandNodeHelpers';
 import { MVP_DEMAND_SCENARIO } from './domain/demand/mvpDemandScenario';
 import { WORKSPACE_MODE_ICONS } from './ui/icons/materialIcons';
 import type { MapFocusIntent } from './session/sessionTypes';
+import { BlockingDataOperationModal } from './ui/data-operation/BlockingDataOperationModal';
+import type { ActiveDataOperation } from './ui/data-operation/types';
 
 import './App.css';
 
@@ -95,6 +97,7 @@ export default function App(): ReactElement {
     INITIAL_MAP_WORKSPACE_DEBUG_SNAPSHOT
   );
   const [mapFocusIntent, setMapFocusIntent] = useState<MapFocusIntent | null>(null);
+  const [activeDataOperation, setActiveDataOperation] = useState<ActiveDataOperation | null>(null);
 
   const projections = useNetworkPlanningProjections(
     sessionController.sessionLines,
@@ -199,7 +202,11 @@ const toolModeControlOptions: ReadonlyArray<{
   );
 
   return (
-    <div className="app-shell" data-app-surface="desktop-shell">
+    <>
+      <div
+        className={`app-shell${activeDataOperation ? ' app-shell--blocked' : ''}`}
+        data-app-surface="desktop-shell"
+      >
       <SimulationControlBar
         clockController={clockController}
         debugAction={
@@ -285,6 +292,7 @@ const toolModeControlOptions: ReadonlyArray<{
           mapFocusIntent={mapFocusIntent}
           onMapFocusIntentConsumed={setMapFocusIntent}
           onDebugSnapshotChange={handleMapDebugSnapshotChange}
+          onActiveDataOperationChange={setActiveDataOperation}
         />
       </main>
 
@@ -330,6 +338,8 @@ const toolModeControlOptions: ReadonlyArray<{
         }}
       />
       <ToastHost />
+      <BlockingDataOperationModal activeOperation={activeDataOperation} />
     </div>
-);
+    </>
+  );
 }

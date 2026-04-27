@@ -1697,3 +1697,85 @@ body {
   font-style: italic;
   padding: 4px 2px;
 }
+
+/* --- Blocking Data Operation Modal --- */
+
+.app-shell--blocked {
+  filter: blur(1.5px) grayscale(0.2);
+  pointer-events: none;
+  user-select: none;
+}
+
+.blocking-data-operation-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 18, 0.45);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+.blocking-data-operation-modal {
+  width: 100%;
+  max-width: 420px;
+  padding: 32px;
+  border: 1px solid #3d5a8a;
+  border-radius: 16px;
+  background: #141c29;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.blocking-data-operation-modal__title {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #edf3ff;
+  letter-spacing: 0.01em;
+}
+
+.blocking-data-operation-modal__phase {
+  margin: 0 0 24px;
+  font-size: 0.9rem;
+  color: #9fb0cb;
+}
+
+.blocking-data-operation-modal__progress-container {
+  position: relative;
+  height: 6px;
+  margin-bottom: 12px;
+  border-radius: 3px;
+  background: #1d2a3f;
+  overflow: hidden;
+}
+
+.blocking-data-operation-modal__progress-bar {
+  height: 100%;
+  background: #4a90e2;
+  box-shadow: 0 0 10px rgba(74, 144, 226, 0.4);
+  transition: width 200ms ease-out;
+}
+
+.blocking-data-operation-modal__progress-bar--indeterminate {
+  width: 30%;
+  animation: indeterminate-progress 1.5s infinite linear;
+}
+
+@keyframes indeterminate-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+.blocking-data-operation-modal__percent {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #adc2e2;
+  font-family: 'Datatype', monospace;
+}

@@ -21,6 +21,7 @@ import type { OsmStopCandidate, OsmStopCandidateGroup } from '../domain/types/os
 import { createUniqueStopLabel } from '../domain/stop/stopLabeling';
 import { generateLineLabel, generateUniqueLineLabel } from '../domain/line/lineLabeling';
 import type { LineBuildSelectionState, MapFocusIntent, WorkspaceToolMode } from '../session/sessionTypes';
+import type { ActiveDataOperation } from '../ui/data-operation/types';
 import {
   MAP_LAYER_ID_COMPLETED_LINES,
   MAP_LAYER_ID_DRAFT_LINE,
@@ -88,6 +89,7 @@ interface MapWorkspaceSurfaceProps {
       y: number;
     } | null
   ) => void;
+  readonly onActiveDataOperationChange: (operation: ActiveDataOperation | null) => void;
 }
 
 /** Canonical map diagnostics payload surfaced to shell-owned debug modal state. */
@@ -177,7 +179,8 @@ export function MapWorkspaceSurface({
   onSelectedLineDialogOpenIntentChange,
   mapFocusIntent,
   onMapFocusIntentConsumed,
-  onDebugSnapshotChange
+  onDebugSnapshotChange,
+  onActiveDataOperationChange
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -271,9 +274,52 @@ export function MapWorkspaceSurface({
     let cancelled = false;
 
     const loadCandidates = async (): Promise<void> => {
-      const candidates = await loadOsmStopCandidates();
-      if (!cancelled) {
+      onActiveDataOperationChange({
+        title: 'Workspace Initialization',
+        phase: 'Loading OSM stop candidates...',
+        progress: { kind: 'indeterminate' }
+      });
+
+      try {
+        const candidates = await loadOsmStopCandidates();
+        if (cancelled) return;
+
+        onActiveDataOperationChange({
+          title: 'Workspace Initialization',
+          phase: 'Validating generated candidate data...',
+          progress: { kind: 'indeterminate' }
+        });
+
+        // Small delay to ensure the phase is visible if it completes instantly
+        await new Promise((resolve) => setTimeout(resolve, 60));
+        if (cancelled) return;
+
+        onActiveDataOperationChange({
+          title: 'Workspace Initialization',
+          phase: 'Grouping stop-facility candidates...',
+          progress: { kind: 'indeterminate' }
+        });
+
+        // Ensure the "Grouping" phase is painted before potentially heavy sync work
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        if (cancelled) return;
+
         setOsmStopCandidates(candidates);
+
+        onActiveDataOperationChange({
+          title: 'Workspace Initialization',
+          phase: 'Preparing map overlay...',
+          progress: { kind: 'indeterminate' }
+        });
+
+        // Brief wait to allow map style/source sync to kick in
+        await new Promise((resolve) => setTimeout(resolve, 60));
+      } catch (error) {
+        console.error('[MapWorkspaceSurface] OSM candidate load failed:', error);
+      } finally {
+        if (!cancelled) {
+          onActiveDataOperationChange(null);
+        }
       }
     };
 
@@ -282,7 +328,7 @@ export function MapWorkspaceSurface({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [onActiveDataOperationChange]);
 
   useEffect(() => {
     const containerElement = mapContainerRef.current;
