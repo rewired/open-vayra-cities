@@ -92,3 +92,9 @@ data/routing/osrm/**/*.osrm.*
 # Generated browser artifacts - must not be committed unless explicitly curated.
 apps/web/public/generated/*.geojson
 apps/web/public/generated/*.json
+apps/web/public/generated/*.geojsonseq
+apps/web/public/generated/*.ndjson
+
+# Intermediate OSM generated files
+data/generated/osm/**
+!data/generated/osm/.gitkeep

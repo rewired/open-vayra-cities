@@ -1,0 +1,70 @@
+# Local OSM Stop Candidate Generation
+
+This document describes how to generate external stop candidates from OpenStreetMap (OSM) data for use in CityOps.
+
+## Purpose
+
+OSM stop candidates provide a set of suggested locations for stops based on real-world transit data. They are **external suggestions** and are not automatically adopted as CityOps stops. They serve as a guide for manual stop placement or future automated planning features.
+
+## Prerequisites
+
+- **Docker**: Required for running the Osmium tooling container.
+- **Node.js**: Required for normalizing the extracted data.
+- **PowerShell**: Used for workflow scripts.
+- **Local OSM Data**: An `.osm.pbf` file of your area of interest (e.g., from [Geofabrik](https://download.geofabrik.de/)).
+
+## Setup
+
+Before running the generation workflow, you must build the dedicated Osmium tooling image:
+
+```powershell
+./scripts/osm/setup-osmium-tooling.ps1
+```
+
+This script will:
+1. Create required local directories:
+   - `data/osm/`
+   - `data/generated/osm/`
+   - `apps/web/public/generated/`
+2. Build the Docker image `cityops-osmium-tooling:local`.
+
+## Generation Workflow
+
+1. **Prepare OSM data**: Place your `.osm.pbf` file in the `data/osm/` directory.
+2. **Run generation**:
+
+   ```powershell
+   ./scripts/osm/start-stop-candidate-generation.ps1
+   ```
+
+   If exactly one PBF file exists in `data/osm/`, the script will resolve it automatically. Otherwise, specify it explicitly:
+
+   ```powershell
+   ./scripts/osm/start-stop-candidate-generation.ps1 -InputPbf ./data/osm/hamburg-latest.osm.pbf
+   ```
+
+### Output Artifact
+
+The workflow produces a GeoJSON file at:
+`apps/web/public/generated/osm-stop-candidates.geojson`
+
+This file is consumed by the web app to render candidate markers on the map.
+
+## App Behavior
+
+- If the artifact is missing, the app will start normally but zero candidates will be rendered.
+- If the artifact is present, candidates are rendered as secondary map features.
+- Candidates remain non-canonical; selecting one does not create a CityOps stop in this slice.
+
+## Attribution and Licensing
+
+- OSM data is © OpenStreetMap contributors.
+- Generated local artifacts inherit OSM licensing considerations (ODbL).
+- Do not commit generated `.geojson` files to the repository unless explicitly curated and approved.
+
+## Troubleshooting
+
+- **Docker not running**: Ensure the Docker Desktop (or equivalent) is active.
+- **Multiple PBF files**: Use the `-InputPbf` parameter to resolve ambiguity.
+- **No PBF file found**: Ensure the file has a `.pbf` or `.osm.pbf` extension and is located in `data/osm/`.
+- **Tooling image missing**: Run the setup script again.

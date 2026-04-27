@@ -38,6 +38,17 @@ To enable realistic street-routing between stops, you must set up the local OSRM
 
 For more details, read [docs/routing/local-osrm-routing.md](docs/routing/local-osrm-routing.md).
 
+### Local OSM Stop Candidates (Docker)
+
+To generate suggested stop locations from OSM data, use the Osmium tooling workflow. **Docker is required.**
+
+1. Setup the tooling:
+   `.\scripts\osm\setup-osmium-tooling.ps1`
+2. Run the generation:
+   `.\scripts\osm\start-stop-candidate-generation.ps1`
+
+For more details, read [docs/routing/local-osm-stop-candidates.md](docs/routing/local-osm-stop-candidates.md).
+
 ## Documentation map
 
 Canonical project documentation lives at the repository root:
