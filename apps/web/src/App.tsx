@@ -81,7 +81,8 @@ const INITIAL_MAP_WORKSPACE_DEBUG_SNAPSHOT: MapWorkspaceDebugSnapshot = {
   completedOverlayNote: 'n/a',
   draftOverlayNote: 'n/a',
   draftMetadataSummary: 'Draft inactive',
-  lastPlacedStopLabel: null
+  lastPlacedStopLabel: null,
+  osmStopCandidateCount: 0
 };
 
 /** Renders the desktop-only CityOps application shell layout and composes extracted session/projection/inspector boundaries. */
@@ -112,15 +113,14 @@ export default function App(): ReactElement {
     inspectorPanelState.mode === 'line-selected'
       ? sessionController.sessionLines.find((line) => line.id === inspectorPanelState.selectedLine.id) ?? null
       : null;
-  const toolModeControlOptions: ReadonlyArray<{
-    readonly mode: 'inspect' | 'place-stop' | 'build-line';
-    readonly shortLabel: string;
-    readonly accessibleLabel: string;
-  }> = [
-    { mode: 'inspect', shortLabel: 'Inspect', accessibleLabel: 'Inspect workspace' },
-    { mode: 'place-stop', shortLabel: 'STOP', accessibleLabel: 'Place stop tool' },
-    { mode: 'build-line', shortLabel: 'LINE', accessibleLabel: 'Build line tool' }
-  ];
+const toolModeControlOptions: ReadonlyArray<{
+  readonly mode: 'inspect' | 'build-line';
+  readonly shortLabel: string;
+  readonly accessibleLabel: string;
+}> = [
+  { mode: 'inspect', shortLabel: 'Inspect', accessibleLabel: 'Inspect workspace' },
+  { mode: 'build-line', shortLabel: 'LINE', accessibleLabel: 'Build line tool' }
+];
   const handleMapDebugSnapshotChange = useCallback((nextSnapshot: MapWorkspaceDebugSnapshot): void => {
     setMapWorkspaceDebugSnapshot(nextSnapshot);
   }, []);

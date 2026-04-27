@@ -1,6 +1,7 @@
 import type { Line } from '../domain/types/line';
 import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
 import type { Stop, StopId } from '../domain/types/stop';
+import type { OsmStopCandidate } from '../domain/types/osmStopCandidate';
 import { buildCompletedLineFeatureCollection, buildDraftLineFeatureCollection } from './lineGeoJson';
 import {
   MAP_COMPLETED_LINE_CASING_LAYER_PAINT,
@@ -19,11 +20,18 @@ import {
   MAP_STOP_CIRCLE_LAYER_STYLE,
   MAP_STOP_LABEL_LAYER_LAYOUT,
   MAP_STOP_LABEL_LAYER_PAINT,
-  MAP_VEHICLE_CIRCLE_LAYER_PAINT
+  MAP_VEHICLE_CIRCLE_LAYER_PAINT,
+  MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_LABEL,
+  MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT,
+  MAP_OSM_STOP_CANDIDATE_LABEL_LAYER_LAYOUT,
+  MAP_OSM_STOP_CANDIDATE_LABEL_LAYER_PAINT
 } from './mapRenderConstants';
 import type { MapLibreMap } from './maplibreGlobal';
 import { buildStopFeatureCollection } from './stopGeoJson';
 import { buildVehicleFeatureCollection } from './vehicleGeoJson';
+import { buildOsmStopCandidateFeatureCollection } from './osmStopCandidateGeoJson';
 
 /**
  * Optional stop-sync payload used to refresh map-native stop features.
@@ -61,6 +69,7 @@ export interface SyncAllMapWorkspaceSourcesInput {
   readonly stopSync?: MapWorkspaceStopSyncInput;
   readonly lineSync?: MapWorkspaceLineSyncInput;
   readonly vehicleSync?: MapWorkspaceVehicleSyncInput;
+  readonly osmStopCandidateSync?: readonly OsmStopCandidate[];
 }
 
 /**
@@ -73,12 +82,16 @@ export interface MapWorkspaceSourceSyncDiagnostics {
   readonly lineSourceFeatureCount: number;
   readonly vehicleBuilderFeatureCount?: number;
   readonly vehicleSourceFeatureCount: number;
+  readonly osmStopCandidateBuilderFeatureCount?: number;
+  readonly osmStopCandidateSourceFeatureCount: number;
 }
 
 const CUSTOM_LAYER_ORDER = [
   MAP_LAYER_ID_COMPLETED_LINES_CASING,
   MAP_LAYER_ID_COMPLETED_LINES,
   MAP_LAYER_ID_DRAFT_LINE,
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_LABEL,
   MAP_LAYER_ID_STOPS_CIRCLE,
   MAP_LAYER_ID_STOPS_LABEL,
   MAP_LAYER_ID_VEHICLES
@@ -99,7 +112,8 @@ const WORKSPACE_SOURCE_IDS = [
   MAP_SOURCE_ID_COMPLETED_LINES,
   MAP_SOURCE_ID_DRAFT_LINE,
   MAP_SOURCE_ID_STOPS,
-  MAP_SOURCE_ID_VEHICLES
+  MAP_SOURCE_ID_VEHICLES,
+  MAP_SOURCE_ID_OSM_STOP_CANDIDATES
 ] as const;
 
 /**
@@ -239,17 +253,45 @@ const ensureAllMapWorkspaceRenderSourcesAndLayers = (map: MapLibreMap): void => 
     });
   }
 
+  if (!map.getSource(MAP_SOURCE_ID_OSM_STOP_CANDIDATES)) {
+    map.addSource(MAP_SOURCE_ID_OSM_STOP_CANDIDATES, {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+      type: 'circle',
+      source: MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
+      paint: MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_OSM_STOP_CANDIDATES_LABEL)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_OSM_STOP_CANDIDATES_LABEL,
+      type: 'symbol',
+      source: MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
+      layout: MAP_OSM_STOP_CANDIDATE_LABEL_LAYER_LAYOUT,
+      paint: MAP_OSM_STOP_CANDIDATE_LABEL_LAYER_PAINT
+    });
+  }
+
 };
 
 const syncMapWorkspaceSourceData = ({
   map,
   stopSync,
   lineSync,
-  vehicleSync
+  vehicleSync,
+  osmStopCandidateSync
 }: SyncAllMapWorkspaceSourcesInput): MapWorkspaceSourceSyncDiagnostics => {
   let stopBuilderFeatureCount: number | undefined;
   let lineBuilderFeatureCount: number | undefined;
   let vehicleBuilderFeatureCount: number | undefined;
+  let osmStopCandidateBuilderFeatureCount: number | undefined;
 
   if (stopSync) {
     const stopFeatureCollection = buildStopFeatureCollection({
@@ -296,6 +338,13 @@ const syncMapWorkspaceSourceData = ({
     vehicleSource?.setData(vehicleFeatureCollection);
   }
 
+  if (osmStopCandidateSync) {
+    const osmFeatureCollection = buildOsmStopCandidateFeatureCollection(osmStopCandidateSync);
+    osmStopCandidateBuilderFeatureCount = osmFeatureCollection.features.length;
+    const osmSource = map.getSource(MAP_SOURCE_ID_OSM_STOP_CANDIDATES);
+    osmSource?.setData(osmFeatureCollection);
+  }
+
   enforceMapWorkspaceCustomLayerOrder(map);
 
   return {
@@ -305,7 +354,9 @@ const syncMapWorkspaceSourceData = ({
     lineSourceFeatureCount:
       countSourceFeatures(map, MAP_SOURCE_ID_COMPLETED_LINES) + countSourceFeatures(map, MAP_SOURCE_ID_DRAFT_LINE),
     ...(vehicleBuilderFeatureCount === undefined ? {} : { vehicleBuilderFeatureCount }),
-    vehicleSourceFeatureCount: countSourceFeatures(map, MAP_SOURCE_ID_VEHICLES)
+    vehicleSourceFeatureCount: countSourceFeatures(map, MAP_SOURCE_ID_VEHICLES),
+    ...(osmStopCandidateBuilderFeatureCount === undefined ? {} : { osmStopCandidateBuilderFeatureCount }),
+    osmStopCandidateSourceFeatureCount: countSourceFeatures(map, MAP_SOURCE_ID_OSM_STOP_CANDIDATES)
   };
 };
 
