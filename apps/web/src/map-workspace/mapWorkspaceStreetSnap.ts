@@ -15,6 +15,7 @@ import {
   type MapLibreMap,
   type MapLibreRenderedFeature
 } from './maplibreGlobal';
+import type { StopPosition } from '../domain/types/stop';
 import { extractStreetLabelCandidate } from './streetFeatureLabel';
 
 interface ScreenPoint {
@@ -300,33 +301,33 @@ const resolveBestSnapCandidateFromFeatures = (
 
 const resolveDirectHitSnapCandidate = (
   map: MapLibreMap,
-  event: MapLibreInteractionEvent,
+  point: ScreenPoint,
   streetLayerIds: readonly string[]
 ): SnapCandidate | null => {
   const directHitQueryRadiusPixels = STREET_SNAP_DIRECT_HIT_QUERY_RADIUS_PIXELS;
   const directHitQueryPointOrBox =
     directHitQueryRadiusPixels === 0
-      ? event.point
+      ? point
       : ([
-          { x: event.point.x - directHitQueryRadiusPixels, y: event.point.y - directHitQueryRadiusPixels },
-          { x: event.point.x + directHitQueryRadiusPixels, y: event.point.y + directHitQueryRadiusPixels }
+          { x: point.x - directHitQueryRadiusPixels, y: point.y - directHitQueryRadiusPixels },
+          { x: point.x + directHitQueryRadiusPixels, y: point.y + directHitQueryRadiusPixels }
         ] as const);
 
   const directHitFeatures = map.queryRenderedFeatures(directHitQueryPointOrBox, { layers: streetLayerIds });
-  return resolveBestSnapCandidateFromFeatures(map, event.point, directHitFeatures, streetLayerIds, 'direct-hit');
+  return resolveBestSnapCandidateFromFeatures(map, point, directHitFeatures, streetLayerIds, 'direct-hit');
 };
 
 const resolveFallbackSnapCandidate = (
   map: MapLibreMap,
-  event: MapLibreInteractionEvent,
+  point: ScreenPoint,
   streetLayerIds: readonly string[]
 ): SnapCandidate | null => {
   const fallbackCandidates: SnapCandidate[] = [];
 
   for (const offset of STREET_SNAP_FALLBACK_QUERY_OFFSETS) {
-    const queryPoint: ScreenPoint = { x: event.point.x + offset.deltaX, y: event.point.y + offset.deltaY };
+    const queryPoint: ScreenPoint = { x: point.x + offset.deltaX, y: point.y + offset.deltaY };
     const fallbackFeatures = map.queryRenderedFeatures(queryPoint, { layers: streetLayerIds });
-    const candidate = resolveBestSnapCandidateFromFeatures(map, event.point, fallbackFeatures, streetLayerIds, 'fallback');
+    const candidate = resolveBestSnapCandidateFromFeatures(map, point, fallbackFeatures, streetLayerIds, 'fallback');
 
     if (!candidate) {
       continue;
@@ -474,7 +475,7 @@ export const resolveSnappedStreetPosition = (
     return null;
   }
 
-  const directHitCandidate = resolveDirectHitSnapCandidate(map, event, streetLayerIds);
+  const directHitCandidate = resolveDirectHitSnapCandidate(map, event.point, streetLayerIds);
   if (directHitCandidate) {
     const lng = directHitCandidate.snappedPosition.lng;
     const lat = directHitCandidate.snappedPosition.lat;
@@ -488,7 +489,7 @@ export const resolveSnappedStreetPosition = (
     };
   }
 
-  const fallbackCandidate = resolveFallbackSnapCandidate(map, event, streetLayerIds);
+  const fallbackCandidate = resolveFallbackSnapCandidate(map, event.point, streetLayerIds);
   if (!fallbackCandidate) {
     return null;
   }
@@ -504,3 +505,50 @@ export const resolveSnappedStreetPosition = (
     streetLabelCandidate: fallbackStreetLabelCandidate
   };
 };
+
+/**
+ * Resolves a snapped street position for a given geographic point by projecting it to screen space
+ * and performing the same staged direct-hit/fallback snapping as used for map clicks.
+ */
+export function resolveSnappedStreetPositionForGeographicPoint(
+  map: MapLibreMap,
+  position: StopPosition,
+  streetLayerIds: readonly string[]
+): Readonly<{ lng: number; lat: number; streetLabelCandidate: string | null }> | null {
+  if (streetLayerIds.length === 0) {
+    return null;
+  }
+
+  const point = map.project([position.lng, position.lat]);
+
+  const directHitCandidate = resolveDirectHitSnapCandidate(map, point, streetLayerIds);
+  if (directHitCandidate) {
+    const lng = directHitCandidate.snappedPosition.lng;
+    const lat = directHitCandidate.snappedPosition.lat;
+    const streetLabelCandidate =
+      directHitCandidate.streetLabelCandidate ?? resolveNearbyStreetLabelCandidate(map, { lng, lat });
+
+    return {
+      lng,
+      lat,
+      streetLabelCandidate
+    };
+  }
+
+  const fallbackCandidate = resolveFallbackSnapCandidate(map, point, streetLayerIds);
+  if (!fallbackCandidate) {
+    return null;
+  }
+
+  const fallbackLng = fallbackCandidate.snappedPosition.lng;
+  const fallbackLat = fallbackCandidate.snappedPosition.lat;
+  const fallbackStreetLabelCandidate =
+    fallbackCandidate.streetLabelCandidate ??
+    resolveNearbyStreetLabelCandidate(map, { lng: fallbackLng, lat: fallbackLat });
+
+  return {
+    lng: fallbackLng,
+    lat: fallbackLat,
+    streetLabelCandidate: fallbackStreetLabelCandidate
+  };
+}

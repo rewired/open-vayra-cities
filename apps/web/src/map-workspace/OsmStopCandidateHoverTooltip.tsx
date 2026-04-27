@@ -8,6 +8,7 @@ interface OsmStopCandidateHoverTooltipProps {
   readonly berthCountHint: number;
   readonly x: number;
   readonly y: number;
+  readonly anchorResolution?: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | undefined;
 }
 
 /**
@@ -21,7 +22,8 @@ export function OsmStopCandidateHoverTooltip({
   memberKinds,
   berthCountHint,
   x,
-  y
+  y,
+  anchorResolution
 }: OsmStopCandidateHoverTooltipProps): ReactElement {
   const memberLabel = memberCount === 1 ? '1 OSM object' : `${memberCount} OSM objects grouped`;
   const berthLabel = berthCountHint > 0 ? `${berthCountHint} visible stop bays` : null;
@@ -56,6 +58,34 @@ export function OsmStopCandidateHoverTooltip({
           {berthLabel}
         </div>
       )}
+      <div
+        style={{
+          marginTop: '8px',
+          paddingTop: '6px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          fontSize: '11px'
+        }}
+      >
+        <span style={{ color: '#9ca3af' }}>Street anchor: </span>
+        {anchorResolution ? (
+          <span
+            style={{
+              color:
+                anchorResolution.status === 'ready'
+                  ? '#4ade80'
+                  : anchorResolution.status === 'review'
+                  ? '#fbbf24'
+                  : '#f87171',
+              fontWeight: 600
+            }}
+          >
+            {anchorResolution.status.charAt(0).toUpperCase() + anchorResolution.status.slice(1)}
+            {anchorResolution.distanceMeters !== null && ` (${Math.round(anchorResolution.distanceMeters)}m)`}
+          </span>
+        ) : (
+          <span style={{ color: '#64748b', fontStyle: 'italic' }}>unavailable</span>
+        )}
+      </div>
     </div>
   );
 }

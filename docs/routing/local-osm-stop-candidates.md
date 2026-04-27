@@ -63,7 +63,18 @@ The app groups raw candidates into logical stop facilities using the following r
 - **Max Group Span**: A single group cannot exceed **60m** in total geographic span, preventing over-merging along long street segments.
 - **Role Awareness**: Passenger-visible objects (`bus-stop`, `platform`) are grouped first, then vehicle stop positions are assigned to the best nearby group.
 
-Each group maintains separate positions for display (favoring passenger-visible platforms) and future routing (favoring stop positions).
+### Street Anchor Resolution
+
+Each consolidated group maintains separate positions for display and routing:
+- **Display Position**: Favoring passenger-visible platforms or signs.
+- **Routing Anchor**: Favoring OSM stop-position nodes.
+
+When a candidate group is hovered, the app resolves its **Street Anchor Status** by snapping the routing anchor to the nearest rendered street line. This determines "adoption readiness":
+- **Ready**: Nearby street found (<= 35m).
+- **Review**: Street found but questionable distance (<= 60m).
+- **Blocked**: No nearby street found or distance too great.
+
+Visible markers may appear off-street if their display position is away from the curb, but future adoption will use the resolved street-snapped anchor to ensure valid routing truth.
 
 - Candidates remain non-canonical; selecting one does not create a CityOps stop in this slice.
 

@@ -39,6 +39,7 @@ import {
   type PlacementAttemptResult,
   type StopSelectionState
 } from './mapWorkspaceInteractions';
+import { resolveStreetLayerIdsFromStyle } from './mapWorkspaceStreetSnap';
 import { StopHoverTooltip } from './StopHoverTooltip';
 import { OsmStopCandidateHoverTooltip } from './OsmStopCandidateHoverTooltip';
 import { LineCompletionDialog } from './LineCompletionDialog';
@@ -87,6 +88,7 @@ interface MapWorkspaceSurfaceProps {
       berthCountHint: number;
       x: number;
       y: number;
+      anchorResolution?: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | undefined;
     } | null
   ) => void;
   readonly onActiveDataOperationChange: (operation: ActiveDataOperation | null) => void;
@@ -108,8 +110,11 @@ export interface MapWorkspaceDebugSnapshot {
   readonly draftOverlayNote: string;
   readonly draftMetadataSummary: string;
   readonly lastPlacedStopLabel: string | null;
-  readonly osmStopCandidateRawCount?: number;
-  readonly osmStopCandidateGroupCount?: number;
+  readonly osmStopCandidateRawCount?: number | undefined;
+  readonly osmStopCandidateGroupCount?: number | undefined;
+  readonly osmStopCandidateAnchorLastStatus?: string | undefined;
+  readonly osmStopCandidateAnchorLastDistanceMeters?: number | undefined;
+  readonly osmStopCandidateStreetLayerCount?: number | undefined;
 }
 
 interface DraftLineMetadata {
@@ -198,6 +203,7 @@ export function MapWorkspaceSurface({
     berthCountHint: number;
     x: number;
     y: number;
+    anchorResolution?: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | undefined;
   } | null>(null);
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
   const [featureDiagnostics, setFeatureDiagnostics] = useState<MapWorkspaceFeatureDiagnostics>(
@@ -419,7 +425,27 @@ export function MapWorkspaceSurface({
           clearSelectedCompletedLine();
         }
       },
-      onOsmCandidateHoverChange: setHoveredOsmCandidate,
+      onOsmCandidateHoverChange: (nextHover) => {
+        if (!nextHover) {
+          setHoveredOsmCandidate(null);
+          return;
+        }
+
+        const group = osmStopCandidateGroups.find((g) => g.id === nextHover.candidateGroupId);
+        if (!group) {
+          setHoveredOsmCandidate(nextHover);
+          return;
+        }
+
+        const streetLayerIds = resolveStreetLayerIdsFromStyle(mapInstance);
+        const { resolveOsmStopCandidateGroupStreetAnchor } = require('./osmStopCandidateStreetAnchorResolution');
+        const anchorResolution = resolveOsmStopCandidateGroupStreetAnchor(mapInstance, group, streetLayerIds);
+
+        setHoveredOsmCandidate({
+          ...nextHover,
+          anchorResolution
+        });
+      },
       onValidPlacement: (lng, lat, labelCandidate) => {
         let createdStop!: Stop;
         onPlacedStopsChange((currentStops) => {
@@ -733,7 +759,10 @@ export function MapWorkspaceSurface({
       draftMetadataSummary,
       lastPlacedStopLabel,
       osmStopCandidateRawCount: osmStopCandidates.length,
-      osmStopCandidateGroupCount: osmStopCandidateGroups.length
+      osmStopCandidateGroupCount: osmStopCandidateGroups.length,
+      osmStopCandidateAnchorLastStatus: hoveredOsmCandidate?.anchorResolution?.status,
+      osmStopCandidateAnchorLastDistanceMeters: hoveredOsmCandidate?.anchorResolution?.distanceMeters ?? undefined,
+      osmStopCandidateStreetLayerCount: mapInstanceRef.current ? resolveStreetLayerIdsFromStyle(mapInstanceRef.current).length : undefined
     });
   }, [
     buildLineUiFeedback.minimumStopRequirement,
@@ -750,7 +779,8 @@ export function MapWorkspaceSurface({
     stopSelectionSummary,
     vehicleDiagnosticsSummary,
     osmStopCandidates.length,
-    osmStopCandidateGroups.length
+    osmStopCandidateGroups.length,
+    hoveredOsmCandidate?.anchorResolution
   ]);
 
   useEffect(() => {
@@ -948,6 +978,7 @@ export function MapWorkspaceSurface({
           berthCountHint={hoveredOsmCandidate.berthCountHint}
           x={hoveredOsmCandidate.x}
           y={hoveredOsmCandidate.y}
+          anchorResolution={hoveredOsmCandidate.anchorResolution}
         />
       )}
 
