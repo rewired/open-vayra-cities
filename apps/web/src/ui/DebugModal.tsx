@@ -154,6 +154,8 @@ export function DebugModal({
                     <td>{summaryItem.count}</td>
                   </tr>
                 ))}
+                <tr><th scope="row">OSM stop candidates (raw)</th><td>{mapWorkspaceDebugSnapshot.osmStopCandidateRawCount ?? 0}</td></tr>
+                <tr><th scope="row">OSM stop candidates (grouped)</th><td>{mapWorkspaceDebugSnapshot.osmStopCandidateGroupCount ?? 0}</td></tr>
               </tbody>
             </table>
             <ul className="app-debug-modal__list">

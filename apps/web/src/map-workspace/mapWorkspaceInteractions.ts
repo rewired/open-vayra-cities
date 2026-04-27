@@ -75,7 +75,17 @@ export interface MapWorkspaceSurfaceInteractionsContracts {
   readonly onStopHoverChange: (nextHover: { stopId: StopId; x: number; y: number } | null) => void;
   readonly onValidPlacement: (lng: number, lat: number, labelCandidate: string | null) => Stop;
   readonly buildLineContracts: BuildLineModeMapClickContracts;
-  readonly onOsmCandidateHoverChange?: (nextHover: { candidateId: string; label: string; kind: string; x: number; y: number } | null) => void;
+  readonly onOsmCandidateHoverChange?: (
+    nextHover: {
+      candidateGroupId: string;
+      label: string;
+      memberCount: number;
+      memberKinds: string;
+      berthCountHint: number;
+      x: number;
+      y: number;
+    } | null
+  ) => void;
 }
 
 /** Disposable interaction binding returned by workspace map setup helpers. */
@@ -226,15 +236,17 @@ export const setupMapWorkspaceInteractions = ({
     if (!onOsmCandidateHoverChange) return;
     const feature = event.features?.[0];
     const props = feature?.properties;
-    if (props?.candidateId && props?.label && props?.kind) {
-      onOsmCandidateHoverChange({
-        candidateId: props.candidateId as string,
-        label: props.label as string,
-        kind: props.kind as string,
-        x: event.point.x,
-        y: event.point.y
-      });
-    }
+      if (props?.candidateGroupId && props?.label && props?.memberCount !== undefined) {
+        onOsmCandidateHoverChange({
+          candidateGroupId: props.candidateGroupId as string,
+          label: props.label as string,
+          memberCount: props.memberCount as number,
+          memberKinds: (props.memberKinds as string) ?? '',
+          berthCountHint: (props.berthCountHint as number) ?? 0,
+          x: event.point.x,
+          y: event.point.y
+        });
+      }
   };
 
   const onOsmCandidateMouseLeave = (): void => {

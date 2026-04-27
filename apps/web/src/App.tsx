@@ -82,7 +82,8 @@ const INITIAL_MAP_WORKSPACE_DEBUG_SNAPSHOT: MapWorkspaceDebugSnapshot = {
   draftOverlayNote: 'n/a',
   draftMetadataSummary: 'Draft inactive',
   lastPlacedStopLabel: null,
-  osmStopCandidateCount: 0
+  osmStopCandidateRawCount: 0,
+  osmStopCandidateGroupCount: 0
 };
 
 /** Renders the desktop-only CityOps application shell layout and composes extracted session/projection/inspector boundaries. */

@@ -24,6 +24,46 @@ export interface OsmStopCandidate {
 }
 
 /**
+ * Branded identifier for OSM stop candidate groups.
+ */
+export type OsmStopCandidateGroupId = string & { readonly __brand: 'OsmStopCandidateGroupId' };
+
+/**
+ * Member of an OSM stop candidate group, representing one raw OSM object.
+ */
+export interface OsmStopCandidateGroupMember {
+  readonly id: OsmStopCandidateId;
+  readonly kind: OsmStopCandidateKind;
+  readonly label: string;
+  readonly position: StopPosition;
+  readonly osmElementId?: string;
+}
+
+/**
+ * Consolidated OSM stop candidate group, used for display and future adoption.
+ * Separated from canonical CityOps Stop type.
+ */
+export interface OsmStopCandidateGroup {
+  readonly id: OsmStopCandidateGroupId;
+  readonly label: string;
+  readonly displayPosition: StopPosition;
+  readonly routingAnchorPosition: StopPosition;
+  readonly memberIds: readonly OsmStopCandidateId[];
+  readonly memberKinds: readonly OsmStopCandidateKind[];
+  readonly memberCount: number;
+  readonly passengerVisibleMemberCount: number;
+  readonly vehicleAnchorMemberCount: number;
+  readonly berthCountHint: number;
+  readonly source: 'osm';
+}
+
+/**
  * Creates a branded OsmStopCandidateId from a raw string.
  */
 export const createOsmStopCandidateId = (rawId: string): OsmStopCandidateId => rawId as OsmStopCandidateId;
+
+/**
+ * Creates a branded OsmStopCandidateGroupId from a raw string.
+ */
+export const createOsmStopCandidateGroupId = (rawId: string): OsmStopCandidateGroupId =>
+  rawId as OsmStopCandidateGroupId;

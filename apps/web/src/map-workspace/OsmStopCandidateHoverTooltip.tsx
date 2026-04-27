@@ -1,9 +1,11 @@
 import type { ReactElement } from 'react';
 
 interface OsmStopCandidateHoverTooltipProps {
-  readonly candidateId: string;
+  readonly candidateGroupId: string;
   readonly label: string;
-  readonly kind: string;
+  readonly memberCount: number;
+  readonly memberKinds: string;
+  readonly berthCountHint: number;
   readonly x: number;
   readonly y: number;
 }
@@ -13,17 +15,16 @@ interface OsmStopCandidateHoverTooltipProps {
  * Distinct from CityOps stop hover - no line membership or selection state.
  */
 export function OsmStopCandidateHoverTooltip({
-  candidateId,
+  candidateGroupId,
   label,
-  kind,
+  memberCount,
+  memberKinds,
+  berthCountHint,
   x,
   y
 }: OsmStopCandidateHoverTooltipProps): ReactElement {
-  const kindLabel = kind === 'bus-stop'
-    ? 'Bus Stop'
-    : kind === 'public-transport-platform'
-    ? 'Transport Platform'
-    : 'Transport Stop';
+  const memberLabel = memberCount === 1 ? '1 OSM object' : `${memberCount} OSM objects grouped`;
+  const berthLabel = berthCountHint > 0 ? `${berthCountHint} visible stop bays` : null;
 
   return (
     <div
@@ -48,8 +49,13 @@ export function OsmStopCandidateHoverTooltip({
         {label}
       </h3>
       <div style={{ fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        {kindLabel}
+        {memberLabel}
       </div>
+      {berthLabel && (
+        <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px', fontStyle: 'italic' }}>
+          {berthLabel}
+        </div>
+      )}
     </div>
   );
 }

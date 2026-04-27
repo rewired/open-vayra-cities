@@ -1,7 +1,7 @@
 import type { Line } from '../domain/types/line';
 import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
 import type { Stop, StopId } from '../domain/types/stop';
-import type { OsmStopCandidate } from '../domain/types/osmStopCandidate';
+import type { OsmStopCandidateGroup } from '../domain/types/osmStopCandidate';
 import { buildCompletedLineFeatureCollection, buildDraftLineFeatureCollection } from './lineGeoJson';
 import {
   MAP_COMPLETED_LINE_CASING_LAYER_PAINT,
@@ -66,7 +66,7 @@ export interface SyncAllMapWorkspaceSourcesInput {
   readonly stopSync?: MapWorkspaceStopSyncInput;
   readonly lineSync?: MapWorkspaceLineSyncInput;
   readonly vehicleSync?: MapWorkspaceVehicleSyncInput;
-  readonly osmStopCandidateSync?: readonly OsmStopCandidate[];
+  readonly osmStopCandidateSync?: readonly OsmStopCandidateGroup[];
 }
 
 /**

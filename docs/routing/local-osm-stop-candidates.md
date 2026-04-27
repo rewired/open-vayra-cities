@@ -53,7 +53,18 @@ This file is consumed by the web app to render candidate markers on the map.
 ## App Behavior
 
 - If the artifact is missing, the app will start normally but zero candidates will be rendered.
-- If the artifact is present, candidates are rendered as secondary map features.
+- If the artifact is present, the overlay renders **consolidated candidate groups** rather than every raw OSM object. Obvious duplicates (e.g., a `bus_stop` node and a `stop_position` node at the same location) are merged deterministically based on proximity and label compatibility.
+
+### Consolidation Rules
+
+The app groups raw candidates into logical stop facilities using the following rules:
+- **Grouping Radius**: Compatible labels are grouped within **35m**.
+- **Exact Duplicates**: Highly proximal objects within **5m** are grouped even if modeling styles differ.
+- **Max Group Span**: A single group cannot exceed **60m** in total geographic span, preventing over-merging along long street segments.
+- **Role Awareness**: Passenger-visible objects (`bus-stop`, `platform`) are grouped first, then vehicle stop positions are assigned to the best nearby group.
+
+Each group maintains separate positions for display (favoring passenger-visible platforms) and future routing (favoring stop positions).
+
 - Candidates remain non-canonical; selecting one does not create a CityOps stop in this slice.
 
 ## Attribution and Licensing
