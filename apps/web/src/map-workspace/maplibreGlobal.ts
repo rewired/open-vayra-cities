@@ -271,9 +271,9 @@ export interface MapLibreMap {
   /** Returns the current zoom level of the map. */
   getZoom(): number;
   /** Registers a listener for feature interactions constrained to one style layer id. */
-  on(type: 'click' | 'mouseenter' | 'mouseleave', layerId: string, listener: (event: MapLibreInteractionEvent) => void): void;
+  on(type: 'click' | 'mouseenter' | 'mouseleave' | 'mousemove', layerId: string, listener: (event: MapLibreInteractionEvent) => void): void;
   /** Removes a feature interaction listener constrained to one style layer id. */
-  off(type: 'click' | 'mouseenter' | 'mouseleave', layerId: string, listener: (event: MapLibreInteractionEvent) => void): void;
+  off(type: 'click' | 'mouseenter' | 'mouseleave' | 'mousemove', layerId: string, listener: (event: MapLibreInteractionEvent) => void): void;
   /** Smoothly transitions the map viewport to a new center and/or zoom. */
   easeTo(options: { center?: MapLibreLngLatTuple; zoom?: number; padding?: { top: number; bottom: number; left: number; right: number } }): void;
   /** Fits the map viewport to a provided bounding box with optional padding. */

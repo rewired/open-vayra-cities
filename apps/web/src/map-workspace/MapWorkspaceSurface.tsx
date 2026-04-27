@@ -99,7 +99,7 @@ interface MapWorkspaceSurfaceProps {
   readonly selectedOsmCandidateGroupId: OsmStopCandidateGroupId | null;
   readonly adoptedOsmCandidateGroupIds: ReadonlySet<OsmStopCandidateGroupId>;
   readonly onOsmCandidateSelectionChange: (nextSelectionId: OsmStopCandidateGroupId | null) => void;
-  readonly osmStopCandidates: readonly OsmStopCandidate[];
+  readonly osmStopCandidateGroups: readonly OsmStopCandidateGroup[];
   readonly onOsmCandidateAnchorResolved: (resolution: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | null) => void;
 }
 
@@ -195,7 +195,7 @@ export function MapWorkspaceSurface({
   selectedOsmCandidateGroupId,
   adoptedOsmCandidateGroupIds,
   onOsmCandidateSelectionChange,
-  osmStopCandidates,
+  osmStopCandidateGroups,
   onOsmCandidateAnchorResolved
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -236,10 +236,23 @@ export function MapWorkspaceSurface({
   const draftStopIdSetRef = useRef<ReadonlySet<StopId>>(draftStopIdSet);
   const stopsByIdRef = useRef<ReadonlyMap<StopId, Stop>>(new Map());
 
-  const osmStopCandidateGroups = useMemo(
-    () => consolidateOsmStopCandidates(osmStopCandidates).filter(g => !adoptedOsmCandidateGroupIds.has(g.id)),
-    [osmStopCandidates, adoptedOsmCandidateGroupIds]
-  );
+  const anchorResolutionCacheRef = useRef<Map<OsmStopCandidateGroupId, import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution>>(new Map());
+
+  useEffect(() => {
+    anchorResolutionCacheRef.current.clear();
+  }, [osmStopCandidateGroups]);
+
+  useEffect(() => {
+    if (hoveredOsmCandidate && !osmStopCandidateGroups.some(g => g.id === hoveredOsmCandidate.candidateGroupId)) {
+      setHoveredOsmCandidate(null);
+    }
+  }, [osmStopCandidateGroups, hoveredOsmCandidate]);
+
+  useEffect(() => {
+    if (hoveredStop && !placedStops.some(s => s.id === hoveredStop.stopId)) {
+      setHoveredStop(null);
+    }
+  }, [placedStops, hoveredStop]);
 
   const clearSelectedCompletedLine = (): void => {
     onSelectedLineIdChange(null);
@@ -315,8 +328,7 @@ export function MapWorkspaceSurface({
         },
         vehicleSync: {
           vehicleNetworkProjection: vehicleNetworkProjectionRef.current
-        },
-        osmStopCandidateSync: osmStopCandidateGroups
+        }
       });
 
       setFeatureDiagnostics((currentDiagnostics) => ({
@@ -350,11 +362,13 @@ export function MapWorkspaceSurface({
   }, [draftLineState.stopIds, onLineBuildSelectionChange]);
 
   useEffect(() => {
-    if (activeToolMode === 'build-line') {
-      return;
+    if (activeToolMode !== 'inspect') {
+      setHoveredOsmCandidate(null);
     }
 
-    setDraftLineState(INITIAL_DRAFT_LINE_STATE);
+    if (activeToolMode === 'build-line') {
+      setDraftLineState(INITIAL_DRAFT_LINE_STATE);
+    }
   }, [activeToolMode]);
 
   useEffect(() => {
@@ -383,6 +397,15 @@ export function MapWorkspaceSurface({
           return;
         }
 
+        const cached = anchorResolutionCacheRef.current.get(nextHover.candidateGroupId as OsmStopCandidateGroupId);
+        if (cached) {
+          setHoveredOsmCandidate({
+            ...nextHover,
+            anchorResolution: cached
+          });
+          return;
+        }
+
         const group = osmStopCandidateGroups.find((g) => g.id === nextHover.candidateGroupId);
         if (!group) {
           setHoveredOsmCandidate(nextHover);
@@ -391,6 +414,7 @@ export function MapWorkspaceSurface({
 
         const streetLayerIds = resolveStreetLayerIdsFromStyle(mapInstance);
         const anchorResolution = resolveOsmStopCandidateGroupStreetAnchor(mapInstance, group, streetLayerIds);
+        anchorResolutionCacheRef.current.set(group.id, anchorResolution);
         setHoveredOsmCandidate({
           ...nextHover,
           anchorResolution
@@ -423,12 +447,19 @@ export function MapWorkspaceSurface({
       }
 
       onOsmCandidateSelectionChange(groupId);
+      setHoveredOsmCandidate(null);
 
       const group = osmStopCandidateGroups.find((g) => g.id === groupId);
       if (group) {
-        const streetLayerIds = resolveStreetLayerIdsFromStyle(mapInstance);
-        const anchorResolution = resolveOsmStopCandidateGroupStreetAnchor(mapInstance, group, streetLayerIds);
-        onOsmCandidateAnchorResolved(anchorResolution);
+        const cached = anchorResolutionCacheRef.current.get(group.id);
+        if (cached) {
+          onOsmCandidateAnchorResolved(cached);
+        } else {
+          const streetLayerIds = resolveStreetLayerIdsFromStyle(mapInstance);
+          const anchorResolution = resolveOsmStopCandidateGroupStreetAnchor(mapInstance, group, streetLayerIds);
+          anchorResolutionCacheRef.current.set(group.id, anchorResolution);
+          onOsmCandidateAnchorResolved(anchorResolution);
+        }
       } else {
         onOsmCandidateAnchorResolved(null);
       }
@@ -455,8 +486,7 @@ export function MapWorkspaceSurface({
         draftStopIds: draftStopIdSet,
         isBuildLineModeActive: activeToolMode === 'build-line',
         selectedLine: sessionLines.find(l => l.id === selectedLineId) ?? null
-      },
-      osmStopCandidateSync: osmStopCandidateGroups
+      }
     });
 
     if (sourceSyncDiagnostics) {
@@ -473,11 +503,10 @@ export function MapWorkspaceSurface({
           draftStopIds: draftStopIdSet,
           isBuildLineModeActive: activeToolMode === 'build-line',
           selectedLine: sessionLines.find(l => l.id === selectedLineId) ?? null
-        },
-        osmStopCandidateSync: osmStopCandidateGroups
+        }
       });
     });
-  }, [activeToolMode, draftStopIdSet, placedStops, selectedStopId, osmStopCandidateGroups]);
+  }, [activeToolMode, draftStopIdSet, placedStops, selectedStopId]);
 
   useEffect(() => {
     const mapInstance = mapInstanceRef.current;
@@ -493,8 +522,7 @@ export function MapWorkspaceSurface({
         selectedLineId,
         draftStopIds: draftLineState.stopIds,
         stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
-      },
-      osmStopCandidateSync: osmStopCandidateGroups
+      }
     });
 
     if (sourceSyncDiagnostics) {
@@ -518,8 +546,7 @@ export function MapWorkspaceSurface({
           selectedLineId,
           draftStopIds: draftLineState.stopIds,
           stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
-        },
-        osmStopCandidateSync: osmStopCandidateGroups
+        }
       });
 
       setFeatureDiagnostics((currentDiagnostics) => ({
@@ -532,7 +559,7 @@ export function MapWorkspaceSurface({
         }
       }));
     });
-  }, [draftLineState.stopIds, placedStops, selectedLineId, sessionLines, osmStopCandidateGroups]);
+  }, [draftLineState.stopIds, placedStops, selectedLineId, sessionLines]);
 
   useEffect(() => {
     const mapInstance = mapInstanceRef.current;
@@ -545,8 +572,7 @@ export function MapWorkspaceSurface({
       map: mapInstance,
       vehicleSync: {
         vehicleNetworkProjection
-      },
-      osmStopCandidateSync: osmStopCandidateGroups
+      }
     });
 
     if (sourceSyncDiagnostics) {
@@ -567,8 +593,7 @@ export function MapWorkspaceSurface({
         map: mapInstance,
         vehicleSync: {
           vehicleNetworkProjection
-        },
-        osmStopCandidateSync: osmStopCandidateGroups
+        }
       });
 
       setFeatureDiagnostics((currentDiagnostics) => ({
@@ -581,7 +606,32 @@ export function MapWorkspaceSurface({
         }
       }));
     });
-  }, [vehicleNetworkProjection, osmStopCandidateGroups]);
+  }, [vehicleNetworkProjection]);
+
+  useEffect(() => {
+    const mapInstance = mapInstanceRef.current;
+
+    if (!mapInstance) {
+      return;
+    }
+
+    const sourceSyncDiagnostics = syncExistingMapWorkspaceSourceData({
+      map: mapInstance,
+      osmStopCandidateSync: osmStopCandidateGroups
+    });
+
+    if (sourceSyncDiagnostics) {
+      return;
+    }
+
+    return runWhenMapStyleReady(mapInstance, () => {
+      applyBasemapSemanticReadabilityOverrides(mapInstance);
+      syncAllMapWorkspaceSources({
+        map: mapInstance,
+        osmStopCandidateSync: osmStopCandidateGroups
+      });
+    });
+  }, [osmStopCandidateGroups]);
 
   useEffect(() => {
     const mapInstance = mapInstanceRef.current;
@@ -666,6 +716,7 @@ export function MapWorkspaceSurface({
           });
         }
       });
+      setHoveredStop(null);
     });
 
     return () => {
@@ -736,7 +787,6 @@ export function MapWorkspaceSurface({
       draftOverlayNote: LINE_OVERLAY_COPY.draft,
       draftMetadataSummary,
       lastPlacedStopLabel,
-      osmStopCandidateRawCount: osmStopCandidates.length,
       osmStopCandidateGroupCount: osmStopCandidateGroups.length,
       osmStopCandidateAnchorLastStatus: hoveredOsmCandidate?.anchorResolution?.status,
       osmStopCandidateAnchorLastDistanceMeters: hoveredOsmCandidate?.anchorResolution?.distanceMeters ?? undefined,
@@ -755,8 +805,8 @@ export function MapWorkspaceSurface({
     placementUiFeedback.streetRuleHint,
     pointerSummary,
     stopSelectionSummary,
+    stopSelectionSummary,
     vehicleDiagnosticsSummary,
-    osmStopCandidates.length,
     osmStopCandidateGroups.length,
     hoveredOsmCandidate?.anchorResolution
   ]);

@@ -359,7 +359,7 @@ const toolModeControlOptions: ReadonlyArray<{
           selectedOsmCandidateGroupId={sessionController.selectedOsmCandidateGroupId}
           adoptedOsmCandidateGroupIds={sessionController.adoptedOsmCandidateGroupIds}
           onOsmCandidateSelectionChange={sessionController.setSelectedOsmCandidateGroupId}
-          osmStopCandidates={osmStopCandidates}
+          osmStopCandidateGroups={osmStopCandidateGroups}
           onOsmCandidateAnchorResolved={setSelectedOsmCandidateAnchor}
         />
       </main>
@@ -389,7 +389,23 @@ const toolModeControlOptions: ReadonlyArray<{
         onLineRename={sessionController.renameLineLabel}
         openDialogIntent={sessionController.selectedLineDialogOpenIntent}
         onOpenDialogIntentConsumed={sessionController.setSelectedLineDialogOpenIntent}
-        onOsmCandidateAdopt={sessionController.adoptOsmCandidateGroup}
+        onOsmCandidateAdopt={async (group, anchor) => {
+          setActiveDataOperation({
+            title: 'Adopting OSM stop',
+            phase: 'Creating CityOps stop and refreshing map overlays...',
+            progress: { kind: 'indeterminate' }
+          });
+
+          // Ensure the modal can paint before the main thread is occupied
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+
+          sessionController.adoptOsmCandidateGroup(group, anchor);
+
+          // Wait another frame to allow map source sync to process
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+
+          setActiveDataOperation(null);
+        }}
         osmStopCandidateGroups={osmStopCandidateGroups}
         selectedOsmCandidateAnchor={selectedOsmCandidateAnchor}
         adoptedOsmCandidateGroupIds={sessionController.adoptedOsmCandidateGroupIds}

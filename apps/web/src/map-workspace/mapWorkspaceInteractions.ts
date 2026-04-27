@@ -238,7 +238,24 @@ export const setupMapWorkspaceInteractions = ({
     }
   };
 
-  const onStopMouseEnter = (event: MapLibreInteractionEvent): void => {
+  const onOsmCandidateMouseMove = (event: MapLibreInteractionEvent): void => {
+    if (!onOsmCandidateHoverChange) return;
+    const feature = event.features?.[0];
+    const props = feature?.properties;
+    if (props?.candidateGroupId && props?.label && props?.memberCount !== undefined) {
+      onOsmCandidateHoverChange({
+        candidateGroupId: props.candidateGroupId as string,
+        label: props.label as string,
+        memberCount: props.memberCount as number,
+        memberKinds: (props.memberKinds as string) ?? '',
+        berthCountHint: (props.berthCountHint as number) ?? 0,
+        x: event.point.x,
+        y: event.point.y
+      });
+    }
+  };
+
+  const onStopMouseMove = (event: MapLibreInteractionEvent): void => {
     const feature = event.features?.[0];
     const stopId = decodeStopIdFromFeatureProperties(feature?.properties);
     if (stopId) {
@@ -250,21 +267,12 @@ export const setupMapWorkspaceInteractions = ({
     onStopHoverChange(null);
   };
 
+  const onStopMouseEnter = (event: MapLibreInteractionEvent): void => {
+    onStopMouseMove(event);
+  };
+
   const onOsmCandidateMouseEnter = (event: MapLibreInteractionEvent): void => {
-    if (!onOsmCandidateHoverChange) return;
-    const feature = event.features?.[0];
-    const props = feature?.properties;
-      if (props?.candidateGroupId && props?.label && props?.memberCount !== undefined) {
-        onOsmCandidateHoverChange({
-          candidateGroupId: props.candidateGroupId as string,
-          label: props.label as string,
-          memberCount: props.memberCount as number,
-          memberKinds: (props.memberKinds as string) ?? '',
-          berthCountHint: (props.berthCountHint as number) ?? 0,
-          x: event.point.x,
-          y: event.point.y
-        });
-      }
+    onOsmCandidateMouseMove(event);
   };
 
   const onOsmCandidateMouseLeave = (): void => {
@@ -272,23 +280,45 @@ export const setupMapWorkspaceInteractions = ({
     onOsmCandidateHoverChange(null);
   };
 
-  map.on('mousemove', neutralTelemetryHandlers.onPointerMove);
+  const onGeneralMouseMove = (event: MapLibreInteractionEvent): void => {
+    neutralTelemetryHandlers.onPointerMove(event);
+
+    // Defensive fallback: if mouseleave didn't fire, check if we're still over interactive layers
+    const interactiveLayers = [MAP_LAYER_ID_STOPS_CIRCLE, MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE];
+    const features = map.queryRenderedFeatures(event.point, { layers: interactiveLayers });
+    
+    const isOverStop = features.some(f => f.layer?.id === MAP_LAYER_ID_STOPS_CIRCLE);
+    const isOverOsm = features.some(f => f.layer?.id === MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE);
+
+    if (!isOverStop) {
+      onStopHoverChange(null);
+    }
+    if (!isOverOsm && onOsmCandidateHoverChange) {
+      onOsmCandidateHoverChange(null);
+    }
+  };
+
+  map.on('mousemove', onGeneralMouseMove);
   map.on('click', onMapClick);
   map.on('mouseenter', MAP_LAYER_ID_STOPS_CIRCLE, onStopMouseEnter);
+  map.on('mousemove', MAP_LAYER_ID_STOPS_CIRCLE, onStopMouseMove);
   map.on('mouseleave', MAP_LAYER_ID_STOPS_CIRCLE, onStopMouseLeave);
   if (onOsmCandidateHoverChange) {
     map.on('mouseenter', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseEnter);
+    map.on('mousemove', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseMove);
     map.on('mouseleave', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseLeave);
   }
 
   return {
     dispose: () => {
-      map.off('mousemove', neutralTelemetryHandlers.onPointerMove);
+      map.off('mousemove', onGeneralMouseMove);
       map.off('click', onMapClick);
       map.off('mouseenter', MAP_LAYER_ID_STOPS_CIRCLE, onStopMouseEnter);
+      map.off('mousemove', MAP_LAYER_ID_STOPS_CIRCLE, onStopMouseMove);
       map.off('mouseleave', MAP_LAYER_ID_STOPS_CIRCLE, onStopMouseLeave);
       if (onOsmCandidateHoverChange) {
         map.off('mouseenter', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseEnter);
+        map.off('mousemove', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseMove);
         map.off('mouseleave', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseLeave);
       }
     }
