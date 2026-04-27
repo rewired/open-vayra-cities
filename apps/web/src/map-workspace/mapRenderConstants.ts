@@ -179,11 +179,48 @@ export const MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE = 'osm-stop-candidates-circ
 export const MAP_OSM_STOP_CANDIDATE_LAYER_IDS = [MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE] as const;
 
 /**
+ * Minimum zoom level at which OSM stop candidates begin to fade in.
+ */
+export const MAP_OSM_STOP_CANDIDATE_MIN_VISIBLE_ZOOM = 12;
+
+/**
+ * Zoom level at which OSM stop candidates reach full opacity and size.
+ */
+export const MAP_OSM_STOP_CANDIDATE_FULL_DETAIL_ZOOM = 14;
+
+/**
  * Subdued circle layer paint for OSM stop candidates, visually distinct from CityOS stops.
+ * Uses zoom-aware interpolation to manage overlay density at different scales.
  */
 export const MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT = {
-  'circle-radius': 8,
+  'circle-radius': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    MAP_OSM_STOP_CANDIDATE_MIN_VISIBLE_ZOOM,
+    4,
+    MAP_OSM_STOP_CANDIDATE_FULL_DETAIL_ZOOM,
+    8
+  ],
   'circle-color': '#6b7280',
   'circle-stroke-width': 1,
-  'circle-stroke-color': '#9ca3af'
+  'circle-stroke-color': '#9ca3af',
+  'circle-opacity': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    MAP_OSM_STOP_CANDIDATE_MIN_VISIBLE_ZOOM,
+    0,
+    MAP_OSM_STOP_CANDIDATE_FULL_DETAIL_ZOOM,
+    0.8
+  ],
+  'circle-stroke-opacity': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    MAP_OSM_STOP_CANDIDATE_MIN_VISIBLE_ZOOM,
+    0,
+    MAP_OSM_STOP_CANDIDATE_FULL_DETAIL_ZOOM,
+    0.8
+  ]
 } as const;
