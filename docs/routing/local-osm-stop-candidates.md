@@ -11,42 +11,32 @@ OSM stop candidates provide a set of suggested locations for stops based on real
 - **Docker**: Required for running the Osmium tooling container.
 - **Node.js**: Required for normalizing the extracted data.
 - **PowerShell**: Used for workflow scripts.
-- **Local OSM Data**: An `.osm.pbf` file of your area of interest (e.g., from [Geofabrik](https://download.geofabrik.de/)).
+- **Local OSM Data**: An `.osm.pbf` file placed at `data/osm/hvv-mvp.osm.pbf`.
 
-## Setup
+## Workflow & Orchestration
 
-Before running the generation workflow, you must build the dedicated Osmium tooling image:
+Generating assets via scenarios is the standard flow:
 
 ```powershell
-./scripts/osm/setup-osmium-tooling.ps1
+pnpm scenario:setup:hamburg
 ```
 
-This script will:
-1. Create required local directories:
-   - `data/osm/`
-   - `data/generated/osm/`
-   - `apps/web/public/generated/`
-2. Build the Docker image `cityops-osmium-tooling:local`.
+Or explicitly via the asset pipeline:
 
-## Generation Workflow
+```powershell
+pnpm local-assets:prepare -- --area hvv-mvp
+```
 
-1. **Prepare OSM data**: Place your `.osm.pbf` file in the `data/osm/` directory.
-2. **Run generation**:
+### Advanced / Direct Generation
+If you are executing isolated tasks for troubleshooting, you can build candidates directly against a specific area profile:
 
-   ```powershell
-   ./scripts/osm/start-stop-candidate-generation.ps1
-   ```
+```powershell
+.\scripts\osm\start-stop-candidate-generation.ps1 -Area hvv-mvp
+```
 
-   If exactly one PBF file exists in `data/osm/`, the script will resolve it automatically. Otherwise, specify it explicitly:
-
-   ```powershell
-   ./scripts/osm/start-stop-candidate-generation.ps1 -InputPbf ./data/osm/hamburg-latest.osm.pbf
-   ```
-
-### Output Artifact
-
-The workflow produces a GeoJSON file at:
-`apps/web/public/generated/osm-stop-candidates.geojson`
+### Output Artifact Boundaries
+- **Active Output Target**: `apps/web/public/generated/hvv-mvp/osm-stop-candidates.geojson`
+- **Legacy Global Fallback**: `apps/web/public/generated/osm-stop-candidates.geojson` (manual overrides only)
 
 This file is consumed by the web app to render candidate markers on the map.
 
@@ -95,12 +85,3 @@ Once adopted:
 - OSM data is © OpenStreetMap contributors.
 - Generated local artifacts inherit OSM licensing considerations (ODbL).
 - Do not commit generated `.geojson` files to the repository unless explicitly curated and approved.
-
-## Troubleshooting
-
-- **Docker not running**: Ensure the Docker Desktop (or equivalent) is active.
-- **Multiple PBF files**: Use the `-InputPbf` parameter to resolve ambiguity.
-- **No PBF file found**: Ensure the file has a `.pbf` or `.osm.pbf` extension and is located in `data/osm/`.
-- **Tooling image missing**: Run the setup script again.
-- **Invalid JSON line warnings**: If you see `Skipped invalid JSON lines/records`, it usually means some records in the intermediate file were malformed. The normalizer automatically handles GeoJSONSeq with Record Separator (`\u001e`) prefixes and plain NDJSON. If you see many skips, check if your OSM data extract is valid.
-- **Zero candidates emitted**: If the normalizer reports many records processed but zero candidates emitted with `features without numeric OSM node ID` skips, it means the Osmium export step did not include object IDs. Ensure `osmium export` is run with `--add-unique-id=type_id` (this is the default in `build-stop-candidates.ps1`). CityOps requires stable OSM node IDs to produce stable `osm:node:<id>` candidate IDs.

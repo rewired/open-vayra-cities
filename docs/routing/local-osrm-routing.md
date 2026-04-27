@@ -14,39 +14,40 @@ CityOps uses a local Dockerized instance of the Open Source Routing Machine (OSR
 
 ## Setup Instructions
 
-### 1. Download Local OSM Data
-We use the Hamburg region data from Geofabrik.
-From the repository root, run:
-```powershell
-.\scripts\routing\download-hamburg-osm.ps1
-```
-This script will download `hamburg-latest.osm.pbf` and its MD5 checksum into the `data/osm/` directory and verify the file integrity.
+### 1. Scenario-based Setup Flow
+The legacy `download-hamburg-osm.ps1` script is obsolete. Instead, use the unified scenario pipeline:
 
-### 2. Prepare OSRM Graph
-Once the source data is downloaded, you need to extract and partition the graph for OSRM using the MLD pipeline.
-Run:
 ```powershell
-.\scripts\routing\prepare-osrm.ps1
+pnpm scenario:setup:hamburg
 ```
-This script mounts the data directory into a temporary `osrm/osrm-backend` Docker container, runs `osrm-extract`, `osrm-partition`, and `osrm-customize`, placing the generated graph artifacts into `data/routing/osrm/`.
 
-### 3. Start the OSRM Service
-To start the background routing service, run:
+This orchestrates area verification and creates a BBBike download helper. You must place the downloaded OSM data at:
+```text
+data/osm/hvv-mvp.osm.pbf
+```
+Then, re-run the orchestrator to trigger OSRM graph building and stop candidate generation.
+
+### 2. Direct Debugging & Advanced OSRM Preparation
+For manual overrides or debugging, you can execute the OSRM pipeline steps individually for a chosen area:
+
+**Prepare OSRM Graph:**
 ```powershell
-.\scripts\routing\start-osrm.ps1
+.\scripts\routing\prepare-osrm.ps1 -Area hvv-mvp
 ```
-This uses `docker-compose` to spin up the OSRM backend container, making it available at `http://localhost:5000`.
+This mounts the data directory into a temporary `osrm/osrm-backend` Docker container, runs `osrm-extract`, `osrm-partition`, and `osrm-customize`, placing the generated graph artifacts into `data/routing/osrm/hvv-mvp/`.
 
-### 4. Run Smoke Test
-To verify that the routing service is working and correctly hooked up, run:
+**Start the OSRM Service:**
+```powershell
+.\scripts\routing\start-osrm.ps1 -Area hvv-mvp
+```
+This spins up the OSRM backend container, serving data specifically from the chosen area.
+
+**Verify Route Resolution:**
 ```powershell
 pnpm tsx scripts/routing/smoke-test-osrm.ts
 ```
-If successful, it will output a resolved distance, duration, and geometry for a fixed route.
 
-## Important Note on Generated Data
-**Do not commit `.pbf` or `.osrm` files.**
-Local OSM extracts and generated OSRM artifacts are large and easily reproducible. They are explicitly ignored in `.gitignore`. The `data/osm/` and `data/routing/osrm/` directories contain `.gitkeep` files to maintain structure, but the data itself remains local to your machine.
+## File Policy & Legacy Note
+The old `hamburg-latest` naming scheme is fully deprecated in favor of explicit area scoping (e.g. `hvv-mvp`).
 
-## Attribution and License
-The data used for routing is © OpenStreetMap contributors. Extracts are provided by Geofabrik. By using this routing data locally, be aware of the ODbL license applied to OSM data.
+**Never commit `.pbf` or `.osrm` files.** Local OSM extracts and generated OSRM graphs are large and easily reproducible. They remain excluded via `.gitignore`.

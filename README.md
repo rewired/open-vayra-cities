@@ -1,68 +1,79 @@
 # CityOps
 
-CityOps is a desktop-only, browser-based transit network simulation game with a bus-first MVP scope.
+CityOps is a desktop-only, browser-based transit network simulation game focused on a bus-first MVP scope.
 
-## Quick start
+## Prerequisites
 
-### Prerequisites
+- **Node.js**: version 22+
+- **pnpm**: version 10+
+- **Docker Desktop**: or a compatible Docker runtime (required for local assets)
+- **PowerShell**: required for executing local asset scripts (Windows default)
 
-- Node.js 22+
-- pnpm 10+
+## Installation
 
-### Install dependencies
-
-```bash
+```powershell
 pnpm install
 ```
 
-### Run the web app
+## Scenario Setup Quick Start
 
-```bash
-pnpm --filter @city-ops/web dev
+To set up the baseline Hamburg scenario, run the scenario orchestrator:
+
+```powershell
+pnpm scenario:setup:hamburg
 ```
 
-### Local Routing (Docker)
+### How it works:
+1. **Initial Run**: The orchestrator creates/verifies the required area and scenario configuration JSON files, and generates a BBBike download helper HTML file.
+2. **Missing PBF**: If the OpenStreetMap data extract (`.osm.pbf`) is missing, the process stops.
+3. **Manual Download**: You must open the generated helper HTML (found in `data/generated/download-helpers/`), download the BBBike extract, and save/rename it to:
+   ```text
+   data/osm/hvv-mvp.osm.pbf
+   ```
+4. **Final Run**: Re-run the command (`pnpm scenario:setup:hamburg`). With the PBF file in place, the pipeline will prepare local OSRM assets, extract stop candidates, and compile the scenario registry.
 
-To enable realistic street-routing between stops, you must set up the local OSRM routing service. **Docker is required.**
+## Running the Application
 
-1. Download the OSM data:
-   `.\scripts\routing\download-hamburg-osm.ps1`
-2. Prepare the OSRM graph:
-   `.\scripts\routing\prepare-osrm.ps1`
-3. Start the routing service:
-   `.\scripts\routing\start-osrm.ps1`
-4. Run the smoke test to verify:
-   `pnpm tsx scripts/routing/smoke-test-osrm.ts`
+To start the local development server for the web app:
 
-*Note: The map data used for routing is © OpenStreetMap contributors, provided by Geofabrik. Generated data will not be committed to the repository.*
+```powershell
+pnpm dev:web
+```
 
-For more details, read [docs/routing/local-osrm-routing.md](docs/routing/local-osrm-routing.md).
+## Advanced / Debug Commands
 
-### Local OSM Stop Candidates (Docker)
+For advanced workflows or debugging, the following commands are available:
 
-To generate suggested stop locations from OSM data, use the Osmium tooling workflow. **Docker is required.**
+- **Rebuild Scenario Registry**:
+  ```powershell
+  pnpm scenarios:build
+  ```
+- **Prepare Assets for Specific Area**:
+  ```powershell
+  pnpm local-assets:prepare -- --area hvv-mvp
+  ```
+- **Start Routing Service Directly**:
+  ```powershell
+  .\scripts\routing\start-osrm.ps1 -Area hvv-mvp
+  ```
+- **Verify OSRM Routing**:
+  ```powershell
+  pnpm tsx scripts/routing/smoke-test-osrm.ts
+  ```
 
-1. Setup the tooling:
-   `.\scripts\osm\setup-osmium-tooling.ps1`
-2. Run the generation:
-   `.\scripts\osm\start-stop-candidate-generation.ps1`
+## Local & Generated File Policy
 
-For more details, read [docs/routing/local-osm-stop-candidates.md](docs/routing/local-osm-stop-candidates.md).
+| Path | Meaning | Commit? |
+| :--- | :--- | :--- |
+| `data/areas/*.area.json` | Curated area/asset contract | **Yes** |
+| `data/scenarios/*.scenario.json` | Curated scenario truth | **Yes** |
+| `data/osm/*.osm.pbf` | Downloaded OSM extracts | No |
+| `data/routing/osrm/**` | Generated OSRM graphs | No |
+| `apps/web/public/generated/**` | Generated browser-readable runtime assets | No (except `.gitkeep` placeholders) |
+| `data/generated/download-helpers/*.html` | Generated BBBike download helpers | No |
 
-## Documentation map
+## Documentation Map
 
-Canonical project documentation lives at the repository root:
-
-- `PRODUCT_DEFINITION.md`
-- `FOUNDATION.md`
-- `VISION_SCOPE.md`
-- `DD.md`
-- `TDD.md`
-- `SEC.md`
-- `DESIGN.md`
-
-Architecture Decision Records (ADRs) are located in:
-
-- `docs/adr/`
-
-Use those canonical documents as the primary source of project scope and implementation constraints.
+- **Canonical Project Docs**: Located at the root (`PRODUCT_DEFINITION.md`, `FOUNDATION.md`, `VISION_SCOPE.md`, etc.)
+- **Architecture Decision Records (ADRs)**: Located under `docs/adr/`
+- **Advanced Technical Details**: Located under `docs/routing/` for deeper local routing and OSM stop-candidate integration specifics.

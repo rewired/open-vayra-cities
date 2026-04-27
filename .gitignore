@@ -14,7 +14,6 @@ coverage/
 *.tsbuildinfo
 
 # Compiler output and test output artifacts.
-# These are generated locally during diagnosis and must not be committed.
 apps/*/tsc_output*.txt
 **/tsc_output*.txt
 **/typecheck_output*.txt
@@ -64,42 +63,22 @@ temp/
 # Optional map or import artifacts that should stay local unless explicitly curated
 *.mbtiles
 *.gpkg
-*.pbf
 
-# Local OSM extracts for routing experiments.
-# These files are large, replaceable downloads and must not be committed.
+# Downloaded PBF files and checksums
 data/osm/*.pbf
 data/osm/**/*.pbf
 data/osm/*.pbf.md5
 data/osm/**/*.pbf.md5
-
-# Keep the local OSM data directory discoverable without committing extracts.
 !data/osm/.gitkeep
 
-# Local OSRM routing artifacts.
-# These files are generated locally via Docker and must not be committed.
-data/routing/osrm/*.osrm
-data/routing/osrm/**/*.osrm
-data/routing/osrm/*.osrm.*
-data/routing/osrm/**/*.osrm.*
-
-# Keep the local OSRM data directory discoverable without committing generated files.
+# Local OSRM routing artifacts
+data/routing/osrm/**
 !data/routing/osrm/.gitkeep
 
-# Keep the generated OSM stop candidate artifact directory discoverable.
-!apps/web/public/generated/.gitkeep
-
-# Generated browser artifacts - must not be committed unless explicitly curated.
-apps/web/public/generated/**
-!apps/web/public/generated/.gitkeep
-
-# Intermediate OSM generated files
-data/generated/osm/**
-!data/generated/osm/.gitkeep
-
-# Scenario setup and local asset overrides
+# Generated download helper HTML
 data/generated/download-helpers/*.html
-data/osm/*.osm.pbf
-data/routing/osrm/**
+
+# Browser generated runtime assets
 apps/web/public/generated/**
 !apps/web/public/generated/.gitkeep
+!apps/web/public/generated/scenarios/.gitkeep
