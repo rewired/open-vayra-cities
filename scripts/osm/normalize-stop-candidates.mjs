@@ -10,22 +10,43 @@ export function extractOsmNodeId(feature) {
     // Priority 1: Top-level ID
     let id = feature.id;
     
-    // Priority 2: properties.id
+    // Priority 2: properties['@id'] (common in some tools)
     if (id === undefined || id === null) {
-        id = feature.properties?.id;
+        // Only accept if @type is node or not present (defaulting to node)
+        const type = feature.properties?.['@type'];
+        if (type === 'node' || !type) {
+            id = feature.properties?.['@id'];
+        }
     }
     
-    // Priority 3: properties['@id']
+    // Priority 3: properties.id
     if (id === undefined || id === null) {
-        id = feature.properties?.['@id'];
+        id = feature.properties?.id;
     }
 
     if (id === undefined || id === null) return null;
 
-    // Handle "node/123" format
-    const idStr = String(id);
-    const match = idStr.match(/(?:node\/)?(\d+)/);
-    return match ? match[1] : null;
+    const idStr = String(id).trim();
+
+    // Support:
+    // 123 (numeric)
+    // "123" (string numeric)
+    // "node/123"
+    // "n123" (osmium type_id format)
+    
+    // Rejects:
+    // "w123", "a123", "way/123", "relation/123"
+
+    if (idStr.match(/^\d+$/)) {
+        return idStr;
+    }
+
+    const nodeMatch = idStr.match(/^node\/(\d+)$/) || idStr.match(/^n(\d+)$/);
+    if (nodeMatch) {
+        return nodeMatch[1];
+    }
+
+    return null;
 }
 
 /**
@@ -161,7 +182,12 @@ export function normalizeStopCandidateFeatures(features) {
 
     if (process.env.NODE_ENV !== 'test') {
         if (skipNonPoint > 0) console.warn(`[normalizer] Skipped ${skipNonPoint} features with non-Point geometry`);
-        if (skipNoId > 0) console.warn(`[normalizer] Skipped ${skipNoId} features without numeric OSM ID`);
+        if (skipNoId > 0) {
+            console.warn(`[normalizer] Skipped ${skipNoId} features without numeric OSM node ID`);
+            if (skipNoId === features.length && features.length > 0) {
+                console.warn(`[normalizer] HINT: If this is an osmium export intermediate, ensure osmium export uses --add-unique-id=type_id or exports @type/@id attributes.`);
+            }
+        }
         if (skipNonBus > 0) console.warn(`[normalizer] Skipped ${skipNonBus} non-bus platforms/stops`);
         if (skipUnknown > 0) console.warn(`[normalizer] Skipped ${skipUnknown} features with unknown kind`);
     }

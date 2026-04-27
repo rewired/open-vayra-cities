@@ -18,11 +18,22 @@ function runTests() {
 function testExtractOsmNodeId() {
     console.log('Testing extractOsmNodeId...');
 
+    // Accepts
     assert.strictEqual(extractOsmNodeId({ id: 123 }), '123');
     assert.strictEqual(extractOsmNodeId({ id: '123' }), '123');
     assert.strictEqual(extractOsmNodeId({ id: 'node/123' }), '123');
+    assert.strictEqual(extractOsmNodeId({ id: 'n123' }), '123');
     assert.strictEqual(extractOsmNodeId({ properties: { id: 123 } }), '123');
-    assert.strictEqual(extractOsmNodeId({ properties: { '@id': 'node/123' } }), '123');
+    assert.strictEqual(extractOsmNodeId({ properties: { '@id': '123', '@type': 'node' } }), '123');
+    assert.strictEqual(extractOsmNodeId({ properties: { '@id': '123' } }), '123'); // Default to node if @type missing
+
+    // Rejects
+    assert.strictEqual(extractOsmNodeId({ id: 'w123' }), null);
+    assert.strictEqual(extractOsmNodeId({ id: 'a123' }), null);
+    assert.strictEqual(extractOsmNodeId({ id: 'way/123' }), null);
+    assert.strictEqual(extractOsmNodeId({ id: 'relation/123' }), null);
+    assert.strictEqual(extractOsmNodeId({ properties: { '@id': '123', '@type': 'way' } }), null);
+    assert.strictEqual(extractOsmNodeId({ id: 'abc' }), null);
     assert.strictEqual(extractOsmNodeId({}), null);
 }
 
@@ -70,14 +81,22 @@ function testNormalizeStopCandidateFeatures() {
             id: 103,
             geometry: { type: 'Point', coordinates: [10.2, 50.2] },
             properties: { public_transport: 'platform', rail: 'yes', name: 'Train Platform' }
+        },
+        {
+            type: 'Feature',
+            id: 'n104',
+            geometry: { type: 'Point', coordinates: [10.3, 50.3] },
+            properties: { highway: 'bus_stop', name: 'Bus Stop C' }
         }
     ];
 
     const normalized = normalizeStopCandidateFeatures(features);
-    assert.strictEqual(normalized.length, 2);
+    assert.strictEqual(normalized.length, 3);
     assert.strictEqual(normalized[0].candidateId, 'osm:node:101');
     assert.strictEqual(normalized[0].label, 'Bus Stop A');
     assert.strictEqual(normalized[1].candidateId, 'osm:node:102');
+    assert.strictEqual(normalized[2].candidateId, 'osm:node:104');
+    assert.strictEqual(normalized[2].osmElementId, '104');
 }
 
 try {

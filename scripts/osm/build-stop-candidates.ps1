@@ -84,6 +84,8 @@ if ($LASTEXITCODE -ne 0) {
 # 3. Run osmium export via Docker
 Write-Host "Running osmium export (Docker)..." -ForegroundColor Cyan
 docker run --rm -v "${RootPath}:/work" $ImageName export $ContainerTempPbf `
+    --add-unique-id=type_id `
+    --overwrite `
     -f geojsonseq `
     -o $ContainerTempGeoJsonSeq
 
