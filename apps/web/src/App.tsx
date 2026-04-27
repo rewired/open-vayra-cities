@@ -24,6 +24,7 @@ import type { MapFocusIntent } from './session/sessionTypes';
 import { BlockingDataOperationModal } from './ui/data-operation/BlockingDataOperationModal';
 import type { ActiveDataOperation } from './ui/data-operation/types';
 
+import { AppShell } from './AppShell';
 import './App.css';
 
 const buildSelectedLineExportFilename = (lineId: string): string => `cityops-line-${lineId}.json`;
@@ -202,11 +203,11 @@ const toolModeControlOptions: ReadonlyArray<{
   );
 
   return (
-    <>
-      <div
-        className={`app-shell${activeDataOperation ? ' app-shell--blocked' : ''}`}
-        data-app-surface="desktop-shell"
-      >
+    <AppShell
+      isBlocked={activeDataOperation !== null}
+      toastHost={<ToastHost />}
+      blockingModal={<BlockingDataOperationModal activeOperation={activeDataOperation} />}
+    >
       <SimulationControlBar
         clockController={clockController}
         debugAction={
@@ -337,9 +338,6 @@ const toolModeControlOptions: ReadonlyArray<{
           service: serviceDiagnostics
         }}
       />
-      <ToastHost />
-      <BlockingDataOperationModal activeOperation={activeDataOperation} />
-    </div>
-    </>
+    </AppShell>
   );
 }

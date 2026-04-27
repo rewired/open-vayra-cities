@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 103b: Fix Blocking Modal Blur Scope
+- Refactored the application layout to separate the blurred app shell from global overlays (modals and toasts).
+- Introduced `AppShell.tsx` layout component to manage structural isolation of filtered subtrees.
+- Moved `BlockingDataOperationModal` and `ToastHost` outside the `.app-shell` container in `App.tsx`.
+- Ensured the blocking modal remains sharp and readable while the application background is dimmed and blurred.
+- Added `AppShell.test.tsx` for structural DOM verification and regression prevention.
+- Added ADR 0130 documenting the corrective layout decision.
+
 ### Slice 103: Blocking Data Operation Modal
 - Implemented a reusable `BlockingDataOperationModal` for app-runtime data operations (e.g., loading and consolidating OSM stop candidates).
 - Added shell-level `.app-shell--blocked` state in `App.tsx` and `App.css` to dim and blur the background while blocking interactions.
