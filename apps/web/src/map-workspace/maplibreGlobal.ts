@@ -130,7 +130,7 @@ interface MapLibreRenderedFeatureQueryOptions {
 /**
  * Bounding-box query window defined by top-left and bottom-right screen points.
  */
-type MapLibreRenderedFeatureQueryBox = readonly [MapEventPoint, MapEventPoint];
+export type MapLibreRenderedFeatureQueryBox = readonly [MapEventPoint, MapEventPoint];
 
 /**
  * Query options for filtering source features to a specific source layer.
@@ -268,6 +268,8 @@ export interface MapLibreMap {
   moveLayer(layerId: string, beforeId?: string): void;
   /** Returns whether the current style is fully loaded and ready for source/layer mutations. */
   isStyleLoaded(): boolean;
+  /** Returns the current zoom level of the map. */
+  getZoom(): number;
   /** Registers a listener for feature interactions constrained to one style layer id. */
   on(type: 'click' | 'mouseenter' | 'mouseleave', layerId: string, listener: (event: MapLibreInteractionEvent) => void): void;
   /** Removes a feature interaction listener constrained to one style layer id. */

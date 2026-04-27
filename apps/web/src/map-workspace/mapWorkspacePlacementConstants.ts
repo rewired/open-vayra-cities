@@ -60,3 +60,14 @@ export const STREET_LABEL_LOOKUP_QUERY_RADII_PIXELS = [12, 24, 40] as const;
  * Layer/source hints used to identify and rank preferred street/road label features.
  */
 export const STREET_LABEL_LAYER_HINTS = ['road', 'street', 'highway', 'transport', 'label', 'name'] as const;
+
+/**
+ * Minimum pixel radius for OSM anchor street lookup box.
+ */
+export const OSM_ANCHOR_LOOKUP_MIN_PIXELS = 16;
+
+/**
+ * Maximum pixel radius for OSM anchor street lookup box to prevent excessive queries.
+ * This acts as a safety cap for very low zoom levels.
+ */
+export const OSM_ANCHOR_LOOKUP_MAX_PIXELS = 128;

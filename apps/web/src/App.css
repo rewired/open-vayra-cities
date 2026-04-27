@@ -3,8 +3,9 @@ body,
 #root {
   --right-inspector-width: 364px;
   margin: 0;
-  min-height: 100%;
+  height: 100vh;
   width: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -27,7 +28,8 @@ body {
   grid-template-areas:
     'top-bar top-bar top-bar'
     'left workspace right';
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .left-panel,
@@ -35,6 +37,8 @@ body {
 .workspace,
 .status-bar {
   padding: 16px;
+  min-height: 0;
+  min-width: 0;
 }
 
 .left-panel {
@@ -476,6 +480,9 @@ body {
   grid-area: right;
   border-left: 1px solid #263142;
   background: #121a27;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .status-bar {
@@ -1771,6 +1778,168 @@ body {
   100% {
     transform: translateX(400%);
   }
+}
+
+/* --- OSM Candidate Inspector --- */
+
+.inspector-panel__content--osm-candidate {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inspector-panel__header {
+  margin-bottom: 4px;
+}
+
+.inspector-panel__title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #f5c358;
+}
+
+.inspector-panel__title-icon {
+  font-size: 1.5rem;
+}
+
+.inspector-panel__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.inspector-panel__subtitle {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: #8da4c7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.inspector-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inspector-panel__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inspector-panel__section-title {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #9eb4d7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.inspector-panel__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.inspector-panel__table th {
+  text-align: left;
+  color: #8da4c7;
+  font-weight: 500;
+  padding: 4px 0;
+  width: 40%;
+}
+
+.inspector-panel__table td {
+  text-align: right;
+  color: #e8eef9;
+  padding: 4px 0;
+}
+
+.status-badge {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge--ready {
+  background: #2d4a35;
+  color: #9fe3ad;
+  border: 1px solid #4a7a58;
+}
+
+.status-badge--review {
+  background: #4a452d;
+  color: #fae6b3;
+  border: 1px solid #7a734a;
+}
+
+.status-badge--blocked {
+  background: #4a2d2d;
+  color: #ffb5b5;
+  border: 1px solid #7a4a4a;
+}
+
+.inspector-panel__adoption-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.inspector-panel__adoption-blocked-reason {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  background: #2b1f1f;
+  border: 1px solid #634343;
+  border-radius: 8px;
+  color: #ffb5b5;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.inspector-panel__adoption-blocked-reason .app-material-icon {
+  font-size: 1rem;
+  margin-top: 2px;
+}
+
+.inspector-panel__action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 120ms ease;
+  border: 1px solid #425b83;
+}
+
+.inspector-panel__action-button--primary {
+  background: #3c73c0;
+  color: #ffffff;
+  border-color: #5a94e2;
+}
+
+.inspector-panel__action-button--primary:hover:not(:disabled) {
+  background: #4d88d8;
+  border-color: #72a5ee;
+}
+
+.inspector-panel__action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
 }
 
 .blocking-data-operation-modal__percent {

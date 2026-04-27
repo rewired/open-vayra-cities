@@ -6,7 +6,8 @@ import type {
 import { classifyOsmStopCandidateStreetAnchorDistance } from '../domain/osm/osmStopCandidateStreetAnchor';
 import { calculateGreatCircleDistanceMeters } from '../lib/geometry';
 import type { MapLibreMap } from './maplibreGlobal';
-import { resolveSnappedStreetPositionForGeographicPoint } from './mapWorkspaceStreetSnap';
+import { resolveNearestRenderedStreetPositionForGeographicPoint } from './mapWorkspaceStreetSnap';
+import { OSM_STOP_CANDIDATE_STREET_ANCHOR_REVIEW_MAX_DISTANCE_METERS } from '../domain/osm/osmStopCandidateAnchorConstants';
 
 /**
  * Resolves the street routing anchor for an OSM candidate group by snapping its
@@ -31,7 +32,12 @@ export function resolveOsmStopCandidateGroupStreetAnchor(
     ? 'osm-stop-position'
     : 'osm-display-position';
 
-  const snapped = resolveSnappedStreetPositionForGeographicPoint(map, originalAnchor, streetLayerIds);
+  const snapped = resolveNearestRenderedStreetPositionForGeographicPoint(
+    map,
+    originalAnchor,
+    streetLayerIds,
+    OSM_STOP_CANDIDATE_STREET_ANCHOR_REVIEW_MAX_DISTANCE_METERS
+  );
 
   if (!snapped) {
     return {
@@ -42,14 +48,11 @@ export function resolveOsmStopCandidateGroupStreetAnchor(
       streetAnchorPosition: null,
       distanceMeters: null,
       streetLabelCandidate: null,
-      reason: 'No rendered street line found within snapping tolerance.'
+      reason: `No rendered street line found within ${OSM_STOP_CANDIDATE_STREET_ANCHOR_REVIEW_MAX_DISTANCE_METERS}m.`
     };
   }
 
-  const distanceMeters = calculateGreatCircleDistanceMeters(
-    [originalAnchor.lng, originalAnchor.lat],
-    [snapped.lng, snapped.lat]
-  );
+  const distanceMeters = snapped.distanceMeters;
 
   const status = classifyOsmStopCandidateStreetAnchorDistance(distanceMeters);
 

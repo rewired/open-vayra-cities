@@ -6,17 +6,21 @@ import {
   STREET_SNAP_FALLBACK_QUERY_OFFSETS,
   STREET_SNAP_MAX_PIXEL_TOLERANCE,
   STREET_LABEL_LOOKUP_QUERY_RADII_PIXELS,
-  STREET_LABEL_LAYER_HINTS
+  STREET_LABEL_LAYER_HINTS,
+  OSM_ANCHOR_LOOKUP_MIN_PIXELS,
+  OSM_ANCHOR_LOOKUP_MAX_PIXELS
 } from './mapWorkspacePlacementConstants';
 import {
   getSourceRefsForLayerIds,
   type MapLibreFeatureGeometry,
   type MapLibreInteractionEvent,
   type MapLibreMap,
-  type MapLibreRenderedFeature
+  type MapLibreRenderedFeature,
+  type MapLibreRenderedFeatureQueryBox
 } from './maplibreGlobal';
 import type { StopPosition } from '../domain/types/stop';
 import { extractStreetLabelCandidate } from './streetFeatureLabel';
+import { calculateGreatCircleDistanceMeters } from '../lib/geometry';
 
 interface ScreenPoint {
   readonly x: number;
@@ -551,4 +555,113 @@ export function resolveSnappedStreetPositionForGeographicPoint(
     lat: fallbackLat,
     streetLabelCandidate: fallbackStreetLabelCandidate
   };
+}
+
+/**
+ * Resolves the nearest rendered street position for a geographic point within a meter-based radius.
+ * Unlike the click-snapping logic, this uses a broader search area derived from meters and zoom.
+ * 
+ * Logic:
+ * 1. Derives pixel search radius from latitude, zoom, and requested meters.
+ * 2. Queries rendered features in a bounded screen-space box.
+ * 3. Identifies the nearest point on the nearest street line geometry.
+ * 4. Calculates final quality by great-circle distance.
+ */
+export function resolveNearestRenderedStreetPositionForGeographicPoint(
+  map: MapLibreMap,
+  position: GeographicPoint,
+  streetLayerIds: readonly string[],
+  maxDistanceMeters: number
+): Readonly<{ lng: number; lat: number; distanceMeters: number; streetLabelCandidate: string | null }> | null {
+  if (streetLayerIds.length === 0) {
+    return null;
+  }
+
+  const zoom = map.getZoom();
+  const latRad = (position.lat * Math.PI) / 180;
+  
+  // Meters per pixel at this latitude and zoom (Web Mercator)
+  // Approx Circumference at equator / (tile size * 2^zoom)
+  // MapLibre zoom levels correspond to 512px tiles in this projection context.
+  const metersPerPixel = (40075016.686 * Math.cos(latRad)) / Math.pow(2, zoom + 9);
+  
+  let pixelRadius = maxDistanceMeters / metersPerPixel;
+  
+  // Clamp to reasonable bounds to prevent oversized queries or too-small hits
+  pixelRadius = Math.max(OSM_ANCHOR_LOOKUP_MIN_PIXELS, Math.min(OSM_ANCHOR_LOOKUP_MAX_PIXELS, pixelRadius));
+
+  const point = map.project([position.lng, position.lat]);
+  const queryBox: MapLibreRenderedFeatureQueryBox = [
+    { x: point.x - pixelRadius, y: point.y - pixelRadius },
+    { x: point.x + pixelRadius, y: point.y + pixelRadius }
+  ];
+
+  const features = map.queryRenderedFeatures(queryBox, { layers: streetLayerIds });
+  if (features.length === 0) {
+    return null;
+  }
+
+  let bestMatch: {
+    lng: number;
+    lat: number;
+    distanceMeters: number;
+    streetLabelCandidate: string | null;
+  } | null = null;
+
+  for (const feature of features) {
+    if (!isLineGeometry(feature.geometry)) {
+      continue;
+    }
+
+    const streetLabelCandidate = extractStreetLabelCandidate(feature.properties);
+    const lineCollections = toLineCoordinateCollections(feature.geometry);
+
+    for (const lineCoordinates of lineCollections) {
+      if (lineCoordinates.length < 2) continue;
+
+      for (let i = 0; i < lineCoordinates.length - 1; i++) {
+        const start = lineCoordinates[i];
+        const end = lineCoordinates[i + 1];
+        if (!start || !end) continue;
+
+        const startP = map.project(start);
+        const endP = map.project(end);
+        const nearest = resolveNearestPointOnSegment(point, startP, endP);
+
+        // Even though we queried by box, we still check radial distance for the best point
+        if (nearest.distance > pixelRadius) continue;
+
+        const snappedLng = start[0] + (end[0] - start[0]) * nearest.ratio;
+        const snappedLat = start[1] + (end[1] - start[1]) * nearest.ratio;
+        
+        const distanceMeters = calculateGreatCircleDistanceMeters(
+          [position.lng, position.lat],
+          [snappedLng, snappedLat]
+        );
+
+        if (distanceMeters > maxDistanceMeters) continue;
+
+        if (!bestMatch || distanceMeters < bestMatch.distanceMeters) {
+          bestMatch = {
+            lng: snappedLng,
+            lat: snappedLat,
+            distanceMeters,
+            streetLabelCandidate
+          };
+        }
+      }
+    }
+  }
+
+  if (!bestMatch) {
+    return null;
+  }
+
+  // Final check: if the snapped point has no name, try to find a nearby label
+  if (!bestMatch.streetLabelCandidate) {
+    const nearbyLabel = resolveNearbyStreetLabelCandidate(map, { lng: bestMatch.lng, lat: bestMatch.lat });
+    return { ...bestMatch, streetLabelCandidate: nearbyLabel };
+  }
+
+  return bestMatch;
 }

@@ -3,10 +3,12 @@ import { resolveOsmStopCandidateGroupStreetAnchor } from './osmStopCandidateStre
 import type { OsmStopCandidateGroup } from '../domain/types/osmStopCandidate';
 import type { MapLibreMap } from './maplibreGlobal';
 import * as streetSnap from './mapWorkspaceStreetSnap';
+import { OSM_STOP_CANDIDATE_STREET_ANCHOR_REVIEW_MAX_DISTANCE_METERS } from '../domain/osm/osmStopCandidateAnchorConstants';
 
 describe('osmStopCandidateStreetAnchorResolution', () => {
   const mockMap = {
-    project: vi.fn()
+    project: vi.fn(),
+    getZoom: vi.fn().mockReturnValue(15)
   } as unknown as MapLibreMap;
 
   const mockGroup: OsmStopCandidateGroup = {
@@ -24,7 +26,7 @@ describe('osmStopCandidateStreetAnchorResolution', () => {
   };
 
   it('should return blocked when snapping fails', () => {
-    vi.spyOn(streetSnap, 'resolveSnappedStreetPositionForGeographicPoint').mockReturnValue(null);
+    vi.spyOn(streetSnap, 'resolveNearestRenderedStreetPositionForGeographicPoint').mockReturnValue(null);
 
     const result = resolveOsmStopCandidateGroupStreetAnchor(mockMap, mockGroup, ['street-layer']);
 
@@ -35,9 +37,10 @@ describe('osmStopCandidateStreetAnchorResolution', () => {
 
   it('should return ready when snapped point is close', () => {
     // Approx 11 meters apart
-    vi.spyOn(streetSnap, 'resolveSnappedStreetPositionForGeographicPoint').mockReturnValue({
+    vi.spyOn(streetSnap, 'resolveNearestRenderedStreetPositionForGeographicPoint').mockReturnValue({
       lng: 13.4001,
       lat: 52.5002,
+      distanceMeters: 11,
       streetLabelCandidate: 'Main St'
     });
 
@@ -45,20 +48,25 @@ describe('osmStopCandidateStreetAnchorResolution', () => {
 
     expect(result.status).toBe('ready');
     expect(result.streetAnchorPosition).toEqual({ lng: 13.4001, lat: 52.5002 });
-    expect(result.distanceMeters).toBeLessThan(20);
+    expect(result.distanceMeters).toBe(11);
     expect(result.streetLabelCandidate).toBe('Main St');
   });
 
   it('should prefer routingAnchorPosition over displayPosition', () => {
-    const spy = vi.spyOn(streetSnap, 'resolveSnappedStreetPositionForGeographicPoint');
+    const spy = vi.spyOn(streetSnap, 'resolveNearestRenderedStreetPositionForGeographicPoint');
     
     resolveOsmStopCandidateGroupStreetAnchor(mockMap, mockGroup, ['street-layer']);
 
-    expect(spy).toHaveBeenCalledWith(mockMap, mockGroup.routingAnchorPosition, ['street-layer']);
+    expect(spy).toHaveBeenCalledWith(
+      mockMap,
+      mockGroup.routingAnchorPosition,
+      ['street-layer'],
+      OSM_STOP_CANDIDATE_STREET_ANCHOR_REVIEW_MAX_DISTANCE_METERS
+    );
   });
 
   it('should identify source as osm-stop-position when stop-position member exists', () => {
-    vi.spyOn(streetSnap, 'resolveSnappedStreetPositionForGeographicPoint').mockReturnValue(null);
+    vi.spyOn(streetSnap, 'resolveNearestRenderedStreetPositionForGeographicPoint').mockReturnValue(null);
 
     const result = resolveOsmStopCandidateGroupStreetAnchor(mockMap, mockGroup, ['street-layer']);
 
@@ -70,7 +78,7 @@ describe('osmStopCandidateStreetAnchorResolution', () => {
       ...mockGroup,
       memberKinds: ['bus-stop']
     };
-    vi.spyOn(streetSnap, 'resolveSnappedStreetPositionForGeographicPoint').mockReturnValue(null);
+    vi.spyOn(streetSnap, 'resolveNearestRenderedStreetPositionForGeographicPoint').mockReturnValue(null);
 
     const result = resolveOsmStopCandidateGroupStreetAnchor(mockMap, displayOnlyGroup, ['street-layer']);
 

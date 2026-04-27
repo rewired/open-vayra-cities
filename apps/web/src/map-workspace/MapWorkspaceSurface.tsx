@@ -61,6 +61,7 @@ import {
 } from './mapWorkspaceLifecycle';
 import { applyBasemapSemanticReadabilityOverrides } from './mapBaseStyleOverrides';
 import type { MapLibreMap } from './maplibreGlobal';
+import { resolveOsmStopCandidateGroupStreetAnchor } from './osmStopCandidateStreetAnchorResolution';
 
 /** Canonical single-stop selection contract shared by marker highlighting and shell inspector state. */
 export type { StopSelectionState } from './mapWorkspaceInteractions';
@@ -389,7 +390,6 @@ export function MapWorkspaceSurface({
         }
 
         const streetLayerIds = resolveStreetLayerIdsFromStyle(mapInstance);
-        const { resolveOsmStopCandidateGroupStreetAnchor } = require('./osmStopCandidateStreetAnchorResolution');
         const anchorResolution = resolveOsmStopCandidateGroupStreetAnchor(mapInstance, group, streetLayerIds);
         setHoveredOsmCandidate({
           ...nextHover,
@@ -427,7 +427,6 @@ export function MapWorkspaceSurface({
       const group = osmStopCandidateGroups.find((g) => g.id === groupId);
       if (group) {
         const streetLayerIds = resolveStreetLayerIdsFromStyle(mapInstance);
-        const { resolveOsmStopCandidateGroupStreetAnchor } = require('./osmStopCandidateStreetAnchorResolution');
         const anchorResolution = resolveOsmStopCandidateGroupStreetAnchor(mapInstance, group, streetLayerIds);
         onOsmCandidateAnchorResolved(anchorResolution);
       } else {

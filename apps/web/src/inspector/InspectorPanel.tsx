@@ -124,180 +124,184 @@ export function InspectorPanel({
     <aside className="right-panel" aria-label="Inspector panel">
       <h2>Inspector</h2>
 
-      <nav className="inspector-tabs" aria-label="Inspector tabs" role="tablist">
-        {INSPECTOR_TAB_IDS.map((tabId) => (
-          <button
-            key={tabId}
-            type="button"
-            role="tab"
-            aria-selected={activeTabId === tabId}
-            className="inspector-tabs__button"
-            onClick={() => {
-              setActiveTabId(tabId);
-            }}
-          >
-            {INSPECTOR_TAB_LABELS[tabId]}
-          </button>
-        ))}
-      </nav>
+      {inspectorPanelState.mode === 'osm-candidate-selected' ? (
+        (() => {
+          const candidateGroup = osmStopCandidateGroups.find((g) => g.id === inspectorPanelState.candidateGroupId);
+          if (!candidateGroup) return null;
 
-      {activeTabId === 'network' ? (
-        <section className="inspector-network-summary" aria-label="Network">
-          <h3>Network</h3>
-          <table className="inspector-compact-table inspector-network-summary__primary-table">
-            <tbody>
-              <tr>
-                <th scope="row">Stops</th>
-                <td>{staticNetworkSummaryKpis.totalStopCount}</td>
-              </tr>
-              <tr>
-                <th scope="row">Completed lines</th>
-                <td>{staticNetworkSummaryKpis.completedLineCount}</td>
-              </tr>
-              <tr>
-                <th scope="row">Projected vehicles</th>
-                <td>{vehicleNetworkProjection.summary.totalProjectedVehicleCount}</td>
-              </tr>
-              <tr>
-                <th scope="row">Active service band</th>
-                <td className="inspector-compact-table__value--left">
-                  {TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}
-                </td>
-              </tr>
-              <tr>
-                <th scope="row">Global state</th>
-                <td className="inspector-compact-table__value--left">{globalStateLabel}</td>
-              </tr>
-              <tr>
-                <th scope="row">Degraded service lines</th>
-                <td>{networkServicePlanProjection.summary.degradedLineCount}</td>
-              </tr>
-              <tr>
-                <th scope="row">Blocked service lines</th>
-                <td>{networkServicePlanProjection.summary.blockedLineCount}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <NetworkInventory
-            placedStops={placedStops}
-            completedLines={completedLines}
-            onStopSelect={onStopSelectionChange}
-            onLineSelect={onSelectedLineIdChange}
-            onLineRename={onLineRename}
-          />
-
-          <h3 style={{ marginTop: '1.5rem' }}>Demand capture</h3>
-          <table className="inspector-compact-table">
-            <tbody>
-              <tr>
-                <th scope="row">Homes covered</th>
-                <td>{`${networkDemandProjection.residential.capturedWeight} / ${networkDemandProjection.residential.totalWeight}`}</td>
-              </tr>
-              <tr>
-                <th scope="row">Jobs covered</th>
-                <td>{`${networkDemandProjection.workplace.capturedWeight} / ${networkDemandProjection.workplace.totalWeight}`}</td>
-              </tr>
-              <tr>
-                <th scope="row">Served now</th>
-                <td className="inspector-compact-table__value--highlight">
-                  {networkDemandProjection.activelyServedResidentialWeight}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-      ) : null}
-
-      {activeTabId === 'lines' ? (
-        <section className="inspector-lines-tab" aria-label="Lines">
-          <h3>Lines</h3>
-          {linesViewMode === 'list' ? (
-            completedLines.length > 0 ? (
-              <ul className="inspector-simple-list inspector-lines-tab__list" aria-label="Completed line list">
-                {completedLines.map((line) => (
-                  <li key={line.id} className="inspector-lines-tab__list-item">
-                    <button
-                      type="button"
-                      className="inspector-lines-tab__line-badge-button"
-                      onClick={() => {
-                        onSelectedLineIdChange(line.id);
-                        setLinesViewMode('detail');
-                      }}
-                      title={`Select and focus ${line.label}`}
-                      aria-label={`Select line ${line.id}: ${line.label}`}
-                    >
-                      {line.id}
-                    </button>
-                    <span className="inspector-lines-tab__line-label" title={line.label}>
-                      {line.label}
-                    </span>
-                    <InlineRenameField
-                      value={line.label}
-                      entityLabel="line"
-                      idleDisplayMode="edit-only"
-                      onAccept={(nextValue) => onLineRename(line.id, nextValue)}
-                    />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No completed lines.</p>
-            )
-          ) : (
-            <>
+          return (
+            <OsmStopCandidateInspector
+              candidateGroup={candidateGroup}
+              anchorResolution={selectedOsmCandidateAnchor}
+              existingStops={placedStops}
+              adoptedCandidateGroupIds={adoptedOsmCandidateGroupIds}
+              onAdopt={onOsmCandidateAdopt}
+            />
+          );
+        })()
+      ) : (
+        <>
+          <nav className="inspector-tabs" aria-label="Inspector tabs" role="tablist">
+            {INSPECTOR_TAB_IDS.map((tabId) => (
               <button
+                key={tabId}
                 type="button"
-                className="inspector-lines-tab__back"
+                role="tab"
+                aria-selected={activeTabId === tabId}
+                className="inspector-tabs__button"
                 onClick={() => {
-                  setLinesViewMode('list');
+                  setActiveTabId(tabId);
                 }}
               >
-                Back to completed lines
+                {INSPECTOR_TAB_LABELS[tabId]}
               </button>
-              {inspectorPanelState.mode === 'line-selected' ? (
-                <SelectedLineInspector
-                  panelState={inspectorPanelState}
-                  selectedLineRouteBaseline={selectedLineRouteBaseline}
-                  placedStops={placedStops}
-                  activeTimeBandId={activeTimeBandId}
-                  lineFrequencyInputByTimeBand={lineFrequencyInputByTimeBand}
-                  lineFrequencyControlByTimeBand={lineFrequencyControlByTimeBand}
-                  lineFrequencyValidationByTimeBand={lineFrequencyValidationByTimeBand}
-                  selectedLineServiceProjection={selectedLineServiceProjection}
-                  selectedLineServiceInspectorProjection={selectedLineServiceInspectorProjection}
-                  selectedLinePlanningVehicleProjection={selectedLinePlanningVehicleProjection}
-                  selectedLineDemandProjection={selectedLineDemandProjection}
-                  onLineRename={onLineRename}
-                  onLineSequenceStopFocus={onLineSequenceStopFocus}
-                  onStopRename={onStopRename}
-                  onStopSelectionChange={onStopSelectionChange}
-                  onFrequencyChange={onFrequencyChange}
-                  openDialogIntent={openDialogIntent}
-                  onOpenDialogIntentConsumed={onOpenDialogIntentConsumed}
-                />
-              ) : (
-                <p>Select a completed line from the list to open detail.</p>
-              )}
-            </>
-          )}
-        </section>
-      ) : null}
+            ))}
+          </nav>
 
-      {inspectorPanelState.mode === 'osm-candidate-selected' ? (() => {
-        const candidateGroup = osmStopCandidateGroups.find(g => g.id === inspectorPanelState.candidateGroupId);
-        if (!candidateGroup) return null;
-        
-        return (
-          <OsmStopCandidateInspector
-            candidateGroup={candidateGroup}
-            anchorResolution={selectedOsmCandidateAnchor}
-            existingStops={placedStops}
-            adoptedCandidateGroupIds={adoptedOsmCandidateGroupIds}
-            onAdopt={onOsmCandidateAdopt}
-          />
-        );
-      })() : null}
+          {activeTabId === 'network' ? (
+            <section className="inspector-network-summary" aria-label="Network">
+              <h3>Network</h3>
+              <table className="inspector-compact-table inspector-network-summary__primary-table">
+                <tbody>
+                  <tr>
+                    <th scope="row">Stops</th>
+                    <td>{staticNetworkSummaryKpis.totalStopCount}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Completed lines</th>
+                    <td>{staticNetworkSummaryKpis.completedLineCount}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Projected vehicles</th>
+                    <td>{vehicleNetworkProjection.summary.totalProjectedVehicleCount}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Active service band</th>
+                    <td className="inspector-compact-table__value--left">
+                      {TIME_BAND_DISPLAY_LABELS[networkServicePlanProjection.summary.activeTimeBandId]}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Global state</th>
+                    <td className="inspector-compact-table__value--left">{globalStateLabel}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Degraded service lines</th>
+                    <td>{networkServicePlanProjection.summary.degradedLineCount}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Blocked service lines</th>
+                    <td>{networkServicePlanProjection.summary.blockedLineCount}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <NetworkInventory
+                placedStops={placedStops}
+                completedLines={completedLines}
+                onStopSelect={onStopSelectionChange}
+                onLineSelect={onSelectedLineIdChange}
+                onLineRename={onLineRename}
+              />
+
+              <h3 style={{ marginTop: '1.5rem' }}>Demand capture</h3>
+              <table className="inspector-compact-table">
+                <tbody>
+                  <tr>
+                    <th scope="row">Homes covered</th>
+                    <td>{`${networkDemandProjection.residential.capturedWeight} / ${networkDemandProjection.residential.totalWeight}`}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Jobs covered</th>
+                    <td>{`${networkDemandProjection.workplace.capturedWeight} / ${networkDemandProjection.workplace.totalWeight}`}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Served now</th>
+                    <td className="inspector-compact-table__value--highlight">
+                      {networkDemandProjection.activelyServedResidentialWeight}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+          ) : null}
+
+          {activeTabId === 'lines' ? (
+            <section className="inspector-lines-tab" aria-label="Lines">
+              <h3>Lines</h3>
+              {linesViewMode === 'list' ? (
+                completedLines.length > 0 ? (
+                  <ul className="inspector-simple-list inspector-lines-tab__list" aria-label="Completed line list">
+                    {completedLines.map((line) => (
+                      <li key={line.id} className="inspector-lines-tab__list-item">
+                        <button
+                          type="button"
+                          className="inspector-lines-tab__line-badge-button"
+                          onClick={() => {
+                            onSelectedLineIdChange(line.id);
+                            setLinesViewMode('detail');
+                          }}
+                          title={`Select and focus ${line.label}`}
+                          aria-label={`Select line ${line.id}: ${line.label}`}
+                        >
+                          {line.id}
+                        </button>
+                        <span className="inspector-lines-tab__line-label" title={line.label}>
+                          {line.label}
+                        </span>
+                        <InlineRenameField
+                          value={line.label}
+                          entityLabel="line"
+                          idleDisplayMode="edit-only"
+                          onAccept={(nextValue) => onLineRename(line.id, nextValue)}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No completed lines.</p>
+                )
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="inspector-lines-tab__back"
+                    onClick={() => {
+                      setLinesViewMode('list');
+                    }}
+                  >
+                    Back to completed lines
+                  </button>
+                  {inspectorPanelState.mode === 'line-selected' ? (
+                    <SelectedLineInspector
+                      panelState={inspectorPanelState}
+                      selectedLineRouteBaseline={selectedLineRouteBaseline}
+                      placedStops={placedStops}
+                      activeTimeBandId={activeTimeBandId}
+                      lineFrequencyInputByTimeBand={lineFrequencyInputByTimeBand}
+                      lineFrequencyControlByTimeBand={lineFrequencyControlByTimeBand}
+                      lineFrequencyValidationByTimeBand={lineFrequencyValidationByTimeBand}
+                      selectedLineServiceProjection={selectedLineServiceProjection}
+                      selectedLineServiceInspectorProjection={selectedLineServiceInspectorProjection}
+                      selectedLinePlanningVehicleProjection={selectedLinePlanningVehicleProjection}
+                      selectedLineDemandProjection={selectedLineDemandProjection}
+                      onLineRename={onLineRename}
+                      onLineSequenceStopFocus={onLineSequenceStopFocus}
+                      onStopRename={onStopRename}
+                      onStopSelectionChange={onStopSelectionChange}
+                      onFrequencyChange={onFrequencyChange}
+                      openDialogIntent={openDialogIntent}
+                      onOpenDialogIntentConsumed={onOpenDialogIntentConsumed}
+                    />
+                  ) : (
+                    <p>Select a completed line from the list to open detail.</p>
+                  )}
+                </>
+              )}
+            </section>
+          ) : null}
+        </>
+      )}
 
     </aside>
   );
