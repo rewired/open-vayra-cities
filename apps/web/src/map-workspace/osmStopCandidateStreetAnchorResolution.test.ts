@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { resolveOsmStopCandidateGroupStreetAnchor } from './osmStopCandidateStreetAnchorResolution';
-import type { OsmStopCandidateGroup } from '../domain/types/osmStopCandidate';
+import { createOsmStopCandidateGroupId, type OsmStopCandidateGroup } from '../domain/types/osmStopCandidate';
 import type { MapLibreMap } from './maplibreGlobal';
 import * as streetSnap from './mapWorkspaceStreetSnap';
 import { OSM_STOP_CANDIDATE_STREET_ANCHOR_REVIEW_MAX_DISTANCE_METERS } from '../domain/osm/osmStopCandidateAnchorConstants';
@@ -12,7 +12,7 @@ describe('osmStopCandidateStreetAnchorResolution', () => {
   } as unknown as MapLibreMap;
 
   const mockGroup: OsmStopCandidateGroup = {
-    id: 'group-1' as any,
+    id: createOsmStopCandidateGroupId('group-1'),
     label: 'Test Group',
     displayPosition: { lng: 13.4, lat: 52.5 },
     routingAnchorPosition: { lng: 13.4001, lat: 52.5001 },
