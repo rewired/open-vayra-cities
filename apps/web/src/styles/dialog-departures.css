@@ -1,0 +1,89 @@
+.departures-dialog__line-label,
+.departures-dialog__active-summary {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #d8e6fa;
+}
+
+.departures-dialog__active-summary {
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.departures-dialog__route-baseline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 0.76rem;
+  color: #d4e2f8;
+}
+
+.departures-dialog__route-baseline-pill {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #4b6388;
+  background: #1d2b42;
+  color: #dceafe;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.departures-dialog__timetable {
+  min-height: 0;
+}
+
+.departures-dialog__table-scroll {
+  overflow: auto;
+  max-height: min(58vh, 560px);
+  border: 1px solid var(--cityops-color-border-subtle);
+  border-radius: var(--cityops-radius-md);
+}
+
+.departures-dialog__table {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+  font-size: 0.72rem;
+}
+
+.departures-dialog__table th,
+.departures-dialog__table td {
+  border: 1px solid #2f415f;
+  padding: 4px 6px;
+  white-space: nowrap;
+}
+
+.departures-dialog__table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #16243a;
+  color: #e3efff;
+  text-align: center;
+}
+
+.departures-dialog__table tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: #16243a;
+  color: #d7e7ff;
+  text-align: left;
+  min-width: 150px;
+}
+
+.departures-dialog__table td {
+  text-align: center;
+  color: #d8e6fa;
+}
+
+.departures-dialog__table td[data-state='unavailable'] {
+  color: #f4d7a6;
+}
+
+.departures-dialog__table td[data-state='unconfigured'] {
+  color: #f4d7a6;
+}

@@ -1,0 +1,56 @@
+.line-completion-dialog__content {
+  display: grid;
+  gap: 20px;
+  padding: 8px 4px;
+}
+
+.line-completion-dialog__section h4 {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  color: #9eb4d7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.line-completion-dialog__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.line-completion-dialog__option {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--cityops-color-border);
+  border-radius: var(--cityops-radius-lg);
+  background: var(--cityops-color-surface-soft);
+  color: var(--cityops-color-text-soft);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.line-completion-dialog__option:hover {
+  border-color: #5379ad;
+  background: #243653;
+}
+
+.line-completion-dialog__option--active {
+  border-color: var(--cityops-color-accent-yellow);
+  background: var(--cityops-color-surface-active);
+  color: #fdf4df;
+}
+
+.line-completion-dialog__option strong {
+  font-size: 0.95rem;
+}
+
+.line-completion-dialog__option span {
+  font-size: 0.72rem;
+  color: var(--cityops-color-text-secondary);
+}
+
+.line-completion-dialog__option--active span {
+  color: #e8ce92;
+}

@@ -11,6 +11,10 @@
 @import './styles/inspector-osm-candidate.css';
 @import './styles/network-inventory.css';
 @import './styles/dialogs.css';
+@import './styles/dialog-line-completion.css';
+@import './styles/dialog-service-plan.css';
+@import './styles/dialog-departures.css';
+@import './styles/blocking-data-operation-modal.css';
 @import './styles/toast.css';
 @import './styles/debug-modal.css';
 @import './styles/scenario-selection.css';
