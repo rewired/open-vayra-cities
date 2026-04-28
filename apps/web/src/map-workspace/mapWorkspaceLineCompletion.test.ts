@@ -4,6 +4,7 @@ import { createRoutingProviderId, type RoutingAdapter } from '../domain/routing/
 import { prepareCompletedDraftLine } from './mapWorkspaceLineCompletion';
 import type { Line } from '../domain/types/line';
 import { createLineId, createNoServiceLineServiceByTimeBand } from '../domain/types/line';
+import { LINE_BUILD_PLACEHOLDER_LABEL_PREFIX } from '../domain/constants/lineBuilding';
 
 describe('prepareCompletedDraftLine', () => {
   const stop1: Stop = { id: createStopId('stop-1'), position: { lng: 10, lat: 50 }, label: 'S1' };
@@ -64,6 +65,22 @@ describe('prepareCompletedDraftLine', () => {
     expect(line.label).not.toBe('S1 → S2');
     expect(line.label).toContain('S1 → S2');
 
+  });
+
+  it('falls back to placeholder label when stop-label generation returns null', async () => {
+    const stopWithoutLabel: Stop = { id: createStopId('stop-3'), position: { lng: 10, lat: 50 }, label: '' };
+    const stop2: Stop = { id: createStopId('stop-2'), position: { lng: 10.1, lat: 50.1 }, label: 'S2' };
+
+    const line = await prepareCompletedDraftLine({
+      draftStopIds: [stopWithoutLabel.id, stop2.id],
+      placedStops: [stopWithoutLabel, stop2],
+      existingLines: [],
+      topology: 'linear',
+      servicePattern: 'one-way',
+      routingAdapter: mockAdapter
+    });
+
+    expect(line.label).toBe(`${LINE_BUILD_PLACEHOLDER_LABEL_PREFIX} 1`);
   });
 
   it('throws if stop sequence is shorter than minimum requirements', async () => {
