@@ -424,7 +424,6 @@ const toolModeControlOptions: ReadonlyArray<{
           activeToolMode={sessionController.activeToolMode}
           selectedStopId={sessionController.selectedStopId}
           placedStops={sessionController.sessionStops}
-          lineBuildSelection={sessionController.lineBuildSelection}
           sessionLines={sessionController.sessionLines}
           selectedLineId={sessionController.selectedLineId}
           vehicleNetworkProjection={projections.vehicleNetworkProjection}
@@ -437,9 +436,6 @@ const toolModeControlOptions: ReadonlyArray<{
           mapFocusIntent={mapFocusIntent}
           onMapFocusIntentConsumed={setMapFocusIntent}
           onDebugSnapshotChange={handleMapDebugSnapshotChange}
-          onActiveDataOperationChange={setActiveDataOperation}
-          selectedOsmCandidateGroupId={sessionController.selectedOsmCandidateGroupId}
-          adoptedOsmCandidateGroupIds={sessionController.adoptedOsmCandidateGroupIds}
           onOsmCandidateSelectionChange={sessionController.setSelectedOsmCandidateGroupId}
           osmStopCandidateGroups={osmStopCandidateGroups}
           onOsmCandidateAnchorResolved={setSelectedOsmCandidateAnchor}

@@ -10,21 +10,15 @@ import { type LineTopology, type LineServicePattern } from '../domain/types/line
 import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
-import { loadOsmStopCandidates } from '../domain/osm/osmStopCandidateSource';
-import { consolidateOsmStopCandidates } from '../domain/osm/osmStopCandidateConsolidation';
-import type { OsmStopCandidate, OsmStopCandidateGroup, OsmStopCandidateGroupId } from '../domain/types/osmStopCandidate';
+import type { OsmStopCandidateGroup, OsmStopCandidateGroupId } from '../domain/types/osmStopCandidate';
+
 import { createUniqueStopLabel } from '../domain/stop/stopLabeling';
 import { prepareCompletedDraftLine } from './mapWorkspaceLineCompletion';
 import type { LineBuildSelectionState, MapFocusIntent, WorkspaceToolMode } from '../session/sessionTypes';
 import { INITIAL_DRAFT_LINE_STATE, type DraftLineState } from './mapWorkspaceDraftState';
 import { useMapWorkspaceInteractionBindings } from './useMapWorkspaceInteractionBindings';
 
-import type { ActiveDataOperation } from '../ui/data-operation/types';
-import {
-  MAP_LAYER_ID_COMPLETED_LINES,
-  MAP_LAYER_ID_DRAFT_LINE,
-  MAP_LAYER_ID_VEHICLES
-} from './mapRenderConstants';
+
 import {
   type MapSurfaceInteractionState,
   type PlacementAttemptResult,
@@ -41,11 +35,9 @@ import {
   LINE_OVERLAY_COPY,
   PLACEMENT_MODE_INDICATOR_LABEL
 } from './mapWorkspaceUiFeedback';
-import { syncAllMapWorkspaceSources, syncExistingMapWorkspaceSourceData } from './mapWorkspaceSourceSync';
+import { syncAllMapWorkspaceSources } from './mapWorkspaceSourceSync';
 import {
-  countRenderedFeaturesForLayers,
   createMapWorkspaceInstance,
-  runWhenMapStyleReady,
   setupMapResizeBinding
 } from './mapWorkspaceLifecycle';
 import { applyBasemapSemanticReadabilityOverrides } from './mapBaseStyleOverrides';
@@ -66,7 +58,6 @@ interface MapWorkspaceSurfaceProps {
   readonly activeToolMode: WorkspaceToolMode;
   readonly selectedStopId: StopId | null;
   readonly placedStops: readonly Stop[];
-  readonly lineBuildSelection: LineBuildSelectionState;
   readonly sessionLines: readonly Line[];
   readonly selectedLineId: Line['id'] | null;
   readonly vehicleNetworkProjection: LineVehicleNetworkProjection;
@@ -80,9 +71,6 @@ interface MapWorkspaceSurfaceProps {
   readonly onMapFocusIntentConsumed: (intent: MapFocusIntent | null) => void;
   readonly onDebugSnapshotChange: (nextSnapshot: MapWorkspaceDebugSnapshot) => void;
 
-  readonly onActiveDataOperationChange: (operation: ActiveDataOperation | null) => void;
-  readonly selectedOsmCandidateGroupId: OsmStopCandidateGroupId | null;
-  readonly adoptedOsmCandidateGroupIds: ReadonlySet<OsmStopCandidateGroupId>;
   readonly onOsmCandidateSelectionChange: (nextSelectionId: OsmStopCandidateGroupId | null) => void;
   readonly osmStopCandidateGroups: readonly OsmStopCandidateGroup[];
   readonly onOsmCandidateAnchorResolved: (resolution: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | null) => void;
@@ -133,9 +121,6 @@ export function MapWorkspaceSurface({
   mapFocusIntent,
   onMapFocusIntentConsumed,
   onDebugSnapshotChange,
-  onActiveDataOperationChange,
-  selectedOsmCandidateGroupId,
-  adoptedOsmCandidateGroupIds,
   onOsmCandidateSelectionChange,
   osmStopCandidateGroups,
   onOsmCandidateAnchorResolved
