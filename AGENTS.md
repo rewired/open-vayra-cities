@@ -256,6 +256,26 @@ Do not mix:
 
 ---
 
+## CSS organization rules
+
+Agents must adhere to the CSS architecture when modifying styles.
+
+### Required
+
+* Keep `apps/web/src/App.css` as the ordered import entrypoint unless explicitly instructed otherwise.
+* Put new feature styles in focused files under `apps/web/src/styles/`.
+* Preserve cascade order when moving CSS.
+* Use shared custom properties from the base stylesheet for repeated foundational values.
+
+### Forbidden
+
+* Avoid adding unrelated selectors to existing large CSS files.
+* Do not rename selectors or alter visual values during source-organization slices.
+* Do not introduce CSS Modules, preprocessors, styling libraries, or theme systems without explicit approval.
+* Do not add mobile/touch-first CSS behavior because CityOps is desktop-only.
+
+---
+
 ## MVP scope guardrails
 
 Current MVP focus:
@@ -329,6 +349,7 @@ Before completing a task, verify:
 7. UI did not absorb simulation/domain logic
 8. simplified MVP truths were not silently replaced with heavier realism
 9. documentation placement stayed compliant with this file
+10. CSS changes preserved the feature-file structure and did not recreate stylesheet sprawl
 
 If any of the above changed, surface it explicitly.
 

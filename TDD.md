@@ -166,6 +166,25 @@ Keep build setup simple and close to defaults unless there is a clear need to ex
 
 ---
 
+## CSS organization rule
+
+`apps/web/src/App.css` is the stable stylesheet entrypoint for the web app.
+
+### Required
+
+* Feature styles must live under `apps/web/src/styles/`.
+* CSS files should be organized by UI concern or feature area, not by convenience dumping.
+* Large stylesheets must be split when they begin mixing unrelated concerns.
+* Shared foundational CSS tokens/custom properties belong in the global base stylesheet, not scattered across feature files.
+* Selector names and cascade order must be preserved during CSS-only refactors unless the task explicitly authorizes visual redesign.
+
+### Forbidden
+
+* Do not rebuild a monolithic `App.css`.
+* Do not introduce CSS Modules, preprocessors, runtime theme frameworks, or additional styling dependencies unless explicitly approved.
+
+---
+
 ## Desktop-only implementation rule
 
 This project is desktop-only.
