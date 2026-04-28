@@ -2,7 +2,7 @@
   position: relative;
   flex: 1;
   border: 1px solid #2a3a53;
-  border-radius: 12px;
+  border-radius: var(--cityops-radius-xl);
   overflow: hidden;
 }
 
@@ -54,8 +54,8 @@
   position: absolute;
   z-index: 2;
   padding: 6px 10px;
-  border: 1px solid #425b83;
-  border-radius: 8px;
+  border: 1px solid var(--cityops-color-border);
+  border-radius: var(--cityops-radius-md);
   background: rgb(13 23 38 / 78%);
   color: #d7e4f7;
   font-size: 0.75rem;
@@ -90,7 +90,7 @@
   --stop-marker-affordance-scale: 1;
   border: 2px solid #dbe7f8;
   border-radius: 999px;
-  background: #3c73c0;
+  background: var(--cityops-color-accent-blue-hover);
   box-shadow: 0 0 0 3px rgb(15 23 35 / 50%), 0 0 0 7px rgb(60 115 192 / 24%);
   cursor: pointer;
   transition: box-shadow 120ms ease, background-color 120ms ease, border-color 120ms ease;
@@ -158,6 +158,6 @@
 }
 
 .maplibregl-ctrl-group {
-  border-radius: 8px;
+  border-radius: var(--cityops-radius-md);
   overflow: hidden;
 }

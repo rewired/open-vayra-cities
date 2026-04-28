@@ -18,8 +18,8 @@
   width: min(760px, calc(100vw - 40px));
   max-height: calc(100vh - 56px);
   overflow: auto;
-  border: 1px solid #304766;
-  border-radius: 12px;
+  border: 1px solid var(--cityops-color-border-medium);
+  border-radius: var(--cityops-radius-xl);
   background: #121b2b;
   box-shadow: 0 20px 50px rgb(0 0 0 / 35%);
   padding: 16px;
@@ -52,18 +52,18 @@
 }
 
 .app-debug-modal__tab {
-  border: 1px solid #425b83;
-  border-radius: 6px;
-  background: #1d2a3f;
-  color: #e8eef9;
+  border: 1px solid var(--cityops-color-border);
+  border-radius: var(--cityops-radius-sm);
+  background: var(--cityops-color-surface-hover);
+  color: var(--cityops-color-text);
   padding: 4px 10px;
   font-size: 0.74rem;
   cursor: pointer;
 }
 
 .app-debug-modal__tab[aria-selected='true'] {
-  border-color: #f5c358;
-  background: #2f466f;
+  border-color: var(--cityops-color-accent-yellow);
+  background: var(--cityops-color-surface-active);
 }
 
 .app-debug-modal__section {
@@ -77,10 +77,10 @@
 .app-debug-modal__raw-state {
   margin: 0;
   padding: 10px;
-  border: 1px solid #2f415f;
-  border-radius: 8px;
+  border: 1px solid var(--cityops-color-border-subtle);
+  border-radius: var(--cityops-radius-md);
   background: #0d1624;
-  color: #cfe0fb;
+  color: var(--cityops-color-text-light);
   font-size: 0.74rem;
   line-height: 1.4;
   overflow: auto;

@@ -20,7 +20,7 @@
 
 .left-panel {
   grid-area: left;
-  border-right: 1px solid #263142;
+  border-right: 1px solid var(--cityops-color-border-dark);
   background: #111824;
   padding: 10px 8px;
 }
@@ -40,10 +40,10 @@
   width: 72px;
   min-height: 56px;
   padding: 8px 6px;
-  border: 1px solid #304766;
-  border-radius: 10px;
+  border: 1px solid var(--cityops-color-border-medium);
+  border-radius: var(--cityops-radius-lg);
   background: #182233;
-  color: #e8eef9;
+  color: var(--cityops-color-text);
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -90,12 +90,12 @@
 
 .right-panel p {
   margin: 8px 0 0;
-  color: #9fb0cb;
+  color: var(--cityops-color-text-tertiary);
 }
 
 .right-panel {
   grid-area: right;
-  border-left: 1px solid #263142;
+  border-left: 1px solid var(--cityops-color-border-dark);
   background: #121a27;
   display: flex;
   flex-direction: column;
@@ -108,8 +108,8 @@
   align-items: center;
   gap: 14px;
   justify-content: space-between;
-  border-top: 1px solid #263142;
-  background: #141c29;
+  border-top: 1px solid var(--cityops-color-border-dark);
+  background: var(--cityops-color-surface);
   font-size: 0.82rem;
 }
 
@@ -117,7 +117,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #cfe0fb;
+  color: var(--cityops-color-text-light);
 }
 
 .status-bar__clock-controls {
@@ -133,18 +133,18 @@
 }
 
 .status-bar__button {
-  border: 1px solid #425b83;
-  border-radius: 6px;
-  background: #1d2a3f;
-  color: #e8eef9;
+  border: 1px solid var(--cityops-color-border);
+  border-radius: var(--cityops-radius-sm);
+  background: var(--cityops-color-surface-hover);
+  color: var(--cityops-color-text);
   padding: 4px 8px;
   font-size: 0.78rem;
   cursor: pointer;
 }
 
 .status-bar__button[aria-pressed='true'] {
-  border-color: #f5c358;
-  background: #2f466f;
+  border-color: var(--cityops-color-accent-yellow);
+  background: var(--cityops-color-surface-active);
 }
 
 .status-bar__button:disabled {
@@ -156,7 +156,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #9fb0cb;
+  color: var(--cityops-color-text-tertiary);
 }
 
 .app-shell--blocked {

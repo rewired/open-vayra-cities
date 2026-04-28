@@ -5,8 +5,8 @@
   gap: 20px;
   align-items: center;
   padding: 0 20px;
-  border-bottom: 1px solid #263142;
-  background: #141c29;
+  border-bottom: 1px solid var(--cityops-color-border-dark);
+  background: var(--cityops-color-surface);
   overflow: hidden;
 }
 
@@ -26,14 +26,14 @@
   gap: 2px;
   width: 110px;
   flex-shrink: 0;
-  color: #d9e7fd;
+  color: var(--cityops-color-text-soft);
   line-height: 1.1;
 }
 
 .simulation-control-bar__clock-day {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #adc2e2;
+  color: var(--cityops-color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -41,12 +41,12 @@
 .simulation-control-bar__clock-time {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #e8eef9;
+  color: var(--cityops-color-text);
 }
 
 .simulation-control-bar__clock-time-band {
   font-size: 0.65rem;
-  color: #8da4c7;
+  color: var(--cityops-color-text-muted-alt);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -64,18 +64,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #425b83;
-  border-radius: 8px;
-  background: #1d2a3f;
-  color: #e8eef9;
+  border: 1px solid var(--cityops-color-border);
+  border-radius: var(--cityops-radius-md);
+  background: var(--cityops-color-surface-hover);
+  color: var(--cityops-color-text);
   width: 34px;
   height: 34px;
   cursor: pointer;
 }
 
 .simulation-control-bar__icon-button[aria-pressed='true'] {
-  border-color: #f5c358;
-  background: #2f466f;
+  border-color: var(--cityops-color-accent-yellow);
+  background: var(--cityops-color-surface-active);
 }
 
 .simulation-control-bar__speed-control {
@@ -84,7 +84,7 @@
   gap: 2px;
   padding: 2px;
   border: 1px solid #314665;
-  border-radius: 10px;
+  border-radius: var(--cityops-radius-lg);
   background: #18253a;
   flex-shrink: 0;
 }
@@ -94,9 +94,9 @@
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--cityops-radius-sm);
   background: transparent;
-  color: #d9e7fd;
+  color: var(--cityops-color-text-soft);
   min-width: 36px;
   height: 28px;
   padding: 0 6px;
@@ -108,9 +108,9 @@
 }
 
 .simulation-control-bar__speed-button[aria-pressed='true'] {
-  border-color: #f5c358;
-  background: #2f466f;
-  color: #fdf4df;
+  border-color: var(--cityops-color-accent-yellow);
+  background: var(--cityops-color-surface-active);
+  color: var(--cityops-color-text-brightest);
 }
 
 .simulation-control-bar__speed-button:focus-visible {
@@ -130,9 +130,9 @@
   align-items: center;
   gap: 6px;
   border: 1px dashed #5a759e;
-  border-radius: 8px;
+  border-radius: var(--cityops-radius-md);
   background: #1b2a42;
-  color: #e8eef9;
+  color: var(--cityops-color-text);
   height: 34px;
   padding: 0 10px;
   font-size: 0.74rem;
@@ -143,8 +143,8 @@
 }
 
 .simulation-control-bar__debug-button[aria-pressed='true'] {
-  border-color: #f5c358;
-  background: #2f466f;
+  border-color: var(--cityops-color-accent-yellow);
+  background: var(--cityops-color-surface-active);
 }
 
 .simulation-control-bar__debug-button:focus-visible {
@@ -167,7 +167,7 @@
 .simulation-control-bar__scenario-title {
   font-size: 1rem;
   font-weight: 500;
-  color: #8ca2c0;
+  color: var(--cityops-color-text-secondary-muted);
   margin-left: 12px;
   letter-spacing: 0.02em;
 }

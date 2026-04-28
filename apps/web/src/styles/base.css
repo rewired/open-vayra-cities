@@ -2,6 +2,51 @@
 body,
 #root {
   --right-inspector-width: 364px;
+
+  /* Colors */
+  --cityops-color-bg: #10151f;
+  --cityops-color-bg-dark: #0d131e;
+  --cityops-color-text: #e8eef9;
+  --cityops-color-text-lightest: #e2ebf5;
+  --cityops-color-text-muted: #9eb4d7;
+  --cityops-color-text-muted-alt: #8da4c7;
+  --cityops-color-text-secondary: #adc2e2;
+  --cityops-color-text-secondary-muted: #8ca2c0;
+  --cityops-color-text-tertiary: #9fb0cb;
+  --cityops-color-text-light: #cfe0fb;
+  --cityops-color-text-soft: #d9e7fd;
+  --cityops-color-text-bright: #d7e7ff;
+  --cityops-color-text-brightest: #fdf4df;
+  --cityops-color-accent-yellow: #f5c358;
+  --cityops-color-accent-blue: #0075de;
+  --cityops-color-accent-blue-hover: #3c73c0;
+  
+  /* Semantic Colors */
+  --cityops-color-success: #9fe3ad;
+  --cityops-color-danger: #ffb5b5;
+  --cityops-color-warning: #fae6b3;
+  
+  /* Borders */
+  --cityops-color-border: #425b83;
+  --cityops-color-border-medium: #304766;
+  --cityops-color-border-dark: #263142;
+  --cityops-color-border-subtle: #2f415f;
+  
+  /* Surfaces */
+  --cityops-color-surface: #141c29;
+  --cityops-color-surface-hover: #1d2a3f;
+  --cityops-color-surface-active: #2f466f;
+  --cityops-color-surface-card: #131f31;
+  --cityops-color-surface-soft: #1b2a40;
+  
+  /* Radii */
+  --cityops-radius-sm: 6px;
+  --cityops-radius-md: 8px;
+  --cityops-radius-lg: 10px;
+  --cityops-radius-xl: 12px;
+  --cityops-radius-2xl: 16px;
+  --cityops-radius-pill: 999px;
+
   margin: 0;
   height: 100vh;
   width: 100%;
@@ -11,8 +56,8 @@ body,
 body {
   min-width: 1100px;
   font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background: #10151f;
-  color: #e8eef9;
+  background: var(--cityops-color-bg);
+  color: var(--cityops-color-text);
 }
 
 .u-technical-numeric {

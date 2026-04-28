@@ -16,9 +16,9 @@
   display: grid;
   gap: 10px;
   padding: 10px;
-  border: 1px solid #2f415f;
-  border-radius: 10px;
-  background: #131f31;
+  border: 1px solid var(--cityops-color-border-subtle);
+  border-radius: var(--cityops-radius-lg);
+  background: var(--cityops-color-surface-card);
 }
 
 .inspector-dialog__surface--small {
@@ -61,10 +61,10 @@
   display: grid;
   gap: 4px;
   padding: 12px;
-  border: 1px solid #425b83;
-  border-radius: 10px;
-  background: #1b2a40;
-  color: #d9e7fd;
+  border: 1px solid var(--cityops-color-border);
+  border-radius: var(--cityops-radius-lg);
+  background: var(--cityops-color-surface-soft);
+  color: var(--cityops-color-text-soft);
   text-align: center;
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease;
@@ -76,8 +76,8 @@
 }
 
 .line-completion-dialog__option--active {
-  border-color: #f5c358;
-  background: #2f466f;
+  border-color: var(--cityops-color-accent-yellow);
+  background: var(--cityops-color-surface-active);
   color: #fdf4df;
 }
 
@@ -87,7 +87,7 @@
 
 .line-completion-dialog__option span {
   font-size: 0.72rem;
-  color: #adc2e2;
+  color: var(--cityops-color-text-secondary);
 }
 
 .line-completion-dialog__option--active span {
@@ -114,10 +114,10 @@
   width: 32px;
   height: 32px;
   padding: 0;
-  border: 1px solid #425b83;
-  border-radius: 8px;
-  background: #1d2a3f;
-  color: #e8eef9;
+  border: 1px solid var(--cityops-color-border);
+  border-radius: var(--cityops-radius-md);
+  background: var(--cityops-color-surface-hover);
+  color: var(--cityops-color-text);
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease;
 }
@@ -148,10 +148,10 @@
 .service-plan-dialog__issue-pill {
   margin: 0;
   padding: 3px 8px;
-  border: 1px solid #425b83;
-  border-radius: 999px;
+  border: 1px solid var(--cityops-color-border);
+  border-radius: var(--cityops-radius-pill);
   background: #1b2b44;
-  color: #d7e7ff;
+  color: var(--cityops-color-text-bright);
   font-size: 0.7rem;
   font-weight: 600;
 }
@@ -166,7 +166,7 @@
 .service-plan-dialog__issue-pill--message {
   border-color: #927b3a;
   background: #3d351f;
-  color: #fae6b3;
+  color: var(--cityops-color-warning);
 }
 
 .departures-dialog__line-label,
@@ -209,8 +209,8 @@
 .departures-dialog__table-scroll {
   overflow: auto;
   max-height: min(58vh, 560px);
-  border: 1px solid #2f415f;
-  border-radius: 8px;
+  border: 1px solid var(--cityops-color-border-subtle);
+  border-radius: var(--cityops-radius-md);
 }
 
 .departures-dialog__table {
@@ -276,8 +276,8 @@
   max-width: 420px;
   padding: 32px;
   border: 1px solid #3d5a8a;
-  border-radius: 16px;
-  background: #141c29;
+  border-radius: var(--cityops-radius-2xl);
+  background: var(--cityops-color-surface);
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
   text-align: center;
 }
@@ -293,7 +293,7 @@
 .blocking-data-operation-modal__phase {
   margin: 0 0 24px;
   font-size: 0.9rem;
-  color: #9fb0cb;
+  color: var(--cityops-color-text-tertiary);
 }
 
 .blocking-data-operation-modal__progress-container {
@@ -301,7 +301,7 @@
   height: 6px;
   margin-bottom: 12px;
   border-radius: 3px;
-  background: #1d2a3f;
+  background: var(--cityops-color-surface-hover);
   overflow: hidden;
 }
 
@@ -329,6 +329,6 @@
 .blocking-data-operation-modal__percent {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #adc2e2;
+  color: var(--cityops-color-text-secondary);
   font-family: 'Datatype', monospace;
 }
