@@ -57,7 +57,13 @@ import {
 } from './mapWorkspaceLifecycle';
 import { applyBasemapSemanticReadabilityOverrides } from './mapBaseStyleOverrides';
 import type { MapLibreMap } from './maplibreGlobal';
-import { resolveOsmStopCandidateGroupStreetAnchor } from './osmStopCandidateStreetAnchorResolution';
+import {
+  isStaleOsmStopCandidateHover,
+  resolveOsmStopCandidateHover,
+  resolveCachedOsmStopCandidateStreetAnchor,
+  type ResolvedOsmStopCandidateHoverPayload,
+  type OsmStopCandidateAnchorResolutionCache
+} from './mapWorkspaceOsmCandidateHover';
 import { applyMapWorkspaceFocusIntent } from './mapWorkspaceFocus';
 import { buildMapWorkspaceDebugSnapshot, type MapWorkspaceDebugSnapshot } from './mapWorkspaceDebugSnapshot';
 
@@ -81,18 +87,7 @@ interface MapWorkspaceSurfaceProps {
   readonly mapFocusIntent: MapFocusIntent | null;
   readonly onMapFocusIntentConsumed: (intent: MapFocusIntent | null) => void;
   readonly onDebugSnapshotChange: (nextSnapshot: MapWorkspaceDebugSnapshot) => void;
-  readonly onOsmCandidateHoverChange?: (
-    nextHover: {
-      candidateGroupId: string;
-      label: string;
-      memberCount: number;
-      memberKinds: string;
-      berthCountHint: number;
-      x: number;
-      y: number;
-      anchorResolution?: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | undefined;
-    } | null
-  ) => void;
+
   readonly onActiveDataOperationChange: (operation: ActiveDataOperation | null) => void;
   readonly selectedOsmCandidateGroupId: OsmStopCandidateGroupId | null;
   readonly adoptedOsmCandidateGroupIds: ReadonlySet<OsmStopCandidateGroupId>;
@@ -183,16 +178,7 @@ export function MapWorkspaceSurface({
   });
   const [placementAttemptResult, setPlacementAttemptResult] = useState<PlacementAttemptResult>('none');
   const [hoveredStop, setHoveredStop] = useState<{ stopId: StopId; x: number; y: number } | null>(null);
-  const [hoveredOsmCandidate, setHoveredOsmCandidate] = useState<{
-    candidateGroupId: string;
-    label: string;
-    memberCount: number;
-    memberKinds: string;
-    berthCountHint: number;
-    x: number;
-    y: number;
-    anchorResolution?: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | undefined;
-  } | null>(null);
+  const [hoveredOsmCandidate, setHoveredOsmCandidate] = useState<ResolvedOsmStopCandidateHoverPayload | null>(null);
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
   const [featureDiagnostics, setFeatureDiagnostics] = useState<MapWorkspaceFeatureDiagnostics>(
     INITIAL_MAP_WORKSPACE_FEATURE_DIAGNOSTICS
@@ -213,14 +199,14 @@ export function MapWorkspaceSurface({
   const draftStopIdSetRef = useRef<ReadonlySet<StopId>>(draftStopIdSet);
   const stopsByIdRef = useRef<ReadonlyMap<StopId, Stop>>(new Map());
 
-  const anchorResolutionCacheRef = useRef<Map<OsmStopCandidateGroupId, import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution>>(new Map());
+  const anchorResolutionCacheRef = useRef<OsmStopCandidateAnchorResolutionCache>(new Map());
 
   useEffect(() => {
     anchorResolutionCacheRef.current.clear();
   }, [osmStopCandidateGroups]);
 
   useEffect(() => {
-    if (hoveredOsmCandidate && !osmStopCandidateGroups.some(g => g.id === hoveredOsmCandidate.candidateGroupId)) {
+    if (isStaleOsmStopCandidateHover(hoveredOsmCandidate, osmStopCandidateGroups)) {
       setHoveredOsmCandidate(null);
     }
   }, [osmStopCandidateGroups, hoveredOsmCandidate]);
@@ -369,33 +355,13 @@ export function MapWorkspaceSurface({
         }
       },
       onOsmCandidateHoverChange: (nextHover) => {
-        if (!nextHover) {
-          setHoveredOsmCandidate(null);
-          return;
-        }
-
-        const cached = anchorResolutionCacheRef.current.get(nextHover.candidateGroupId as OsmStopCandidateGroupId);
-        if (cached) {
-          setHoveredOsmCandidate({
-            ...nextHover,
-            anchorResolution: cached
-          });
-          return;
-        }
-
-        const group = osmStopCandidateGroups.find((g) => g.id === nextHover.candidateGroupId);
-        if (!group) {
-          setHoveredOsmCandidate(nextHover);
-          return;
-        }
-
-        const streetLayerIds = resolveStreetLayerIdsFromStyle(mapInstance);
-        const anchorResolution = resolveOsmStopCandidateGroupStreetAnchor(mapInstance, group, streetLayerIds);
-        anchorResolutionCacheRef.current.set(group.id, anchorResolution);
-        setHoveredOsmCandidate({
-          ...nextHover,
-          anchorResolution
+        const resolved = resolveOsmStopCandidateHover({
+          map: mapInstance,
+          hover: nextHover,
+          groups: osmStopCandidateGroups,
+          cache: anchorResolutionCacheRef.current
         });
+        setHoveredOsmCandidate(resolved);
       },
       onValidPlacement: (lng, lat, labelCandidate) => {
         let createdStop!: Stop;
@@ -428,15 +394,12 @@ export function MapWorkspaceSurface({
 
       const group = osmStopCandidateGroups.find((g) => g.id === groupId);
       if (group) {
-        const cached = anchorResolutionCacheRef.current.get(group.id);
-        if (cached) {
-          onOsmCandidateAnchorResolved(cached);
-        } else {
-          const streetLayerIds = resolveStreetLayerIdsFromStyle(mapInstance);
-          const anchorResolution = resolveOsmStopCandidateGroupStreetAnchor(mapInstance, group, streetLayerIds);
-          anchorResolutionCacheRef.current.set(group.id, anchorResolution);
-          onOsmCandidateAnchorResolved(anchorResolution);
-        }
+        const anchorResolution = resolveCachedOsmStopCandidateStreetAnchor({
+          map: mapInstance,
+          group,
+          cache: anchorResolutionCacheRef.current
+        });
+        onOsmCandidateAnchorResolved(anchorResolution);
       } else {
         onOsmCandidateAnchorResolved(null);
       }

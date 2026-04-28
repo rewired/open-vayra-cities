@@ -9,6 +9,7 @@ import {
   MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE
 } from './mapRenderConstants';
 import { createOsmStopCandidateGroupId, type OsmStopCandidateGroupId } from '../domain/types/osmStopCandidate';
+import type { OsmStopCandidateHoverPayload } from './mapWorkspaceOsmCandidateHover';
 import {
   type MapLibreInteractionEvent,
   type MapLibreMap
@@ -76,17 +77,7 @@ export interface MapWorkspaceSurfaceInteractionsContracts {
   readonly onStopHoverChange: (nextHover: { stopId: StopId; x: number; y: number } | null) => void;
   readonly onValidPlacement: (lng: number, lat: number, labelCandidate: string | null) => Stop;
   readonly buildLineContracts: BuildLineModeMapClickContracts;
-  readonly onOsmCandidateHoverChange?: (
-    nextHover: {
-      candidateGroupId: string;
-      label: string;
-      memberCount: number;
-      memberKinds: string;
-      berthCountHint: number;
-      x: number;
-      y: number;
-    } | null
-  ) => void;
+  readonly onOsmCandidateHoverChange?: (nextHover: OsmStopCandidateHoverPayload | null) => void;
 }
 
 /** Disposable interaction binding returned by workspace map setup helpers. */
@@ -242,13 +233,24 @@ export const setupMapWorkspaceInteractions = ({
     if (!onOsmCandidateHoverChange) return;
     const feature = event.features?.[0];
     const props = feature?.properties;
-    if (props?.candidateGroupId && props?.label && props?.memberCount !== undefined) {
+
+    if (!props) return;
+
+    const groupId = decodeOsmCandidateGroupIdFromFeatureProperties(props);
+    if (!groupId) return;
+
+    const label = props.label;
+    const memberCount = props.memberCount;
+    const memberKinds = props.memberKinds;
+    const berthCountHint = props.berthCountHint;
+
+    if (typeof label === 'string' && typeof memberCount === 'number') {
       onOsmCandidateHoverChange({
-        candidateGroupId: props.candidateGroupId as string,
-        label: props.label as string,
-        memberCount: props.memberCount as number,
-        memberKinds: (props.memberKinds as string) ?? '',
-        berthCountHint: (props.berthCountHint as number) ?? 0,
+        candidateGroupId: groupId,
+        label,
+        memberCount,
+        memberKinds: typeof memberKinds === 'string' ? memberKinds : '',
+        berthCountHint: typeof berthCountHint === 'number' ? berthCountHint : 0,
         x: event.point.x,
         y: event.point.y
       });
