@@ -1,0 +1,151 @@
+.network-inventory {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.network-inventory__section {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.network-inventory__title {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #9eb4d7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.network-inventory__list {
+  margin-top: 0;
+  padding-left: 0;
+  list-style: none;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #2f415f;
+  border-radius: 8px;
+  background: #121b2b;
+}
+
+.network-inventory__list-item {
+  border-bottom: 1px solid #233147;
+}
+
+.network-inventory__list-item:last-child {
+  border-bottom: none;
+}
+
+.network-inventory__list-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+}
+
+.network-inventory__item-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  min-width: 0;
+  padding: 5px 6px;
+  border: none;
+  background: transparent;
+  color: #d7e7ff;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.network-inventory__item-button:hover {
+  background: #1d2a42;
+  color: #ffffff;
+}
+
+.network-inventory__item-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inline-rename-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 132px;
+  max-width: 50%;
+}
+
+.inline-rename-field__editor-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.inline-rename-field__input {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #486187;
+  border-radius: 6px;
+  background: #101a2a;
+  color: #e7f1ff;
+  font-size: 0.75rem;
+  padding: 5px 6px;
+}
+
+.inline-rename-field__input:focus-visible {
+  outline: 2px solid #9ec2ff;
+  outline-offset: 1px;
+}
+
+.inline-rename-field__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #314866;
+  border-radius: 6px;
+  background: #18273b;
+  color: #d7e7ff;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.inline-rename-field__icon-button:hover {
+  background: #244061;
+  border-color: #4f719b;
+}
+
+.inline-rename-field__icon-button .app-material-icon {
+  font-size: 0.95rem;
+}
+
+.inline-rename-field__validation {
+  margin: 2px 0 0;
+  font-size: 0.68rem;
+  color: #ffb5b5;
+}
+
+.network-inventory__item-id {
+  font-size: 0.65rem;
+  color: #7995bc;
+  font-family: 'Datatype', monospace;
+}
+
+.network-inventory__empty {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #647b9e;
+  font-style: italic;
+  padding: 4px 2px;
+}

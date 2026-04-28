@@ -1,0 +1,173 @@
+.simulation-control-bar {
+  grid-area: top-bar;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #263142;
+  background: #141c29;
+  overflow: hidden;
+}
+
+.simulation-control-bar__brand {
+  display: inline-flex;
+  align-items: center;
+  font-size: 2.5rem;
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+
+.simulation-control-bar__clock-readout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 110px;
+  flex-shrink: 0;
+  color: #d9e7fd;
+  line-height: 1.1;
+}
+
+.simulation-control-bar__clock-day {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #adc2e2;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.simulation-control-bar__clock-time {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e8eef9;
+}
+
+.simulation-control-bar__clock-time-band {
+  font-size: 0.65rem;
+  color: #8da4c7;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.simulation-control-bar__controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.simulation-control-bar__icon-button,
+.session-actions__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #425b83;
+  border-radius: 8px;
+  background: #1d2a3f;
+  color: #e8eef9;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+}
+
+.simulation-control-bar__icon-button[aria-pressed='true'] {
+  border-color: #f5c358;
+  background: #2f466f;
+}
+
+.simulation-control-bar__speed-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid #314665;
+  border-radius: 10px;
+  background: #18253a;
+  flex-shrink: 0;
+}
+
+.simulation-control-bar__speed-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #d9e7fd;
+  min-width: 36px;
+  height: 28px;
+  padding: 0 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.simulation-control-bar__speed-button[aria-pressed='true'] {
+  border-color: #f5c358;
+  background: #2f466f;
+  color: #fdf4df;
+}
+
+.simulation-control-bar__speed-button:focus-visible {
+  outline: 2px solid #8eb6f6;
+  outline-offset: 1px;
+}
+
+.simulation-control-bar__actions {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 8px;
+}
+
+.simulation-control-bar__debug-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px dashed #5a759e;
+  border-radius: 8px;
+  background: #1b2a42;
+  color: #e8eef9;
+  height: 34px;
+  padding: 0 10px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.simulation-control-bar__debug-button[aria-pressed='true'] {
+  border-color: #f5c358;
+  background: #2f466f;
+}
+
+.simulation-control-bar__debug-button:focus-visible {
+  outline: 2px solid #8eb6f6;
+  outline-offset: 1px;
+}
+
+.session-actions {
+  display: grid;
+  gap: 6px;
+}
+
+.session-actions__buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.simulation-control-bar__scenario-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #8ca2c0;
+  margin-left: 12px;
+  letter-spacing: 0.02em;
+}

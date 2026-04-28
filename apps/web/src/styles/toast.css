@@ -1,0 +1,128 @@
+.app-toast-host {
+  position: fixed;
+  top: 74px;
+  /* Below top bar (64px) + margin */
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 400px;
+  max-width: calc(100vw - 40px);
+  pointer-events: none;
+}
+
+.app-toast {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #2f415f;
+  border-radius: 12px;
+  background: rgba(19, 31, 49, 0.96);
+  box-shadow:
+    rgba(0, 0, 0, 0.4) 0px 4px 18px,
+    rgba(0, 0, 0, 0.2) 0px 2px 8px;
+  color: #e8eef9;
+  pointer-events: auto;
+  animation: toast-slide-in 240ms ease-out;
+  overflow: hidden;
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.app-toast--success {
+  border-left: 4px solid #2a9d99;
+}
+
+.app-toast--error {
+  border-left: 4px solid #e71616;
+}
+
+.app-toast--warning {
+  border-left: 4px solid #e79d00;
+}
+
+.app-toast--info {
+  border-left: 4px solid #0075de;
+}
+
+.app-toast__icon-area {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 2px;
+}
+
+.app-toast__icon-area .app-material-icon {
+  font-size: 32px;
+}
+
+.app-toast--success .app-toast__icon-area {
+  color: #9fe3ad;
+}
+
+.app-toast--error .app-toast__icon-area {
+  color: #ffb5b5;
+}
+
+.app-toast--warning .app-toast__icon-area {
+  color: #ffe39c;
+}
+
+.app-toast--info .app-toast__icon-area {
+  color: #a4cfff;
+}
+
+.app-toast__content {
+  flex: 1;
+  min-width: 0;
+  /* Enable text wrapping */
+}
+
+.app-toast__title {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.app-toast__detail {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #adc2e2;
+  overflow-wrap: anywhere;
+}
+
+.app-toast__dismiss-button {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: #6a88b5;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 120ms ease, color 120ms ease;
+  height: fit-content;
+}
+
+.app-toast__dismiss-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e8eef9;
+}
+
+.app-toast__dismiss-button .app-material-icon {
+  font-size: 1.2rem;
+}
