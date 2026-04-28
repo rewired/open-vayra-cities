@@ -2,6 +2,8 @@ import type { Line } from '../domain/types/line';
 import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
 import type { Stop, StopId } from '../domain/types/stop';
 import type { OsmStopCandidateGroup } from '../domain/types/osmStopCandidate';
+import type { DemandNode } from '../domain/types/demandNode';
+import type { TimeBandId } from '../domain/types/timeBand';
 import { buildCompletedLineFeatureCollection, buildDraftLineFeatureCollection } from './lineGeoJson';
 import {
   MAP_COMPLETED_LINE_CASING_LAYER_PAINT,
@@ -23,12 +25,17 @@ import {
   MAP_VEHICLE_CIRCLE_LAYER_PAINT,
   MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
   MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
-  MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT
+  MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT,
+  MAP_SOURCE_ID_DEMAND_NODES,
+  MAP_LAYER_ID_DEMAND_NODES_CIRCLE,
+  MAP_DEMAND_NODE_CIRCLE_LAYER_PAINT
 } from './mapRenderConstants';
 import type { MapLibreMap } from './maplibreGlobal';
 import { buildStopFeatureCollection } from './stopGeoJson';
 import { buildVehicleFeatureCollection } from './vehicleGeoJson';
 import { buildOsmStopCandidateFeatureCollection } from './osmStopCandidateGeoJson';
+import { buildDemandNodeGeoJson } from './demandNodeGeoJson';
+
 
 /**
  * Optional stop-sync payload used to refresh map-native stop features.
@@ -67,6 +74,11 @@ export interface SyncAllMapWorkspaceSourcesInput {
   readonly lineSync?: MapWorkspaceLineSyncInput;
   readonly vehicleSync?: MapWorkspaceVehicleSyncInput;
   readonly osmStopCandidateSync?: readonly OsmStopCandidateGroup[];
+  readonly demandNodeSync?: {
+    readonly demandNodes: readonly DemandNode[];
+    readonly activeTimeBandId: TimeBandId;
+    readonly visible: boolean;
+  };
 }
 
 /**
@@ -81,9 +93,13 @@ export interface MapWorkspaceSourceSyncDiagnostics {
   readonly vehicleSourceFeatureCount: number;
   readonly osmStopCandidateBuilderFeatureCount?: number;
   readonly osmStopCandidateSourceFeatureCount: number;
+  readonly demandNodeBuilderFeatureCount?: number;
+  readonly demandNodeSourceFeatureCount?: number;
 }
 
+
 const CUSTOM_LAYER_ORDER = [
+  MAP_LAYER_ID_DEMAND_NODES_CIRCLE,
   MAP_LAYER_ID_COMPLETED_LINES_CASING,
   MAP_LAYER_ID_COMPLETED_LINES,
   MAP_LAYER_ID_DRAFT_LINE,
@@ -109,8 +125,10 @@ const WORKSPACE_SOURCE_IDS = [
   MAP_SOURCE_ID_DRAFT_LINE,
   MAP_SOURCE_ID_STOPS,
   MAP_SOURCE_ID_VEHICLES,
-  MAP_SOURCE_ID_OSM_STOP_CANDIDATES
+  MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
+  MAP_SOURCE_ID_DEMAND_NODES
 ] as const;
+
 
 /**
  * Returns whether all workspace-owned GeoJSON sources already exist on the current map style.
@@ -265,15 +283,33 @@ const ensureAllMapWorkspaceRenderSourcesAndLayers = (map: MapLibreMap): void => 
     });
   }
 
+  if (!map.getSource(MAP_SOURCE_ID_DEMAND_NODES)) {
+    map.addSource(MAP_SOURCE_ID_DEMAND_NODES, {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_DEMAND_NODES_CIRCLE)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_DEMAND_NODES_CIRCLE,
+      type: 'circle',
+      source: MAP_SOURCE_ID_DEMAND_NODES,
+      paint: MAP_DEMAND_NODE_CIRCLE_LAYER_PAINT
+    });
+  }
 };
+
 
 const syncMapWorkspaceSourceData = ({
   map,
   stopSync,
   lineSync,
   vehicleSync,
-  osmStopCandidateSync
+  osmStopCandidateSync,
+  demandNodeSync
 }: SyncAllMapWorkspaceSourcesInput): MapWorkspaceSourceSyncDiagnostics => {
+
   let stopBuilderFeatureCount: number | undefined;
   let lineBuilderFeatureCount: number | undefined;
   let vehicleBuilderFeatureCount: number | undefined;
@@ -331,6 +367,18 @@ const syncMapWorkspaceSourceData = ({
     osmSource?.setData(osmFeatureCollection);
   }
 
+  let demandNodeBuilderFeatureCount: number | undefined;
+  if (demandNodeSync) {
+    const demandFeatureCollection = demandNodeSync.visible
+      ? buildDemandNodeGeoJson(demandNodeSync.demandNodes, demandNodeSync.activeTimeBandId)
+      : { type: 'FeatureCollection' as const, features: [] };
+
+
+    demandNodeBuilderFeatureCount = demandFeatureCollection.features.length;
+    const demandSource = map.getSource(MAP_SOURCE_ID_DEMAND_NODES);
+    demandSource?.setData(demandFeatureCollection);
+  }
+
   enforceMapWorkspaceCustomLayerOrder(map);
 
   return {
@@ -342,9 +390,12 @@ const syncMapWorkspaceSourceData = ({
     ...(vehicleBuilderFeatureCount === undefined ? {} : { vehicleBuilderFeatureCount }),
     vehicleSourceFeatureCount: countSourceFeatures(map, MAP_SOURCE_ID_VEHICLES),
     ...(osmStopCandidateBuilderFeatureCount === undefined ? {} : { osmStopCandidateBuilderFeatureCount }),
-    osmStopCandidateSourceFeatureCount: countSourceFeatures(map, MAP_SOURCE_ID_OSM_STOP_CANDIDATES)
+    osmStopCandidateSourceFeatureCount: countSourceFeatures(map, MAP_SOURCE_ID_OSM_STOP_CANDIDATES),
+    ...(demandNodeBuilderFeatureCount === undefined ? {} : { demandNodeBuilderFeatureCount }),
+    demandNodeSourceFeatureCount: countSourceFeatures(map, MAP_SOURCE_ID_DEMAND_NODES)
   };
-};
+}
+;
 
 /**
  * Synchronizes source data immediately when all workspace sources already exist.

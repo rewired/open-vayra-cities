@@ -23,7 +23,8 @@ import {
   type DebugModalServiceDiagnostics
 } from './ui/DebugModal';
 import { summarizeDemandNodes } from './domain/demand/demandNodeHelpers';
-import { MVP_DEMAND_SCENARIO } from './domain/demand/mvpDemandScenario';
+import { loadScenarioDemandNodes } from './domain/demand/loadScenarioDemandNodes';
+import type { DemandNode } from './domain/types/demandNode';
 import { WORKSPACE_MODE_ICONS } from './ui/icons/materialIcons';
 import type { MapFocusIntent } from './session/sessionTypes';
 import { BlockingDataOperationModal } from './ui/data-operation/BlockingDataOperationModal';
@@ -139,6 +140,8 @@ export default function App(): ReactElement {
   
   const [osmStopCandidates, setOsmStopCandidates] = useState<readonly OsmStopCandidate[]>([]);
   const [selectedOsmCandidateAnchor, setSelectedOsmCandidateAnchor] = useState<OsmStopCandidateStreetAnchorResolution | null>(null);
+  const [scenarioDemandNodes, setScenarioDemandNodes] = useState<readonly DemandNode[]>([]);
+
 
 
 
@@ -190,6 +193,40 @@ export default function App(): ReactElement {
     };
   }, [selectedScenario]);
 
+  useEffect(() => {
+
+    if (!selectedScenario) {
+      setScenarioDemandNodes([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadDemand = async (): Promise<void> => {
+      try {
+        const result = await loadScenarioDemandNodes(selectedScenario.scenarioId);
+        if (cancelled) return;
+
+        if (result.status === 'loaded') {
+          setScenarioDemandNodes(result.nodes);
+        } else {
+          console.warn(`[App] Demand nodes load status: ${result.status}. Message: ${result.message || 'none'}`);
+          setScenarioDemandNodes([]);
+        }
+      } catch (error) {
+        console.error('[App] Demand node load failed:', error);
+        if (!cancelled) {
+          setScenarioDemandNodes([]);
+        }
+      }
+    };
+
+    loadDemand();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedScenario]);
 
   const projections = useNetworkPlanningProjections(
     sessionController.sessionLines,
@@ -198,8 +235,9 @@ export default function App(): ReactElement {
     clockController.activeSimulationTimeBandId,
     clockController.currentSimulationMinuteOfDay,
     clockController.currentSimulationSecondOfDay,
-    MVP_DEMAND_SCENARIO
+    scenarioDemandNodes
   );
+
   const inspectorPanelState = resolveInspectorPanelState(
     sessionController.selectedLine,
     sessionController.selectedStop,
@@ -232,7 +270,7 @@ const toolModeControlOptions: ReadonlyArray<{
     totalProjectedVehicleCount: projections.vehicleNetworkProjection.summary.totalProjectedVehicleCount,
     draftOrderedStopIds: sessionController.lineBuildSelection.selectedStopIds,
     completedLineIds: sessionController.sessionLines.map((line) => line.id),
-    demandNodeSummary: summarizeDemandNodes(MVP_DEMAND_SCENARIO)
+    demandNodeSummary: summarizeDemandNodes(scenarioDemandNodes)
   };
   const routingDiagnostics: DebugModalRoutingDiagnostics = {
     selectedLineOrderedStopIds: sessionController.selectedLine?.stopIds ?? [],
@@ -439,7 +477,10 @@ const toolModeControlOptions: ReadonlyArray<{
           onOsmCandidateSelectionChange={sessionController.setSelectedOsmCandidateGroupId}
           osmStopCandidateGroups={osmStopCandidateGroups}
           onOsmCandidateAnchorResolved={setSelectedOsmCandidateAnchor}
+          demandNodes={scenarioDemandNodes}
+          activeTimeBandId={clockController.activeSimulationTimeBandId}
         />
+
       </main>
 
       <InspectorPanel

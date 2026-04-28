@@ -11,6 +11,9 @@ import type { LineVehicleNetworkProjection } from '../domain/types/lineVehiclePr
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
 import type { OsmStopCandidateGroup, OsmStopCandidateGroupId } from '../domain/types/osmStopCandidate';
+import type { DemandNode } from '../domain/types/demandNode';
+import type { TimeBandId } from '../domain/types/timeBand';
+
 
 import { createUniqueStopLabel } from '../domain/stop/stopLabeling';
 import { prepareCompletedDraftLine } from './mapWorkspaceLineCompletion';
@@ -74,6 +77,8 @@ interface MapWorkspaceSurfaceProps {
   readonly onOsmCandidateSelectionChange: (nextSelectionId: OsmStopCandidateGroupId | null) => void;
   readonly osmStopCandidateGroups: readonly OsmStopCandidateGroup[];
   readonly onOsmCandidateAnchorResolved: (resolution: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | null) => void;
+  readonly demandNodes: readonly DemandNode[];
+  readonly activeTimeBandId: TimeBandId;
 }
 
 
@@ -123,7 +128,9 @@ export function MapWorkspaceSurface({
   onDebugSnapshotChange,
   onOsmCandidateSelectionChange,
   osmStopCandidateGroups,
-  onOsmCandidateAnchorResolved
+  onOsmCandidateAnchorResolved,
+  demandNodes,
+  activeTimeBandId
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -139,6 +146,8 @@ export function MapWorkspaceSurface({
     INITIAL_MAP_WORKSPACE_FEATURE_DIAGNOSTICS
   );
   const [lastPlacedStopLabel, setLastPlacedStopLabel] = useState<string | null>(null);
+  const [isDemandOverlayVisible, setIsDemandOverlayVisible] = useState<boolean>(false);
+
   const [isCompletingLine, setIsCompletingLine] = useState(false);
   const [isCompletionDialogOpen, setIsCompletionDialogOpen] = useState(false);
   const activeToolModeRef = useRef<WorkspaceToolMode>(activeToolMode);
@@ -215,6 +224,21 @@ export function MapWorkspaceSurface({
     draftStopIdSetRef.current = draftStopIdSet;
   }, [draftStopIdSet]);
 
+  const demandNodesRef = useRef<readonly DemandNode[]>(demandNodes);
+  const activeTimeBandIdRef = useRef<TimeBandId>(activeTimeBandId);
+  const isDemandOverlayVisibleRef = useRef<boolean>(isDemandOverlayVisible);
+
+  useEffect(() => {
+    demandNodesRef.current = demandNodes;
+  }, [demandNodes]);
+
+  useEffect(() => {
+    activeTimeBandIdRef.current = activeTimeBandId;
+  }, [activeTimeBandId]);
+
+  useEffect(() => {
+    isDemandOverlayVisibleRef.current = isDemandOverlayVisible;
+  }, [isDemandOverlayVisible]);
 
   useEffect(() => {
     const containerElement = mapContainerRef.current;
@@ -244,7 +268,13 @@ export function MapWorkspaceSurface({
         },
         vehicleSync: {
           vehicleNetworkProjection: vehicleNetworkProjectionRef.current
+        },
+        demandNodeSync: {
+          demandNodes: demandNodesRef.current,
+          activeTimeBandId: activeTimeBandIdRef.current,
+          visible: isDemandOverlayVisibleRef.current
         }
+
       });
 
       setFeatureDiagnostics((currentDiagnostics) => ({
@@ -321,7 +351,11 @@ export function MapWorkspaceSurface({
     selectedLineId,
     vehicleNetworkProjection,
     osmStopCandidateGroups,
+    demandNodes,
+    activeTimeBandId,
+    isDemandOverlayVisible,
     setFeatureDiagnostics
+
   });
 
   const placementUiFeedback = buildPlacementUiFeedback(activeToolMode, placementAttemptResult);
@@ -438,6 +472,22 @@ export function MapWorkspaceSurface({
   return (
     <section className="map-workspace" aria-label="Map workspace surface">
       <div ref={mapContainerRef} className="map-workspace__map" aria-label="CityOps baseline map" />
+
+      <div className="map-workspace__overlay map-workspace__overlay--demand-toggle" aria-label="Demand overlay controls">
+        <label className="map-workspace__demand-toggle-label">
+          <input
+            type="checkbox"
+            checked={isDemandOverlayVisible}
+            onChange={(e) => setIsDemandOverlayVisible(e.target.checked)}
+            className="map-workspace__demand-toggle-checkbox"
+          />
+          <span>Demand overlay</span>
+        </label>
+        <span className="map-workspace__demand-toggle-status">
+          {demandNodes.length > 0 ? `${demandNodes.length} nodes` : 'No scenario demand data'}
+        </span>
+      </div>
+
 
       {placementUiFeedback.showPlacementModeIndicator ? (
         <div className="map-workspace__overlay map-workspace__overlay--mode" aria-live="polite" aria-label="Placement mode status">

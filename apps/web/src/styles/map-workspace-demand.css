@@ -1,0 +1,32 @@
+.map-workspace__overlay--demand-toggle {
+  top: 14px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: auto;
+  text-transform: none;
+}
+
+.map-workspace__demand-toggle-label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-weight: 600;
+  color: var(--cityops-color-text-light);
+  cursor: pointer;
+}
+
+.map-workspace__demand-toggle-checkbox {
+  accent-color: var(--cityops-color-accent-blue);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.map-workspace__demand-toggle-status {
+  font-size: 0.65rem;
+  color: var(--cityops-color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}

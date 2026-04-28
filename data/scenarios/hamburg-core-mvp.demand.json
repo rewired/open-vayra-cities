@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "hamburg-core-mvp",
+  "demandProfileId": "hamburg-core-synthetic-v1",
+  "nodes": [
+    {
+      "id": "demand-res-altona-1",
+      "label": "Altona North Residential",
+      "position": { "lng": 9.935, "lat": 53.56 },
+      "role": "origin",
+      "demandClass": "residential",
+      "weightByTimeBand": {
+        "morning-rush": 100,
+        "late-morning": 30,
+        "midday": 30,
+        "afternoon": 30,
+        "evening-rush": 100,
+        "evening": 15,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-res-altona-2",
+      "label": "Altona South Residential",
+      "position": { "lng": 9.938, "lat": 53.547 },
+      "role": "origin",
+      "demandClass": "residential",
+      "weightByTimeBand": {
+        "morning-rush": 120,
+        "late-morning": 40,
+        "midday": 40,
+        "afternoon": 40,
+        "evening-rush": 120,
+        "evening": 20,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-res-eimsbuttel-1",
+      "label": "Eimsbüttel Central Residential",
+      "position": { "lng": 9.954, "lat": 53.576 },
+      "role": "origin",
+      "demandClass": "residential",
+      "weightByTimeBand": {
+        "morning-rush": 150,
+        "late-morning": 50,
+        "midday": 50,
+        "afternoon": 50,
+        "evening-rush": 150,
+        "evening": 25,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-res-eimsbuttel-2",
+      "label": "Eimsbüttel East Residential",
+      "position": { "lng": 9.97, "lat": 53.57 },
+      "role": "origin",
+      "demandClass": "residential",
+      "weightByTimeBand": {
+        "morning-rush": 110,
+        "late-morning": 35,
+        "midday": 35,
+        "afternoon": 35,
+        "evening-rush": 110,
+        "evening": 17,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-res-winterhude-1",
+      "label": "Winterhude West Residential",
+      "position": { "lng": 9.995, "lat": 53.59 },
+      "role": "origin",
+      "demandClass": "residential",
+      "weightByTimeBand": {
+        "morning-rush": 140,
+        "late-morning": 45,
+        "midday": 45,
+        "afternoon": 45,
+        "evening-rush": 140,
+        "evening": 22,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-res-winterhude-2",
+      "label": "Winterhude East Residential",
+      "position": { "lng": 10.015, "lat": 53.595 },
+      "role": "origin",
+      "demandClass": "residential",
+      "weightByTimeBand": {
+        "morning-rush": 130,
+        "late-morning": 40,
+        "midday": 40,
+        "afternoon": 40,
+        "evening-rush": 130,
+        "evening": 20,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-res-harburg-1",
+      "label": "Harburg Central Residential",
+      "position": { "lng": 9.98, "lat": 53.461 },
+      "role": "origin",
+      "demandClass": "residential",
+      "weightByTimeBand": {
+        "morning-rush": 90,
+        "late-morning": 25,
+        "midday": 25,
+        "afternoon": 25,
+        "evening-rush": 90,
+        "evening": 12,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-res-st-georg-1",
+      "label": "St. Georg Residential",
+      "position": { "lng": 10.01, "lat": 53.555 },
+      "role": "origin",
+      "demandClass": "residential",
+      "weightByTimeBand": {
+        "morning-rush": 80,
+        "late-morning": 20,
+        "midday": 20,
+        "afternoon": 20,
+        "evening-rush": 80,
+        "evening": 10,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-res-wilhelmsburg-1",
+      "label": "Wilhelmsburg North Residential",
+      "position": { "lng": 10, "lat": 53.5 },
+      "role": "origin",
+      "demandClass": "residential",
+      "weightByTimeBand": {
+        "morning-rush": 70,
+        "late-morning": 20,
+        "midday": 20,
+        "afternoon": 20,
+        "evening-rush": 70,
+        "evening": 10,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-res-eppendorf-1",
+      "label": "Eppendorf Residential",
+      "position": { "lng": 9.985, "lat": 53.585 },
+      "role": "origin",
+      "demandClass": "residential",
+      "weightByTimeBand": {
+        "morning-rush": 120,
+        "late-morning": 35,
+        "midday": 35,
+        "afternoon": 35,
+        "evening-rush": 120,
+        "evening": 17,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-work-city-1",
+      "label": "City Center Workplaces",
+      "position": { "lng": 9.993, "lat": 53.551 },
+      "role": "destination",
+      "demandClass": "workplace",
+      "weightByTimeBand": {
+        "morning-rush": 200,
+        "late-morning": 80,
+        "midday": 80,
+        "afternoon": 80,
+        "evening-rush": 160,
+        "evening": 40,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-work-city-2",
+      "label": "Jungfernstieg Business District",
+      "position": { "lng": 9.99, "lat": 53.554 },
+      "role": "destination",
+      "demandClass": "workplace",
+      "weightByTimeBand": {
+        "morning-rush": 180,
+        "late-morning": 70,
+        "midday": 70,
+        "afternoon": 70,
+        "evening-rush": 144,
+        "evening": 35,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-work-hammerbrook-1",
+      "label": "Hammerbrook Office Hub",
+      "position": { "lng": 10.021, "lat": 53.546 },
+      "role": "destination",
+      "demandClass": "workplace",
+      "weightByTimeBand": {
+        "morning-rush": 250,
+        "late-morning": 100,
+        "midday": 100,
+        "afternoon": 100,
+        "evening-rush": 200,
+        "evening": 50,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-work-hafencity-1",
+      "label": "HafenCity West Workplaces",
+      "position": { "lng": 9.994, "lat": 53.542 },
+      "role": "destination",
+      "demandClass": "workplace",
+      "weightByTimeBand": {
+        "morning-rush": 150,
+        "late-morning": 60,
+        "midday": 60,
+        "afternoon": 60,
+        "evening-rush": 120,
+        "evening": 30,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-work-hafencity-2",
+      "label": "HafenCity East Development",
+      "position": { "lng": 10.008, "lat": 53.54 },
+      "role": "destination",
+      "demandClass": "workplace",
+      "weightByTimeBand": {
+        "morning-rush": 120,
+        "late-morning": 50,
+        "midday": 50,
+        "afternoon": 50,
+        "evening-rush": 96,
+        "evening": 25,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-work-altona-1",
+      "label": "Altona Business Park",
+      "position": { "lng": 9.925, "lat": 53.555 },
+      "role": "destination",
+      "demandClass": "workplace",
+      "weightByTimeBand": {
+        "morning-rush": 130,
+        "late-morning": 55,
+        "midday": 55,
+        "afternoon": 55,
+        "evening-rush": 104,
+        "evening": 27,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-work-harburg-1",
+      "label": "Harburg Port Industry",
+      "position": { "lng": 9.975, "lat": 53.475 },
+      "role": "destination",
+      "demandClass": "workplace",
+      "weightByTimeBand": {
+        "morning-rush": 110,
+        "late-morning": 40,
+        "midday": 40,
+        "afternoon": 40,
+        "evening-rush": 88,
+        "evening": 20,
+        "night": 1
+      }
+    },
+    {
+      "id": "demand-work-uk-eppendorf-1",
+      "label": "UKE Medical Center",
+      "position": { "lng": 9.975, "lat": 53.59 },
+      "role": "destination",
+      "demandClass": "workplace",
+      "weightByTimeBand": {
+        "morning-rush": 300,
+        "late-morning": 150,
+        "midday": 150,
+        "afternoon": 150,
+        "evening-rush": 240,
+        "evening": 75,
+        "night": 1
+      }
+    }
+  ]
+}

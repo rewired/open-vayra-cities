@@ -224,3 +224,41 @@ export const MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT = {
     0.8
   ]
 } as const;
+
+/**
+ * Canonical GeoJSON source id for scenario-bound demand nodes.
+ */
+export const MAP_SOURCE_ID_DEMAND_NODES = 'cityops-demand-nodes';
+
+/**
+ * Canonical circle layer id for non-interactive demand node markers.
+ */
+export const MAP_LAYER_ID_DEMAND_NODES_CIRCLE = 'cityops-demand-nodes-circle';
+
+/**
+ * Canonical style layer ids for demand node rendering in deterministic order.
+ */
+export const MAP_DEMAND_NODE_LAYER_IDS = [MAP_LAYER_ID_DEMAND_NODES_CIRCLE] as const;
+
+/**
+ * Circle paint attributes scaling node sizes by active weight logic.
+ */
+export const MAP_DEMAND_NODE_CIRCLE_LAYER_PAINT = {
+  'circle-radius': [
+    'interpolate',
+    ['linear'],
+    ['get', 'activeWeight'],
+    0, 6,
+    300, 18
+  ],
+  'circle-color': [
+    'case',
+    ['==', ['get', 'role'], 'origin'],
+    '#14b8a6', // Teal for residential origin
+    '#ec4899'  // Pink for workplace destination
+  ],
+  'circle-opacity': 0.6,
+  'circle-stroke-width': 1.5,
+  'circle-stroke-color': '#ffffff'
+} as const;
+

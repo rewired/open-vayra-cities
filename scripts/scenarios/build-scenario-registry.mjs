@@ -102,7 +102,19 @@ for (const file of scenarioFiles) {
     missingRequirements,
     scenario: data
   });
+
+  // Copy associated demand payload if present
+  const demandFile = file.replace('.scenario.json', '.demand.json');
+  const demandFilePath = path.join(scenariosDir, demandFile);
+  if (fs.existsSync(demandFilePath)) {
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+    const publicDemandPath = path.join(outputDir, demandFile);
+    fs.copyFileSync(demandFilePath, publicDemandPath);
+  }
 }
+
 
 // 3. Generate Output
 const registry = {
