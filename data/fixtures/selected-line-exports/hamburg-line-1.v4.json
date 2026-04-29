@@ -1,16 +1,16 @@
 {
-  "schema": "cityops.network-save",
+  "schema": "openvayra-cities.network-save",
   "schemaVersion": 1,
   "exportedAt": "2026-04-26T10:18:20.000Z",
   "app": {
     "name": "CityOps"
   },
   "payload": {
-    "schemaVersion": "cityops-selected-line-export-v4",
+    "schemaVersion": "openvayra-cities-selected-line-export-v4",
     "exportKind": "single-line",
     "createdAtIsoUtc": "2026-04-26T10:18:20.000Z",
     "sourceMetadata": {
-      "source": "cityops-web"
+      "source": "openvayra-cities-web"
     },
     "line": {
       "id": "line-1",

@@ -16,13 +16,13 @@
   display: flex;
   gap: 16px;
   padding: 16px;
-  border: 1px solid var(--cityops-color-border-subtle);
-  border-radius: var(--cityops-radius-xl);
+  border: 1px solid var(--openvayra-cities-color-border-subtle);
+  border-radius: var(--openvayra-cities-radius-xl);
   background: rgba(19, 31, 49, 0.96);
   box-shadow:
     rgba(0, 0, 0, 0.4) 0px 4px 18px,
     rgba(0, 0, 0, 0.2) 0px 2px 8px;
-  color: var(--cityops-color-text);
+  color: var(--openvayra-cities-color-text);
   pointer-events: auto;
   animation: toast-slide-in 240ms ease-out;
   overflow: hidden;
@@ -53,7 +53,7 @@
 }
 
 .app-toast--info {
-  border-left: 4px solid var(--cityops-color-accent-blue);
+  border-left: 4px solid var(--openvayra-cities-color-accent-blue);
 }
 
 .app-toast__icon-area {
@@ -68,11 +68,11 @@
 }
 
 .app-toast--success .app-toast__icon-area {
-  color: var(--cityops-color-success);
+  color: var(--openvayra-cities-color-success);
 }
 
 .app-toast--error .app-toast__icon-area {
-  color: var(--cityops-color-danger);
+  color: var(--openvayra-cities-color-danger);
 }
 
 .app-toast--warning .app-toast__icon-area {
@@ -99,7 +99,7 @@
   margin: 0;
   font-size: 0.85rem;
   line-height: 1.4;
-  color: var(--cityops-color-text-secondary);
+  color: var(--openvayra-cities-color-text-secondary);
   overflow-wrap: anywhere;
 }
 
@@ -120,7 +120,7 @@
 
 .app-toast__dismiss-button:hover {
   background: rgba(255, 255, 255, 0.08);
-  color: var(--cityops-color-text);
+  color: var(--openvayra-cities-color-text);
 }
 
 .app-toast__dismiss-button .app-material-icon {

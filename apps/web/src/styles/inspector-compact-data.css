@@ -1,8 +1,8 @@
 .inspector-card {
   padding: 8px;
-  border: 1px solid var(--cityops-color-border-subtle);
-  border-radius: var(--cityops-radius-md);
-  background: var(--cityops-color-surface-card);
+  border: 1px solid var(--openvayra-cities-color-border-subtle);
+  border-radius: var(--openvayra-cities-radius-md);
+  background: var(--openvayra-cities-color-surface-card);
 }
 
 .inspector-card h3 {
@@ -21,13 +21,13 @@
 .inspector-compact-table td {
   vertical-align: top;
   padding: 4px 6px;
-  border-top: 1px solid var(--cityops-color-border-subtle);
+  border-top: 1px solid var(--openvayra-cities-color-border-subtle);
 }
 
 .inspector-compact-table th {
   text-align: left;
   width: 46%;
-  color: var(--cityops-color-text-light);
+  color: var(--openvayra-cities-color-text-light);
   font-weight: 600;
 }
 
@@ -45,6 +45,6 @@
 
 .inspector-details summary {
   cursor: pointer;
-  color: var(--cityops-color-text-light);
+  color: var(--openvayra-cities-color-text-light);
   font-size: 0.78rem;
 }

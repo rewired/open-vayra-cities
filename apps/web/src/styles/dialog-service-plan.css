@@ -8,10 +8,10 @@
 .service-plan-dialog__issue-pill {
   margin: 0;
   padding: 3px 8px;
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-pill);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-pill);
   background: #1b2b44;
-  color: var(--cityops-color-text-bright);
+  color: var(--openvayra-cities-color-text-bright);
   font-size: 0.7rem;
   font-weight: 600;
 }
@@ -26,5 +26,5 @@
 .service-plan-dialog__issue-pill--message {
   border-color: #927b3a;
   background: #3d351f;
-  color: var(--cityops-color-warning);
+  color: var(--openvayra-cities-color-warning);
 }

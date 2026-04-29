@@ -16,9 +16,9 @@
   display: grid;
   gap: 10px;
   padding: 10px;
-  border: 1px solid var(--cityops-color-border-subtle);
-  border-radius: var(--cityops-radius-lg);
-  background: var(--cityops-color-surface-card);
+  border: 1px solid var(--openvayra-cities-color-border-subtle);
+  border-radius: var(--openvayra-cities-radius-lg);
+  background: var(--openvayra-cities-color-surface-card);
 }
 
 .inspector-dialog__surface--small {
@@ -57,10 +57,10 @@
   width: 32px;
   height: 32px;
   padding: 0;
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-md);
-  background: var(--cityops-color-surface-hover);
-  color: var(--cityops-color-text);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-md);
+  background: var(--openvayra-cities-color-surface-hover);
+  color: var(--openvayra-cities-color-text);
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease;
 }

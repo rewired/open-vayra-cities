@@ -4,8 +4,8 @@
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background: var(--cityops-color-bg-dark);
-  color: var(--cityops-color-text-lightest);
+  background: var(--openvayra-cities-color-bg-dark);
+  color: var(--openvayra-cities-color-text-lightest);
   overflow: hidden;
   box-sizing: border-box;
   padding: 40px;
@@ -61,14 +61,14 @@
 .scenario-selection-screen__brand {
   font-size: 1.5rem;
   letter-spacing: 0.04em;
-  color: var(--cityops-wordmark-ops-color);
+  color: var(--openvayra-cities-wordmark-ops-color);
   margin-bottom: 16px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
 }
 
 .scenario-selection-screen__brand strong {
-  color: var(--cityops-wordmark-city-color);
+  color: var(--openvayra-cities-wordmark-city-color);
   font-weight: 700;
 }
 
@@ -82,7 +82,7 @@
 
 .scenario-selection-screen__subtitle {
   font-size: 1.1rem;
-  color: var(--cityops-color-text-secondary-muted);
+  color: var(--openvayra-cities-color-text-secondary-muted);
   margin: 0;
 }
 
@@ -105,8 +105,8 @@
   gap: 8px;
   background: transparent;
   border: 1px solid #344866;
-  border-radius: var(--cityops-radius-xl);
-  color: var(--cityops-color-text-secondary-muted);
+  border-radius: var(--openvayra-cities-radius-xl);
+  color: var(--openvayra-cities-color-text-secondary-muted);
   padding: 10px 20px;
   font-size: 0.9rem;
   font-weight: 600;

@@ -78,7 +78,7 @@ export type SelectedLineExportValidationResult =
 const CANONICAL_TIME_BAND_IDS_SET = new Set<string>(MVP_TIME_BAND_IDS);
 
 /** Legacy v3 schema version string for explicit rejection. */
-const SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3 = 'cityops-selected-line-export-v3';
+const SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3 = 'openvayra-cities-selected-line-export-v3';
 
 /** Human-readable message for unsupported v3 imports. */
 export const UNSUPPORTED_LEGACY_V3_MESSAGE = 'This CityOps save format is no longer supported.';

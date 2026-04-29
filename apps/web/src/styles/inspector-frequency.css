@@ -31,8 +31,8 @@
   color: #c8d6ee;
   margin: 0;
   padding: 6px 8px;
-  border: 1px solid var(--cityops-color-border-subtle);
-  border-radius: var(--cityops-radius-md);
+  border: 1px solid var(--openvayra-cities-color-border-subtle);
+  border-radius: var(--openvayra-cities-radius-md);
 }
 
 .inspector-frequency-editor__band-label,
@@ -58,19 +58,19 @@
 }
 
 .inspector-frequency-editor__toggle {
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-sm);
-  background: var(--cityops-color-surface-soft);
-  color: var(--cityops-color-text-soft);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-sm);
+  background: var(--openvayra-cities-color-surface-soft);
+  color: var(--openvayra-cities-color-text-soft);
   padding: 4px 8px;
   font-size: 0.72rem;
   cursor: pointer;
 }
 
 .inspector-frequency-editor__toggle[data-active='true'] {
-  border-color: var(--cityops-color-accent-yellow);
-  background: var(--cityops-color-surface-active);
-  color: var(--cityops-color-text-brightest);
+  border-color: var(--openvayra-cities-color-accent-yellow);
+  background: var(--openvayra-cities-color-surface-active);
+  color: var(--openvayra-cities-color-text-brightest);
 }
 
 .inspector-frequency-editor__interval-field {
@@ -84,10 +84,10 @@
 .inspector-frequency-editor__interval-field input {
   width: 48px;
   padding: 3px 5px;
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-sm);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-sm);
   background: #182338;
-  color: var(--cityops-color-text);
+  color: var(--openvayra-cities-color-text);
   text-align: center;
 }
 

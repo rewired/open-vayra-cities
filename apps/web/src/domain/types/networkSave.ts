@@ -1,7 +1,7 @@
 /**
  * Canonical schema identifier for CityOps network save files.
  */
-export const NETWORK_SAVE_SCHEMA = 'cityops.network-save' as const;
+export const NETWORK_SAVE_SCHEMA = 'openvayra-cities.network-save' as const;
 
 /**
  * Current supported schema version for the network save envelope.

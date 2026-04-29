@@ -83,7 +83,7 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
 
   it('explicitly rejects legacy v3 payload with clear message', () => {
     const payload = JSON.parse(readFileSync(getFixturePath('v4.raw-legacy'), 'utf-8')) as MutableJsonObject;
-    payload['schemaVersion'] = 'cityops-selected-line-export-v3';
+    payload['schemaVersion'] = 'openvayra-cities-selected-line-export-v3';
 
     const result = validateSelectedLineExportPayload(payload);
     expect(result.ok).toBe(false);
@@ -96,7 +96,7 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
 
   it('fails on unknown schema version', () => {
     const payload = cloneFixturePayload();
-    payload['schemaVersion'] = 'cityops-selected-line-export-v999';
+    payload['schemaVersion'] = 'openvayra-cities-selected-line-export-v999';
 
     expectIssueInEnvelope(payload, 'invalid-schema-version');
   });

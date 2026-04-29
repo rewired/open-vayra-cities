@@ -59,20 +59,20 @@ describe('buildSelectedLineExportPayload', () => {
       placedStops,
       createdAtIsoUtc: '2026-04-24T12:00:00.000Z',
       sourceMetadata: {
-        source: 'cityops-web',
+        source: 'openvayra-cities-web',
         sourceVersion: 'test'
       }
     });
 
     // Verify envelope
-    expect(envelope.schema).toBe('cityops.network-save');
+    expect(envelope.schema).toBe('openvayra-cities.network-save');
     expect(envelope.schemaVersion).toBe(1);
     expect(envelope.exportedAt).toBe('2026-04-24T12:00:00.000Z');
     expect(envelope.app.name).toBe('CityOps');
 
     // Verify nested payload
     const payload = envelope.payload;
-    expect(payload.schemaVersion).toBe('cityops-selected-line-export-v4');
+    expect(payload.schemaVersion).toBe('openvayra-cities-selected-line-export-v4');
     expect(payload.exportKind).toBe('single-line');
     expect(payload.createdAtIsoUtc).toBe('2026-04-24T12:00:00.000Z');
     expect(payload.line.id).toBe(lineId);
@@ -101,19 +101,19 @@ describe('buildSelectedLineExportPayload', () => {
       night: { kind: 'no-service' }
     });
     expect(payload.sourceMetadata).toEqual({
-      source: 'cityops-web',
+      source: 'openvayra-cities-web',
       sourceVersion: 'test'
     });
   });
 
-  it('defaults source metadata to cityops-web when omitted', () => {
+  it('defaults source metadata to openvayra-cities-web when omitted', () => {
     const envelope = buildSelectedLineExportPayload({
       selectedLine,
       placedStops,
       createdAtIsoUtc: '2026-04-24T12:00:00.000Z'
     });
 
-    expect(envelope.payload.sourceMetadata).toEqual({ source: 'cityops-web' });
+    expect(envelope.payload.sourceMetadata).toEqual({ source: 'openvayra-cities-web' });
   });
 
   it('produces JSON output without route geometry fields for v4', () => {
@@ -130,7 +130,7 @@ describe('buildSelectedLineExportPayload', () => {
     expect(json).not.toContain('"orderedGeometry"');
     
     // Ensure envelope fields are present in JSON
-    expect(json).toContain('"schema":"cityops.network-save"');
+    expect(json).toContain('"schema":"openvayra-cities.network-save"');
     expect(json).toContain('"schemaVersion":1');
   });
 });

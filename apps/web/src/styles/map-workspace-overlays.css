@@ -41,8 +41,8 @@
   position: absolute;
   z-index: 2;
   padding: 6px 10px;
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-md);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-md);
   background: rgb(13 23 38 / 78%);
   color: #d7e4f7;
   font-size: 0.75rem;

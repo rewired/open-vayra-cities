@@ -1,49 +1,49 @@
 /**
  * Canonical GeoJSON source id for all placed stop point features rendered in the map workspace.
  */
-export const MAP_SOURCE_ID_STOPS = 'cityops-stops';
+export const MAP_SOURCE_ID_STOPS = 'openvayra-cities-stops';
 /**
  * Canonical GeoJSON source id for completed session line rendering.
  */
-export const MAP_SOURCE_ID_COMPLETED_LINES = 'cityops-completed-lines';
+export const MAP_SOURCE_ID_COMPLETED_LINES = 'openvayra-cities-completed-lines';
 
 /**
  * Canonical GeoJSON source id for active draft line rendering.
  */
-export const MAP_SOURCE_ID_DRAFT_LINE = 'cityops-draft-line';
+export const MAP_SOURCE_ID_DRAFT_LINE = 'openvayra-cities-draft-line';
 /**
  * Canonical GeoJSON source id for projected active vehicle point rendering.
  */
-export const MAP_SOURCE_ID_VEHICLES = 'cityops-vehicles';
+export const MAP_SOURCE_ID_VEHICLES = 'openvayra-cities-vehicles';
 
 /**
  * Canonical circle layer id for stop body rendering and feature hit interactions.
  */
-export const MAP_LAYER_ID_STOPS_CIRCLE = 'cityops-stops-circle';
+export const MAP_LAYER_ID_STOPS_CIRCLE = 'openvayra-cities-stops-circle';
 
 /**
  * Canonical symbol layer id for stop label rendering.
  */
-export const MAP_LAYER_ID_STOPS_LABEL = 'cityops-stops-label';
+export const MAP_LAYER_ID_STOPS_LABEL = 'openvayra-cities-stops-label';
 
 /**
  * Canonical line layer id for completed line casing contrast rendering.
  */
-export const MAP_LAYER_ID_COMPLETED_LINES_CASING = 'cityops-completed-lines-casing';
+export const MAP_LAYER_ID_COMPLETED_LINES_CASING = 'openvayra-cities-completed-lines-casing';
 
 /**
  * Canonical line layer id for completed line foreground rendering and interactions.
  */
-export const MAP_LAYER_ID_COMPLETED_LINES = 'cityops-completed-lines';
+export const MAP_LAYER_ID_COMPLETED_LINES = 'openvayra-cities-completed-lines';
 
 /**
  * Canonical line layer id for active draft line preview rendering.
  */
-export const MAP_LAYER_ID_DRAFT_LINE = 'cityops-draft-line';
+export const MAP_LAYER_ID_DRAFT_LINE = 'openvayra-cities-draft-line';
 /**
  * Canonical circle layer id for projected active vehicle marker rendering.
  */
-export const MAP_LAYER_ID_VEHICLES = 'cityops-vehicles';
+export const MAP_LAYER_ID_VEHICLES = 'openvayra-cities-vehicles';
 
 /**
  * Canonical style layer ids for stop rendering in deterministic registration order.
@@ -228,22 +228,22 @@ export const MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT = {
 /**
  * Canonical GeoJSON source id for scenario-bound demand nodes.
  */
-export const MAP_SOURCE_ID_DEMAND_NODES = 'cityops-demand-nodes';
+export const MAP_SOURCE_ID_DEMAND_NODES = 'openvayra-cities-demand-nodes';
 
 /**
  * Canonical circle layer id for demand nodes captured by at least one stop.
  */
-export const MAP_LAYER_ID_DEMAND_NODES_CAPTURED_RING = 'cityops-demand-nodes-captured-ring';
+export const MAP_LAYER_ID_DEMAND_NODES_CAPTURED_RING = 'openvayra-cities-demand-nodes-captured-ring';
 
 /**
  * Canonical circle layer id for demand nodes captured by the currently selected stop.
  */
-export const MAP_LAYER_ID_DEMAND_NODES_SELECTED_STOP_CAPTURE_RING = 'cityops-demand-nodes-selected-stop-capture-ring';
+export const MAP_LAYER_ID_DEMAND_NODES_SELECTED_STOP_CAPTURE_RING = 'openvayra-cities-demand-nodes-selected-stop-capture-ring';
 
 /**
  * Canonical circle layer id for non-interactive demand node markers.
  */
-export const MAP_LAYER_ID_DEMAND_NODES_CIRCLE = 'cityops-demand-nodes-circle';
+export const MAP_LAYER_ID_DEMAND_NODES_CIRCLE = 'openvayra-cities-demand-nodes-circle';
 
 /**
  * Canonical style layer ids for demand node rendering in deterministic order.

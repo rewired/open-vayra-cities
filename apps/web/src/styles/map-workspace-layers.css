@@ -16,29 +16,29 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-md);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-md);
   background: rgb(13 23 38 / 85%);
-  color: var(--cityops-color-text-light);
+  color: var(--openvayra-cities-color-text-light);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
 }
 
 .map-workspace-layers__button:hover {
   background: rgb(22 38 61 / 90%);
-  color: var(--cityops-color-accent-blue);
+  color: var(--openvayra-cities-color-accent-blue);
 }
 
 .map-workspace-layers__button--active {
-  background: var(--cityops-color-accent-blue);
+  background: var(--openvayra-cities-color-accent-blue);
   color: #ffffff;
-  border-color: var(--cityops-color-accent-blue);
+  border-color: var(--openvayra-cities-color-accent-blue);
 }
 
 .map-workspace-layers__flyout {
   width: 260px;
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-md);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-md);
   background: rgb(13 23 38 / 95%);
   backdrop-filter: blur(4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -59,7 +59,7 @@
 
 .map-workspace-layers__flyout-header {
   padding: 10px 12px;
-  border-bottom: 1px solid var(--cityops-color-border);
+  border-bottom: 1px solid var(--openvayra-cities-color-border);
   background: rgb(22 38 61 / 50%);
 }
 
@@ -69,7 +69,7 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--cityops-color-text-light);
+  color: var(--openvayra-cities-color-text-light);
 }
 
 .map-workspace-layers__flyout-content {
@@ -80,7 +80,7 @@
   padding: 12px;
   margin: 0;
   font-size: 0.75rem;
-  color: var(--cityops-color-text-muted);
+  color: var(--openvayra-cities-color-text-muted);
   text-align: center;
 }
 
@@ -116,7 +116,7 @@
 }
 
 .map-workspace-layers__checkbox {
-  accent-color: var(--cityops-color-accent-blue);
+  accent-color: var(--openvayra-cities-color-accent-blue);
   margin-top: 3px;
   width: 14px;
   height: 14px;
@@ -136,11 +136,11 @@
 .map-workspace-layers__item-title {
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--cityops-color-text-light);
+  color: var(--openvayra-cities-color-text-light);
 }
 
 .map-workspace-layers__item-desc {
   font-size: 0.65rem;
-  color: var(--cityops-color-text-muted);
+  color: var(--openvayra-cities-color-text-muted);
   line-height: 1.3;
 }

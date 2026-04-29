@@ -15,8 +15,8 @@
   max-width: 420px;
   padding: 32px;
   border: 1px solid #3d5a8a;
-  border-radius: var(--cityops-radius-2xl);
-  background: var(--cityops-color-surface);
+  border-radius: var(--openvayra-cities-radius-2xl);
+  background: var(--openvayra-cities-color-surface);
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
   text-align: center;
 }
@@ -32,7 +32,7 @@
 .blocking-data-operation-modal__phase {
   margin: 0 0 24px;
   font-size: 0.9rem;
-  color: var(--cityops-color-text-tertiary);
+  color: var(--openvayra-cities-color-text-tertiary);
 }
 
 .blocking-data-operation-modal__progress-container {
@@ -40,7 +40,7 @@
   height: 6px;
   margin-bottom: 12px;
   border-radius: 3px;
-  background: var(--cityops-color-surface-hover);
+  background: var(--openvayra-cities-color-surface-hover);
   overflow: hidden;
 }
 
@@ -68,6 +68,6 @@
 .blocking-data-operation-modal__percent {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--cityops-color-text-secondary);
+  color: var(--openvayra-cities-color-text-secondary);
   font-family: 'Datatype', monospace;
 }

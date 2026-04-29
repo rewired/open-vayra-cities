@@ -37,7 +37,7 @@ import { ScenarioSelectionScreen } from './scenario/ScenarioSelectionScreen';
 import './App.css';
 
 
-const buildSelectedLineExportFilename = (lineId: string): string => `cityops-line-${lineId}.json`;
+const buildSelectedLineExportFilename = (lineId: string): string => `openvayra-cities-line-${lineId}.json`;
 
 const downloadJsonFile = (filename: string, payload: unknown): void => {
   const jsonBlob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -422,7 +422,7 @@ const toolModeControlOptions: ReadonlyArray<{
                 placedStops: sessionController.sessionStops,
                 createdAtIsoUtc: new Date().toISOString(),
                 sourceMetadata: {
-                  source: 'cityops-web'
+                  source: 'openvayra-cities-web'
                 }
               });
 

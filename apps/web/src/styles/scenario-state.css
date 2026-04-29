@@ -6,8 +6,8 @@
   justify-content: center;
   width: 100vw;
   height: 100vh;
-  background: var(--cityops-color-bg-dark);
-  color: var(--cityops-color-text-lightest);
+  background: var(--openvayra-cities-color-bg-dark);
+  color: var(--openvayra-cities-color-text-lightest);
   box-sizing: border-box;
   text-align: center;
   padding: 20px;
@@ -51,7 +51,7 @@
 .scenario-error-state__command-box {
   background: #151d2a;
   border: 1px solid #27364d;
-  border-radius: var(--cityops-radius-md);
+  border-radius: var(--openvayra-cities-radius-md);
   padding: 12px 24px;
   margin-bottom: 24px;
   display: flex;
@@ -73,7 +73,7 @@
   color: #ffffff;
   border: 1px solid #344866;
   padding: 10px 20px;
-  border-radius: var(--cityops-radius-lg);
+  border-radius: var(--openvayra-cities-radius-lg);
   font-weight: 600;
   cursor: pointer;
   transition: background 150ms ease;

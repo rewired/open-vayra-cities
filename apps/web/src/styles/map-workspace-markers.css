@@ -6,7 +6,7 @@
   --stop-marker-affordance-scale: 1;
   border: 2px solid #dbe7f8;
   border-radius: 999px;
-  background: var(--cityops-color-accent-blue-hover);
+  background: var(--openvayra-cities-color-accent-blue-hover);
   box-shadow: 0 0 0 3px rgb(15 23 35 / 50%), 0 0 0 7px rgb(60 115 192 / 24%);
   cursor: pointer;
   transition: box-shadow 120ms ease, background-color 120ms ease, border-color 120ms ease;

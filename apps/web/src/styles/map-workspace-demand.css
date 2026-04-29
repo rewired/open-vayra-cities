@@ -13,12 +13,12 @@
   gap: 8px;
   align-items: center;
   font-weight: 600;
-  color: var(--cityops-color-text-light);
+  color: var(--openvayra-cities-color-text-light);
   cursor: pointer;
 }
 
 .map-workspace__demand-toggle-checkbox {
-  accent-color: var(--cityops-color-accent-blue);
+  accent-color: var(--openvayra-cities-color-accent-blue);
   width: 14px;
   height: 14px;
   cursor: pointer;
@@ -26,7 +26,7 @@
 
 .map-workspace__demand-toggle-status {
   font-size: 0.65rem;
-  color: var(--cityops-color-text-muted);
+  color: var(--openvayra-cities-color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }

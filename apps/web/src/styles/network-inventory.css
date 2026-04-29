@@ -12,7 +12,7 @@
 .network-inventory__title {
   margin: 0;
   font-size: 0.75rem;
-  color: var(--cityops-color-text-muted);
+  color: var(--openvayra-cities-color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
@@ -24,8 +24,8 @@
   list-style: none;
   max-height: 180px;
   overflow-y: auto;
-  border: 1px solid var(--cityops-color-border-subtle);
-  border-radius: var(--cityops-radius-md);
+  border: 1px solid var(--openvayra-cities-color-border-subtle);
+  border-radius: var(--openvayra-cities-radius-md);
   background: #121b2b;
 }
 
@@ -54,7 +54,7 @@
   padding: 5px 6px;
   border: none;
   background: transparent;
-  color: var(--cityops-color-text-bright);
+  color: var(--openvayra-cities-color-text-bright);
   font-size: 0.78rem;
   text-align: left;
   cursor: pointer;
@@ -95,7 +95,7 @@
   width: 100%;
   box-sizing: border-box;
   border: 1px solid #486187;
-  border-radius: var(--cityops-radius-sm);
+  border-radius: var(--openvayra-cities-radius-sm);
   background: #101a2a;
   color: #e7f1ff;
   font-size: 0.75rem;
@@ -112,9 +112,9 @@
   align-items: center;
   justify-content: center;
   border: 1px solid #314866;
-  border-radius: var(--cityops-radius-sm);
+  border-radius: var(--openvayra-cities-radius-sm);
   background: #18273b;
-  color: var(--cityops-color-text-bright);
+  color: var(--openvayra-cities-color-text-bright);
   width: 24px;
   height: 24px;
   padding: 0;

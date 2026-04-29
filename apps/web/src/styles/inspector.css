@@ -19,11 +19,11 @@
 }
 
 .inspector-line-json-loader__feedback--success {
-  color: var(--cityops-color-success);
+  color: var(--openvayra-cities-color-success);
 }
 
 .inspector-line-json-loader__feedback--error {
-  color: var(--cityops-color-danger);
+  color: var(--openvayra-cities-color-danger);
 }
 
 .inspector-tabs {
@@ -33,26 +33,26 @@
 }
 
 .inspector-tabs__button {
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-md);
-  background: var(--cityops-color-surface-hover);
-  color: var(--cityops-color-text-soft);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-md);
+  background: var(--openvayra-cities-color-surface-hover);
+  color: var(--openvayra-cities-color-text-soft);
   padding: 4px 10px;
   font-size: 0.76rem;
   cursor: pointer;
 }
 
 .inspector-tabs__button[aria-selected='true'] {
-  border-color: var(--cityops-color-accent-yellow);
-  background: var(--cityops-color-surface-active);
-  color: var(--cityops-color-text-brightest);
+  border-color: var(--openvayra-cities-color-accent-yellow);
+  background: var(--openvayra-cities-color-surface-active);
+  color: var(--openvayra-cities-color-text-brightest);
 }
 
 .inspector-network-summary {
   margin-top: 14px;
   padding: 10px;
-  border: 1px solid var(--cityops-color-border-subtle);
-  border-radius: var(--cityops-radius-md);
+  border: 1px solid var(--openvayra-cities-color-border-subtle);
+  border-radius: var(--openvayra-cities-radius-md);
   background: #172233;
 }
 
@@ -128,10 +128,10 @@
 
 .inspector-lines-tab__action,
 .inspector-lines-tab__back {
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-sm);
-  background: var(--cityops-color-surface-hover);
-  color: var(--cityops-color-text);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-sm);
+  background: var(--openvayra-cities-color-surface-hover);
+  color: var(--openvayra-cities-color-text);
   padding: 4px 8px;
   font-size: 0.74rem;
   cursor: pointer;

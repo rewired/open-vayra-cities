@@ -7,7 +7,7 @@ import type { TimeBandId } from './timeBand';
 /**
  * Canonical schema version literal for single-line JSON export payloads.
  */
-export const SELECTED_LINE_EXPORT_SCHEMA_VERSION_V4 = 'cityops-selected-line-export-v4' as const;
+export const SELECTED_LINE_EXPORT_SCHEMA_VERSION_V4 = 'openvayra-cities-selected-line-export-v4' as const;
 
 export const SELECTED_LINE_EXPORT_SCHEMA_VERSION = SELECTED_LINE_EXPORT_SCHEMA_VERSION_V4;
 
@@ -134,7 +134,7 @@ export const buildSelectedLineExportPayload = ({
     exportKind: SELECTED_LINE_EXPORT_KIND,
     createdAtIsoUtc,
     sourceMetadata: {
-      source: 'cityops-web',
+      source: 'openvayra-cities-web',
       ...sourceMetadata
     },
     line: {

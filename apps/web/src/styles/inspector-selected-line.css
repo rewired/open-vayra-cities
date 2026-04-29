@@ -27,10 +27,10 @@
   justify-content: center;
   min-width: 58px;
   padding: 3px 10px;
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-pill);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-pill);
   background: #1b2b44;
-  color: var(--cityops-color-text-bright);
+  color: var(--openvayra-cities-color-text-bright);
   font-size: 0.74rem;
   font-weight: 700;
 }
@@ -111,10 +111,10 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-sm);
-  background: var(--cityops-color-surface-hover);
-  color: var(--cityops-color-text);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-sm);
+  background: var(--openvayra-cities-color-surface-hover);
+  color: var(--openvayra-cities-color-text);
   cursor: pointer;
   transition: background 120ms ease, border-color 120ms ease;
 }
@@ -139,10 +139,10 @@
 .selected-line-inspector__route-order-badge {
   min-width: 28px;
   height: 28px;
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-pill);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-pill);
   background: #1b2b44;
-  color: var(--cityops-color-text-bright);
+  color: var(--openvayra-cities-color-text-bright);
   font-size: 0.68rem;
   font-weight: 700;
   cursor: pointer;
@@ -192,13 +192,13 @@
 }
 
 .selected-line-inspector__value-label--served {
-  color: var(--cityops-color-success);
+  color: var(--openvayra-cities-color-success);
   font-weight: 600;
 }
 
 .selected-line-inspector__value-label--no-service,
 .selected-line-inspector__value-label--unconfigured {
-  color: var(--cityops-color-danger);
+  color: var(--openvayra-cities-color-danger);
 }
 
 .selected-line-inspector__demand-warnings {
@@ -212,6 +212,6 @@
 .selected-line-inspector__warning-text {
   margin: 0;
   font-size: 0.72rem;
-  color: var(--cityops-color-danger);
+  color: var(--openvayra-cities-color-danger);
   line-height: 1.4;
 }

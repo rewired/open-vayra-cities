@@ -4,7 +4,7 @@
   justify-content: space-between;
   background: #151d2a;
   border: 1px solid #27364d;
-  border-radius: var(--cityops-radius-2xl);
+  border-radius: var(--openvayra-cities-radius-2xl);
   padding: 32px;
   transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
   position: relative;
@@ -42,9 +42,9 @@
   font-size: 0.75rem;
   font-weight: 700;
   background: #223147;
-  color: var(--cityops-color-text-secondary-muted);
+  color: var(--openvayra-cities-color-text-secondary-muted);
   padding: 4px 10px;
-  border-radius: var(--cityops-radius-sm);
+  border-radius: var(--openvayra-cities-radius-sm);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -59,7 +59,7 @@
 .scenario-card__missing-box {
   background: rgba(219, 125, 81, 0.08);
   border: 1px solid rgba(219, 125, 81, 0.25);
-  border-radius: var(--cityops-radius-xl);
+  border-radius: var(--openvayra-cities-radius-xl);
   padding: 16px;
   margin-bottom: 24px;
 }
@@ -101,7 +101,7 @@
   width: 100%;
   padding: 14px;
   border: none;
-  border-radius: var(--cityops-radius-xl);
+  border-radius: var(--openvayra-cities-radius-xl);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
@@ -131,14 +131,14 @@
   color: #db7d51;
   background: rgba(219, 125, 81, 0.15);
   padding: 6px 14px;
-  border-radius: var(--cityops-radius-pill);
+  border-radius: var(--openvayra-cities-radius-pill);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .scenario-card__action-button--escape {
   background: #223147;
-  color: var(--cityops-color-text-secondary-muted);
+  color: var(--openvayra-cities-color-text-secondary-muted);
   border: 1px solid #344866;
 }
 

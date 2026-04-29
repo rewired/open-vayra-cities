@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--cityops-color-accent-yellow);
+  color: var(--openvayra-cities-color-accent-yellow);
 }
 
 .inspector-panel__title-icon {
@@ -29,7 +29,7 @@
 .inspector-panel__subtitle {
   margin: 2px 0 0;
   font-size: 0.75rem;
-  color: var(--cityops-color-text-muted-alt);
+  color: var(--openvayra-cities-color-text-muted-alt);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -49,7 +49,7 @@
 .inspector-panel__section-title {
   margin: 0;
   font-size: 0.8rem;
-  color: var(--cityops-color-text-muted);
+  color: var(--openvayra-cities-color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
@@ -63,7 +63,7 @@
 
 .inspector-panel__table th {
   text-align: left;
-  color: var(--cityops-color-text-muted-alt);
+  color: var(--openvayra-cities-color-text-muted-alt);
   font-weight: 500;
   padding: 4px 0;
   width: 40%;
@@ -86,19 +86,19 @@
 
 .status-badge--ready {
   background: #2d4a35;
-  color: var(--cityops-color-success);
+  color: var(--openvayra-cities-color-success);
   border: 1px solid #4a7a58;
 }
 
 .status-badge--review {
   background: #4a452d;
-  color: var(--cityops-color-warning);
+  color: var(--openvayra-cities-color-warning);
   border: 1px solid #7a734a;
 }
 
 .status-badge--blocked {
   background: #4a2d2d;
-  color: var(--cityops-color-danger);
+  color: var(--openvayra-cities-color-danger);
   border: 1px solid #7a4a4a;
 }
 
@@ -117,7 +117,7 @@
   background: #2b1f1f;
   border: 1px solid #634343;
   border-radius: 8px;
-  color: var(--cityops-color-danger);
+  color: var(--openvayra-cities-color-danger);
   font-size: 0.75rem;
   line-height: 1.4;
 }

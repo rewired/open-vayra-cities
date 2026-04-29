@@ -38,8 +38,8 @@
 .departures-dialog__table-scroll {
   overflow: auto;
   max-height: min(58vh, 560px);
-  border: 1px solid var(--cityops-color-border-subtle);
-  border-radius: var(--cityops-radius-md);
+  border: 1px solid var(--openvayra-cities-color-border-subtle);
+  border-radius: var(--openvayra-cities-radius-md);
 }
 
 .departures-dialog__table {

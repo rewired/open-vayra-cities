@@ -22,10 +22,10 @@
   display: grid;
   gap: 4px;
   padding: 12px;
-  border: 1px solid var(--cityops-color-border);
-  border-radius: var(--cityops-radius-lg);
-  background: var(--cityops-color-surface-soft);
-  color: var(--cityops-color-text-soft);
+  border: 1px solid var(--openvayra-cities-color-border);
+  border-radius: var(--openvayra-cities-radius-lg);
+  background: var(--openvayra-cities-color-surface-soft);
+  color: var(--openvayra-cities-color-text-soft);
   text-align: center;
   cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease;
@@ -37,8 +37,8 @@
 }
 
 .line-completion-dialog__option--active {
-  border-color: var(--cityops-color-accent-yellow);
-  background: var(--cityops-color-surface-active);
+  border-color: var(--openvayra-cities-color-accent-yellow);
+  background: var(--openvayra-cities-color-surface-active);
   color: #fdf4df;
 }
 
@@ -48,7 +48,7 @@
 
 .line-completion-dialog__option span {
   font-size: 0.72rem;
-  color: var(--cityops-color-text-secondary);
+  color: var(--openvayra-cities-color-text-secondary);
 }
 
 .line-completion-dialog__option--active span {

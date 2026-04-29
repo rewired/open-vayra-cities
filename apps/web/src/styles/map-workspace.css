@@ -2,7 +2,7 @@
   position: relative;
   flex: 1;
   border: 1px solid #2a3a53;
-  border-radius: var(--cityops-radius-xl);
+  border-radius: var(--openvayra-cities-radius-xl);
   overflow: hidden;
 }
 
