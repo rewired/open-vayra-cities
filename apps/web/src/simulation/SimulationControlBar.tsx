@@ -28,7 +28,7 @@ export function SimulationControlBar({
   scenarioTitle
 }: SimulationControlBarProps): ReactElement {
   return (
-    <section className="simulation-control-bar" aria-label="CityOps top bar">
+    <section className="simulation-control-bar" aria-label="OpenVayra - Cities top bar">
       <div className="simulation-control-bar__brand" aria-label="Application brand">
         <strong>City</strong>Ops
         {scenarioTitle && <span className="simulation-control-bar__scenario-title"> — {scenarioTitle}</span>}

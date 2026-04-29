@@ -63,7 +63,7 @@ describe('convertSelectedLineExportPayloadToSession', () => {
       schema: NETWORK_SAVE_SCHEMA,
       schemaVersion: NETWORK_SAVE_SCHEMA_VERSION,
       exportedAt: new Date().toISOString(),
-      app: { name: 'CityOps' },
+      app: { name: 'OpenVayra - Cities' },
       payload: noServicePayload
     });
     expect(validationResult.ok).toBe(true);

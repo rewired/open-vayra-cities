@@ -13,7 +13,7 @@ interface OsmStopCandidateHoverTooltipProps {
 
 /**
  * Simpler tooltip for OSM candidate hover displaying candidate name and kind.
- * Distinct from CityOps stop hover - no line membership or selection state.
+ * Distinct from OpenVayra - Cities stop hover - no line membership or selection state.
  */
 export function OsmStopCandidateHoverTooltip({
   candidateGroupId,

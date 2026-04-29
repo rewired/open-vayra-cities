@@ -160,7 +160,7 @@ export const buildSelectedLineExportPayload = ({
     schemaVersion: NETWORK_SAVE_SCHEMA_VERSION,
     exportedAt: createdAtIsoUtc,
     app: {
-      name: 'CityOps'
+      name: 'OpenVayra - Cities'
     },
     payload
   };

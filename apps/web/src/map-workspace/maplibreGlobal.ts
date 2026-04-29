@@ -1,5 +1,5 @@
 /**
- * Minimal MapLibre constructor options used by the CityOps map workspace baseline.
+ * Minimal MapLibre constructor options used by the OpenVayra - Cities map workspace baseline.
  */
 interface MapConstructorOptions {
   readonly container: HTMLElement;

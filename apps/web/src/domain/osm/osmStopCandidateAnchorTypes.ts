@@ -2,7 +2,7 @@ import type { OsmStopCandidateGroupId } from '../types/osmStopCandidate';
 import type { StopPosition } from '../types/stop';
 
 /**
- * Readiness status of an OSM candidate group for automatic adoption into the CityOps network.
+ * Readiness status of an OSM candidate group for automatic adoption into the OpenVayra - Cities network.
  * Based on the proximity of its routing anchor to a valid street line.
  */
 export type OsmStopCandidateStreetAnchorStatus = 'ready' | 'review' | 'blocked';

@@ -59,7 +59,7 @@ export const parseSelectedLineExportFile = async (file: File): Promise<SelectedL
       ok: false,
       issue: {
         code: 'invalid-file-type',
-        message: 'Choose a .json file exported from CityOps.'
+        message: 'Choose a .json file exported from OpenVayra - Cities.'
       }
     };
   }

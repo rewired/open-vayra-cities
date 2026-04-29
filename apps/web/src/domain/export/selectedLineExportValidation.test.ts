@@ -42,7 +42,7 @@ const wrapInEnvelope = (payload: unknown): MutableJsonObject => ({
   schema: NETWORK_SAVE_SCHEMA,
   schemaVersion: NETWORK_SAVE_SCHEMA_VERSION,
   exportedAt: new Date().toISOString(),
-  app: { name: 'CityOps' },
+  app: { name: 'OpenVayra - Cities' },
   payload
 });
 
@@ -351,7 +351,7 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
 
   it('rejects envelope with non-object app', () => {
     const envelope = wrapInEnvelope(cloneFixturePayload());
-    envelope['app'] = 'CityOps';
+    envelope['app'] = 'OpenVayra - Cities';
 
     const result = validateSelectedLineExportPayload(envelope);
     expect(result.ok).toBe(false);
@@ -371,9 +371,9 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
     }
   });
 
-  it('rejects envelope with app.name !== "CityOps"', () => {
+  it('rejects envelope with app.name !== "OpenVayra - Cities"', () => {
     const envelope = wrapInEnvelope(cloneFixturePayload());
-    envelope['app'] = { name: 'NotCityOps' };
+    envelope['app'] = { name: 'NotOpenVayra - Cities' };
 
     const result = validateSelectedLineExportPayload(envelope);
     expect(result.ok).toBe(false);
@@ -384,7 +384,7 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
 
   it('rejects envelope with non-string app.build', () => {
     const envelope = wrapInEnvelope(cloneFixturePayload());
-    envelope['app'] = { name: 'CityOps', build: 123 };
+    envelope['app'] = { name: 'OpenVayra - Cities', build: 123 };
 
     const result = validateSelectedLineExportPayload(envelope);
     expect(result.ok).toBe(false);
@@ -395,7 +395,7 @@ describe('validateSelectedLineExportPayload fixture contract', () => {
 
   it('accepts envelope with valid string app.build', () => {
     const envelope = wrapInEnvelope(cloneFixturePayload());
-    envelope['app'] = { name: 'CityOps', build: 'v1.2.3-abcd' };
+    envelope['app'] = { name: 'OpenVayra - Cities', build: 'v1.2.3-abcd' };
 
     const result = validateSelectedLineExportPayload(envelope);
     expect(result.ok).toBe(true);

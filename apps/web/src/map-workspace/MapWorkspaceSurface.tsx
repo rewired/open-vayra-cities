@@ -495,7 +495,7 @@ export function MapWorkspaceSurface({
 
   return (
     <section className="map-workspace" aria-label="Map workspace surface">
-      <div ref={mapContainerRef} className="map-workspace__map" aria-label="CityOps baseline map" />
+      <div ref={mapContainerRef} className="map-workspace__map" aria-label="OpenVayra - Cities baseline map" />
 
       <MapLayerFlyout
         visibility={layerVisibility}

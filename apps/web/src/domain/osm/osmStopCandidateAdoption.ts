@@ -27,7 +27,7 @@ export interface OsmStopCandidateAdoptionEligibility {
 }
 
 /**
- * Evaluates whether an OSM stop candidate group can be adopted as a canonical CityOps stop.
+ * Evaluates whether an OSM stop candidate group can be adopted as a canonical OpenVayra - Cities stop.
  */
 export function evaluateOsmStopCandidateAdoptionEligibility(input: {
   readonly group: OsmStopCandidateGroup;
@@ -77,7 +77,7 @@ export function evaluateOsmStopCandidateAdoptionEligibility(input: {
 }
 
 /**
- * Converts a grouped OSM candidate into a canonical CityOps stop using its resolved street anchor.
+ * Converts a grouped OSM candidate into a canonical OpenVayra - Cities stop using its resolved street anchor.
  */
 export function createStopFromOsmCandidateGroup(input: {
   readonly group: OsmStopCandidateGroup;

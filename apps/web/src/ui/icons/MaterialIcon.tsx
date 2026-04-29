@@ -37,7 +37,7 @@ export interface MaterialIconProps {
 }
 
 /**
- * Provides the canonical Material icon renderer for the CityOps web shell.
+ * Provides the canonical Material icon renderer for the OpenVayra - Cities web shell.
  */
 export function MaterialIcon({ 
   name, 

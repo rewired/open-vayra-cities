@@ -41,7 +41,7 @@ export interface OsmStopCandidateGroupMember {
 
 /**
  * Consolidated OSM stop candidate group, used for display and future adoption.
- * Separated from canonical CityOps Stop type.
+ * Separated from canonical OpenVayra - Cities Stop type.
  */
 export interface OsmStopCandidateGroup {
   readonly id: OsmStopCandidateGroupId;

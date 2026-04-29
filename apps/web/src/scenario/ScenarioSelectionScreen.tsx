@@ -28,7 +28,7 @@ export function ScenarioSelectionScreen({
         <div className="scenario-selection-screen__splash-container">
           <img
             src="/images/openvayra-cities-splash.png"
-            alt="CityOps Splash"
+            alt="OpenVayra - Cities Splash"
             className="scenario-selection-screen__splash-image"
           />
         </div>

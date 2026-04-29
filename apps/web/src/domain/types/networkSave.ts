@@ -1,5 +1,5 @@
 /**
- * Canonical schema identifier for CityOps network save files.
+ * Canonical schema identifier for OpenVayra - Cities network save files.
  */
 export const NETWORK_SAVE_SCHEMA = 'openvayra-cities.network-save' as const;
 
@@ -12,13 +12,13 @@ export const NETWORK_SAVE_SCHEMA_VERSION = 1 as const;
  * Canonical application metadata for the export envelope.
  */
 export interface NetworkSaveAppMetadata {
-  readonly name: 'CityOps';
+  readonly name: 'OpenVayra - Cities';
   /** Optional build identifier or version string. */
   readonly build?: string;
 }
 
 /**
- * Generic envelope for CityOps network saves, carrying schema metadata and a typed payload.
+ * Generic envelope for OpenVayra - Cities network saves, carrying schema metadata and a typed payload.
  */
 export interface NetworkSaveEnvelope<TPayload = unknown> {
   /** Explicit schema identity. */

@@ -81,7 +81,7 @@ const CANONICAL_TIME_BAND_IDS_SET = new Set<string>(MVP_TIME_BAND_IDS);
 const SELECTED_LINE_EXPORT_SCHEMA_VERSION_V3 = 'openvayra-cities-selected-line-export-v3';
 
 /** Human-readable message for unsupported v3 imports. */
-export const UNSUPPORTED_LEGACY_V3_MESSAGE = 'This CityOps save format is no longer supported.';
+export const UNSUPPORTED_LEGACY_V3_MESSAGE = 'This OpenVayra - Cities save format is no longer supported.';
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -140,8 +140,8 @@ export const validateSelectedLineExportPayload = (payloadCandidate: unknown): Se
   if (!isRecord(app)) {
     addIssue('invalid-envelope-app', '$.app', 'Envelope app metadata must be an object.');
   } else {
-    if (app.name !== 'CityOps') {
-      addIssue('invalid-envelope-app-name', '$.app.name', 'app.name must equal "CityOps".');
+    if (app.name !== 'OpenVayra - Cities') {
+      addIssue('invalid-envelope-app-name', '$.app.name', 'app.name must equal "OpenVayra - Cities".');
     }
     if (app.build !== undefined && typeof app.build !== 'string') {
       addIssue('invalid-envelope-app-build', '$.app.build', 'app.build must be a string when present.');

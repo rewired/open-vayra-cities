@@ -107,7 +107,7 @@ const INITIAL_MAP_WORKSPACE_DEBUG_SNAPSHOT: MapWorkspaceDebugSnapshot = {
   osmStopCandidateGroupCount: 0
 };
 
-/** Renders the desktop-only CityOps application shell layout and composes extracted session/projection/inspector boundaries. */
+/** Renders the desktop-only OpenVayra - Cities application shell layout and composes extracted session/projection/inspector boundaries. */
 export default function App(): ReactElement {
   const sessionController = useNetworkSessionState();
   const clockController = useSimulationClockController();
@@ -513,7 +513,7 @@ const toolModeControlOptions: ReadonlyArray<{
         onOsmCandidateAdopt={async (group, anchor) => {
           setActiveDataOperation({
             title: 'Adopting OSM stop',
-            phase: 'Creating CityOps stop and refreshing map overlays...',
+            phase: 'Creating OpenVayra - Cities stop and refreshing map overlays...',
             progress: { kind: 'indeterminate' }
           });
 

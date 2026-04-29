@@ -1,5 +1,5 @@
 /**
- * Defines the centralized bootstrap values used to initialize the CityOps Hamburg map workspace surface.
+ * Defines the centralized bootstrap values used to initialize the OpenVayra - Cities Hamburg map workspace surface.
  */
 export interface MapBootstrapConfig {
   /** MapLibre style URL for a street-legible Hamburg startup basemap suitable for stop placement. */
