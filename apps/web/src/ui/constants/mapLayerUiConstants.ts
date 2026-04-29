@@ -1,7 +1,4 @@
-/**
- * Narrow string union representing valid map layer IDs for the flyout control.
- */
-export type MapLayerId = 'demand-heatmap' | 'osm-stop-candidates';
+export type MapLayerId = 'osm-stop-candidates';
 
 /**
  * Represents a registered map layer control item for the UI flyout.
@@ -46,19 +43,8 @@ export const MAP_LAYER_UI_LABELS = {
 /**
  * Canonical initial registry items.
  */
-export const INITIAL_REGISTERED_MAP_LAYERS: readonly MapLayerControlItem[] = [
-  {
-    id: 'demand-heatmap',
-    label: 'Demand heatmap',
-    description: 'Visualizes passenger demand density across the transit area.',
-    disabled: true
-  }
-];
+export const INITIAL_REGISTERED_MAP_LAYERS: readonly MapLayerControlItem[] = [];
 
-/**
- * Canonical initial visibility state for all layers.
- */
 export const INITIAL_MAP_LAYER_VISIBILITY: MapLayerVisibilityById = {
-  'demand-heatmap': false,
   'osm-stop-candidates': false
 };

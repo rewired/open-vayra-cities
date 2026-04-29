@@ -25,7 +25,6 @@ export interface StaticNetworkSummaryKpis {
 }
 
 import { resolveLineRouteBaseline } from './routeBaselineProjection';
-import type { LineBandDemandProjection } from '../demand/servedDemandProjection';
 
 /** Aggregate route-baseline metrics projected for selected-line inspector rendering. */
 export interface RouteBaselineAggregateMetrics {
@@ -46,7 +45,6 @@ export const ROUTE_STATUS_LABELS: Readonly<Record<RouteStatus, string>> = {
 };
 
 import type { StopId } from '../types/stop';
-import { projectDemandCapturePreview, type NetworkDemandCapturePreviewProjection } from './demandCapturePreviewProjection';
 
 /** Shared projection bundle consumed by shell inspector and workspace map boundaries. */
 export interface NetworkPlanningProjections {
@@ -60,9 +58,6 @@ export interface NetworkPlanningProjections {
   readonly selectedLinePlanningVehicleProjection: ReturnType<typeof projectLinePlanningVehicles> | null;
   readonly networkServicePlanProjection: ReturnType<typeof projectLineServicePlan>;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof projectLineSelectedServiceInspector> | null;
-  readonly selectedLineDemandProjection: LineBandDemandProjection | null;
-  readonly networkDemandProjection: import('./demandCatchmentProjection').NetworkDemandProjection;
-  readonly demandCapturePreviewProjection: NetworkDemandCapturePreviewProjection;
 }
 
 
@@ -95,10 +90,7 @@ const projectStaticNetworkSummaryKpis = (
   };
 };
 
-import { calculateStopCatchments } from '../demand/demandCatchment';
-import { projectLineBandDemand } from '../demand/servedDemandProjection';
-import { projectNetworkDemand } from './demandCatchmentProjection';
-import type { DemandNode } from '../types/demandNode';
+
 
 /** Aggregates shell planning projections from canonical domain projection helpers without owning session state. */
 export const useNetworkPlanningProjections = (
@@ -108,8 +100,7 @@ export const useNetworkPlanningProjections = (
   selectedStopId: StopId | null,
   activeSimulationTimeBandId: TimeBandId,
   currentSimulationMinuteOfDay: SimulationMinuteOfDay,
-  currentSimulationSecondOfDay: SimulationSecondOfDay,
-  sessionDemandNodes: readonly DemandNode[] = []
+  currentSimulationSecondOfDay: SimulationSecondOfDay
 ): NetworkPlanningProjections => {
   const staticNetworkSummaryKpis = projectStaticNetworkSummaryKpis(sessionStops.length, sessionLines, selectedLine);
   const routeBaselinesByLineId = new Map(
@@ -154,43 +145,12 @@ export const useNetworkPlanningProjections = (
     ? projectLineSelectedServiceInspector(selectedLineServiceProjection, MAX_READINESS_ISSUES_VISIBLE)
     : null;
 
-  const catchments = calculateStopCatchments(sessionStops, sessionDemandNodes);
-  const catchmentLookup = new Map(catchments.map((c) => [c.stopId, c]));
-  
-  const residentialNodeMap = new Map(sessionDemandNodes.filter(n => n.demandClass === 'residential').map(n => [n.id, n]));
-  const workplaceNodeMap = new Map(sessionDemandNodes.filter(n => n.demandClass === 'workplace').map(n => [n.id, n]));
-
-  const selectedLineDemandProjection = selectedLine && selectedLineServiceProjection
-    ? projectLineBandDemand(
-        selectedLine.id,
-        selectedLine.stopIds,
-        selectedLine.topology,
-        selectedLine.servicePattern,
-        activeSimulationTimeBandId,
-        selectedLineServiceProjection.activeBandState,
-        catchmentLookup,
-        residentialNodeMap,
-        workplaceNodeMap
-      )
-    : null;
-
-  const networkDemandProjection = projectNetworkDemand(
-    sessionDemandNodes,
-    sessionStops,
-    sessionLines,
-    networkServicePlanProjection,
-    activeSimulationTimeBandId
-  );
 
   const selectedLinePlanningVehicleProjection = selectedLine
     ? projectLinePlanningVehicles(selectedLine, selectedLineRouteBaseline)
     : null;
 
-  const demandCapturePreviewProjection = projectDemandCapturePreview({
-    demandNodes: sessionDemandNodes,
-    stopCatchments: catchments,
-    selectedStopId
-  });
+
 
   return {
     staticNetworkSummaryKpis,
@@ -202,9 +162,6 @@ export const useNetworkPlanningProjections = (
     selectedLineVehicleProjection,
     selectedLinePlanningVehicleProjection,
     networkServicePlanProjection,
-    selectedLineServiceInspectorProjection,
-    selectedLineDemandProjection,
-    networkDemandProjection,
-    demandCapturePreviewProjection
+    selectedLineServiceInspectorProjection
   };
 };

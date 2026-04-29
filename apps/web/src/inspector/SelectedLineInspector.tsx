@@ -26,7 +26,6 @@ interface SelectedLineInspectorProps {
   readonly selectedLineServiceProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineServicePlanForLine> | null;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineSelectedServiceInspector> | null;
   readonly selectedLinePlanningVehicleProjection: ReturnType<typeof import('../domain/projection/linePlanningVehicleProjection').projectLinePlanningVehicles> | null;
-  readonly selectedLineDemandProjection: import('../domain/demand/servedDemandProjection').LineBandDemandProjection | null;
   readonly onLineRename: (
     lineId: import('../domain/types/line').Line['id'],
     nextLabel: string
@@ -63,7 +62,6 @@ export function SelectedLineInspector({
   selectedLineServiceProjection,
   selectedLineServiceInspectorProjection,
   selectedLinePlanningVehicleProjection,
-  selectedLineDemandProjection,
   onLineRename,
   onLineSequenceStopFocus,
   onStopSelectionChange,
@@ -152,48 +150,6 @@ export function SelectedLineInspector({
         </div>
       </section>
 
-      {selectedLineDemandProjection ? (
-        <section className="selected-line-inspector__demand" aria-label="Line demand">
-          <h3>Line demand</h3>
-          <table className="inspector-compact-table">
-            <tbody>
-              <tr>
-                <th scope="row">Status</th>
-                <td className="inspector-compact-table__value--left">
-                  <span className={`selected-line-inspector__value-label selected-line-inspector__value-label--${selectedLineDemandProjection.status}`}>
-                    {selectedLineDemandProjection.status === 'served' ? 'Active' : selectedLineDemandProjection.status}
-                  </span>
-                </td>
-              </tr>
-              {selectedLineDemandProjection.status === 'served' ? (
-                <>
-                  <tr>
-                    <th scope="row">Structural coverage</th>
-                    <td className="inspector-compact-table__value--left">
-                      {`${selectedLineDemandProjection.capturedOriginWeight} homes · ${selectedLineDemandProjection.capturedDestinationWeight} jobs`}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Served demand</th>
-                    <td className="inspector-compact-table__value--highlight">
-                      {selectedLineDemandProjection.servedDemandWeight}
-                    </td>
-                  </tr>
-                </>
-              ) : null}
-            </tbody>
-          </table>
-          {selectedLineDemandProjection.warnings.length > 0 ? (
-            <div className="selected-line-inspector__demand-warnings">
-              {selectedLineDemandProjection.warnings.map((w, idx) => (
-                <p key={idx} className="selected-line-inspector__warning-text">
-                  {`⚠ ${w.message}`}
-                </p>
-              ))}
-            </div>
-          ) : null}
-        </section>
-      ) : null}
 
       <section className="selected-line-inspector__actions" aria-label="Line actions">
         <div className="selected-line-inspector__actions-row">

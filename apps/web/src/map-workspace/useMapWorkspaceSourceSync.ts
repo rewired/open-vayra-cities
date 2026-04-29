@@ -4,11 +4,8 @@ import type { Line } from '../domain/types/line';
 import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
 import type { OsmStopCandidateGroup } from '../domain/types/osmStopCandidate';
 import type { Stop, StopId } from '../domain/types/stop';
-import type { DemandNode } from '../domain/types/demandNode';
-import type { TimeBandId } from '../domain/types/timeBand';
 import type { WorkspaceToolMode } from '../session/sessionTypes';
 import type { MapLibreMap } from './maplibreGlobal';
-import type { NetworkDemandCapturePreviewProjection } from '../domain/projection/demandCapturePreviewProjection';
 
 import {
   MAP_LAYER_ID_COMPLETED_LINES,
@@ -47,10 +44,6 @@ export interface UseMapWorkspaceSourceSyncInput {
   readonly selectedLineId: Line['id'] | null;
   readonly vehicleNetworkProjection: LineVehicleNetworkProjection;
   readonly osmStopCandidateGroups: readonly OsmStopCandidateGroup[];
-  readonly demandNodes: readonly DemandNode[];
-  readonly activeTimeBandId: TimeBandId;
-  readonly isDemandOverlayVisible: boolean;
-  readonly demandCapturePreviewProjection: NetworkDemandCapturePreviewProjection;
   readonly setFeatureDiagnostics: React.Dispatch<React.SetStateAction<MapWorkspaceFeatureDiagnostics>>;
 }
 
@@ -71,10 +64,6 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
     selectedLineId,
     vehicleNetworkProjection,
     osmStopCandidateGroups,
-    demandNodes,
-    activeTimeBandId,
-    isDemandOverlayVisible,
-    demandCapturePreviewProjection,
     setFeatureDiagnostics
   } = input;
 
@@ -244,41 +233,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
     });
   }, [osmStopCandidateGroups, mapRef.current]);
 
-  // 4.5. Demand node source sync
-  useEffect(() => {
-    const mapInstance = mapRef.current;
 
-    if (!mapInstance) {
-      return;
-    }
-
-    const sourceSyncDiagnostics = syncExistingMapWorkspaceSourceData({
-      map: mapInstance,
-      demandNodeSync: {
-        demandNodes,
-        activeTimeBandId,
-        visible: isDemandOverlayVisible,
-        demandCapturePreviewProjection
-      }
-    });
-
-    if (sourceSyncDiagnostics) {
-      return;
-    }
-
-    return runWhenMapStyleReady(mapInstance, () => {
-      applyBasemapSemanticReadabilityOverrides(mapInstance);
-      syncAllMapWorkspaceSources({
-        map: mapInstance,
-        demandNodeSync: {
-          demandNodes,
-          activeTimeBandId,
-          visible: isDemandOverlayVisible,
-          demandCapturePreviewProjection
-        }
-      });
-    });
-  }, [demandNodes, activeTimeBandId, isDemandOverlayVisible, demandCapturePreviewProjection, mapRef.current]);
 
   // 5. Rendered feature diagnostics refresh
 

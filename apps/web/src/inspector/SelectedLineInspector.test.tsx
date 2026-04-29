@@ -95,7 +95,6 @@ const renderInspector = (): RenderResult => {
         selectedLineServiceProjection={null}
         selectedLineServiceInspectorProjection={null}
         selectedLinePlanningVehicleProjection={null}
-        selectedLineDemandProjection={null}
         onLineRename={vi.fn()}
         onLineSequenceStopFocus={vi.fn()}
         onStopSelectionChange={vi.fn()}
@@ -157,7 +156,6 @@ describe('SelectedLineInspector route sequence', () => {
           selectedLineServiceProjection={null}
           selectedLineServiceInspectorProjection={null}
           selectedLinePlanningVehicleProjection={null}
-          selectedLineDemandProjection={null}
           onLineRename={vi.fn()}
           onLineSequenceStopFocus={onLineSequenceStopFocus}
           onStopSelectionChange={vi.fn()}

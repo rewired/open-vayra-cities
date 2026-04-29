@@ -22,9 +22,6 @@ import {
   type DebugModalRoutingDiagnostics,
   type DebugModalServiceDiagnostics
 } from './ui/DebugModal';
-import { summarizeDemandNodes } from './domain/demand/demandNodeHelpers';
-import { loadScenarioDemandNodes } from './domain/demand/loadScenarioDemandNodes';
-import type { DemandNode } from './domain/types/demandNode';
 import { WORKSPACE_MODE_ICONS } from './ui/icons/materialIcons';
 import type { MapFocusIntent } from './session/sessionTypes';
 import { BlockingDataOperationModal } from './ui/data-operation/BlockingDataOperationModal';
@@ -140,7 +137,6 @@ export default function App(): ReactElement {
   
   const [osmStopCandidates, setOsmStopCandidates] = useState<readonly OsmStopCandidate[]>([]);
   const [selectedOsmCandidateAnchor, setSelectedOsmCandidateAnchor] = useState<OsmStopCandidateStreetAnchorResolution | null>(null);
-  const [scenarioDemandNodes, setScenarioDemandNodes] = useState<readonly DemandNode[]>([]);
 
 
 
@@ -193,40 +189,6 @@ export default function App(): ReactElement {
     };
   }, [selectedScenario]);
 
-  useEffect(() => {
-
-    if (!selectedScenario) {
-      setScenarioDemandNodes([]);
-      return;
-    }
-
-    let cancelled = false;
-
-    const loadDemand = async (): Promise<void> => {
-      try {
-        const result = await loadScenarioDemandNodes(selectedScenario.scenarioId);
-        if (cancelled) return;
-
-        if (result.status === 'loaded') {
-          setScenarioDemandNodes(result.nodes);
-        } else {
-          console.warn(`[App] Demand nodes load status: ${result.status}. Message: ${result.message || 'none'}`);
-          setScenarioDemandNodes([]);
-        }
-      } catch (error) {
-        console.error('[App] Demand node load failed:', error);
-        if (!cancelled) {
-          setScenarioDemandNodes([]);
-        }
-      }
-    };
-
-    loadDemand();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedScenario]);
 
   const projections = useNetworkPlanningProjections(
     sessionController.sessionLines,
@@ -235,8 +197,7 @@ export default function App(): ReactElement {
     sessionController.selectedStopId,
     clockController.activeSimulationTimeBandId,
     clockController.currentSimulationMinuteOfDay,
-    clockController.currentSimulationSecondOfDay,
-    scenarioDemandNodes
+    clockController.currentSimulationSecondOfDay
   );
 
   const inspectorPanelState = resolveInspectorPanelState(
@@ -270,8 +231,7 @@ const toolModeControlOptions: ReadonlyArray<{
     completedLineCount: sessionController.sessionLines.length,
     totalProjectedVehicleCount: projections.vehicleNetworkProjection.summary.totalProjectedVehicleCount,
     draftOrderedStopIds: sessionController.lineBuildSelection.selectedStopIds,
-    completedLineIds: sessionController.sessionLines.map((line) => line.id),
-    demandNodeSummary: summarizeDemandNodes(scenarioDemandNodes)
+    completedLineIds: sessionController.sessionLines.map((line) => line.id)
   };
   const routingDiagnostics: DebugModalRoutingDiagnostics = {
     selectedLineOrderedStopIds: sessionController.selectedLine?.stopIds ?? [],
@@ -478,9 +438,6 @@ const toolModeControlOptions: ReadonlyArray<{
           onOsmCandidateSelectionChange={sessionController.setSelectedOsmCandidateGroupId}
           osmStopCandidateGroups={osmStopCandidateGroups}
           onOsmCandidateAnchorResolved={setSelectedOsmCandidateAnchor}
-          demandNodes={scenarioDemandNodes}
-          activeTimeBandId={clockController.activeSimulationTimeBandId}
-          demandCapturePreviewProjection={projections.demandCapturePreviewProjection}
         />
 
       </main>
@@ -497,8 +454,6 @@ const toolModeControlOptions: ReadonlyArray<{
         selectedLineServiceProjection={projections.selectedLineServiceProjection}
         selectedLineServiceInspectorProjection={projections.selectedLineServiceInspectorProjection}
         selectedLinePlanningVehicleProjection={projections.selectedLinePlanningVehicleProjection}
-        selectedLineDemandProjection={projections.selectedLineDemandProjection}
-        networkDemandProjection={projections.networkDemandProjection}
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
         lineFrequencyControlByTimeBand={sessionController.lineFrequencyControlByTimeBand}
         lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}

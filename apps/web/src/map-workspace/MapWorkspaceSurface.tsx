@@ -11,9 +11,6 @@ import type { LineVehicleNetworkProjection } from '../domain/types/lineVehiclePr
 import type { Stop, StopId } from '../domain/types/stop';
 import { createStopId } from '../domain/types/stop';
 import type { OsmStopCandidateGroup, OsmStopCandidateGroupId } from '../domain/types/osmStopCandidate';
-import type { DemandNode } from '../domain/types/demandNode';
-import type { TimeBandId } from '../domain/types/timeBand';
-import type { NetworkDemandCapturePreviewProjection } from '../domain/projection/demandCapturePreviewProjection';
 
 
 import { createUniqueStopLabel } from '../domain/stop/stopLabeling';
@@ -84,9 +81,6 @@ interface MapWorkspaceSurfaceProps {
   readonly onOsmCandidateSelectionChange: (nextSelectionId: OsmStopCandidateGroupId | null) => void;
   readonly osmStopCandidateGroups: readonly OsmStopCandidateGroup[];
   readonly onOsmCandidateAnchorResolved: (resolution: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | null) => void;
-  readonly demandNodes: readonly DemandNode[];
-  readonly activeTimeBandId: TimeBandId;
-  readonly demandCapturePreviewProjection: NetworkDemandCapturePreviewProjection;
 }
 
 
@@ -136,10 +130,7 @@ export function MapWorkspaceSurface({
   onDebugSnapshotChange,
   onOsmCandidateSelectionChange,
   osmStopCandidateGroups,
-  onOsmCandidateAnchorResolved,
-  demandNodes,
-  activeTimeBandId,
-  demandCapturePreviewProjection
+  onOsmCandidateAnchorResolved
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -155,7 +146,6 @@ export function MapWorkspaceSurface({
     INITIAL_MAP_WORKSPACE_FEATURE_DIAGNOSTICS
   );
   const [lastPlacedStopLabel, setLastPlacedStopLabel] = useState<string | null>(null);
-  const [isDemandOverlayVisible, setIsDemandOverlayVisible] = useState<boolean>(false);
   const [layerVisibility, setLayerVisibility] = useState<MapLayerVisibilityById>(INITIAL_MAP_LAYER_VISIBILITY);
 
   const handleToggleLayer = (layerId: MapLayerId): void => {
@@ -241,26 +231,7 @@ export function MapWorkspaceSurface({
     draftStopIdSetRef.current = draftStopIdSet;
   }, [draftStopIdSet]);
 
-  const demandNodesRef = useRef<readonly DemandNode[]>(demandNodes);
-  const activeTimeBandIdRef = useRef<TimeBandId>(activeTimeBandId);
-  const isDemandOverlayVisibleRef = useRef<boolean>(isDemandOverlayVisible);
-  const demandCapturePreviewProjectionRef = useRef<NetworkDemandCapturePreviewProjection>(demandCapturePreviewProjection);
 
-  useEffect(() => {
-    demandNodesRef.current = demandNodes;
-  }, [demandNodes]);
-
-  useEffect(() => {
-    activeTimeBandIdRef.current = activeTimeBandId;
-  }, [activeTimeBandId]);
-
-  useEffect(() => {
-    isDemandOverlayVisibleRef.current = isDemandOverlayVisible;
-  }, [isDemandOverlayVisible]);
-
-  useEffect(() => {
-    demandCapturePreviewProjectionRef.current = demandCapturePreviewProjection;
-  }, [demandCapturePreviewProjection]);
 
   useEffect(() => {
     const containerElement = mapContainerRef.current;
@@ -291,12 +262,7 @@ export function MapWorkspaceSurface({
         vehicleSync: {
           vehicleNetworkProjection: vehicleNetworkProjectionRef.current
         },
-        demandNodeSync: {
-          demandNodes: demandNodesRef.current,
-          activeTimeBandId: activeTimeBandIdRef.current,
-          visible: isDemandOverlayVisibleRef.current,
-          demandCapturePreviewProjection: demandCapturePreviewProjectionRef.current
-        }
+
 
       });
 
@@ -374,10 +340,6 @@ export function MapWorkspaceSurface({
     selectedLineId,
     vehicleNetworkProjection,
     osmStopCandidateGroups,
-    demandNodes,
-    activeTimeBandId,
-    isDemandOverlayVisible,
-    demandCapturePreviewProjection,
     setFeatureDiagnostics
 
   });
@@ -502,24 +464,6 @@ export function MapWorkspaceSurface({
         onToggleLayer={handleToggleLayer}
       />
 
-      <div className="map-workspace__overlay map-workspace__overlay--demand-toggle" aria-label="Demand overlay controls">
-        <label className="map-workspace__demand-toggle-label">
-          <input
-            type="checkbox"
-            checked={isDemandOverlayVisible}
-            onChange={(e) => setIsDemandOverlayVisible(e.target.checked)}
-            className="map-workspace__demand-toggle-checkbox"
-          />
-          <span>Demand overlay</span>
-        </label>
-        <span className="map-workspace__demand-toggle-status">
-          {demandNodes.length === 0
-            ? 'No scenario demand data'
-            : demandCapturePreviewProjection.selectedStopCapturedNodeCount > 0
-            ? `${demandCapturePreviewProjection.capturedNodeCount} / ${demandCapturePreviewProjection.totalNodeCount} captured · selected stop: ${demandCapturePreviewProjection.selectedStopCapturedNodeCount}`
-            : `${demandCapturePreviewProjection.capturedNodeCount} / ${demandCapturePreviewProjection.totalNodeCount} captured`}
-        </span>
-      </div>
 
 
       {placementUiFeedback.showPlacementModeIndicator ? (

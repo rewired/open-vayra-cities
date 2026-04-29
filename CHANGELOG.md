@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 140: Legacy Demand Purge Before Scenario Demand Import
+- Removed all legacy/demo demand domain files, types, constants, and JSON data.
+- Neutralized demand state in `App.tsx` and removed demand props from shell components.
+- Removed demand projections from `useNetworkPlanningProjections.ts`.
+- Removed demand UI from `InspectorPanel.tsx`, `SelectedLineInspector.tsx`, and `DebugModal.tsx`.
+- Purge demand map layers, sources, and visibility controls from `MapWorkspaceSurface.tsx`, `useMapWorkspaceSourceSync.ts`, and `mapWorkspaceSourceSync.ts`.
+- Removed demand constants from `mapLayerUiConstants.ts` and `mapRenderConstants.ts`.
+- Added ADR `0142-legacy-demo-demand-purge-before-scenario-import.md`.
+
 ### Slice 132: Demand Capture Preview Overlay
 - Implemented `demandCapturePreviewProjection.ts` deriving deterministic demand node capture statuses against existing placed stops and the active selected stop.
 - Configured spatial highlight ring overrides in `mapRenderConstants.ts` mapping catchment categories into direct style rules.

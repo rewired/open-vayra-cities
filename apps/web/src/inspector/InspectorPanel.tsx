@@ -28,8 +28,6 @@ interface InspectorPanelProps {
   readonly selectedLineServiceProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineServicePlanForLine> | null;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineSelectedServiceInspector> | null;
   readonly selectedLinePlanningVehicleProjection: ReturnType<typeof import('../domain/projection/linePlanningVehicleProjection').projectLinePlanningVehicles> | null;
-  readonly selectedLineDemandProjection: import('../domain/demand/servedDemandProjection').LineBandDemandProjection | null;
-  readonly networkDemandProjection: import('../domain/projection/demandCatchmentProjection').NetworkDemandProjection;
   readonly lineFrequencyInputByTimeBand: LineFrequencyInputByTimeBand;
   readonly lineFrequencyControlByTimeBand: LineFrequencyControlByTimeBand;
   readonly lineFrequencyValidationByTimeBand: LineFrequencyValidationByTimeBand;
@@ -81,8 +79,6 @@ export function InspectorPanel({
   selectedLineServiceProjection,
   selectedLineServiceInspectorProjection,
   selectedLinePlanningVehicleProjection,
-  selectedLineDemandProjection,
-  networkDemandProjection,
   lineFrequencyInputByTimeBand,
   lineFrequencyControlByTimeBand,
   lineFrequencyValidationByTimeBand,
@@ -204,25 +200,7 @@ export function InspectorPanel({
                 onLineRename={onLineRename}
               />
 
-              <h3 style={{ marginTop: '1.5rem' }}>Demand capture</h3>
-              <table className="inspector-compact-table">
-                <tbody>
-                  <tr>
-                    <th scope="row">Homes covered</th>
-                    <td>{`${networkDemandProjection.residential.capturedWeight} / ${networkDemandProjection.residential.totalWeight}`}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Jobs covered</th>
-                    <td>{`${networkDemandProjection.workplace.capturedWeight} / ${networkDemandProjection.workplace.totalWeight}`}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Served now</th>
-                    <td className="inspector-compact-table__value--highlight">
-                      {networkDemandProjection.activelyServedResidentialWeight}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+
             </section>
           ) : null}
 
@@ -284,7 +262,6 @@ export function InspectorPanel({
                       selectedLineServiceProjection={selectedLineServiceProjection}
                       selectedLineServiceInspectorProjection={selectedLineServiceInspectorProjection}
                       selectedLinePlanningVehicleProjection={selectedLinePlanningVehicleProjection}
-                      selectedLineDemandProjection={selectedLineDemandProjection}
                       onLineRename={onLineRename}
                       onLineSequenceStopFocus={onLineSequenceStopFocus}
                       onStopRename={onStopRename}
