@@ -6,6 +6,7 @@ export type ScenarioSourceMaterialKind =
   | 'census-grid'
   | 'osm-extract'
   | 'commuter-statistics'
+  | 'workplace-attractors'
   | 'generated';
 
 /**

@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
 import { parseScenarioSourceMaterialManifest } from './scenarioSourceMaterialManifest';
 
 describe('parseScenarioSourceMaterialManifest', () => {
@@ -148,5 +150,37 @@ describe('parseScenarioSourceMaterialManifest', () => {
       ]
     };
     expect(() => parseScenarioSourceMaterialManifest(manifest)).toThrow('must have at least a useful label, path, or expectedPath');
+  });
+  it('should parse a manifest source with workplace-attractors kind and adapter', () => {
+    const manifest = {
+      ...validManifest,
+      sources: [
+        {
+          id: 'src-attractor',
+          kind: 'workplace-attractors',
+          label: 'Workplace Attractors',
+          path: 'data/attractors.geojson',
+          adapter: 'workplace-attractor-geojson',
+          options: {
+            weightProperty: 'weight'
+          },
+          enabled: true
+        }
+      ]
+    };
+    const parsed = parseScenarioSourceMaterialManifest(manifest);
+    expect(parsed.sources[0]?.kind).toBe('workplace-attractors');
+    expect(parsed.sources[0]?.adapter).toBe('workplace-attractor-geojson');
+    expect(parsed.sources[0]?.options).toEqual({ weightProperty: 'weight' });
+  });
+
+  it('should parse the Hamburg MVP source material manifest successfully', () => {
+    const filePath = path.resolve(__dirname, '../../../../../data/scenario-source-material/hamburg-core-mvp.source-material.json');
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    const manifest = JSON.parse(fileContent);
+    
+    const parsed = parseScenarioSourceMaterialManifest(manifest);
+    expect(parsed.scenarioId).toBe('hamburg-core-mvp');
+    expect(parsed.sources.some(s => s.kind === 'workplace-attractors')).toBe(true);
   });
 });

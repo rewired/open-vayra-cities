@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 149: Align Source-Material Kind Contracts After Workplace Attractor Adapter
+- Added `workplace-attractors` to the canonical `ScenarioSourceMaterialKind` union.
+- Added `workplace-attractors` to `VALID_SOURCE_MATERIAL_KINDS`.
+- Added parser test coverage for `workplace-attractors` kind, adapter, and options.
+- Added parser test coverage validating the `hamburg-core-mvp.source-material.json` manifest file.
+
 ### Slice 148: Generic Workplace Attractor GeoJSON Adapter
 - Introduced a generic, scenario-agnostic GeoJSON workplace attractor source adapter (`workplace-attractor-geojson.mjs`).
 - Implemented deterministic parsing for `Point`, `Polygon`, and `MultiPolygon` feature types, computing fallback bounding box centroids.

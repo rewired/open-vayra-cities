@@ -8,5 +8,6 @@ export const VALID_SOURCE_MATERIAL_KINDS: readonly ScenarioSourceMaterialKind[] 
   'census-grid',
   'osm-extract',
   'commuter-statistics',
+  'workplace-attractors',
   'generated'
 ];
