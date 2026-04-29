@@ -71,7 +71,7 @@ function testOsmPointFeature() {
 }
 
 function testOsmPolygonFeature() {
-  console.log('Testing OSM Polygon Feature normalization...');
+  console.log('Testing OSM Large Polygon Feature pointization...');
   const scenarioPath = path.join(tempDir, 'test.scenario.json');
   const inputPath = path.join(tempDir, 'input.geojson');
   const outputPath = path.join(tempDir, 'output.geojson');
@@ -108,9 +108,51 @@ function testOsmPolygonFeature() {
 
   assert.strictEqual(result.status, 0, `Script failed: ${result.stderr}`);
   const output = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
-  assert.strictEqual(output.features.length, 1);
-  assert.strictEqual(output.features[0].properties.id, 'way-5678');
+  assert.ok(output.features.length > 1, `Expected multiple points, got ${output.features.length}`);
+  assert.strictEqual(output.features[0].properties.id, 'way-5678-p0');
   assert.strictEqual(output.features[0].properties.category, 'workplace-office');
+}
+
+function testOsmSmallPolygonFeature() {
+  console.log('Testing OSM Small Polygon Feature normalization...');
+  const scenarioPath = path.join(tempDir, 'test.scenario.json');
+  const inputPath = path.join(tempDir, 'input.geojson');
+  const outputPath = path.join(tempDir, 'output.geojson');
+  const manifestPath = path.join(tempDir, 'manifest.json');
+
+  const scenario = {
+    scenarioId: 'test-scenario',
+    playableBounds: { west: 9.5, south: 53.0, east: 10.5, north: 54.0 }
+  };
+  fs.writeFileSync(scenarioPath, JSON.stringify(scenario, null, 2));
+
+  const geojson = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[10.0, 53.5], [10.001, 53.5], [10.001, 53.501], [10.0, 53.501], [10.0, 53.5]]]
+        },
+        properties: { '@type': 'way', '@id': '1234', office: 'it' }
+      }
+    ]
+  };
+  fs.writeFileSync(inputPath, JSON.stringify(geojson, null, 2));
+
+  const result = runScript([
+    '--scenario', scenarioPath,
+    '--input', inputPath,
+    '--output', outputPath,
+    '--manifest-output', manifestPath,
+    '--allow-fixture-residential'
+  ]);
+
+  assert.strictEqual(result.status, 0, `Script failed: ${result.stderr}`);
+  const output = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+  assert.strictEqual(output.features.length, 1);
+  assert.strictEqual(output.features[0].properties.id, 'way-1234');
 }
 
 function testUnsupportedGeometry() {
@@ -374,6 +416,7 @@ function runAll() {
     testPackageScripts();
     testOsmPointFeature();
     testOsmPolygonFeature();
+    testOsmSmallPolygonFeature();
     testUnsupportedGeometry();
     testOutOfBoundsFeatures();
     testDuplicateIds();

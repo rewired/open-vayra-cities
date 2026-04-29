@@ -1,7 +1,16 @@
 import fs from 'fs';
 import path from 'path';
+import proj4 from 'proj4';
 import { parseCensusGridCsv } from './source-adapters/census-grid-csv.mjs';
 import { parseWorkplaceAttractorGeoJson } from './source-adapters/workplace-attractor-geojson.mjs';
+import {
+  RESIDENTIAL_GRID_SUBDIVISION_PER_AXIS,
+  RESIDENTIAL_GRID_CELL_SIZE_METERS,
+  WORKPLACE_RUNTIME_MAX_DESTINATION_NODES
+} from './constants.mjs';
+
+proj4.defs('EPSG:3035', '+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
+
 
 const CANONICAL_TIME_BANDS = [
   'morning-rush',
@@ -34,7 +43,6 @@ const WORKPLACE_ATTRACTOR_TIME_BANDS = {
 };
 
 const MAX_WORKPLACE_ATTRACTOR_SOURCE_FEATURES_FOR_DIRECT_PREVIEW = 5000;
-const MAX_RUNTIME_WORKPLACE_DEMAND_NODES = 1000;
 const WORKPLACE_ATTRACTOR_AGGREGATION_CELL_METERS = 500;
 
 function fail(msg) {
@@ -86,6 +94,8 @@ function main() {
   let finalNotes = '';
   let residentialSourceRows = 0;
   let residentialRuntimeNodes = 0;
+  let residentialSourcePop = 0;
+  let residentialRuntimePop = 0;
   let workplaceSourceAttractors = 0;
   let workplaceRuntimeNodes = 0;
   let workplaceAggregationMode = 'direct';
@@ -193,20 +203,58 @@ function main() {
         }
 
         residentialSourceRows += records.length;
+        const N = RESIDENTIAL_GRID_SUBDIVISION_PER_AXIS;
+        const L = RESIDENTIAL_GRID_CELL_SIZE_METERS;
+        const S = L / N;
+        const offsetStart = -L / 2 + S / 2;
+
         for (const record of records) {
-          residentialRuntimeNodes++;
-          finalNodes.push({
-            id: `${src.id}-${record.id}`,
-            position: { lng: record.longitude, lat: record.latitude },
-            role: 'origin',
-            class: 'residential',
-            baseWeight: record.population,
-            timeBandWeights: CENSUS_GRID_RESIDENTIAL_TIME_BANDS,
-            sourceTrace: {
-              sourceId: src.id,
-              gridId: record.id
+          residentialSourcePop += record.population;
+          
+          // Project WGS84 midpoint to EPSG:3035
+          let x, y;
+          try {
+            const converted = proj4('EPSG:4326', 'EPSG:3035', [record.longitude, record.latitude]);
+            x = converted[0];
+            y = converted[1];
+          } catch (err) {
+            fail(`Failed to project coordinates for grid ${record.id}: ${err.message}`);
+          }
+
+          const subWeight = record.population / (N * N);
+
+          for (let i = 0; i < N; i++) {
+            for (let j = 0; j < N; j++) {
+              const x_sub = x + offsetStart + i * S;
+              const y_sub = y + offsetStart + j * S;
+
+              let lng_sub, lat_sub;
+              try {
+                const converted = proj4('EPSG:3035', 'EPSG:4326', [x_sub, y_sub]);
+                lng_sub = converted[0];
+                lat_sub = converted[1];
+              } catch (err) {
+                fail(`Failed to project subnode coordinates for grid ${record.id} sub ${i}_${j}: ${err.message}`);
+              }
+
+              residentialRuntimeNodes++;
+              residentialRuntimePop += subWeight;
+              
+              finalNodes.push({
+                id: `${src.id}-${record.id}-sub-${i}-${j}`,
+                position: { lng: lng_sub, lat: lat_sub },
+                role: 'origin',
+                class: 'residential',
+                baseWeight: subWeight,
+                timeBandWeights: CENSUS_GRID_RESIDENTIAL_TIME_BANDS,
+                sourceTrace: {
+                  sourceId: src.id,
+                  gridId: record.id,
+                  subnodeIndex: `${i}_${j}`
+                }
+              });
             }
-          });
+          }
         }
 
         finalGeneratedFrom.push({
@@ -312,10 +360,10 @@ function main() {
           }
         }
         
-        if (workplaceNodes.length > MAX_RUNTIME_WORKPLACE_DEMAND_NODES) {
-          console.warn(`[Warning] Workplace node count (${workplaceNodes.length}) exceeds hard limit (${MAX_RUNTIME_WORKPLACE_DEMAND_NODES}). Truncating deterministically.`);
+        if (workplaceNodes.length > WORKPLACE_RUNTIME_MAX_DESTINATION_NODES) {
+          console.warn(`[Warning] Workplace node count (${workplaceNodes.length}) exceeds hard limit (${WORKPLACE_RUNTIME_MAX_DESTINATION_NODES}). Truncating deterministically.`);
           workplaceNodes.sort((a, b) => b.baseWeight - a.baseWeight);
-          workplaceNodes = workplaceNodes.slice(0, MAX_RUNTIME_WORKPLACE_DEMAND_NODES);
+          workplaceNodes = workplaceNodes.slice(0, WORKPLACE_RUNTIME_MAX_DESTINATION_NODES);
         }
         
         workplaceRuntimeNodes += workplaceNodes.length;
@@ -487,10 +535,12 @@ function main() {
   }
 
   fs.writeFileSync(outputPath, JSON.stringify(artifact, null, 2), 'utf8');
-  console.log(`Residential source rows: ${residentialSourceRows}`);
+  console.log(`Residential source cells: ${residentialSourceRows}`);
   console.log(`Residential runtime nodes: ${residentialRuntimeNodes}`);
-  console.log(`Workplace source attractors: ${workplaceSourceAttractors}`);
-  console.log(`Workplace runtime nodes: ${workplaceRuntimeNodes}`);
+  console.log(`Residential subdivision: ${RESIDENTIAL_GRID_SUBDIVISION_PER_AXIS}x${RESIDENTIAL_GRID_SUBDIVISION_PER_AXIS}`);
+  console.log(`Residential population weight: source=${residentialSourcePop} runtime=${residentialRuntimePop}`);
+  console.log(`Workplace source features: ${workplaceSourceAttractors}`);
+  console.log(`Workplace runtime destination nodes: ${workplaceRuntimeNodes}`);
   console.log(`Workplace aggregation: ${workplaceAggregationMode}`);
   console.log(`Generated demand artifact: ${outputPath}`);
 }

@@ -369,15 +369,13 @@ function testManifestCensusGridValid() {
   assert.ok(fs.existsSync(outputPath));
 
   const generated = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
-  assert.strictEqual(generated.nodes.length, 1);
+  assert.strictEqual(generated.nodes.length, 16);
   
   const node = generated.nodes[0];
-  assert.strictEqual(node.id, 'baseline-population-grid-g1');
-  assert.strictEqual(node.position.lng, 10.0);
-  assert.strictEqual(node.position.lat, 53.5);
+  assert.strictEqual(node.id, 'baseline-population-grid-g1-sub-0-0');
   assert.strictEqual(node.role, 'origin');
   assert.strictEqual(node.class, 'residential');
-  assert.strictEqual(node.baseWeight, 100);
+  assert.strictEqual(node.baseWeight, 6.25);
   
   assert.ok(node.timeBandWeights);
   assert.strictEqual(node.timeBandWeights['morning-rush'], 1.5);
@@ -508,7 +506,7 @@ function testManifestMixedSources() {
   assert.ok(fs.existsSync(outputPath));
 
   const generated = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
-  assert.strictEqual(generated.nodes.length, 2);
+  assert.strictEqual(generated.nodes.length, 17);
 }
 
 function testManifestCensusGridDuplicateIds() {
@@ -522,7 +520,7 @@ function testManifestCensusGridDuplicateIds() {
     scenarioId: 'test-scenario',
     sourceMetadata: { generatedFrom: [] },
     nodes: [
-      { id: 'baseline-population-grid-g1', position: { lng: 10, lat: 50 }, role: 'origin', class: 'residential', baseWeight: 1, timeBandWeights: { 'morning-rush': 1, 'late-morning': 1, 'midday': 1, 'afternoon': 1, 'evening-rush': 1, 'evening': 1, 'night': 1 } }
+      { id: 'baseline-population-grid-g1-sub-0-0', position: { lng: 10, lat: 50 }, role: 'origin', class: 'residential', baseWeight: 1, timeBandWeights: { 'morning-rush': 1, 'late-morning': 1, 'midday': 1, 'afternoon': 1, 'evening-rush': 1, 'evening': 1, 'night': 1 } }
     ],
     attractors: [], gateways: []
   };

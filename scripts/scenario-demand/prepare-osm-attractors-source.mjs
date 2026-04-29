@@ -1,6 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import * as turf from '@turf/turf';
 import { getGeoJsonRepresentativePoint } from './source-adapters/geojson-representative-point.mjs';
+import {
+  WORKPLACE_POLYGON_POINTIZATION_MIN_AREA_SQUARE_METERS,
+  WORKPLACE_POLYGON_POINTIZATION_TARGET_SPACING_METERS,
+  WORKPLACE_POLYGON_POINTIZATION_MAX_POINTS_PER_FEATURE
+} from './constants.mjs';
+
 
 /**
  * Exit with an error message.
@@ -98,6 +105,8 @@ function main() {
   const knownIds = new Set();
   const outputFeatures = [];
   let skippedUnsupportedGeometries = 0;
+  let pointizedFeatures = 0;
+  let generatedPointsTotal = 0;
 
 
   for (let i = 0; i < geojson.features.length; i++) {
@@ -124,66 +133,154 @@ function main() {
 
     if (!bestMapping) continue;
 
-    // Geometry handling
-    let position = null;
-    try {
-      position = getGeoJsonRepresentativePoint(feature.geometry, `features[${i}]`);
-    } catch (err) {
-      if (rejectUnsupportedGeometries) {
-        fail(`Feature at index ${i} failed geometry evaluation: ${err.message}`);
+    const geom = feature.geometry;
+    if (!geom || typeof geom !== 'object') continue;
+
+    // Determine stable ID base
+    let baseId = props['@id'] || props['id'];
+    const type = props['@type'] || 'node';
+    if (baseId) {
+      baseId = `${type}-${baseId}`;
+    } else {
+      baseId = `osm-${i}`;
+    }
+
+    // Determine Name
+    const name = props['name'] || props['operator'] || `${bestMapping.category}-${baseId}`;
+
+    let pointsToEmit = []; // Array of { lng, lat, weight }
+
+    if (geom.type === 'Point') {
+      const coords = geom.coordinates;
+      pointsToEmit.push({ lng: coords[0], lat: coords[1], weight: bestMapping.weight });
+    } else if (geom.type === 'Polygon' || geom.type === 'MultiPolygon') {
+      let area = 0;
+      try {
+        area = turf.area(feature);
+      } catch (err) {
+        console.warn(`Turf failed to compute area for feature at index ${i}: ${err.message}`);
+      }
+
+      if (area < WORKPLACE_POLYGON_POINTIZATION_MIN_AREA_SQUARE_METERS) {
+        let position = null;
+        try {
+          position = getGeoJsonRepresentativePoint(geom, `features[${i}]`);
+          pointsToEmit.push({ lng: position.longitude, lat: position.latitude, weight: bestMapping.weight });
+        } catch (err) {
+          if (rejectUnsupportedGeometries) {
+            fail(`Feature at index ${i} failed geometry evaluation: ${err.message}`);
+          } else {
+            console.warn(`Skipping feature at index ${i} due to unsupported/invalid geometry: ${err.message}`);
+            skippedUnsupportedGeometries++;
+            continue;
+          }
+        }
       } else {
-        console.warn(`Skipping feature at index ${i} due to unsupported/invalid geometry: ${err.message}`);
+        // Large polygon pointization
+        pointizedFeatures++;
+        const MAX_POINTS = WORKPLACE_POLYGON_POINTIZATION_MAX_POINTS_PER_FEATURE;
+        const TARGET_SPACING = WORKPLACE_POLYGON_POINTIZATION_TARGET_SPACING_METERS;
+        
+        const effectiveSpacing = Math.max(TARGET_SPACING, Math.sqrt(area / MAX_POINTS));
+        
+        let bbox;
+        try {
+          bbox = turf.bbox(feature);
+        } catch (err) {
+          fail(`Turf failed to compute bbox for feature at index ${i}: ${err.message}`);
+        }
+
+        const centerLat = (bbox[1] + bbox[3]) / 2;
+        const metersPerDegreeLat = 111320;
+        const metersPerDegreeLng = 111320 * Math.cos(centerLat * Math.PI / 180);
+        const latStep = effectiveSpacing / metersPerDegreeLat;
+        const lngStep = effectiveSpacing / metersPerDegreeLng;
+
+        let candidatePoints = [];
+        for (let lng = bbox[0]; lng <= bbox[2]; lng += lngStep) {
+          for (let lat = bbox[1]; lat <= bbox[3]; lat += latStep) {
+            // Bounds check
+            if (lng < bounds.west || lng > bounds.east || lat < bounds.south || lat > bounds.north) {
+              continue;
+            }
+            const pt = turf.point([lng, lat]);
+            try {
+              if (turf.booleanPointInPolygon(pt, feature)) {
+                candidatePoints.push({ lng, lat });
+              }
+            } catch (err) {
+              // Ignore
+            }
+          }
+        }
+
+        if (candidatePoints.length === 0) {
+          // Fallback to centroid if grid missed it
+          let position = null;
+          try {
+            position = getGeoJsonRepresentativePoint(geom, `features[${i}]`);
+            pointsToEmit.push({ lng: position.longitude, lat: position.latitude, weight: bestMapping.weight });
+          } catch (err) {
+            if (rejectUnsupportedGeometries) {
+              fail(`Feature at index ${i} failed geometry evaluation: ${err.message}`);
+            } else {
+              console.warn(`Skipping feature at index ${i} due to unsupported/invalid geometry: ${err.message}`);
+              skippedUnsupportedGeometries++;
+              continue;
+            }
+          }
+        } else {
+          if (candidatePoints.length > MAX_POINTS) {
+            candidatePoints = candidatePoints.slice(0, MAX_POINTS);
+          }
+          const subWeight = bestMapping.weight / candidatePoints.length;
+          for (const pt of candidatePoints) {
+            pointsToEmit.push({ lng: pt.lng, lat: pt.lat, weight: subWeight });
+          }
+          generatedPointsTotal += candidatePoints.length;
+        }
+      }
+    } else {
+      if (rejectUnsupportedGeometries) {
+        fail(`Feature at index ${i} failed geometry evaluation: Unsupported geometry type ${geom.type}`);
+      } else {
+        console.warn(`Skipping feature at index ${i} due to unsupported geometry: ${geom.type}`);
         skippedUnsupportedGeometries++;
         continue;
       }
-
     }
 
-    const lng = position.longitude;
-    const lat = position.latitude;
-
-    if (!Number.isFinite(lng) || !Number.isFinite(lat) || Number.isNaN(lng) || Number.isNaN(lat)) {
-      skippedUnsupportedGeometries++;
-      continue;
-    }
-
-    // Bounds check
-    if (lng < bounds.west || lng > bounds.east || lat < bounds.south || lat > bounds.north) {
-      continue;
-    }
-
-    // Determine stable ID
-    let id = props['@id'] || props['id'];
-    const type = props['@type'] || 'node';
-    if (id) {
-      id = `${type}-${id}`;
-    } else {
-      id = `osm-${i}`;
-    }
-
-    if (knownIds.has(id)) {
-      fail(`Duplicate stable ID detected: ${id}. Row context features[${i}].`);
-    }
-    knownIds.add(id);
-
-    // Determine Name
-    const name = props['name'] || props['operator'] || `${bestMapping.category}-${id}`;
-
-    outputFeatures.push({
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [lng, lat]
-      },
-      properties: {
-        id,
-        name,
-        category: bestMapping.category,
-        scale: bestMapping.scale,
-        weight: bestMapping.weight,
-        sourceTag: `${matchedKey}=${matchedValue}`
+    for (let pIdx = 0; pIdx < pointsToEmit.length; pIdx++) {
+      const pt = pointsToEmit[pIdx];
+      
+      // Final bounds check just in case
+      if (pt.lng < bounds.west || pt.lng > bounds.east || pt.lat < bounds.south || pt.lat > bounds.north) {
+        continue;
       }
-    });
+
+      const finalId = pointsToEmit.length > 1 ? `${baseId}-p${pIdx}` : baseId;
+
+      if (knownIds.has(finalId)) {
+        fail(`Duplicate stable ID detected: ${finalId}. Row context features[${i}].`);
+      }
+      knownIds.add(finalId);
+
+      outputFeatures.push({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [pt.lng, pt.lat]
+        },
+        properties: {
+          id: finalId,
+          name: pointsToEmit.length > 1 ? `${name} (Part ${pIdx + 1})` : name,
+          category: bestMapping.category,
+          scale: bestMapping.scale,
+          weight: pt.weight,
+          sourceTag: `${matchedKey}=${matchedValue}`
+        }
+      });
+    }
   }
 
   // Write output GeoJSON
@@ -198,7 +295,10 @@ function main() {
   }
 
   fs.writeFileSync(outputPath, JSON.stringify(outputCollection, null, 2), 'utf8');
-  console.log(`Normalized attractor GeoJSON created: ${outputPath} (${outputFeatures.length} points retained)`);
+  console.log(`Normalized attractor GeoJSON created: ${outputPath}`);
+  console.log(`Workplace source features: ${geojson.features.length}`);
+  console.log(`Workplace polygon pointization: pointizedFeatures=${pointizedFeatures} generatedPoints=${generatedPointsTotal}`);
+  console.log(`Workplace runtime destination nodes: ${outputFeatures.length}`);
   if (skippedUnsupportedGeometries > 0) {
     console.log(`Skipped ${skippedUnsupportedGeometries} features due to unsupported or invalid geometry.`);
   }
