@@ -262,6 +262,21 @@ export const MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT = {
   'circle-stroke-opacity': 0.8
 } as const;
 
+/**
+ * Maximum number of point features to render for the scenario demand preview overlay.
+ */
+export const SCENARIO_DEMAND_PREVIEW_MAX_RENDERED_FEATURES = 2000;
+
+/**
+ * Target spatial aggregation grid cell size for heavy workplace attractor clustering.
+ */
+export const SCENARIO_DEMAND_PREVIEW_WORKPLACE_AGGREGATION_CELL_METERS = 100;
+
+/**
+ * Minimum zoom level required to draw full, un-thinned point distributions safely.
+ */
+export const SCENARIO_DEMAND_PREVIEW_MIN_ZOOM_FOR_FULL_DETAIL = 13;
+
 
 
 

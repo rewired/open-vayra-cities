@@ -1,5 +1,6 @@
 import type { MapLibreGeoJsonFeatureCollection } from './maplibreGlobal';
 import type { ScenarioDemandArtifact } from '../domain/types/scenarioDemand';
+import { SCENARIO_DEMAND_PREVIEW_MAX_RENDERED_FEATURES } from './mapRenderConstants';
 
 /**
  * Public scenario demand preview feature property contract projected into MapLibre GeoJSON sources.
@@ -84,8 +85,20 @@ export function buildScenarioDemandPreviewFeatureCollection(
     }
   }
 
+  let finalFeatures = features;
+  if (features.length > SCENARIO_DEMAND_PREVIEW_MAX_RENDERED_FEATURES) {
+    const step = features.length / SCENARIO_DEMAND_PREVIEW_MAX_RENDERED_FEATURES;
+    finalFeatures = [];
+    for (let i = 0; i < SCENARIO_DEMAND_PREVIEW_MAX_RENDERED_FEATURES; i++) {
+      const index = Math.floor(i * step);
+      if (features[index]) {
+        finalFeatures.push(features[index]);
+      }
+    }
+  }
+
   return {
     type: 'FeatureCollection',
-    features
+    features: finalFeatures
   };
 }

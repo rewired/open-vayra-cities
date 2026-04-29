@@ -282,6 +282,8 @@ export function MapWorkspaceSurface({
           sourceFeatureCount: sourceSyncDiagnostics.vehicleSourceFeatureCount
         }
       }));
+
+      applyMapLayerVisibility(mapInstance, layerVisibility);
     };
     mapInstance.on('load', onMapLoad);
     const mapResizeBinding = setupMapResizeBinding(containerElement, mapInstanceRef);

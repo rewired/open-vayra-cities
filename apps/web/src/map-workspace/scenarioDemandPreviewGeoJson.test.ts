@@ -85,4 +85,30 @@ describe('buildScenarioDemandPreviewFeatureCollection', () => {
     expect(gatewayFeature.properties.scale).toBe('n/a');
     expect(gatewayFeature.properties.weight).toBe(30);
   });
+
+  it('caps feature collection size using deterministic thinning', () => {
+    const mockArtifact: ScenarioDemandArtifact = {
+      schemaVersion: 1,
+      scenarioId: 'test-scenario',
+      generatedAt: '2026-04-29T00:00:00Z',
+      sourceMetadata: {
+        generatedFrom: [],
+        generatorName: 'test-gen',
+        generatorVersion: '1.0.0'
+      },
+      nodes: Array.from({ length: 3000 }, (_, i) => ({
+        id: `node-${i}`,
+        position: { lng: 10.0, lat: 53.5 },
+        role: 'origin',
+        class: 'residential',
+        baseWeight: 10,
+        timeBandWeights: { 'morning-rush': 1, 'late-morning': 1, 'midday': 1, 'afternoon': 1, 'evening-rush': 1, 'evening': 1, 'night': 1 }
+      })),
+      attractors: [],
+      gateways: []
+    };
+
+    const result = buildScenarioDemandPreviewFeatureCollection(mockArtifact);
+    expect(result.features).toHaveLength(2000);
+  });
 });

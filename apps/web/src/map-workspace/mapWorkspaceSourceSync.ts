@@ -274,7 +274,8 @@ const ensureAllMapWorkspaceRenderSourcesAndLayers = (map: MapLibreMap): void => 
       id: MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
       type: 'circle',
       source: MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
-      paint: MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT
+      paint: MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT,
+      layout: { visibility: 'visible' }
     });
   }
 
@@ -290,7 +291,8 @@ const ensureAllMapWorkspaceRenderSourcesAndLayers = (map: MapLibreMap): void => 
       id: MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
       type: 'circle',
       source: MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
-      paint: MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT
+      paint: MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT,
+      layout: { visibility: 'none' }
     });
   }
 };
@@ -379,8 +381,7 @@ const syncMapWorkspaceSourceData = ({
     ...(vehicleBuilderFeatureCount === undefined ? {} : { vehicleBuilderFeatureCount }),
     vehicleSourceFeatureCount: countSourceFeatures(map, MAP_SOURCE_ID_VEHICLES),
     ...(osmStopCandidateBuilderFeatureCount === undefined ? {} : { osmStopCandidateBuilderFeatureCount }),
-    osmStopCandidateSourceFeatureCount: countSourceFeatures(map, MAP_SOURCE_ID_OSM_STOP_CANDIDATES),
-
+    osmStopCandidateSourceFeatureCount: osmStopCandidateBuilderFeatureCount ?? 0,
   };
 }
 ;

@@ -99,11 +99,11 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
         draftStopIds: draftStopIdSet,
         isBuildLineModeActive: activeToolMode === 'build-line',
         selectedLine: sessionLines.find(l => l.id === selectedLineId) ?? null
-      },
-      scenarioDemandArtifact: scenarioDemandArtifactRef.current
+      }
     });
 
     if (sourceSyncDiagnostics) {
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
       return;
     }
 
@@ -117,8 +117,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
           draftStopIds: draftStopIdSet,
           isBuildLineModeActive: activeToolMode === 'build-line',
           selectedLine: sessionLines.find(l => l.id === selectedLineId) ?? null
-        },
-        scenarioDemandArtifact: scenarioDemandArtifactRef.current
+        }
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
     });
@@ -139,11 +138,11 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
         selectedLineId,
         draftStopIds,
         stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
-      },
-      scenarioDemandArtifact: scenarioDemandArtifactRef.current
+      }
     });
 
     if (sourceSyncDiagnostics) {
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
       setFeatureDiagnostics((currentDiagnostics) => ({
         ...currentDiagnostics,
         lines: {
@@ -164,8 +163,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
           selectedLineId,
           draftStopIds,
           stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
-        },
-        scenarioDemandArtifact: scenarioDemandArtifactRef.current
+        }
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
 
@@ -193,11 +191,11 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
       map: mapInstance,
       vehicleSync: {
         vehicleNetworkProjection
-      },
-      scenarioDemandArtifact: scenarioDemandArtifactRef.current
+      }
     });
 
     if (sourceSyncDiagnostics) {
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
       setFeatureDiagnostics((currentDiagnostics) => ({
         ...currentDiagnostics,
         vehicles: {
@@ -215,8 +213,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
         map: mapInstance,
         vehicleSync: {
           vehicleNetworkProjection
-        },
-        scenarioDemandArtifact: scenarioDemandArtifactRef.current
+        }
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
 
@@ -242,11 +239,11 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
 
     const sourceSyncDiagnostics = syncExistingMapWorkspaceSourceData({
       map: mapInstance,
-      osmStopCandidateSync: osmStopCandidateGroups,
-      scenarioDemandArtifact: scenarioDemandArtifactRef.current
+      osmStopCandidateSync: osmStopCandidateGroups
     });
 
     if (sourceSyncDiagnostics) {
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
       return;
     }
 
@@ -254,8 +251,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
       applyBasemapSemanticReadabilityOverrides(mapInstance);
       syncAllMapWorkspaceSources({
         map: mapInstance,
-        osmStopCandidateSync: osmStopCandidateGroups,
-        scenarioDemandArtifact: scenarioDemandArtifactRef.current
+        osmStopCandidateSync: osmStopCandidateGroups
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
     });
@@ -269,12 +265,16 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
       return;
     }
 
+    const isDemandVisible = layerVisibility['scenario-demand-preview'];
+    const artifactToSync = isDemandVisible ? scenarioDemandArtifact : null;
+
     const sourceSyncDiagnostics = syncExistingMapWorkspaceSourceData({
       map: mapInstance,
-      scenarioDemandArtifact: scenarioDemandArtifact
+      scenarioDemandArtifact: artifactToSync
     });
 
     if (sourceSyncDiagnostics) {
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
       return;
     }
 
@@ -282,11 +282,11 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
       applyBasemapSemanticReadabilityOverrides(mapInstance);
       syncAllMapWorkspaceSources({
         map: mapInstance,
-        scenarioDemandArtifact: scenarioDemandArtifact
+        scenarioDemandArtifact: artifactToSync
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
     });
-  }, [scenarioDemandArtifact, mapRef.current]);
+  }, [scenarioDemandArtifact, layerVisibility['scenario-demand-preview'], mapRef.current]);
 
 
 
