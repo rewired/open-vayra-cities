@@ -293,15 +293,94 @@ function testManifestReferences() {
   assert.strictEqual(manifest.sources[1].kind, 'workplace-attractors');
 }
 
+function testPackageScripts() {
+  console.log('Testing package scripts existence...');
+  const pkgPath = path.join(rootDir, 'package.json');
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+  const scripts = pkg.scripts || {};
+  
+  assert.ok(scripts['scenario-demand:prepare-osm-attractors:hamburg-core-mvp']);
+  assert.ok(scripts['scenario-demand:build:hamburg-core-mvp:local-demand']);
+}
+
+function testMissingCensusCsvFailure() {
+  console.log('Testing missing census CSV failure...');
+  const scenarioPath = path.join(tempDir, 'test-missing.scenario.json');
+  const inputPath = path.join(tempDir, 'input.geojson');
+  const outputPath = path.join(tempDir, 'output.geojson');
+  const manifestPath = path.join(tempDir, 'manifest.json');
+
+  const scenario = {
+    scenarioId: 'test-missing',
+    playableBounds: { west: 9.5, south: 53.0, east: 10.5, north: 54.0 }
+  };
+  fs.writeFileSync(scenarioPath, JSON.stringify(scenario, null, 2));
+
+  const geojson = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [10.0, 53.5] },
+        properties: { amenity: 'school' }
+      }
+    ]
+  };
+  fs.writeFileSync(inputPath, JSON.stringify(geojson, null, 2));
+
+  const result = runScript([
+    '--scenario', scenarioPath,
+    '--input', inputPath,
+    '--output', outputPath,
+    '--manifest-output', manifestPath
+  ]);
+
+  assert.strictEqual(result.status, 1);
+  assert.ok(result.stderr.includes('Local census normalized file does not exist'));
+  assert.ok(result.stderr.includes('pnpm scenario-demand:prepare-census:test-missing'));
+}
+
+function testInvalidGeoJsonFailure() {
+  console.log('Testing invalid GeoJSON failure...');
+  const scenarioPath = path.join(tempDir, 'test-invalid.scenario.json');
+  const inputPath = path.join(tempDir, 'input.geojson');
+  const outputPath = path.join(tempDir, 'output.geojson');
+  const manifestPath = path.join(tempDir, 'manifest.json');
+
+  const scenario = {
+    scenarioId: 'test-invalid',
+    playableBounds: { west: 9.5, south: 53.0, east: 10.5, north: 54.0 }
+  };
+  fs.writeFileSync(scenarioPath, JSON.stringify(scenario, null, 2));
+
+  fs.writeFileSync(inputPath, 'not a geojson');
+
+  const result = runScript([
+    '--scenario', scenarioPath,
+    '--input', inputPath,
+    '--output', outputPath,
+    '--manifest-output', manifestPath,
+    '--allow-fixture-residential'
+  ]);
+
+  assert.strictEqual(result.status, 1);
+  assert.ok(result.stderr.includes('Failed to parse input GeoJSON'));
+}
+
 function runAll() {
+
   try {
     setup();
+    testPackageScripts();
     testOsmPointFeature();
     testOsmPolygonFeature();
     testUnsupportedGeometry();
     testOutOfBoundsFeatures();
     testDuplicateIds();
+    testMissingCensusCsvFailure();
+    testInvalidGeoJsonFailure();
     testManifestReferences();
+
     console.log('--- All Prepare OSM Script Tests Passed ---');
   } finally {
     cleanup();

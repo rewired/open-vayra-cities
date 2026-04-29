@@ -36,6 +36,14 @@ pnpm scenario-demand:prepare-osm-attractors:hamburg-core-mvp
 ```
 *Requires census points to construct full configurations unless overridden via `--allow-fixture-residential`.*
 
+*Outputs:*
+- `data/generated/scenario-source-material/hamburg-core-mvp/workplace-attractors.normalized.geojson`
+- `data/generated/scenario-source-material/hamburg-core-mvp/hamburg-core-mvp.local-demand.source-material.json`
+
+> [!IMPORTANT]
+> **Local Data Only:** Raw OSM extracts and generated local source material files are local to your environment and **must not be committed** to the repository. They are ignored by `.gitignore`.
+
+
 ### 3. Payload Assembly
 Consolidate demographic endpoints:
 ```bash
@@ -64,5 +72,9 @@ pnpm scenario-demand:build:hamburg-core-mvp:local-demand
 > [!WARNING]
 > **Heuristic Constraints:** Extracted assignments represent synthetic simulation weights for destination routing logic rather than direct physical employment figures.
 
-## Licensing
+## Licensing & Scope
 OSM spatial products use strictly bound Open Database License requirements. Do not bundle unapproved upstream binaries directly inside remote repositories.
+
+> [!NOTE]
+> **Simulation Scope:** This workflow is designed for gameplay demand simulation. It is **not** a tool for real-world transit reconstruction or planning.
+

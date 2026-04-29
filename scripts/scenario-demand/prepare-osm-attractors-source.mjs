@@ -97,6 +97,8 @@ function main() {
 
   const knownIds = new Set();
   const outputFeatures = [];
+  let skippedUnsupportedGeometries = 0;
+
 
   for (let i = 0; i < geojson.features.length; i++) {
     const feature = geojson.features[i];
@@ -131,8 +133,10 @@ function main() {
         fail(`Feature at index ${i} failed geometry evaluation: ${err.message}`);
       } else {
         console.warn(`Skipping feature at index ${i} due to unsupported/invalid geometry: ${err.message}`);
+        skippedUnsupportedGeometries++;
         continue;
       }
+
     }
 
     const lng = position.longitude;
@@ -190,6 +194,10 @@ function main() {
 
   fs.writeFileSync(outputPath, JSON.stringify(outputCollection, null, 2), 'utf8');
   console.log(`Normalized attractor GeoJSON created: ${outputPath} (${outputFeatures.length} points retained)`);
+  if (skippedUnsupportedGeometries > 0) {
+    console.log(`Skipped ${skippedUnsupportedGeometries} features due to unsupported or invalid geometry.`);
+  }
+
 
   // Generate combined Manifest
   const scenarioId = scenario.scenarioId;
