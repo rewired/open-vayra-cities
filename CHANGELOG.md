@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 146: Generic Census Grid Source Adapter Skeleton
+- Introduced a generic population-grid CSV source-material adapter skeleton (`census-grid-csv.mjs`).
+- Configured flexible column mappings allowing custom external formats without local hardcoding.
+- Implemented data boundary validation enforcing valid bounding boxes and structural integrity.
+- Added ADR 0148 documenting implementation scopes.
+
 
 ### Slice 145: Manifest-Driven Scenario Demand Generation
 - Integrated the source-material manifest into the scenario demand generator skeleton (`build-scenario-demand.mjs`).
