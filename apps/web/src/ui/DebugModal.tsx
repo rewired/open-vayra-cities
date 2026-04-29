@@ -19,6 +19,11 @@ export interface DebugModalOverviewDiagnostics {
   readonly draftOrderedStopIds: readonly string[];
   readonly completedLineIds: readonly string[];
   readonly selectedOsmCandidateGroupId: string | null;
+  readonly scenarioDemandArtifactStatus: 'unloaded' | 'loaded' | 'failed';
+  readonly scenarioDemandNodeCount: number | null;
+  readonly scenarioDemandAttractorCount: number | null;
+  readonly scenarioDemandGatewayCount: number | null;
+  readonly scenarioDemandArtifactErrorMessage: string | null;
 }
 
 /** Immutable selected-line segment detail for debug inspection. */
@@ -150,6 +155,11 @@ export function DebugModal({
                 </tr>
                 <tr><th scope="row">OSM stop candidates (raw)</th><td>{mapWorkspaceDebugSnapshot.osmStopCandidateRawCount ?? 0}</td></tr>
                 <tr><th scope="row">OSM stop candidates (grouped)</th><td>{mapWorkspaceDebugSnapshot.osmStopCandidateGroupCount ?? 0}</td></tr>
+                <tr><th scope="row">Demand artifact status</th><td>{overviewDiagnostics.scenarioDemandArtifactStatus}</td></tr>
+                <tr><th scope="row">Demand node count</th><td>{overviewDiagnostics.scenarioDemandNodeCount ?? 0}</td></tr>
+                <tr><th scope="row">Demand attractor count</th><td>{overviewDiagnostics.scenarioDemandAttractorCount ?? 0}</td></tr>
+                <tr><th scope="row">Demand gateway count</th><td>{overviewDiagnostics.scenarioDemandGatewayCount ?? 0}</td></tr>
+                <tr><th scope="row">Demand artifact error</th><td>{overviewDiagnostics.scenarioDemandArtifactErrorMessage ?? 'none'}</td></tr>
               </tbody>
             </table>
             <ul className="app-debug-modal__list">

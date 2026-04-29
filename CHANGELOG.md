@@ -838,3 +838,7 @@ All notable changes to this project will be documented in this file.
 - Replace additive right-panel inspector sections with an explicit selection-priority state machine (line first, then stop, else neutral empty state).
 - Keep selected-line inspector output minimal and structural-only (`id/label`, stop count, ordered stop summary).
 - Add ADR 0027 documenting the inspector selection-priority state machine and explicit non-goals.
+
+- Slice 152: add a scenario-demand runtime artifact loader that fetches `ScenarioDefinition.demandAssets.scenarioDemand`, validates with the canonical parser, and returns explicit loaded/failed result unions.
+- Slice 152: wire shell-owned demand artifact initialization into scenario selection, including actionable missing-artifact failures and debug modal demand status/count diagnostics.
+- Slice 152: keep runtime demand scope to artifact loading only (no demand capture, heatmaps, served-demand, economy, or satisfaction behavior).
