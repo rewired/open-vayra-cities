@@ -1,4 +1,4 @@
-export type MapLayerId = 'osm-stop-candidates';
+export type MapLayerId = 'osm-stop-candidates' | 'scenario-demand-preview';
 
 /**
  * Represents a registered map layer control item for the UI flyout.
@@ -48,9 +48,15 @@ export const INITIAL_REGISTERED_MAP_LAYERS: readonly MapLayerControlItem[] = [
     id: 'osm-stop-candidates',
     label: 'OSM stop candidates',
     description: 'Show source-material stop candidates before adoption.'
+  },
+  {
+    id: 'scenario-demand-preview',
+    label: 'Scenario demand preview',
+    description: 'Show generated residential demand, workplace attractors, and gateways.'
   }
 ];
 
 export const INITIAL_MAP_LAYER_VISIBILITY: MapLayerVisibilityById = {
-  'osm-stop-candidates': true
+  'osm-stop-candidates': true,
+  'scenario-demand-preview': false
 };

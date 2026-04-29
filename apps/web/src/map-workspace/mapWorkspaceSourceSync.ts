@@ -24,8 +24,12 @@ import {
   MAP_VEHICLE_CIRCLE_LAYER_PAINT,
   MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
   MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
-  MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT
+  MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT,
+  MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
+  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
+  MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT
 } from './mapRenderConstants';
+import { buildScenarioDemandPreviewFeatureCollection } from './scenarioDemandPreviewGeoJson';
 import type { MapLibreMap } from './maplibreGlobal';
 import { buildStopFeatureCollection } from './stopGeoJson';
 import { buildVehicleFeatureCollection } from './vehicleGeoJson';
@@ -71,6 +75,7 @@ export interface SyncAllMapWorkspaceSourcesInput {
   readonly lineSync?: MapWorkspaceLineSyncInput;
   readonly vehicleSync?: MapWorkspaceVehicleSyncInput;
   readonly osmStopCandidateSync?: readonly OsmStopCandidateGroup[];
+  readonly scenarioDemandArtifact?: import('../domain/types/scenarioDemand').ScenarioDemandArtifact | null;
 }
 
 /**
@@ -92,6 +97,7 @@ const CUSTOM_LAYER_ORDER = [
   MAP_LAYER_ID_COMPLETED_LINES_CASING,
   MAP_LAYER_ID_COMPLETED_LINES,
   MAP_LAYER_ID_DRAFT_LINE,
+  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
   MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
   MAP_LAYER_ID_STOPS_CIRCLE,
   MAP_LAYER_ID_STOPS_LABEL,
@@ -114,7 +120,8 @@ const WORKSPACE_SOURCE_IDS = [
   MAP_SOURCE_ID_DRAFT_LINE,
   MAP_SOURCE_ID_STOPS,
   MAP_SOURCE_ID_VEHICLES,
-  MAP_SOURCE_ID_OSM_STOP_CANDIDATES
+  MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
+  MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW
 ] as const;
 
 
@@ -271,7 +278,21 @@ const ensureAllMapWorkspaceRenderSourcesAndLayers = (map: MapLibreMap): void => 
     });
   }
 
+  if (!map.getSource(MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW)) {
+    map.addSource(MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW, {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
+  }
 
+  if (!map.getLayer(MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
+      type: 'circle',
+      source: MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
+      paint: MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT
+    });
+  }
 };
 
 
@@ -280,7 +301,8 @@ const syncMapWorkspaceSourceData = ({
   stopSync,
   lineSync,
   vehicleSync,
-  osmStopCandidateSync
+  osmStopCandidateSync,
+  scenarioDemandArtifact
 }: SyncAllMapWorkspaceSourcesInput): MapWorkspaceSourceSyncDiagnostics => {
 
   let stopBuilderFeatureCount: number | undefined;
@@ -340,7 +362,11 @@ const syncMapWorkspaceSourceData = ({
     osmSource?.setData(osmFeatureCollection);
   }
 
-
+  if (scenarioDemandArtifact !== undefined) {
+    const demandFeatureCollection = buildScenarioDemandPreviewFeatureCollection(scenarioDemandArtifact);
+    const demandSource = map.getSource(MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW);
+    demandSource?.setData(demandFeatureCollection);
+  }
 
   enforceMapWorkspaceCustomLayerOrder(map);
 

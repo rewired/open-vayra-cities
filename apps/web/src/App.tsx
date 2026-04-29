@@ -473,6 +473,7 @@ const toolModeControlOptions: ReadonlyArray<{
           onOsmCandidateSelectionChange={sessionController.setSelectedOsmCandidateGroupId}
           osmStopCandidateGroups={osmStopCandidateGroups}
           onOsmCandidateAnchorResolved={setSelectedOsmCandidateAnchor}
+          scenarioDemandArtifact={scenarioDemandArtifactState.status === 'loaded' ? scenarioDemandArtifactState.artifact : null}
         />
 
       </main>

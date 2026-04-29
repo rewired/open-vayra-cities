@@ -81,6 +81,7 @@ interface MapWorkspaceSurfaceProps {
   readonly onOsmCandidateSelectionChange: (nextSelectionId: OsmStopCandidateGroupId | null) => void;
   readonly osmStopCandidateGroups: readonly OsmStopCandidateGroup[];
   readonly onOsmCandidateAnchorResolved: (resolution: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | null) => void;
+  readonly scenarioDemandArtifact: import('../domain/types/scenarioDemand').ScenarioDemandArtifact | null;
 }
 
 
@@ -130,7 +131,8 @@ export function MapWorkspaceSurface({
   onDebugSnapshotChange,
   onOsmCandidateSelectionChange,
   osmStopCandidateGroups,
-  onOsmCandidateAnchorResolved
+  onOsmCandidateAnchorResolved,
+  scenarioDemandArtifact
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -341,7 +343,8 @@ export function MapWorkspaceSurface({
     vehicleNetworkProjection,
     osmStopCandidateGroups,
     layerVisibility,
-    setFeatureDiagnostics
+    setFeatureDiagnostics,
+    scenarioDemandArtifact
   });
 
   const placementUiFeedback = buildPlacementUiFeedback(activeToolMode, placementAttemptResult);

@@ -1,6 +1,6 @@
 import type { MapLibreMap } from './maplibreGlobal';
 import type { MapLayerVisibilityById } from '../ui/constants/mapLayerUiConstants';
-import { MAP_OSM_STOP_CANDIDATE_LAYER_IDS } from './mapRenderConstants';
+import { MAP_OSM_STOP_CANDIDATE_LAYER_IDS, MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS } from './mapRenderConstants';
 
 /**
  * Interface representing the minimal MapLibre API needed to apply layer visibility.
@@ -22,7 +22,17 @@ export function applyMapLayerVisibility(
   if (osmVisible !== undefined) {
     const visibilityValue = osmVisible ? 'visible' : 'none';
     for (const layerId of MAP_OSM_STOP_CANDIDATE_LAYER_IDS) {
-      // Missing layer handles are ignored safely
+      if (map.getLayer(layerId)) {
+        map.setLayoutProperty(layerId, 'visibility', visibilityValue);
+      }
+    }
+  }
+
+  // scenario-demand-preview
+  const demandVisible = visibility['scenario-demand-preview'];
+  if (demandVisible !== undefined) {
+    const visibilityValue = demandVisible ? 'visible' : 'none';
+    for (const layerId of MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS) {
       if (map.getLayer(layerId)) {
         map.setLayoutProperty(layerId, 'visibility', visibilityValue);
       }

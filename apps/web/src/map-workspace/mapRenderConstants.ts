@@ -225,6 +225,44 @@ export const MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT = {
   ]
 } as const;
 
+/**
+ * Canonical GeoJSON source id for all scenario demand preview features.
+ */
+export const MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW = 'openvayra-cities-scenario-demand-preview';
+
+/**
+ * Canonical circle layer id for scenario demand preview rendering.
+ */
+export const MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE = 'openvayra-cities-scenario-demand-preview-circle';
+
+/**
+ * Canonical style layer ids for scenario demand preview rendering in order.
+ */
+export const MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS = [MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE] as const;
+
+/**
+ * Data-driven circle layer paint style for distinct demand preview categorization.
+ */
+export const MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT = {
+  'circle-radius': [
+    'case',
+    ['==', ['get', 'entityKind'], 'node'], 4,
+    ['==', ['get', 'entityKind'], 'attractor'], 6,
+    8
+  ],
+  'circle-color': [
+    'case',
+    ['==', ['get', 'entityKind'], 'node'], '#38bdf8',
+    ['==', ['get', 'entityKind'], 'attractor'], '#fb923c',
+    '#a855f7'
+  ],
+  'circle-stroke-width': 1,
+  'circle-stroke-color': '#ffffff',
+  'circle-opacity': 0.6,
+  'circle-stroke-opacity': 0.8
+} as const;
+
+
 
 
 

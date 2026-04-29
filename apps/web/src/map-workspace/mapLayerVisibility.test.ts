@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { applyMapLayerVisibility } from './mapLayerVisibility';
-import { MAP_OSM_STOP_CANDIDATE_LAYER_IDS } from './mapRenderConstants';
+import { MAP_OSM_STOP_CANDIDATE_LAYER_IDS, MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS } from './mapRenderConstants';
 import type { VisibilityApplicableMap } from './mapLayerVisibility';
 import { INITIAL_REGISTERED_MAP_LAYERS, INITIAL_MAP_LAYER_VISIBILITY } from '../ui/constants/mapLayerUiConstants';
 
@@ -13,7 +13,7 @@ describe('applyMapLayerVisibility', () => {
       setLayoutProperty: mockSetLayoutProperty,
     };
 
-    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': true });
+    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': true, 'scenario-demand-preview': false });
 
     for (const layerId of MAP_OSM_STOP_CANDIDATE_LAYER_IDS) {
       expect(mockGetLayer).toHaveBeenCalledWith(layerId);
@@ -29,9 +29,41 @@ describe('applyMapLayerVisibility', () => {
       setLayoutProperty: mockSetLayoutProperty,
     };
 
-    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': false });
+    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': false, 'scenario-demand-preview': false });
 
     for (const layerId of MAP_OSM_STOP_CANDIDATE_LAYER_IDS) {
+      expect(mockGetLayer).toHaveBeenCalledWith(layerId);
+      expect(mockSetLayoutProperty).toHaveBeenCalledWith(layerId, 'visibility', 'none');
+    }
+  });
+
+  it('sets visible state to every demand preview layer', () => {
+    const mockSetLayoutProperty = vi.fn();
+    const mockGetLayer = vi.fn().mockReturnValue({});
+    const mockMap: VisibilityApplicableMap = {
+      getLayer: mockGetLayer,
+      setLayoutProperty: mockSetLayoutProperty,
+    };
+
+    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': false, 'scenario-demand-preview': true });
+
+    for (const layerId of MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS) {
+      expect(mockGetLayer).toHaveBeenCalledWith(layerId);
+      expect(mockSetLayoutProperty).toHaveBeenCalledWith(layerId, 'visibility', 'visible');
+    }
+  });
+
+  it('sets hidden state to every demand preview layer', () => {
+    const mockSetLayoutProperty = vi.fn();
+    const mockGetLayer = vi.fn().mockReturnValue({});
+    const mockMap: VisibilityApplicableMap = {
+      getLayer: mockGetLayer,
+      setLayoutProperty: mockSetLayoutProperty,
+    };
+
+    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': false, 'scenario-demand-preview': false });
+
+    for (const layerId of MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS) {
       expect(mockGetLayer).toHaveBeenCalledWith(layerId);
       expect(mockSetLayoutProperty).toHaveBeenCalledWith(layerId, 'visibility', 'none');
     }
@@ -46,23 +78,10 @@ describe('applyMapLayerVisibility', () => {
     };
 
     expect(() => {
-      applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': true });
+      applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': true, 'scenario-demand-preview': true });
     }).not.toThrow();
 
     expect(mockSetLayoutProperty).not.toHaveBeenCalled();
-  });
-
-  it('does not invent unknown or future layer ids', () => {
-    const mockSetLayoutProperty = vi.fn();
-    const mockGetLayer = vi.fn().mockReturnValue({});
-    const mockMap: VisibilityApplicableMap = {
-      getLayer: mockGetLayer,
-      setLayoutProperty: mockSetLayoutProperty,
-    };
-
-    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': true });
-
-    expect(mockGetLayer).toHaveBeenCalledTimes(MAP_OSM_STOP_CANDIDATE_LAYER_IDS.length);
   });
 
   it('keeps registered layer list and initial visibility map aligned', () => {

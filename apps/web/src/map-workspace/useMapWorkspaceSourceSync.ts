@@ -48,6 +48,7 @@ export interface UseMapWorkspaceSourceSyncInput {
   readonly osmStopCandidateGroups: readonly OsmStopCandidateGroup[];
   readonly layerVisibility: MapLayerVisibilityById;
   readonly setFeatureDiagnostics: React.Dispatch<React.SetStateAction<MapWorkspaceFeatureDiagnostics>>;
+  readonly scenarioDemandArtifact: import('../domain/types/scenarioDemand').ScenarioDemandArtifact | null;
 }
 
 /**
@@ -68,13 +69,19 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
     vehicleNetworkProjection,
     osmStopCandidateGroups,
     layerVisibility,
-    setFeatureDiagnostics
+    setFeatureDiagnostics,
+    scenarioDemandArtifact
   } = input;
 
   const layerVisibilityRef = useRef(layerVisibility);
   useEffect(() => {
     layerVisibilityRef.current = layerVisibility;
   }, [layerVisibility]);
+
+  const scenarioDemandArtifactRef = useRef(scenarioDemandArtifact);
+  useEffect(() => {
+    scenarioDemandArtifactRef.current = scenarioDemandArtifact;
+  }, [scenarioDemandArtifact]);
 
   // 1. Stop source sync
   useEffect(() => {
@@ -92,7 +99,8 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
         draftStopIds: draftStopIdSet,
         isBuildLineModeActive: activeToolMode === 'build-line',
         selectedLine: sessionLines.find(l => l.id === selectedLineId) ?? null
-      }
+      },
+      scenarioDemandArtifact: scenarioDemandArtifactRef.current
     });
 
     if (sourceSyncDiagnostics) {
@@ -109,7 +117,8 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
           draftStopIds: draftStopIdSet,
           isBuildLineModeActive: activeToolMode === 'build-line',
           selectedLine: sessionLines.find(l => l.id === selectedLineId) ?? null
-        }
+        },
+        scenarioDemandArtifact: scenarioDemandArtifactRef.current
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
     });
@@ -130,7 +139,8 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
         selectedLineId,
         draftStopIds,
         stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
-      }
+      },
+      scenarioDemandArtifact: scenarioDemandArtifactRef.current
     });
 
     if (sourceSyncDiagnostics) {
@@ -154,7 +164,8 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
           selectedLineId,
           draftStopIds,
           stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
-        }
+        },
+        scenarioDemandArtifact: scenarioDemandArtifactRef.current
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
 
@@ -182,7 +193,8 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
       map: mapInstance,
       vehicleSync: {
         vehicleNetworkProjection
-      }
+      },
+      scenarioDemandArtifact: scenarioDemandArtifactRef.current
     });
 
     if (sourceSyncDiagnostics) {
@@ -203,7 +215,8 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
         map: mapInstance,
         vehicleSync: {
           vehicleNetworkProjection
-        }
+        },
+        scenarioDemandArtifact: scenarioDemandArtifactRef.current
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
 
@@ -229,7 +242,8 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
 
     const sourceSyncDiagnostics = syncExistingMapWorkspaceSourceData({
       map: mapInstance,
-      osmStopCandidateSync: osmStopCandidateGroups
+      osmStopCandidateSync: osmStopCandidateGroups,
+      scenarioDemandArtifact: scenarioDemandArtifactRef.current
     });
 
     if (sourceSyncDiagnostics) {
@@ -240,11 +254,39 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
       applyBasemapSemanticReadabilityOverrides(mapInstance);
       syncAllMapWorkspaceSources({
         map: mapInstance,
-        osmStopCandidateSync: osmStopCandidateGroups
+        osmStopCandidateSync: osmStopCandidateGroups,
+        scenarioDemandArtifact: scenarioDemandArtifactRef.current
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
     });
   }, [osmStopCandidateGroups, mapRef.current]);
+
+  // 5. Scenario demand source sync
+  useEffect(() => {
+    const mapInstance = mapRef.current;
+
+    if (!mapInstance) {
+      return;
+    }
+
+    const sourceSyncDiagnostics = syncExistingMapWorkspaceSourceData({
+      map: mapInstance,
+      scenarioDemandArtifact: scenarioDemandArtifact
+    });
+
+    if (sourceSyncDiagnostics) {
+      return;
+    }
+
+    return runWhenMapStyleReady(mapInstance, () => {
+      applyBasemapSemanticReadabilityOverrides(mapInstance);
+      syncAllMapWorkspaceSources({
+        map: mapInstance,
+        scenarioDemandArtifact: scenarioDemandArtifact
+      });
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
+    });
+  }, [scenarioDemandArtifact, mapRef.current]);
 
 
 
