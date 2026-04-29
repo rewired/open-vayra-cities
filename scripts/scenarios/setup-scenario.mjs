@@ -40,6 +40,7 @@ if (presetId !== 'hamburg-core-mvp') {
 const PRESETS = {
   'hamburg-core-mvp': {
     areaId: 'hvv-mvp',
+    sourceMaterialManifest: 'data/scenario-source-material/hamburg-core-mvp.source-material.json',
     areaJson: {
       schemaVersion: 1,
       areaId: 'hvv-mvp',
@@ -226,18 +227,33 @@ if (registryResult.status !== 0) {
   fail('Failed to rebuild scenario registry.');
 }
 
-// Generate scenario demand if seed exists
-const seedPath = path.join(rootDir, 'data/scenario-demand', `${presetId}.seed.json`);
-if (fs.existsSync(seedPath)) {
-  console.log(`Running build-scenario-demand.mjs for ${presetId}...`);
-  const demandOut = path.join(rootDir, 'apps/web/public/generated/scenarios', `${presetId}.demand.json`);
+// Generate scenario demand
+if (preset.sourceMaterialManifest) {
+  const manifestPath = path.join(rootDir, preset.sourceMaterialManifest);
+  if (!fs.existsSync(manifestPath)) {
+    fail(`Required source-material manifest missing: ${preset.sourceMaterialManifest}\nExpected it to exist for preset ${presetId}.`);
+  }
+  console.log(`Running build-scenario-demand.mjs with manifest for ${presetId}...`);
   const demandResult = child_process.spawnSync('node', [
     'scripts/scenario-demand/build-scenario-demand.mjs',
-    '--input', seedPath,
-    '--output', demandOut
+    '--manifest', preset.sourceMaterialManifest
   ], { stdio: 'inherit', cwd: rootDir });
   if (demandResult.status !== 0) {
-    fail(`Failed to generate scenario demand for ${presetId}.`);
+    fail(`Failed to generate scenario demand for ${presetId} via manifest.`);
+  }
+} else {
+  const seedPath = path.join(rootDir, 'data/scenario-demand', `${presetId}.seed.json`);
+  if (fs.existsSync(seedPath)) {
+    console.log(`Running build-scenario-demand.mjs for ${presetId}...`);
+    const demandOut = path.join(rootDir, 'apps/web/public/generated/scenarios', `${presetId}.demand.json`);
+    const demandResult = child_process.spawnSync('node', [
+      'scripts/scenario-demand/build-scenario-demand.mjs',
+      '--input', seedPath,
+      '--output', demandOut
+    ], { stdio: 'inherit', cwd: rootDir });
+    if (demandResult.status !== 0) {
+      fail(`Failed to generate scenario demand for ${presetId}.`);
+    }
   }
 }
 

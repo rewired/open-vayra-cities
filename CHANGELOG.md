@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 151: Use Source-Material Manifests in Scenario Setup Demand Orchestration
+- Routed scenario setup demand generation through the generic source-material manifest pipeline.
+- Updated `setup-scenario.mjs` to invoke `build-scenario-demand.mjs` with `--manifest` for `hamburg-core-mvp`.
+- Enforced clear, actionable failure if the required source-material manifest is missing.
+
 ### Slice 149: Align Source-Material Kind Contracts After Workplace Attractor Adapter
 - Added `workplace-attractors` to the canonical `ScenarioSourceMaterialKind` union.
 - Added `workplace-attractors` to `VALID_SOURCE_MATERIAL_KINDS`.
