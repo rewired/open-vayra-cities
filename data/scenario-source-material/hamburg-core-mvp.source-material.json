@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "hamburg-core-mvp",
+  "manifestId": "hamburg-core-mvp-source-material",
+  "description": "Source-material manifest for the baseline Hamburg scenario demand generation workflow.",
+  "sources": [
+    {
+      "id": "hamburg-core-mvp-manual-seed",
+      "kind": "manual-seed",
+      "label": "Curated baseline demand seed",
+      "path": "data/scenario-demand/hamburg-core-mvp.seed.json",
+      "enabled": true
+    },
+    {
+      "id": "future-census-grid",
+      "kind": "census-grid",
+      "label": "Future local census grid source material",
+      "expectedPath": "data/external/census/...",
+      "enabled": false,
+      "notes": "Reserved for a later generic census-grid adapter."
+    },
+    {
+      "id": "future-osm-extract",
+      "kind": "osm-extract",
+      "label": "Future local OSM extract source material",
+      "expectedPath": "data/osm/...",
+      "enabled": false,
+      "notes": "Reserved for a later generic OSM attractor adapter."
+    }
+  ],
+  "output": {
+    "demandArtifactPath": "apps/web/public/generated/scenarios/hamburg-core-mvp.demand.json"
+  }
+}

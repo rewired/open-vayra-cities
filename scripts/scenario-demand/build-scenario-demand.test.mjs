@@ -156,6 +156,94 @@ function testCreateOutputDir() {
   assert.ok(fs.existsSync(outputPath));
 }
 
+function testManifestUsage() {
+  console.log('Testing manifest usage...');
+  const manifestPath = path.join(tempDir, 'test.manifest.json');
+  const seedPath = path.join(tempDir, 'seed.json');
+  const outputPath = path.join(tempDir, 'nested', 'manifest-out.demand.json');
+
+  const seed = {
+    scenarioId: 'test-scenario',
+    sourceMetadata: { generatedFrom: [] },
+    nodes: [], attractors: [], gateways: []
+  };
+  fs.writeFileSync(seedPath, JSON.stringify(seed, null, 2));
+
+  const manifest = {
+    schemaVersion: 1,
+    scenarioId: 'test-scenario',
+    manifestId: 'test-manifest',
+    sources: [
+      { id: 's1', kind: 'manual-seed', label: 'Seed', path: seedPath, enabled: true }
+    ],
+    output: { demandArtifactPath: outputPath }
+  };
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+
+  const result = runGenerator(['--manifest', manifestPath]);
+  assert.strictEqual(result.status, 0, `Generator failed: ${result.stderr}`);
+  assert.ok(fs.existsSync(outputPath), 'Output file not created from manifest output path');
+}
+
+function testManifestDisabledUnsupported() {
+  console.log('Testing manifest ignoring disabled unsupported sources...');
+  const manifestPath = path.join(tempDir, 'disabled-unsupported.manifest.json');
+  const seedPath = path.join(tempDir, 'seed.json');
+  const outputPath = path.join(tempDir, 'manifest-out.demand.json');
+
+  const seed = {
+    scenarioId: 'test-scenario',
+    sourceMetadata: { generatedFrom: [] },
+    nodes: [], attractors: [], gateways: []
+  };
+  fs.writeFileSync(seedPath, JSON.stringify(seed, null, 2));
+
+  const manifest = {
+    schemaVersion: 1,
+    scenarioId: 'test-scenario',
+    manifestId: 'test-manifest',
+    sources: [
+      { id: 's1', kind: 'manual-seed', label: 'Seed', path: seedPath, enabled: true },
+      { id: 's2', kind: 'census-grid', label: 'Future Census', expectedPath: 'data/external/census/...', enabled: false }
+    ],
+    output: { demandArtifactPath: outputPath }
+  };
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+
+  const result = runGenerator(['--manifest', manifestPath]);
+  assert.strictEqual(result.status, 0, `Generator failed: ${result.stderr}`);
+}
+
+function testManifestEnabledUnsupported() {
+  console.log('Testing manifest failing on enabled unsupported sources...');
+  const manifestPath = path.join(tempDir, 'enabled-unsupported.manifest.json');
+  const seedPath = path.join(tempDir, 'seed.json');
+  const outputPath = path.join(tempDir, 'manifest-out.demand.json');
+
+  const seed = {
+    scenarioId: 'test-scenario',
+    sourceMetadata: { generatedFrom: [] },
+    nodes: [], attractors: [], gateways: []
+  };
+  fs.writeFileSync(seedPath, JSON.stringify(seed, null, 2));
+
+  const manifest = {
+    schemaVersion: 1,
+    scenarioId: 'test-scenario',
+    manifestId: 'test-manifest',
+    sources: [
+      { id: 's1', kind: 'manual-seed', label: 'Seed', path: seedPath, enabled: true },
+      { id: 's2', kind: 'census-grid', label: 'Future Census', expectedPath: 'data/external/census/...', enabled: true }
+    ],
+    output: { demandArtifactPath: outputPath }
+  };
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+
+  const result = runGenerator(['--manifest', manifestPath]);
+  assert.strictEqual(result.status, 1);
+  assert.ok(result.stderr.includes('is configured but no adapter exists yet'));
+}
+
 function runAll() {
   try {
     setup();
@@ -164,6 +252,9 @@ function runAll() {
     testInvalidSeedShape();
     testDuplicateIds();
     testCreateOutputDir();
+    testManifestUsage();
+    testManifestDisabledUnsupported();
+    testManifestEnabledUnsupported();
     console.log('--- All Generator Tests Passed ---');
   } finally {
     cleanup();

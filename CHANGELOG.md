@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 
+### Slice 144: Generic Scenario Source Material Manifest
+- Introduced a generic, reusable scenario source-material manifest schema and parser.
+- Defined canonical types for source entries (`manual-seed`, `census-grid`, `osm-extract`, etc.) mapping external datasets safely.
+- Integrated manifest parsing into the scenario demand generator skeleton, supporting workspace-relative input pipelines.
+- Added ADR 0146 documenting source configuration decoupling from simulation runtime state.
+
 ### Slice 143: Generic Scenario Demand Generator Skeleton
 - Introduced a generic, reusable scenario demand artifact generator script (`build-scenario-demand.mjs`).
 - Added curated seed format and initial Hamburg seed fixture (`hamburg-core-mvp.seed.json`).

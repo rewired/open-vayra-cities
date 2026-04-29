@@ -32,6 +32,7 @@ function main() {
   const args = process.argv.slice(2);
   let inputPath = null;
   let outputPath = null;
+  let manifestPath = null;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--input') {
@@ -40,11 +41,60 @@ function main() {
     } else if (args[i] === '--output') {
       outputPath = args[i + 1];
       i++;
+    } else if (args[i] === '--manifest') {
+      manifestPath = args[i + 1];
+      i++;
     }
   }
 
-  if (!inputPath || !outputPath) {
-    fail('Missing required arguments: --input <path> --output <path>');
+  if (!manifestPath && (!inputPath || !outputPath)) {
+    fail('Missing required arguments: --manifest <path> OR (--input <path> --output <path>)');
+  }
+
+  if (manifestPath) {
+    if (!fs.existsSync(manifestPath)) {
+      fail(`Manifest file not found: ${manifestPath}`);
+    }
+    let manifest;
+    try {
+      manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    } catch (e) {
+      fail(`Failed to parse manifest JSON: ${e.message}`);
+    }
+
+    if (!manifest || typeof manifest !== 'object') fail('Manifest must be an object.');
+    if (typeof manifest.schemaVersion !== 'number') fail('Manifest missing valid schemaVersion.');
+    if (typeof manifest.scenarioId !== 'string') fail('Manifest missing valid scenarioId.');
+    if (!Array.isArray(manifest.sources)) fail('Manifest missing sources array.');
+
+    const enabledSources = manifest.sources.filter(s => s.enabled !== false);
+    const supportedKinds = ['manual-seed'];
+
+    for (const src of enabledSources) {
+      if (!src.kind || typeof src.kind !== 'string') fail(`Source ${src.id || 'unknown'} missing kind.`);
+      if (!supportedKinds.includes(src.kind)) {
+        fail(`Source kind ${src.kind} is configured but no adapter exists yet.`);
+      }
+    }
+
+    const seedSource = enabledSources.find(s => s.kind === 'manual-seed');
+    if (!seedSource) {
+      fail('No enabled manual-seed source found in manifest.');
+    }
+
+    if (!seedSource.path || typeof seedSource.path !== 'string') {
+      fail(`Source ${seedSource.id} missing path.`);
+    }
+
+    inputPath = seedSource.path;
+
+    if (!manifest.output || typeof manifest.output !== 'object') {
+      fail('Manifest missing output object.');
+    }
+    if (typeof manifest.output.demandArtifactPath !== 'string') {
+      fail('Manifest output missing demandArtifactPath.');
+    }
+    outputPath = manifest.output.demandArtifactPath;
   }
 
   if (!fs.existsSync(inputPath)) {
