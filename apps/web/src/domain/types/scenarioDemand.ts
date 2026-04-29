@@ -1,22 +1,23 @@
 import type { TimeBandId } from './timeBand';
+import type {
+  ScenarioDemandNodeRole,
+  ScenarioDemandNodeClass,
+  ScenarioDemandAttractorCategory,
+  ScenarioDemandScale,
+  ScenarioDemandGatewayKind,
+  ScenarioDemandSourceKind
+} from '../constants/scenarioDemand';
 
 /**
  * Role of a demand node in the simulation.
  */
-export type ScenarioDemandNodeRole = 'origin' | 'destination' | 'bidirectional';
+export type { ScenarioDemandNodeRole };
 
 /**
  * Classification of a demand node.
  * Future-ready classes are clearly marked with '_future'.
  */
-export type ScenarioDemandNodeClass =
-  | 'residential'
-  | 'workplace'
-  | 'gateway'
-  | 'education_future'
-  | 'retail_future'
-  | 'health_future'
-  | 'leisure_future';
+export type { ScenarioDemandNodeClass };
 
 /**
  * Geographic position for demand entities in WGS84 coordinates.
@@ -49,17 +50,12 @@ export interface ScenarioDemandNode {
 /**
  * Category of an attractor.
  */
-export type ScenarioDemandAttractorCategory =
-  | 'workplace'
-  | 'education'
-  | 'retail'
-  | 'health'
-  | 'leisure';
+export type { ScenarioDemandAttractorCategory };
 
 /**
  * Scale of an attractor or gateway.
  */
-export type ScenarioDemandScale = 'local' | 'district' | 'major' | 'metropolitan';
+export type { ScenarioDemandScale };
 
 /**
  * Represents a scenario-owned attractor (non-gateway target pull location).
@@ -86,12 +82,7 @@ export interface ScenarioDemandAttractor {
 /**
  * Kind of a gateway.
  */
-export type ScenarioDemandGatewayKind =
-  | 'rail-station'
-  | 'bus-station'
-  | 'airport'
-  | 'ferry-terminal'
-  | 'other';
+export type { ScenarioDemandGatewayKind };
 
 /**
  * Represents a scenario-owned gateway (bidirectional external/internal exchange point).
@@ -120,12 +111,7 @@ export interface ScenarioDemandGateway {
 /**
  * Kind of source data.
  */
-export type ScenarioDemandSourceKind =
-  | 'census'
-  | 'osm'
-  | 'commuter-statistics'
-  | 'manual'
-  | 'generated';
+export type { ScenarioDemandSourceKind };
 
 /**
  * Metadata entry for a single source dataset.

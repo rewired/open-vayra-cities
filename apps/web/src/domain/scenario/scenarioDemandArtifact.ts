@@ -5,6 +5,7 @@ import type {
   ScenarioDemandNode,
   ScenarioDemandAttractor,
   ScenarioDemandGateway,
+  ScenarioDemandPosition,
   ScenarioDemandSourceKind,
   ScenarioDemandNodeRole,
   ScenarioDemandNodeClass,
@@ -12,7 +13,6 @@ import type {
   ScenarioDemandScale,
   ScenarioDemandGatewayKind
 } from '../types/scenarioDemand';
-import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
 import {
   ALLOWED_DEMAND_NODE_ROLES,
   ALLOWED_DEMAND_NODE_CLASSES,
@@ -23,6 +23,66 @@ import {
 } from '../constants/scenarioDemand';
 import type { TimeBandId } from '../types/timeBand';
 
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function isNonNegativeFiniteNumber(value: unknown): value is number {
+  return isFiniteNumber(value) && value >= 0;
+}
+
+function isScenarioDemandSourceKind(value: unknown): value is ScenarioDemandSourceKind {
+  return typeof value === 'string' && (ALLOWED_DEMAND_SOURCE_KINDS as readonly string[]).includes(value);
+}
+
+function isScenarioDemandNodeRole(value: unknown): value is ScenarioDemandNodeRole {
+  return typeof value === 'string' && (ALLOWED_DEMAND_NODE_ROLES as readonly string[]).includes(value);
+}
+
+function isScenarioDemandNodeClass(value: unknown): value is ScenarioDemandNodeClass {
+  return typeof value === 'string' && (ALLOWED_DEMAND_NODE_CLASSES as readonly string[]).includes(value);
+}
+
+function isScenarioDemandAttractorCategory(value: unknown): value is ScenarioDemandAttractorCategory {
+  return typeof value === 'string' && (ALLOWED_ATTRACTOR_CATEGORIES as readonly string[]).includes(value);
+}
+
+function isScenarioDemandScale(value: unknown): value is ScenarioDemandScale {
+  return typeof value === 'string' && (ALLOWED_DEMAND_SCALES as readonly string[]).includes(value);
+}
+
+function isScenarioDemandGatewayKind(value: unknown): value is ScenarioDemandGatewayKind {
+  return typeof value === 'string' && (ALLOWED_GATEWAY_KINDS as readonly string[]).includes(value);
+}
+
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+function isJsonValue(value: unknown): value is JsonValue {
+  if (value === null) return true;
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    if (typeof value === 'number' && !Number.isFinite(value)) return false;
+    return true;
+  }
+  if (Array.isArray(value)) {
+    return value.every(isJsonValue);
+  }
+  if (typeof value === 'object') {
+    if (Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null) {
+      return false;
+    }
+    return Object.entries(value).every(([key, val]) => typeof key === 'string' && isJsonValue(val));
+  }
+  return false;
+}
+
+function isJsonRecord(value: unknown): value is Record<string, unknown> {
+  return isRecord(value) && Object.values(value).every(isJsonValue);
+}
+
 /**
  * Validates an untrusted payload against the ScenarioDemandArtifact schema.
  * 
@@ -30,258 +90,341 @@ import type { TimeBandId } from '../types/timeBand';
  * @throws Error upon structural or value constraints violations.
  */
 export function parseScenarioDemandArtifact(payload: unknown): ScenarioDemandArtifact {
-  if (!payload || typeof payload !== 'object') {
+  if (!isRecord(payload)) {
     throw new Error('Scenario demand artifact must be a valid JSON object.');
   }
 
-  const raw = payload as Record<string, unknown>;
-
-  if (typeof raw.schemaVersion !== 'number') {
+  const schemaVersion = payload.schemaVersion;
+  if (typeof schemaVersion !== 'number') {
     throw new Error('Demand artifact missing numeric schemaVersion.');
   }
 
-  if (typeof raw.scenarioId !== 'string') {
+  const scenarioId = payload.scenarioId;
+  if (typeof scenarioId !== 'string') {
     throw new Error('Demand artifact missing string scenarioId.');
   }
 
-  if (typeof raw.generatedAt !== 'string') {
+  const generatedAt = payload.generatedAt;
+  if (typeof generatedAt !== 'string') {
     throw new Error('Demand artifact missing string generatedAt.');
   }
 
-  if (!raw.sourceMetadata || typeof raw.sourceMetadata !== 'object') {
+  const rawMeta = payload.sourceMetadata;
+  if (!isRecord(rawMeta)) {
     throw new Error('Demand artifact missing sourceMetadata object.');
   }
 
-  const rawMeta = raw.sourceMetadata as Record<string, unknown>;
-  if (!Array.isArray(rawMeta.generatedFrom)) {
-    throw new Error('sourceMetadata missing generatedFrom array.');
-  }
-
-  if (typeof rawMeta.generatorName !== 'string') {
+  const generatorName = rawMeta.generatorName;
+  if (typeof generatorName !== 'string') {
     throw new Error('sourceMetadata missing string generatorName.');
   }
 
-  if (typeof rawMeta.generatorVersion !== 'string') {
+  const generatorVersion = rawMeta.generatorVersion;
+  if (typeof generatorVersion !== 'string') {
     throw new Error('sourceMetadata missing string generatorVersion.');
   }
 
-  const generatedFrom = rawMeta.generatedFrom.map((entry: unknown, index: number) => {
-    if (!entry || typeof entry !== 'object') {
-      throw new Error(`generatedFrom entry at index ${index} is not an object.`);
-    }
-    const e = entry as Record<string, unknown>;
-    if (typeof e.sourceKind !== 'string' || !ALLOWED_DEMAND_SOURCE_KINDS.includes(e.sourceKind as ScenarioDemandSourceKind)) {
-      throw new Error(`generatedFrom entry at index ${index} holds invalid sourceKind.`);
-    }
-    if (typeof e.label !== 'string') {
-      throw new Error(`generatedFrom entry at index ${index} missing string label.`);
+  const notes = rawMeta.notes;
+  if (notes !== undefined && typeof notes !== 'string') {
+    throw new Error('sourceMetadata notes must be a string.');
+  }
+
+  const generatedFrom = rawMeta.generatedFrom;
+  if (!Array.isArray(generatedFrom)) {
+    throw new Error('sourceMetadata missing generatedFrom array.');
+  }
+
+  const parsedGeneratedFrom: ScenarioDemandSourceEntry[] = [];
+  for (let i = 0; i < generatedFrom.length; i++) {
+    const entry = generatedFrom[i];
+    if (!isRecord(entry)) {
+      throw new Error(`generatedFrom entry at index ${i} is not an object.`);
     }
 
-    const parsedEntry: ScenarioDemandSourceEntry = {
-      sourceKind: e.sourceKind as ScenarioDemandSourceKind,
-      label: e.label,
-      ...(typeof e.sourceDate === 'string' ? { sourceDate: e.sourceDate } : {}),
-      ...(typeof e.datasetYear === 'number' ? { datasetYear: e.datasetYear } : {}),
-      ...(typeof e.licenseHint === 'string' ? { licenseHint: e.licenseHint } : {}),
-      ...(typeof e.attributionHint === 'string' ? { attributionHint: e.attributionHint } : {})
-    };
-    return parsedEntry;
-  });
+    const sourceKind = entry.sourceKind;
+    if (!isScenarioDemandSourceKind(sourceKind)) {
+      throw new Error(`generatedFrom entry at index ${i} holds invalid sourceKind.`);
+    }
+
+    const label = entry.label;
+    if (typeof label !== 'string') {
+      throw new Error(`generatedFrom entry at index ${i} missing string label.`);
+    }
+
+    const sourceDate = entry.sourceDate;
+    if (sourceDate !== undefined && typeof sourceDate !== 'string') {
+      throw new Error(`generatedFrom entry at index ${i} sourceDate must be a string.`);
+    }
+
+    const datasetYear = entry.datasetYear;
+    if (datasetYear !== undefined && !isFiniteNumber(datasetYear)) {
+      throw new Error(`generatedFrom entry at index ${i} datasetYear must be a finite number.`);
+    }
+
+    const licenseHint = entry.licenseHint;
+    if (licenseHint !== undefined && typeof licenseHint !== 'string') {
+      throw new Error(`generatedFrom entry at index ${i} licenseHint must be a string.`);
+    }
+
+    const attributionHint = entry.attributionHint;
+    if (attributionHint !== undefined && typeof attributionHint !== 'string') {
+      throw new Error(`generatedFrom entry at index ${i} attributionHint must be a string.`);
+    }
+
+    parsedGeneratedFrom.push({
+      sourceKind,
+      label,
+      ...(sourceDate !== undefined ? { sourceDate } : {}),
+      ...(datasetYear !== undefined ? { datasetYear } : {}),
+      ...(licenseHint !== undefined ? { licenseHint } : {}),
+      ...(attributionHint !== undefined ? { attributionHint } : {})
+    });
+  }
 
   const sourceMetadata: ScenarioDemandSourceMetadata = {
-    generatedFrom,
-    generatorName: rawMeta.generatorName,
-    generatorVersion: rawMeta.generatorVersion,
-    ...(typeof rawMeta.notes === 'string' ? { notes: rawMeta.notes } : {})
+    generatedFrom: parsedGeneratedFrom,
+    generatorName,
+    generatorVersion,
+    ...(notes !== undefined ? { notes } : {})
   };
 
-  if (!Array.isArray(raw.nodes)) {
+  const rawNodes = payload.nodes;
+  if (!Array.isArray(rawNodes)) {
     throw new Error('Demand artifact missing nodes array.');
   }
 
-  if (!Array.isArray(raw.attractors)) {
+  const rawAttractors = payload.attractors;
+  if (!Array.isArray(rawAttractors)) {
     throw new Error('Demand artifact missing attractors array.');
   }
 
-  if (!Array.isArray(raw.gateways)) {
+  const rawGateways = payload.gateways;
+  if (!Array.isArray(rawGateways)) {
     throw new Error('Demand artifact missing gateways array.');
   }
 
   const knownIds = new Set<string>();
 
-  const parsePosition = (pos: unknown, entityId: string, entityType: string) => {
-    if (!pos || typeof pos !== 'object') {
+  const parsePosition = (pos: unknown, entityId: string, entityType: string): ScenarioDemandPosition => {
+    if (!isRecord(pos)) {
       throw new Error(`${entityType} ${entityId} missing position object.`);
     }
-    const p = pos as Record<string, unknown>;
-    if (typeof p.lng !== 'number' || !Number.isFinite(p.lng)) {
+    const lng = pos.lng;
+    if (!isFiniteNumber(lng)) {
       throw new Error(`${entityType} ${entityId} position lng must be a finite number.`);
     }
-    if (typeof p.lat !== 'number' || !Number.isFinite(p.lat)) {
+    const lat = pos.lat;
+    if (!isFiniteNumber(lat)) {
       throw new Error(`${entityType} ${entityId} position lat must be a finite number.`);
     }
-    return { lng: p.lng, lat: p.lat };
+    return { lng, lat };
   };
 
-  const parseTimeBandWeights = (weights: unknown, entityId: string, entityType: string): Record<TimeBandId, number> => {
-    if (!weights || typeof weights !== 'object') {
+  const parseTimeBandWeights = (weights: unknown, entityId: string, entityType: string): Readonly<Record<TimeBandId, number>> => {
+    if (!isRecord(weights)) {
       throw new Error(`${entityType} ${entityId} missing timeBandWeights object.`);
     }
-    const w = weights as Record<string, unknown>;
-    const result: Partial<Record<TimeBandId, number>> = {};
-    
-    for (const bandId of MVP_TIME_BAND_IDS) {
-      const val = w[bandId];
-      if (typeof val !== 'number' || !Number.isFinite(val) || val < 0) {
+
+    const getWeight = (bandId: TimeBandId): number => {
+      const val = weights[bandId];
+      if (!isNonNegativeFiniteNumber(val)) {
         throw new Error(`${entityType} ${entityId} missing or invalid non-negative weight for time band ${bandId}.`);
       }
-      result[bandId] = val;
-    }
-    return result as Record<TimeBandId, number>;
+      return val;
+    };
+
+    return {
+      'morning-rush': getWeight('morning-rush'),
+      'late-morning': getWeight('late-morning'),
+      'midday': getWeight('midday'),
+      'afternoon': getWeight('afternoon'),
+      'evening-rush': getWeight('evening-rush'),
+      'evening': getWeight('evening'),
+      'night': getWeight('night')
+    };
   };
 
-  const nodes = raw.nodes.map((node: unknown, index: number) => {
-    if (!node || typeof node !== 'object') {
-      throw new Error(`Node at index ${index} is not an object.`);
-    }
-    const n = node as Record<string, unknown>;
-    if (typeof n.id !== 'string') throw new Error(`Node at index ${index} missing string id.`);
-    
-    if (knownIds.has(n.id)) {
-      throw new Error(`Duplicate entity ID detected: ${n.id}`);
-    }
-    knownIds.add(n.id);
-
-    const position = parsePosition(n.position, n.id, 'Node');
-
-    if (typeof n.role !== 'string' || !ALLOWED_DEMAND_NODE_ROLES.includes(n.role as ScenarioDemandNodeRole)) {
-      throw new Error(`Node ${n.id} holds invalid role.`);
+  const nodes: ScenarioDemandNode[] = [];
+  for (let i = 0; i < rawNodes.length; i++) {
+    const n = rawNodes[i];
+    if (!isRecord(n)) {
+      throw new Error(`Node at index ${i} is not an object.`);
     }
 
-    if (typeof n.class !== 'string' || !ALLOWED_DEMAND_NODE_CLASSES.includes(n.class as ScenarioDemandNodeClass)) {
-      throw new Error(`Node ${n.id} holds invalid class.`);
+    const id = n.id;
+    if (typeof id !== 'string') {
+      throw new Error(`Node at index ${i} missing string id.`);
     }
 
-    if (typeof n.baseWeight !== 'number' || !Number.isFinite(n.baseWeight) || n.baseWeight < 0) {
-      throw new Error(`Node ${n.id} requires non-negative numeric baseWeight.`);
+    if (knownIds.has(id)) {
+      throw new Error(`Duplicate entity ID detected: ${id}`);
+    }
+    knownIds.add(id);
+
+    const position = parsePosition(n.position, id, 'Node');
+
+    const role = n.role;
+    if (!isScenarioDemandNodeRole(role)) {
+      throw new Error(`Node ${id} holds invalid role.`);
     }
 
-    const timeBandWeights = parseTimeBandWeights(n.timeBandWeights, n.id, 'Node');
+    const nodeClass = n.class;
+    if (!isScenarioDemandNodeClass(nodeClass)) {
+      throw new Error(`Node ${id} holds invalid class.`);
+    }
 
-    const parsedNode: ScenarioDemandNode = {
-      id: n.id,
+    const baseWeight = n.baseWeight;
+    if (!isNonNegativeFiniteNumber(baseWeight)) {
+      throw new Error(`Node ${id} requires non-negative numeric baseWeight.`);
+    }
+
+    const timeBandWeights = parseTimeBandWeights(n.timeBandWeights, id, 'Node');
+
+    const sourceTrace = n.sourceTrace;
+    if (sourceTrace !== undefined && !isJsonRecord(sourceTrace)) {
+      throw new Error(`Node ${id} holds invalid sourceTrace.`);
+    }
+
+    nodes.push({
+      id,
       position,
-      role: n.role as ScenarioDemandNodeRole,
-      class: n.class as ScenarioDemandNodeClass,
-      baseWeight: n.baseWeight,
+      role,
+      class: nodeClass,
+      baseWeight,
       timeBandWeights,
-      ...(n.sourceTrace && typeof n.sourceTrace === 'object' ? { sourceTrace: n.sourceTrace as Record<string, unknown> } : {})
-    };
-    return parsedNode;
-  });
+      ...(sourceTrace !== undefined ? { sourceTrace } : {})
+    });
+  }
 
-  const attractors = raw.attractors.map((attractor: unknown, index: number) => {
-    if (!attractor || typeof attractor !== 'object') {
-      throw new Error(`Attractor at index ${index} is not an object.`);
-    }
-    const a = attractor as Record<string, unknown>;
-    if (typeof a.id !== 'string') throw new Error(`Attractor at index ${index} missing string id.`);
-
-    if (knownIds.has(a.id)) {
-      throw new Error(`Duplicate entity ID detected: ${a.id}`);
-    }
-    knownIds.add(a.id);
-
-    const position = parsePosition(a.position, a.id, 'Attractor');
-
-    if (typeof a.category !== 'string' || !ALLOWED_ATTRACTOR_CATEGORIES.includes(a.category as ScenarioDemandAttractorCategory)) {
-      throw new Error(`Attractor ${a.id} holds invalid category.`);
+  const attractors: ScenarioDemandAttractor[] = [];
+  for (let i = 0; i < rawAttractors.length; i++) {
+    const a = rawAttractors[i];
+    if (!isRecord(a)) {
+      throw new Error(`Attractor at index ${i} is not an object.`);
     }
 
-    if (typeof a.scale !== 'string' || !ALLOWED_DEMAND_SCALES.includes(a.scale as ScenarioDemandScale)) {
-      throw new Error(`Attractor ${a.id} holds invalid scale.`);
+    const id = a.id;
+    if (typeof id !== 'string') {
+      throw new Error(`Attractor at index ${i} missing string id.`);
     }
 
-    if (typeof a.sourceWeight !== 'number' || !Number.isFinite(a.sourceWeight) || a.sourceWeight < 0) {
-      throw new Error(`Attractor ${a.id} requires non-negative numeric sourceWeight.`);
+    if (knownIds.has(id)) {
+      throw new Error(`Duplicate entity ID detected: ${id}`);
+    }
+    knownIds.add(id);
+
+    const position = parsePosition(a.position, id, 'Attractor');
+
+    const category = a.category;
+    if (!isScenarioDemandAttractorCategory(category)) {
+      throw new Error(`Attractor ${id} holds invalid category.`);
     }
 
-    if (typeof a.sinkWeight !== 'number' || !Number.isFinite(a.sinkWeight) || a.sinkWeight < 0) {
-      throw new Error(`Attractor ${a.id} requires non-negative numeric sinkWeight.`);
+    const scale = a.scale;
+    if (!isScenarioDemandScale(scale)) {
+      throw new Error(`Attractor ${id} holds invalid scale.`);
     }
 
-    let timeBandWeights: Record<TimeBandId, number> | undefined;
+    const sourceWeight = a.sourceWeight;
+    if (!isNonNegativeFiniteNumber(sourceWeight)) {
+      throw new Error(`Attractor ${id} requires non-negative numeric sourceWeight.`);
+    }
+
+    const sinkWeight = a.sinkWeight;
+    if (!isNonNegativeFiniteNumber(sinkWeight)) {
+      throw new Error(`Attractor ${id} requires non-negative numeric sinkWeight.`);
+    }
+
+    let timeBandWeights: Readonly<Record<TimeBandId, number>> | undefined;
     if (a.timeBandWeights !== undefined) {
-      timeBandWeights = parseTimeBandWeights(a.timeBandWeights, a.id, 'Attractor');
+      timeBandWeights = parseTimeBandWeights(a.timeBandWeights, id, 'Attractor');
     }
 
-    const parsedAttractor: ScenarioDemandAttractor = {
-      id: a.id,
+    const sourceTrace = a.sourceTrace;
+    if (sourceTrace !== undefined && !isJsonRecord(sourceTrace)) {
+      throw new Error(`Attractor ${id} holds invalid sourceTrace.`);
+    }
+
+    attractors.push({
+      id,
       position,
-      category: a.category as ScenarioDemandAttractorCategory,
-      scale: a.scale as ScenarioDemandScale,
-      sourceWeight: a.sourceWeight,
-      sinkWeight: a.sinkWeight,
-      ...(timeBandWeights ? { timeBandWeights } : {}),
-      ...(a.sourceTrace && typeof a.sourceTrace === 'object' ? { sourceTrace: a.sourceTrace as Record<string, unknown> } : {})
-    };
-    return parsedAttractor;
-  });
+      category,
+      scale,
+      sourceWeight,
+      sinkWeight,
+      ...(timeBandWeights !== undefined ? { timeBandWeights } : {}),
+      ...(sourceTrace !== undefined ? { sourceTrace } : {})
+    });
+  }
 
-  const gateways = raw.gateways.map((gateway: unknown, index: number) => {
-    if (!gateway || typeof gateway !== 'object') {
-      throw new Error(`Gateway at index ${index} is not an object.`);
-    }
-    const g = gateway as Record<string, unknown>;
-    if (typeof g.id !== 'string') throw new Error(`Gateway at index ${index} missing string id.`);
-
-    if (knownIds.has(g.id)) {
-      throw new Error(`Duplicate entity ID detected: ${g.id}`);
-    }
-    knownIds.add(g.id);
-
-    const position = parsePosition(g.position, g.id, 'Gateway');
-
-    if (typeof g.kind !== 'string' || !ALLOWED_GATEWAY_KINDS.includes(g.kind as ScenarioDemandGatewayKind)) {
-      throw new Error(`Gateway ${g.id} holds invalid kind.`);
+  const gateways: ScenarioDemandGateway[] = [];
+  for (let i = 0; i < rawGateways.length; i++) {
+    const g = rawGateways[i];
+    if (!isRecord(g)) {
+      throw new Error(`Gateway at index ${i} is not an object.`);
     }
 
-    if (typeof g.scale !== 'string' || !ALLOWED_DEMAND_SCALES.includes(g.scale as ScenarioDemandScale)) {
-      throw new Error(`Gateway ${g.id} holds invalid scale.`);
+    const id = g.id;
+    if (typeof id !== 'string') {
+      throw new Error(`Gateway at index ${i} missing string id.`);
     }
 
-    if (typeof g.sourceWeight !== 'number' || !Number.isFinite(g.sourceWeight) || g.sourceWeight < 0) {
-      throw new Error(`Gateway ${g.id} requires non-negative numeric sourceWeight.`);
+    if (knownIds.has(id)) {
+      throw new Error(`Duplicate entity ID detected: ${id}`);
+    }
+    knownIds.add(id);
+
+    const position = parsePosition(g.position, id, 'Gateway');
+
+    const kind = g.kind;
+    if (!isScenarioDemandGatewayKind(kind)) {
+      throw new Error(`Gateway ${id} holds invalid kind.`);
     }
 
-    if (typeof g.sinkWeight !== 'number' || !Number.isFinite(g.sinkWeight) || g.sinkWeight < 0) {
-      throw new Error(`Gateway ${g.id} requires non-negative numeric sinkWeight.`);
+    const scale = g.scale;
+    if (!isScenarioDemandScale(scale)) {
+      throw new Error(`Gateway ${id} holds invalid scale.`);
     }
 
-    if (typeof g.transferWeight !== 'number' || !Number.isFinite(g.transferWeight) || g.transferWeight < 0) {
-      throw new Error(`Gateway ${g.id} requires non-negative numeric transferWeight.`);
+    const sourceWeight = g.sourceWeight;
+    if (!isNonNegativeFiniteNumber(sourceWeight)) {
+      throw new Error(`Gateway ${id} requires non-negative numeric sourceWeight.`);
     }
 
-    const timeBandWeights = parseTimeBandWeights(g.timeBandWeights, g.id, 'Gateway');
+    const sinkWeight = g.sinkWeight;
+    if (!isNonNegativeFiniteNumber(sinkWeight)) {
+      throw new Error(`Gateway ${id} requires non-negative numeric sinkWeight.`);
+    }
 
-    const parsedGateway: ScenarioDemandGateway = {
-      id: g.id,
+    const transferWeight = g.transferWeight;
+    if (!isNonNegativeFiniteNumber(transferWeight)) {
+      throw new Error(`Gateway ${id} requires non-negative numeric transferWeight.`);
+    }
+
+    const timeBandWeights = parseTimeBandWeights(g.timeBandWeights, id, 'Gateway');
+
+    const sourceTrace = g.sourceTrace;
+    if (sourceTrace !== undefined && !isJsonRecord(sourceTrace)) {
+      throw new Error(`Gateway ${id} holds invalid sourceTrace.`);
+    }
+
+    gateways.push({
+      id,
       position,
-      kind: g.kind as ScenarioDemandGatewayKind,
-      scale: g.scale as ScenarioDemandScale,
-      sourceWeight: g.sourceWeight,
-      sinkWeight: g.sinkWeight,
-      transferWeight: g.transferWeight,
+      kind,
+      scale,
+      sourceWeight,
+      sinkWeight,
+      transferWeight,
       timeBandWeights,
-      ...(g.sourceTrace && typeof g.sourceTrace === 'object' ? { sourceTrace: g.sourceTrace as Record<string, unknown> } : {})
-    };
-    return parsedGateway;
-  });
+      ...(sourceTrace !== undefined ? { sourceTrace } : {})
+    });
+  }
 
   return {
-    schemaVersion: raw.schemaVersion,
-    scenarioId: raw.scenarioId,
-    generatedAt: raw.generatedAt,
+    schemaVersion,
+    scenarioId,
+    generatedAt,
     sourceMetadata,
     nodes,
     attractors,

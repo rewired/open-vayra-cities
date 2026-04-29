@@ -116,6 +116,30 @@ describe('parseScenarioDemandArtifact', () => {
     expect(() => parseScenarioDemandArtifact(invalidArtifact)).toThrow('Duplicate entity ID detected: node-1');
   });
 
+  test('rejects NaN weights', () => {
+    const invalidArtifact = JSON.parse(JSON.stringify(validArtifact));
+    invalidArtifact.nodes[0].baseWeight = NaN;
+    expect(() => parseScenarioDemandArtifact(invalidArtifact)).toThrow('requires non-negative numeric baseWeight');
+  });
+
+  test('rejects -Infinity weights', () => {
+    const invalidArtifact = JSON.parse(JSON.stringify(validArtifact));
+    invalidArtifact.nodes[0].baseWeight = -Infinity;
+    expect(() => parseScenarioDemandArtifact(invalidArtifact)).toThrow('requires non-negative numeric baseWeight');
+  });
+
+  test('rejects invalid sourceTrace (non-object)', () => {
+    const invalidArtifact = JSON.parse(JSON.stringify(validArtifact));
+    invalidArtifact.nodes[0].sourceTrace = 'invalid';
+    expect(() => parseScenarioDemandArtifact(invalidArtifact)).toThrow('holds invalid sourceTrace');
+  });
+
+  test('rejects invalid sourceTrace (non-JSON value)', () => {
+    const invalidArtifact = JSON.parse(JSON.stringify(validArtifact));
+    invalidArtifact.nodes[0].sourceTrace = { invalidFunc: () => {} };
+    expect(() => parseScenarioDemandArtifact(invalidArtifact)).toThrow('holds invalid sourceTrace');
+  });
+
   test('parses optional source metadata correctly', () => {
     const artifactWithOptional = JSON.parse(JSON.stringify(validArtifact));
     artifactWithOptional.sourceMetadata.notes = 'Generated for testing';

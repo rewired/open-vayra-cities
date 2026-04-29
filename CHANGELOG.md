@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 
+### Slice 142: Scenario Demand Parser Type Hygiene Repair
+- Replaced broad unchecked casts in scenario demand artifact parser with strict runtime control-flow type narrowing.
+- Re-derived taxonomy domain string unions directly from constants tuples instead of duplicated definitions.
+- Extended unit test suites ensuring invalid payloads (such as NaN weights, non-finite bounds, or structurally corrupted records) trigger appropriate parser rejections.
+- Added ADR 0144 documenting type safety rules across integration boundaries.
+
 ### Slice 141: Scenario-Owned Demand Contracts
 - Introduced canonical scenario-owned demand data contracts, defining target runtime truth shapes for demand sources, attractors, gateways, and time-band weights.
 - Added strict validation parser accepting `unknown` at public boundaries to narrow constraints without type weakening.
