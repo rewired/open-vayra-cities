@@ -1,0 +1,137 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "work_01",
+        "name": "Office Alpha",
+        "weight": 300,
+        "scale": "local"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9.91, 53.51]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "work_02",
+        "name": "Office Beta",
+        "weight": 400,
+        "scale": "district"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9.93, 53.53]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "work_03",
+        "name": "Industrial Park X",
+        "weight": 800,
+        "scale": "major"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [9.95, 53.55],
+            [9.96, 53.55],
+            [9.96, 53.56],
+            [9.95, 53.56],
+            [9.95, 53.55]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "work_04",
+        "name": "Shopping Mall Y",
+        "weight": 600,
+        "scale": "district"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [9.97, 53.57],
+            [9.98, 53.57],
+            [9.98, 53.58],
+            [9.97, 53.58],
+            [9.97, 53.57]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "work_05",
+        "name": "Business Center Z",
+        "weight": 1000,
+        "scale": "metropolitan"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [9.99, 53.59],
+              [10.0, 53.59],
+              [10.0, 53.6],
+              [9.99, 53.6],
+              [9.99, 53.59]
+            ]
+          ],
+          [
+            [
+              [10.01, 53.59],
+              [10.02, 53.59],
+              [10.02, 53.6],
+              [10.01, 53.6],
+              [10.01, 53.59]
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "work_06",
+        "name": "Tech Hub W",
+        "weight": 500,
+        "scale": "major"
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [10.03, 53.61],
+              [10.04, 53.61],
+              [10.04, 53.62],
+              [10.03, 53.62],
+              [10.03, 53.61]
+            ]
+          ],
+          [
+            [
+              [10.05, 53.61],
+              [10.06, 53.61],
+              [10.06, 53.62],
+              [10.05, 53.62],
+              [10.05, 53.61]
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

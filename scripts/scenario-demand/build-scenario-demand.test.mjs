@@ -677,6 +677,42 @@ function testManifestWorkplaceAttractorsDuplicateIds() {
   assert.ok(result.stderr.includes('Duplicate entity ID detected'));
 }
 
+function testHamburgManifest() {
+  console.log('Testing Hamburg manifest with fixtures...');
+  const realManifestPath = path.join(rootDir, 'data', 'scenario-source-material', 'hamburg-core-mvp.source-material.json');
+  const tempManifestPath = path.join(tempDir, 'hamburg-temp.manifest.json');
+  const tempOutputPath = path.join(tempDir, 'hamburg-temp.demand.json');
+
+  const manifest = JSON.parse(fs.readFileSync(realManifestPath, 'utf8'));
+  manifest.output.demandArtifactPath = tempOutputPath;
+  
+  fs.writeFileSync(tempManifestPath, JSON.stringify(manifest, null, 2));
+
+  const result = runGenerator(['--manifest', tempManifestPath]);
+  assert.strictEqual(result.status, 0, `Generator failed: ${result.stderr}`);
+  assert.ok(fs.existsSync(tempOutputPath));
+
+  const generated = JSON.parse(fs.readFileSync(tempOutputPath, 'utf8'));
+  
+  assert.ok(generated.nodes.length >= 8, `Expected >= 8 nodes, got ${generated.nodes.length}`);
+  assert.ok(generated.attractors.length >= 6, `Expected >= 6 attractors, got ${generated.attractors.length}`);
+
+  const residentialNode = generated.nodes.find(n => n.class === 'residential');
+  assert.ok(residentialNode.id.startsWith('hamburg-core-mvp-residential-grid-fixture'), `Expected id to start with prefix, got ${residentialNode.id}`);
+
+  const workplaceAttractor = generated.attractors.find(a => a.category === 'workplace');
+  assert.ok(workplaceAttractor.id.startsWith('hamburg-core-mvp-workplace-attractors-fixture'), `Expected id to start with prefix, got ${workplaceAttractor.id}`);
+
+  const hasManualSeed = generated.nodes.some(n => n.id.startsWith('hamburg-core-mvp-manual-seed')) ||
+                        generated.attractors.some(a => a.id.startsWith('hamburg-core-mvp-manual-seed'));
+  assert.ok(!hasManualSeed, 'Generated artifact contains entities from disabled manual-seed');
+
+  const hasCensusMeta = generated.sourceMetadata.generatedFrom.some(s => s.sourceKind === 'census');
+  const hasOsmMeta = generated.sourceMetadata.generatedFrom.some(s => s.sourceKind === 'osm');
+  assert.ok(hasCensusMeta, 'Missing census metadata in generatedFrom');
+  assert.ok(hasOsmMeta, 'Missing osm metadata in generatedFrom');
+}
+
 function runAll() {
   try {
     setup();
@@ -699,10 +735,12 @@ function runAll() {
     testManifestCensusGridDuplicateIds();
     testManifestWorkplaceAttractorsValid();
     testManifestWorkplaceAttractorsDuplicateIds();
+    testHamburgManifest();
     console.log('--- All Generator Tests Passed ---');
   } finally {
     cleanup();
   }
 }
+
 
 runAll();

@@ -9,31 +9,29 @@
       "kind": "manual-seed",
       "label": "Curated baseline demand seed",
       "path": "data/scenario-demand/hamburg-core-mvp.seed.json",
-      "enabled": true
+      "enabled": false
     },
     {
-      "id": "future-census-grid",
+      "id": "hamburg-core-mvp-residential-grid-fixture",
       "kind": "census-grid",
-      "label": "Future local census grid source material",
-      "expectedPath": "data/external/census/...",
-      "enabled": false,
-      "notes": "Reserved for a later generic census-grid adapter."
+      "label": "Hamburg Core MVP Residential Grid Fixture",
+      "path": "data/scenario-source-material/fixtures/hamburg-core-mvp/residential-grid.fixture.csv",
+      "adapter": "census-grid-csv",
+      "enabled": true,
+      "options": {
+        "idColumn": "grid_id",
+        "longitudeColumn": "lng",
+        "latitudeColumn": "lat",
+        "populationColumn": "population"
+      }
     },
     {
-      "id": "future-osm-extract",
-      "kind": "osm-extract",
-      "label": "Future local OSM extract source material",
-      "expectedPath": "data/osm/...",
-      "enabled": false,
-      "notes": "Reserved for a later generic OSM attractor adapter."
-    },
-    {
-      "id": "future-workplace-attractors",
+      "id": "hamburg-core-mvp-workplace-attractors-fixture",
       "kind": "workplace-attractors",
-      "label": "Local workplace attractor source material",
-      "path": "data/scenario-source-material/fixtures/workplace-attractors.geojson",
-      "enabled": false,
+      "label": "Hamburg Core MVP Workplace Attractors Fixture",
+      "path": "data/scenario-source-material/fixtures/hamburg-core-mvp/workplace-attractors.fixture.geojson",
       "adapter": "workplace-attractor-geojson",
+      "enabled": true,
       "options": {
         "idProperty": "id",
         "labelProperty": "name",
@@ -42,6 +40,14 @@
         "defaultWeight": 100,
         "defaultScale": "district"
       }
+    },
+    {
+      "id": "future-osm-extract",
+      "kind": "osm-extract",
+      "label": "Future local OSM extract source material",
+      "expectedPath": "data/osm/...",
+      "enabled": false,
+      "notes": "Reserved for a later generic OSM attractor adapter."
     }
   ],
   "output": {
