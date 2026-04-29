@@ -1,13 +1,13 @@
 {
-  "name": "city-ops",
+  "name": "open-vayra-cities",
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev:web": "pnpm --filter @city-ops/web dev",
-    "build:web": "pnpm --filter @city-ops/web build",
-    "typecheck:web": "pnpm --filter @city-ops/web typecheck",
+    "dev:web": "pnpm --filter @open-vayra-cities/web dev",
+    "build:web": "pnpm --filter @open-vayra-cities/web build",
+    "typecheck:web": "pnpm --filter @open-vayra-cities/web typecheck",
     "typecheck": "pnpm typecheck:web",
-    "test:web": "pnpm --filter @city-ops/web test",
+    "test:web": "pnpm --filter @open-vayra-cities/web test",
     "lint": "eslint .",
     "verify": "pnpm lint && pnpm typecheck && pnpm test",
     "local-assets:prepare": "node scripts/local-assets/prepare-local-assets.mjs",
