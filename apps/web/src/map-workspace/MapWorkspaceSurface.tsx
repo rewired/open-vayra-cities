@@ -340,8 +340,8 @@ export function MapWorkspaceSurface({
     selectedLineId,
     vehicleNetworkProjection,
     osmStopCandidateGroups,
+    layerVisibility,
     setFeatureDiagnostics
-
   });
 
   const placementUiFeedback = buildPlacementUiFeedback(activeToolMode, placementAttemptResult);

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 153: Repair Map Layer Registry and Visibility Contract
+- Registered the `osm-stop-candidates` overlay in the map layer flyout.
+- Set default visibility for OSM stop candidates to `true`.
+- Implemented `applyMapLayerVisibility` helper mapping visibility state to MapLibre layers.
+- Integrated visibility application into `useMapWorkspaceSourceSync` and `MapWorkspaceSurface`.
+
 ### Slice 151: Use Source-Material Manifests in Scenario Setup Demand Orchestration
 - Routed scenario setup demand generation through the generic source-material manifest pipeline.
 - Updated `setup-scenario.mjs` to invoke `build-scenario-demand.mjs` with `--manifest` for `hamburg-core-mvp`.

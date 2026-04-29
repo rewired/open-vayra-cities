@@ -43,8 +43,14 @@ export const MAP_LAYER_UI_LABELS = {
 /**
  * Canonical initial registry items.
  */
-export const INITIAL_REGISTERED_MAP_LAYERS: readonly MapLayerControlItem[] = [];
+export const INITIAL_REGISTERED_MAP_LAYERS: readonly MapLayerControlItem[] = [
+  {
+    id: 'osm-stop-candidates',
+    label: 'OSM stop candidates',
+    description: 'Show source-material stop candidates before adoption.'
+  }
+];
 
 export const INITIAL_MAP_LAYER_VISIBILITY: MapLayerVisibilityById = {
-  'osm-stop-candidates': false
+  'osm-stop-candidates': true
 };

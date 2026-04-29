@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import type { Line } from '../domain/types/line';
 import type { LineVehicleNetworkProjection } from '../domain/types/lineVehicleProjection';
@@ -6,6 +6,8 @@ import type { OsmStopCandidateGroup } from '../domain/types/osmStopCandidate';
 import type { Stop, StopId } from '../domain/types/stop';
 import type { WorkspaceToolMode } from '../session/sessionTypes';
 import type { MapLibreMap } from './maplibreGlobal';
+import type { MapLayerVisibilityById } from '../ui/constants/mapLayerUiConstants';
+import { applyMapLayerVisibility } from './mapLayerVisibility';
 
 import {
   MAP_LAYER_ID_COMPLETED_LINES,
@@ -44,6 +46,7 @@ export interface UseMapWorkspaceSourceSyncInput {
   readonly selectedLineId: Line['id'] | null;
   readonly vehicleNetworkProjection: LineVehicleNetworkProjection;
   readonly osmStopCandidateGroups: readonly OsmStopCandidateGroup[];
+  readonly layerVisibility: MapLayerVisibilityById;
   readonly setFeatureDiagnostics: React.Dispatch<React.SetStateAction<MapWorkspaceFeatureDiagnostics>>;
 }
 
@@ -64,8 +67,14 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
     selectedLineId,
     vehicleNetworkProjection,
     osmStopCandidateGroups,
+    layerVisibility,
     setFeatureDiagnostics
   } = input;
+
+  const layerVisibilityRef = useRef(layerVisibility);
+  useEffect(() => {
+    layerVisibilityRef.current = layerVisibility;
+  }, [layerVisibility]);
 
   // 1. Stop source sync
   useEffect(() => {
@@ -102,6 +111,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
           selectedLine: sessionLines.find(l => l.id === selectedLineId) ?? null
         }
       });
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
     });
   }, [activeToolMode, draftStopIdSet, placedStops, selectedStopId, sessionLines, selectedLineId, mapRef.current]);
 
@@ -146,6 +156,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
           stopsById: new Map(placedStops.map((stop) => [stop.id, stop] as const))
         }
       });
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
 
       setFeatureDiagnostics((currentDiagnostics) => ({
         ...currentDiagnostics,
@@ -194,6 +205,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
           vehicleNetworkProjection
         }
       });
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
 
       setFeatureDiagnostics((currentDiagnostics) => ({
         ...currentDiagnostics,
@@ -230,12 +242,23 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
         map: mapInstance,
         osmStopCandidateSync: osmStopCandidateGroups
       });
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
     });
   }, [osmStopCandidateGroups, mapRef.current]);
 
 
 
-  // 5. Rendered feature diagnostics refresh
+  // 5. Visibility application effect
+  useEffect(() => {
+    const mapInstance = mapRef.current;
+    if (!mapInstance) {
+      return;
+    }
+
+    applyMapLayerVisibility(mapInstance, layerVisibility);
+  }, [layerVisibility, mapRef.current]);
+
+  // 6. Rendered feature diagnostics refresh
 
   useEffect(() => {
     const mapInstance = mapRef.current;
