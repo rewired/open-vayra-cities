@@ -274,6 +274,17 @@ Reference systems may inspire the design, but should not be imported blindly.
 
 ---
 
+## Map Layer Registry rule
+
+Optional map overlays must register with the central map layer flyout.
+
+### Guidelines
+
+* New standalone map overlay toggle buttons are not allowed unless explicitly justified.
+* The layer control owns UI visibility state only; it must not own simulation/domain/routing truth.
+
+---
+
 ## DESIGN.md handling
 
 `DESIGN.md` is externally provided by Voltagent.

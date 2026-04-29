@@ -54,6 +54,12 @@ import {
 import { applyMapWorkspaceFocusIntent } from './mapWorkspaceFocus';
 import { buildMapWorkspaceDebugSnapshot, type MapWorkspaceDebugSnapshot } from './mapWorkspaceDebugSnapshot';
 import { useMapWorkspaceSourceSync, type MapWorkspaceFeatureDiagnostics, type LayerFeatureDiagnostics } from './useMapWorkspaceSourceSync';
+import { MapLayerFlyout } from './MapLayerFlyout';
+import {
+  INITIAL_MAP_LAYER_VISIBILITY,
+  type MapLayerId,
+  type MapLayerVisibilityById
+} from '../ui/constants/mapLayerUiConstants';
 
 /** Canonical single-stop selection contract shared by marker highlighting and shell inspector state. */
 export type { StopSelectionState } from './mapWorkspaceInteractions';
@@ -150,6 +156,14 @@ export function MapWorkspaceSurface({
   );
   const [lastPlacedStopLabel, setLastPlacedStopLabel] = useState<string | null>(null);
   const [isDemandOverlayVisible, setIsDemandOverlayVisible] = useState<boolean>(false);
+  const [layerVisibility, setLayerVisibility] = useState<MapLayerVisibilityById>(INITIAL_MAP_LAYER_VISIBILITY);
+
+  const handleToggleLayer = (layerId: MapLayerId): void => {
+    setLayerVisibility((prev) => ({
+      ...prev,
+      [layerId]: !prev[layerId]
+    }));
+  };
 
   const [isCompletingLine, setIsCompletingLine] = useState(false);
   const [isCompletionDialogOpen, setIsCompletionDialogOpen] = useState(false);
@@ -482,6 +496,11 @@ export function MapWorkspaceSurface({
   return (
     <section className="map-workspace" aria-label="Map workspace surface">
       <div ref={mapContainerRef} className="map-workspace__map" aria-label="CityOps baseline map" />
+
+      <MapLayerFlyout
+        visibility={layerVisibility}
+        onToggleLayer={handleToggleLayer}
+      />
 
       <div className="map-workspace__overlay map-workspace__overlay--demand-toggle" aria-label="Demand overlay controls">
         <label className="map-workspace__demand-toggle-label">
