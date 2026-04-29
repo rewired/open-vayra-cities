@@ -6,7 +6,7 @@ param(
     [string]$OutputGeoJson = "",
 
     [Parameter(Mandatory=$false)]
-    [string]$ImageName = "cityops-osmium-tooling:local",
+    [string]$ImageName = "open-vayra-osmium-tooling:local",
 
     [Parameter(Mandatory=$false)]
     [string]$IntermediateDir = "",
@@ -94,8 +94,8 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# 4. Run CityOps normalizer on host (requires Node)
-Write-Host "Running CityOps normalizer (Node)..." -ForegroundColor Cyan
+# 4. Run OpenVayra normalizer on host (requires Node)
+Write-Host "Running OpenVayra normalizer (Node)..." -ForegroundColor Cyan
 
 $normalizeScript = Join-Path $ScriptDir "normalize-stop-candidates.mjs"
 

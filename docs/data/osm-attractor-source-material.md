@@ -15,7 +15,7 @@ graph TD
 ```
 
 ### Data Pipelines
-1. **Raw Source Material:** Non-committed datasets (`data/osm/hvv-mvp.osm.pbf`).
+1. **Raw Source Material:** Local `.osm.pbf` extracts placed under `data/osm/<areaId>.osm.pbf` (e.g., `data/osm/hvv-mvp.osm.pbf`). These files are excluded from source control.
 2. **Intermediate Geometry:** Unmapped raw objects extracted from PBF sources.
 3. **Normalized Local Source:** Standard GeoJSON features restricted to playable boundaries with unified game semantics (`id, category, scale, weight`).
 4. **Runtime Demand Payload:** Consolidated JSON read directly during active simulations.
@@ -25,9 +25,14 @@ graph TD
 ### 1. Geometry Extraction
 Isolate spatial primitives via Docker-wrapped `osmium` utilities:
 ```bash
+powershell -File scripts/scenario-demand/prepare-osm-attractors-source.ps1 -ScenarioId <scenarioId> -Area <areaId>
+```
+Or execute the Hamburg preset script:
+```bash
 pnpm scenario-demand:extract-osm-attractors:hamburg-core-mvp
 ```
-*Outputs:* `data/generated/scenario-source-material/hamburg-core-mvp/osm-attractors.raw.geojson`
+*Outputs:* `data/generated/scenario-source-material/<scenarioId>/osm-attractors.raw.geojson`
+
 
 ### 2. Categorization & Normalization
 Filter by bounds and compute operational sizes:

@@ -1,9 +1,21 @@
 param(
     [Parameter(Mandatory=$false)]
-    [string]$Area = "hvv-mvp",
+    [string]$ScenarioId,
 
     [Parameter(Mandatory=$false)]
-    [string]$ImageName = "cityops-osmium-tooling:local"
+    [string]$Area,
+
+    [Parameter(Mandatory=$false)]
+    [string]$InputPbf,
+
+    [Parameter(Mandatory=$false)]
+    [string]$OutputGeoJson,
+
+    [Parameter(Mandatory=$false)]
+    [string]$ImageName = "open-vayra-osmium-tooling:local",
+
+    [Parameter(Mandatory=$false)]
+    [switch]$DryRun
 )
 
 $ErrorActionPreference = "Stop"
@@ -11,23 +23,61 @@ $ErrorActionPreference = "Stop"
 # Resolve root path
 $RootPath = (Resolve-Path "$PSScriptRoot\..\..").Path
 
-$InputPbf = Join-Path $RootPath "data\osm\${Area}.osm.pbf"
+# Validation
+if (-not $OutputGeoJson -and -not $ScenarioId) {
+    Write-Error "ScenarioId is required unless OutputGeoJson is explicitly provided."
+    exit 1
+}
+
+if (-not $InputPbf -and -not $Area) {
+    Write-Error "Area is required unless InputPbf is explicitly provided."
+    exit 1
+}
+
+# Path Resolution
+if (-not $InputPbf) {
+    $InputPbf = Join-Path $RootPath "data\osm\${Area}.osm.pbf"
+} else {
+    if (-not [System.IO.Path]::IsPathRooted($InputPbf)) {
+        $InputPbf = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $InputPbf))
+    }
+}
+
+if (-not $OutputGeoJson) {
+    $OutputGeoJson = Join-Path $RootPath "data\generated\scenario-source-material\${ScenarioId}\osm-attractors.raw.geojson"
+} else {
+    if (-not [System.IO.Path]::IsPathRooted($OutputGeoJson)) {
+        $OutputGeoJson = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $OutputGeoJson))
+    }
+}
+
+$IntermediateDir = Split-Path -Parent $OutputGeoJson
+$TempPbf = Join-Path $IntermediateDir "attractors.osm.pbf"
+
+if ($DryRun) {
+    Write-Host "DRY RUN: Resolved paths"
+    Write-Host "ScenarioId: $ScenarioId"
+    Write-Host "Area: $Area"
+    Write-Host "InputPbf: $InputPbf"
+    Write-Host "OutputGeoJson: $OutputGeoJson"
+    Write-Host "ImageName: $ImageName"
+    Write-Host "TempPbf: $TempPbf"
+    exit 0
+}
+
+# Create intermediate directory if it doesn't exist
+if (-not (Test-Path $IntermediateDir)) {
+    New-Item -ItemType Directory -Force -Path $IntermediateDir | Out-Null
+}
+
 if (-not (Test-Path $InputPbf)) {
     Write-Error "Input PBF not found at $InputPbf. Please place the raw OSM extract there."
     exit 1
 }
 
-$IntermediateDir = Join-Path $RootPath "data\generated\scenario-source-material\hamburg-core-mvp"
-if (-not (Test-Path $IntermediateDir)) {
-    New-Item -ItemType Directory -Force -Path $IntermediateDir | Out-Null
-}
-
-$TempPbf = Join-Path $IntermediateDir "attractors.osm.pbf"
-$OutputGeoJson = Join-Path $IntermediateDir "osm-attractors.raw.geojson"
-
 function Get-ContainerPath([string]$HostPath) {
     $absPath = [System.IO.Path]::GetFullPath($HostPath)
-    if ($absPath.StartsWith($RootPath)) {
+    if ($absPath -like "$RootPath*") {
         $subPath = $absPath.Substring($RootPath.Length).TrimStart("\")
         $linuxPath = $subPath.Replace("\", "/")
         return "/work/$linuxPath"
@@ -85,3 +135,4 @@ if ($LASTEXITCODE -ne 0) {
 if (Test-Path $TempPbf) { Remove-Item -Force $TempPbf }
 
 Write-Host "OSM Attractor extract complete: $OutputGeoJson" -ForegroundColor Green
+

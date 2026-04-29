@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$false)]
-    [string]$ImageName = "cityops-osmium-tooling:local",
+    [string]$ImageName = "open-vayra-osmium-tooling:local",
 
     [Parameter(Mandatory=$false)]
     [switch]$NoBuild = $false
@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 # Resolve root path
 $RootPath = (Resolve-Path "$PSScriptRoot\..\..").Path
 
-Write-Host "--- CityOps Osmium Tooling Setup ---" -ForegroundColor Cyan
+Write-Host "--- OpenVayra Osmium Tooling Setup ---" -ForegroundColor Cyan
 
 # 1. Ensure required directories and .gitkeep files exist
 $Directories = @(

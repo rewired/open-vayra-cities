@@ -9,7 +9,7 @@ param(
     [string]$Area = "",
 
     [Parameter(Mandatory=$false)]
-    [string]$ImageName = "cityops-osmium-tooling:local",
+    [string]$ImageName = "open-vayra-osmium-tooling:local",
 
     [Parameter(Mandatory=$false)]
     [switch]$RebuildImage = $false,
@@ -23,7 +23,7 @@ $ErrorActionPreference = "Stop"
 # Resolve root path
 $RootPath = (Resolve-Path "$PSScriptRoot\..\..").Path
 
-Write-Host "--- CityOps OSM Stop Candidate Generation ---" -ForegroundColor Cyan
+Write-Host "--- OpenVayra OSM Stop Candidate Generation ---" -ForegroundColor Cyan
 
 # 1. Rebuild image if requested
 if ($RebuildImage) {
@@ -138,4 +138,4 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "`nGeneration complete." -ForegroundColor Green
 Write-Host "Output: $OutputGeoJson" -ForegroundColor White
-Write-Host "Run the app with: pnpm --filter @city-ops/web dev"
+Write-Host "Run the app with: pnpm dev:web"
