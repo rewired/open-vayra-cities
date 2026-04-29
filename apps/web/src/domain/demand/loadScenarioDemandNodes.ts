@@ -1,6 +1,7 @@
 import {
   createDemandNodeId,
   createDemandWeight,
+  createZeroDemandWeightByTimeBand,
   type DemandNode,
   type DemandNodeId,
   type DemandWeight,
@@ -9,6 +10,7 @@ import {
 } from '../types/demandNode';
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
 import type { TimeBandId } from '../types/timeBand';
+
 
 /**
  * Represents the discriminated outcome of loading scenario-specific demand models.
@@ -31,9 +33,12 @@ function isDemandClass(value: unknown): value is DemandClass {
   return value === 'residential' || value === 'workplace';
 }
 
-function isCanonicalTimeBandKey(key: string): key is TimeBandId {
-  return MVP_TIME_BAND_IDS.includes(key as TimeBandId);
+const MVP_TIME_BAND_ID_SET: ReadonlySet<string> = new Set(MVP_TIME_BAND_IDS);
+
+function isCanonicalTimeBandId(value: string): value is TimeBandId {
+  return MVP_TIME_BAND_ID_SET.has(value);
 }
+
 
 /**
  * Fetches and strictly validates demand profile configurations associated with active deployment zones.
@@ -138,7 +143,7 @@ export async function loadScenarioDemandNodes(scenarioId: string): Promise<LoadS
       // Reject unknown timebands
       const weightKeys = Object.keys(weightByTimeBand);
       for (const key of weightKeys) {
-        if (!isCanonicalTimeBandKey(key)) {
+        if (!isCanonicalTimeBandId(key)) {
           return {
             status: 'failed',
             message: `Node "${id}" contains forbidden custom band key "${key}"`,
@@ -148,11 +153,13 @@ export async function loadScenarioDemandNodes(scenarioId: string): Promise<LoadS
       }
 
       // Build weight map safely
-      const weightMap = {} as Record<TimeBandId, DemandWeight>;
+      const weightMap = createZeroDemandWeightByTimeBand();
       for (const timeBandId of MVP_TIME_BAND_IDS) {
         const weight = weightByTimeBand[timeBandId];
         // We already validated that weight is a finite non-negative number
-        weightMap[timeBandId] = createDemandWeight(weight as number);
+        if (typeof weight === 'number') {
+          weightMap[timeBandId] = createDemandWeight(weight);
+        }
       }
 
       validatedNodes.push({

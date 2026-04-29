@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 131c: Final Demand Loader Type-Safety Repair
+- Removed remaining avoidable type casts (`key as TimeBandId`, `{} as Record<TimeBandId, DemandWeight>`, and `weight as number`) from `loadScenarioDemandNodes.ts`.
+- Replaced generic `any` fixture logic and broad `as Response` mocks in loader tests using strict data types and proper `Response` objects.
+- Optimized `hamburg-core-mvp.demand.json` integration tests to safely evaluate payloads as strongly-typed models instead of implicit `any` patterns.
+
 ### Slice 131b: Demand Loader Hardening and Documentation Compliance
 - Hardened the scenario-bound demand loading path by eliminating unsafe type casts in `loadScenarioDemandNodes.ts`.
 - Introduced local type guards (`isRecord`, `isDemandNodeRole`, `isDemandClass`) to narrow unknown input safely.
