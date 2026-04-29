@@ -29,6 +29,7 @@ import type { ActiveDataOperation } from './ui/data-operation/types';
 
 import { AppShell } from './AppShell';
 import { loadScenarioRegistry } from './domain/scenario/loadScenarioRegistry';
+import { loadScenarioDemandArtifact, type ScenarioDemandArtifactLoadResult } from './domain/scenario/loadScenarioDemandArtifact';
 import type { ScenarioRegistryEntry, ScenarioRegistry } from './domain/scenario/scenarioRegistry';
 import { ScenarioSelectionScreen } from './scenario/ScenarioSelectionScreen';
 import './App.css';
@@ -115,6 +116,10 @@ export default function App(): ReactElement {
   const [mapFocusIntent, setMapFocusIntent] = useState<MapFocusIntent | null>(null);
   const [activeDataOperation, setActiveDataOperation] = useState<ActiveDataOperation | null>(null);
   const [selectedScenario, setSelectedScenario] = useState<ScenarioRegistryEntry | null>(null);
+  const [scenarioDemandArtifactState, setScenarioDemandArtifactState] = useState<ScenarioDemandArtifactLoadResult | {
+    readonly status: 'unloaded';
+    readonly message: string;
+  }>({ status: 'unloaded', message: 'No scenario selected yet.' });
   const [registryState, setRegistryState] = useState<{
     status: 'loading' | 'loaded' | 'failed';
     registry: ScenarioRegistry | null;
@@ -152,13 +157,35 @@ export default function App(): ReactElement {
     let cancelled = false;
 
     const loadCandidates = async (): Promise<void> => {
+      setScenarioDemandArtifactState({ status: 'unloaded', message: 'Demand artifact loading in progress.' });
       setActiveDataOperation({
         title: 'Workspace Initialization',
-        phase: 'Loading OSM stop candidates...',
+        phase: 'Loading scenario demand artifact...',
         progress: { kind: 'indeterminate' }
       });
 
       try {
+        const scenarioDemandPath = selectedScenario.scenario.demandAssets?.scenarioDemand?.trim();
+        if (!scenarioDemandPath) {
+          setScenarioDemandArtifactState({
+            status: 'failed',
+            message:
+              'Scenario definition does not configure demandAssets.scenarioDemand. Add a generated scenario demand artifact path via the scenario generation pipeline.'
+          });
+        } else {
+          const demandResult = await loadScenarioDemandArtifact(scenarioDemandPath, selectedScenario.scenarioId);
+          if (!cancelled) {
+            setScenarioDemandArtifactState(demandResult);
+          }
+        }
+        if (cancelled) return;
+
+        setActiveDataOperation({
+          title: 'Workspace Initialization',
+          phase: 'Loading OSM stop candidates...',
+          progress: { kind: 'indeterminate' }
+        });
+
         const candidates = await loadOsmStopCandidates();
         if (cancelled) return;
 
@@ -231,7 +258,15 @@ const toolModeControlOptions: ReadonlyArray<{
     completedLineCount: sessionController.sessionLines.length,
     totalProjectedVehicleCount: projections.vehicleNetworkProjection.summary.totalProjectedVehicleCount,
     draftOrderedStopIds: sessionController.lineBuildSelection.selectedStopIds,
-    completedLineIds: sessionController.sessionLines.map((line) => line.id)
+    completedLineIds: sessionController.sessionLines.map((line) => line.id),
+    scenarioDemandArtifactStatus: scenarioDemandArtifactState.status,
+    scenarioDemandNodeCount: scenarioDemandArtifactState.status === 'loaded' ? scenarioDemandArtifactState.artifact.nodes.length : null,
+    scenarioDemandAttractorCount: scenarioDemandArtifactState.status === 'loaded' ? scenarioDemandArtifactState.artifact.attractors.length : null,
+    scenarioDemandGatewayCount: scenarioDemandArtifactState.status === 'loaded' ? scenarioDemandArtifactState.artifact.gateways.length : null,
+    scenarioDemandArtifactErrorMessage:
+      scenarioDemandArtifactState.status === 'failed' || scenarioDemandArtifactState.status === 'unloaded'
+        ? scenarioDemandArtifactState.message
+        : null
   };
   const routingDiagnostics: DebugModalRoutingDiagnostics = {
     selectedLineOrderedStopIds: sessionController.selectedLine?.stopIds ?? [],
