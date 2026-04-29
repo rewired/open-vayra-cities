@@ -33,6 +33,10 @@ pnpm scenario-demand:extract-osm-attractors:hamburg-core-mvp
 ```
 *Outputs:* `data/generated/scenario-source-material/<scenarioId>/osm-attractors.raw.geojson`
 
+> [!NOTE]
+> **Docker Tooling Image:** The extraction command uses a repository-owned local Docker osmium tooling image (`open-vayra-osmium-tooling:local`). The command builds/ensures that image automatically if missing. No Docker registry pull or login is expected.
+
+
 
 ### 2. Categorization & Normalization
 Filter by bounds and compute operational sizes:

@@ -62,6 +62,12 @@ if ($DryRun) {
     Write-Host "OutputGeoJson: $OutputGeoJson"
     Write-Host "ImageName: $ImageName"
     Write-Host "TempPbf: $TempPbf"
+    
+    if ($ImageName -eq "open-vayra-osmium-tooling:local") {
+        Write-Host "DRY RUN: Would ensure default image $ImageName before extraction."
+    } else {
+        Write-Host "DRY RUN: Custom image $ImageName provided, skipping automatic ensure."
+    }
     exit 0
 }
 
@@ -73,6 +79,28 @@ if (-not (Test-Path $IntermediateDir)) {
 if (-not (Test-Path $InputPbf)) {
     Write-Error "Input PBF not found at $InputPbf. Please place the raw OSM extract there."
     exit 1
+}
+
+# Ensure Docker image exists
+if ($ImageName -eq "open-vayra-osmium-tooling:local") {
+    Write-Host "Ensuring default Docker image exists..." -ForegroundColor Cyan
+    & "$PSScriptRoot\ensure-osmium-tooling-image.ps1"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to ensure Docker image $ImageName."
+        exit 1
+    }
+} else {
+    Write-Host "Using custom Docker image $ImageName. Verifying existence..." -ForegroundColor Cyan
+    try {
+        $ImageId = & docker images -q $ImageName
+        if ($LASTEXITCODE -ne 0 -or -not $ImageId) {
+            Write-Error "Custom Docker image '$ImageName' not found locally. Please build or pull it first."
+            exit 1
+        }
+    } catch {
+        Write-Error "Failed to verify custom Docker image '$ImageName'. Is Docker running?"
+        exit 1
+    }
 }
 
 function Get-ContainerPath([string]$HostPath) {
