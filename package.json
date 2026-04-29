@@ -15,6 +15,9 @@
     "scenario-demand:build": "node scripts/scenario-demand/build-scenario-demand.mjs",
     "scenario-demand:build:hamburg-core-mvp": "node scripts/scenario-demand/build-scenario-demand.mjs --manifest data/scenario-source-material/hamburg-core-mvp.source-material.json",
     "scenario-demand:prepare-census:hamburg-core-mvp": "node scripts/scenario-demand/prepare-census-grid-source.mjs --scenario data/scenarios/hamburg-core-mvp.scenario.json --input data/external/census/hamburg-core-mvp/population-grid-1km.csv --output data/generated/scenario-source-material/hamburg-core-mvp/residential-grid.normalized.csv --manifest-output data/generated/scenario-source-material/hamburg-core-mvp/hamburg-core-mvp.local-census.source-material.json",
+    "scenario-demand:prepare-osm-attractors:hamburg-core-mvp": "node scripts/scenario-demand/prepare-osm-attractors-source.mjs --scenario data/scenarios/hamburg-core-mvp.scenario.json --input data/generated/scenario-source-material/hamburg-core-mvp/osm-attractors.raw.geojson --output data/generated/scenario-source-material/hamburg-core-mvp/workplace-attractors.normalized.geojson --manifest-output data/generated/scenario-source-material/hamburg-core-mvp/hamburg-core-mvp.local-demand.source-material.json",
+    "scenario-demand:extract-osm-attractors:hamburg-core-mvp": "powershell -ExecutionPolicy Bypass -File scripts/scenario-demand/prepare-osm-attractors-source.ps1 -Area hvv-mvp",
+    "scenario-demand:build:hamburg-core-mvp:local-demand": "node scripts/scenario-demand/build-scenario-demand.mjs --manifest data/generated/scenario-source-material/hamburg-core-mvp/hamburg-core-mvp.local-demand.source-material.json",
     "scenario-demand:build:hamburg-core-mvp:local-census": "node scripts/scenario-demand/build-scenario-demand.mjs --manifest data/generated/scenario-source-material/hamburg-core-mvp/hamburg-core-mvp.local-census.source-material.json",
     "scenario:setup": "node scripts/scenarios/setup-scenario.mjs",
     "scenario:setup:hamburg": "node scripts/scenarios/setup-scenario.mjs --preset hamburg-core-mvp --prepare-assets",
@@ -23,7 +26,7 @@
     "routing:smoke-test": "tsx scripts/routing/smoke-test-osrm.ts",
     "routing:logs": "docker compose -f docker/routing/osrm/docker-compose.yml logs --tail 100 osrm",
     "routing:stop": "docker compose -f docker/routing/osrm/docker-compose.yml down",
-    "test": "pnpm test:web && tsx scripts/scenario-demand/build-scenario-demand.test.mjs && tsx scripts/scenario-demand/source-adapters/census-grid-csv.test.mjs && tsx scripts/scenario-demand/source-adapters/workplace-attractor-geojson.test.mjs && tsx scripts/scenario-demand/source-adapters/geojson-representative-point.test.mjs && node scripts/scenario-demand/prepare-census-grid-source.test.mjs"
+    "test": "pnpm test:web && tsx scripts/scenario-demand/build-scenario-demand.test.mjs && tsx scripts/scenario-demand/source-adapters/census-grid-csv.test.mjs && tsx scripts/scenario-demand/source-adapters/workplace-attractor-geojson.test.mjs && tsx scripts/scenario-demand/source-adapters/geojson-representative-point.test.mjs && node scripts/scenario-demand/prepare-census-grid-source.test.mjs && node scripts/scenario-demand/prepare-osm-attractors-source.test.mjs"
   },
   "packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8",
   "devDependencies": {

@@ -43,6 +43,7 @@ Thumbs.db
 
 # Runtime and generated data
 data/generated/
+data/generated/scenario-source-material/**
 data/runtime/
 
 # Local databases
@@ -68,6 +69,7 @@ data/external/census/
 # Downloaded PBF files and checksums
 data/osm/*.pbf
 data/osm/**/*.pbf
+data/osm/*.osm.pbf
 data/osm/*.pbf.md5
 data/osm/**/*.pbf.md5
 !data/osm/.gitkeep

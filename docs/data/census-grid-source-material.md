@@ -95,3 +95,9 @@ Compile processed grids into client bundles:
 ```bash
 pnpm scenario-demand:build:hamburg-core-mvp:local-census
 ```
+
+---
+
+## Combined Local Demand Execution
+
+For workflows incorporating spatial attractors alongside standard demographic baselines, consult [OSM Attractor Source-Material Preparation](file:///d:/__DEV/open-vayra-cities/docs/data/osm-attractor-source-material.md) requirements for structured manifest options.
