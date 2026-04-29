@@ -24,6 +24,9 @@ export interface DebugModalOverviewDiagnostics {
   readonly scenarioDemandAttractorCount: number | null;
   readonly scenarioDemandGatewayCount: number | null;
   readonly scenarioDemandArtifactErrorMessage: string | null;
+  readonly scenarioDemandNodesCaptured: number | null;
+  readonly scenarioDemandAttractorsCaptured: number | null;
+  readonly scenarioDemandGatewaysCaptured: number | null;
 }
 
 /** Immutable selected-line segment detail for debug inspection. */
@@ -159,6 +162,9 @@ export function DebugModal({
                 <tr><th scope="row">Demand node count</th><td>{overviewDiagnostics.scenarioDemandNodeCount ?? 0}</td></tr>
                 <tr><th scope="row">Demand attractor count</th><td>{overviewDiagnostics.scenarioDemandAttractorCount ?? 0}</td></tr>
                 <tr><th scope="row">Demand gateway count</th><td>{overviewDiagnostics.scenarioDemandGatewayCount ?? 0}</td></tr>
+                <tr><th scope="row">Demand nodes captured</th><td>{overviewDiagnostics.scenarioDemandNodesCaptured ?? 0}</td></tr>
+                <tr><th scope="row">Demand attractors captured</th><td>{overviewDiagnostics.scenarioDemandAttractorsCaptured ?? 0}</td></tr>
+                <tr><th scope="row">Demand gateways captured</th><td>{overviewDiagnostics.scenarioDemandGatewaysCaptured ?? 0}</td></tr>
                 <tr><th scope="row">Demand artifact error</th><td>{overviewDiagnostics.scenarioDemandArtifactErrorMessage ?? 'none'}</td></tr>
               </tbody>
             </table>

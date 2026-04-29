@@ -48,6 +48,7 @@ interface InspectorPanelProps {
   readonly osmStopCandidateGroups: readonly import('../domain/types/osmStopCandidate').OsmStopCandidateGroup[];
   readonly selectedOsmCandidateAnchor: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | null;
   readonly adoptedOsmCandidateGroupIds: ReadonlySet<import('../domain/types/osmStopCandidate').OsmStopCandidateGroupId>;
+  readonly scenarioDemandCaptureProjection: import('../domain/projection/scenarioDemandCaptureProjection').ScenarioDemandCaptureProjection;
 }
 
 const resolveGlobalStateLabel = (panelState: InspectorPanelState): string => {
@@ -93,7 +94,8 @@ export function InspectorPanel({
   onOsmCandidateAdopt,
   osmStopCandidateGroups,
   selectedOsmCandidateAnchor,
-  adoptedOsmCandidateGroupIds
+  adoptedOsmCandidateGroupIds,
+  scenarioDemandCaptureProjection
 }: InspectorPanelProps): ReactElement {
   const [activeTabId, setActiveTabId] = useState<InspectorTabId>('network');
   const [linesViewMode, setLinesViewMode] = useState<'list' | 'detail'>('list');
@@ -191,6 +193,49 @@ export function InspectorPanel({
                   </tr>
                 </tbody>
               </table>
+
+              <h4 className="inspector-section-title">Demand capture</h4>
+              {scenarioDemandCaptureProjection.status === 'unavailable' ? (
+                <p className="inspector-dialog__note">Demand projection unavailable.</p>
+              ) : (
+                <>
+                  {placedStops.length === 0 && (
+                    <p className="inspector-dialog__note">
+                      Place stops to capture nearby scenario demand. Stops do not create demand.
+                    </p>
+                  )}
+                  <table className="inspector-compact-table inspector-network-summary__primary-table">
+                    <tbody>
+                      <tr>
+                        <th scope="row">Access radius</th>
+                        <td>
+                          {scenarioDemandCaptureProjection.accessRadiusMeters}m
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Residential nodes</th>
+                        <td>
+                          {scenarioDemandCaptureProjection.nodeSummary.capturedCount} / {scenarioDemandCaptureProjection.nodeSummary.totalCount}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Workplace attractors</th>
+                        <td>
+                          {scenarioDemandCaptureProjection.attractorSummary.capturedCount} / {scenarioDemandCaptureProjection.attractorSummary.totalCount}
+                        </td>
+                      </tr>
+                      {scenarioDemandCaptureProjection.gatewaySummary.totalCount > 0 && (
+                        <tr>
+                          <th scope="row">Gateways</th>
+                          <td>
+                            {scenarioDemandCaptureProjection.gatewaySummary.capturedCount} / {scenarioDemandCaptureProjection.gatewaySummary.totalCount}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </>
+              )}
 
               <NetworkInventory
                 placedStops={placedStops}

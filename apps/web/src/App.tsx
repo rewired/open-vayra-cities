@@ -224,7 +224,8 @@ export default function App(): ReactElement {
     sessionController.selectedStopId,
     clockController.activeSimulationTimeBandId,
     clockController.currentSimulationMinuteOfDay,
-    clockController.currentSimulationSecondOfDay
+    clockController.currentSimulationSecondOfDay,
+    scenarioDemandArtifactState.status === 'loaded' ? scenarioDemandArtifactState.artifact : null
   );
 
   const inspectorPanelState = resolveInspectorPanelState(
@@ -266,7 +267,10 @@ const toolModeControlOptions: ReadonlyArray<{
     scenarioDemandArtifactErrorMessage:
       scenarioDemandArtifactState.status === 'failed' || scenarioDemandArtifactState.status === 'unloaded'
         ? scenarioDemandArtifactState.message
-        : null
+        : null,
+    scenarioDemandNodesCaptured: projections.scenarioDemandCaptureProjection.status === 'ready' ? projections.scenarioDemandCaptureProjection.nodeSummary.capturedCount : null,
+    scenarioDemandAttractorsCaptured: projections.scenarioDemandCaptureProjection.status === 'ready' ? projections.scenarioDemandCaptureProjection.attractorSummary.capturedCount : null,
+    scenarioDemandGatewaysCaptured: projections.scenarioDemandCaptureProjection.status === 'ready' ? projections.scenarioDemandCaptureProjection.gatewaySummary.capturedCount : null
   };
   const routingDiagnostics: DebugModalRoutingDiagnostics = {
     selectedLineOrderedStopIds: sessionController.selectedLine?.stopIds ?? [],
@@ -490,6 +494,7 @@ const toolModeControlOptions: ReadonlyArray<{
         selectedLineServiceProjection={projections.selectedLineServiceProjection}
         selectedLineServiceInspectorProjection={projections.selectedLineServiceInspectorProjection}
         selectedLinePlanningVehicleProjection={projections.selectedLinePlanningVehicleProjection}
+        scenarioDemandCaptureProjection={projections.scenarioDemandCaptureProjection}
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
         lineFrequencyControlByTimeBand={sessionController.lineFrequencyControlByTimeBand}
         lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}

@@ -60,3 +60,9 @@ export const ALLOWED_DEMAND_SOURCE_KINDS = [
 ] as const;
 export type ScenarioDemandSourceKind = (typeof ALLOWED_DEMAND_SOURCE_KINDS)[number];
 
+/**
+ * Canonical MVP stop-access radius in meters for scenario demand capture.
+ */
+export const SCENARIO_DEMAND_STOP_ACCESS_RADIUS_METERS = 400;
+
+

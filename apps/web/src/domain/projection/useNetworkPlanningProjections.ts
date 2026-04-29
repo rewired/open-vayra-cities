@@ -1,4 +1,6 @@
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
+import { projectScenarioDemandCapture, type ScenarioDemandCaptureProjection } from './scenarioDemandCaptureProjection';
+import type { ScenarioDemandArtifact } from '../types/scenarioDemand';
 import { projectLineDepartureScheduleForLine, projectLineDepartureScheduleNetwork } from './lineDepartureScheduleProjection';
 import { projectLineServicePlan, projectLineServicePlanForLine, projectLineSelectedServiceInspector } from './lineServicePlanProjection';
 import { projectLineVehicleNetwork } from './lineVehicleProjection';
@@ -58,6 +60,7 @@ export interface NetworkPlanningProjections {
   readonly selectedLinePlanningVehicleProjection: ReturnType<typeof projectLinePlanningVehicles> | null;
   readonly networkServicePlanProjection: ReturnType<typeof projectLineServicePlan>;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof projectLineSelectedServiceInspector> | null;
+  readonly scenarioDemandCaptureProjection: ScenarioDemandCaptureProjection;
 }
 
 
@@ -100,7 +103,8 @@ export const useNetworkPlanningProjections = (
   selectedStopId: StopId | null,
   activeSimulationTimeBandId: TimeBandId,
   currentSimulationMinuteOfDay: SimulationMinuteOfDay,
-  currentSimulationSecondOfDay: SimulationSecondOfDay
+  currentSimulationSecondOfDay: SimulationSecondOfDay,
+  scenarioDemandArtifact: ScenarioDemandArtifact | null
 ): NetworkPlanningProjections => {
   const staticNetworkSummaryKpis = projectStaticNetworkSummaryKpis(sessionStops.length, sessionLines, selectedLine);
   const routeBaselinesByLineId = new Map(
@@ -152,6 +156,11 @@ export const useNetworkPlanningProjections = (
 
 
 
+  const scenarioDemandCaptureProjection = projectScenarioDemandCapture({
+    artifact: scenarioDemandArtifact,
+    stops: sessionStops
+  });
+
   return {
     staticNetworkSummaryKpis,
     selectedLineRouteBaseline,
@@ -162,6 +171,7 @@ export const useNetworkPlanningProjections = (
     selectedLineVehicleProjection,
     selectedLinePlanningVehicleProjection,
     networkServicePlanProjection,
-    selectedLineServiceInspectorProjection
+    selectedLineServiceInspectorProjection,
+    scenarioDemandCaptureProjection
   };
 };
