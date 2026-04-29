@@ -155,6 +155,114 @@ describe('projectScenarioDemandCapture', () => {
     expect(resultOverride.nodeSummary.capturedCount).toBe(0);
   });
 
+  it('should count residential origin nodes and workplace destination nodes separately', () => {
+    const residentialNode = {
+      id: 'res-1',
+      position: { lng: 10.0, lat: 53.5 },
+      role: 'origin' as const,
+      class: 'residential' as const,
+      baseWeight: 10,
+      timeBandWeights: mockTimeBandWeights
+    };
+    const workplaceNode = {
+      id: 'work-1',
+      position: { lng: 10.0, lat: 53.5 },
+      role: 'destination' as const,
+      class: 'workplace' as const,
+      baseWeight: 15,
+      timeBandWeights: mockTimeBandWeights
+    };
+    
+    const customArtifact: ScenarioDemandArtifact = {
+      ...mockArtifact,
+      nodes: [residentialNode, workplaceNode],
+      attractors: [],
+      gateways: []
+    };
+
+    const result = projectScenarioDemandCapture({ artifact: customArtifact, stops: [] });
+    expect(result.residentialSummary.totalCount).toBe(1);
+    expect(result.residentialSummary.totalWeight).toBe(10);
+    expect(result.workplaceSummary.totalCount).toBe(1);
+    expect(result.workplaceSummary.totalWeight).toBe(15);
+    expect(result.workplaceSummary.totalCount).toBeGreaterThan(0);
+  });
+
+  it('should keep legacy attractors separate from workplace destination nodes', () => {
+    const workplaceNode = {
+      id: 'work-1',
+      position: { lng: 10.0, lat: 53.5 },
+      role: 'destination' as const,
+      class: 'workplace' as const,
+      baseWeight: 15,
+      timeBandWeights: mockTimeBandWeights
+    };
+    
+    const customArtifact: ScenarioDemandArtifact = {
+      ...mockArtifact,
+      nodes: [workplaceNode],
+      attractors: [mockAttractor],
+      gateways: []
+    };
+
+    const result = projectScenarioDemandCapture({ artifact: customArtifact, stops: [] });
+    expect(result.workplaceSummary.totalCount).toBe(1);
+    expect(result.attractorSummary.totalCount).toBe(1);
+  });
+
+  it('should update capture counts for workplace destination nodes within access radius', () => {
+    const workplaceNode = {
+      id: 'work-1',
+      position: { lng: 10.0, lat: 53.5 },
+      role: 'destination' as const,
+      class: 'workplace' as const,
+      baseWeight: 15,
+      timeBandWeights: mockTimeBandWeights
+    };
+    
+    const customArtifact: ScenarioDemandArtifact = {
+      ...mockArtifact,
+      nodes: [workplaceNode],
+      attractors: [],
+      gateways: []
+    };
+
+    const stop: Stop = {
+      id: 'stop-1' as StopId,
+      position: { lng: 10.0, lat: 53.5 }
+    };
+
+    const result = projectScenarioDemandCapture({ artifact: customArtifact, stops: [stop] });
+    expect(result.workplaceSummary.capturedCount).toBe(1);
+    expect(result.workplaceSummary.capturedWeight).toBe(15);
+  });
+
+  it('should not capture workplace destination nodes outside access radius', () => {
+    const workplaceNode = {
+      id: 'work-1',
+      position: { lng: 10.0, lat: 53.5 },
+      role: 'destination' as const,
+      class: 'workplace' as const,
+      baseWeight: 15,
+      timeBandWeights: mockTimeBandWeights
+    };
+    
+    const customArtifact: ScenarioDemandArtifact = {
+      ...mockArtifact,
+      nodes: [workplaceNode],
+      attractors: [],
+      gateways: []
+    };
+
+    const stop: Stop = {
+      id: 'stop-1' as StopId,
+      position: { lng: 11.0, lat: 54.0 } // Far away
+    };
+
+    const result = projectScenarioDemandCapture({ artifact: customArtifact, stops: [stop] });
+    expect(result.workplaceSummary.capturedCount).toBe(0);
+    expect(result.workplaceSummary.capturedWeight).toBe(0);
+  });
   it('should throw error for non-positive access radius', () => {
     expect(() => projectScenarioDemandCapture({ artifact: mockArtifact, stops: [], accessRadiusMeters: 0 })).toThrow(
       'Access radius must be a positive number.'

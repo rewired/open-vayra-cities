@@ -215,13 +215,13 @@ export function InspectorPanel({
                       <tr>
                         <th scope="row">Residential nodes</th>
                         <td>
-                          {scenarioDemandCaptureProjection.nodeSummary.capturedCount} / {scenarioDemandCaptureProjection.nodeSummary.totalCount}
+                          {scenarioDemandCaptureProjection.residentialSummary.capturedCount} / {scenarioDemandCaptureProjection.residentialSummary.totalCount}
                         </td>
                       </tr>
                       <tr>
-                        <th scope="row">Workplace attractors</th>
+                        <th scope="row">Workplace destinations</th>
                         <td>
-                          {scenarioDemandCaptureProjection.attractorSummary.capturedCount} / {scenarioDemandCaptureProjection.attractorSummary.totalCount}
+                          {scenarioDemandCaptureProjection.workplaceSummary.capturedCount} / {scenarioDemandCaptureProjection.workplaceSummary.totalCount}
                         </td>
                       </tr>
                       {scenarioDemandCaptureProjection.gatewaySummary.totalCount > 0 && (

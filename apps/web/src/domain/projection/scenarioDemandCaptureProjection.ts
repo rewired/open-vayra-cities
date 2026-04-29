@@ -63,6 +63,10 @@ export interface ScenarioDemandCaptureProjection {
   readonly attractorSummary: CapturedEntitySummary;
   /** Capture breakdown for transfer gateways. */
   readonly gatewaySummary: CapturedEntitySummary;
+  /** Capture breakdown for residential origin nodes. */
+  readonly residentialSummary: CapturedEntitySummary;
+  /** Capture breakdown for workplace destination nodes. */
+  readonly workplaceSummary: CapturedEntitySummary;
   /** Map of entity ID to its single closest capturing stop. */
   readonly nearestStopByEntityId: ReadonlyMap<string, CapturingStopReference>;
 }
@@ -90,6 +94,8 @@ export function projectScenarioDemandCapture(
       nodeSummary: createEmptySummary(),
       attractorSummary: createEmptySummary(),
       gatewaySummary: createEmptySummary(),
+      residentialSummary: createEmptySummary(),
+      workplaceSummary: createEmptySummary(),
       nearestStopByEntityId: new Map()
     };
   }
@@ -151,6 +157,12 @@ export function projectScenarioDemandCapture(
   const attractorSummary = processEntities(artifact.attractors, (a: ScenarioDemandAttractor) => a.sinkWeight);
   const gatewaySummary = processEntities(artifact.gateways, (g: ScenarioDemandGateway) => g.transferWeight);
 
+  const residentialNodes = artifact.nodes.filter(n => n.role === 'origin' && n.class === 'residential');
+  const workplaceNodes = artifact.nodes.filter(n => n.role === 'destination' && n.class === 'workplace');
+
+  const residentialSummary = processEntities(residentialNodes, (n: ScenarioDemandNode) => n.baseWeight);
+  const workplaceSummary = processEntities(workplaceNodes, (n: ScenarioDemandNode) => n.baseWeight);
+
   return {
     status: 'ready',
     accessRadiusMeters,
@@ -158,6 +170,8 @@ export function projectScenarioDemandCapture(
     nodeSummary,
     attractorSummary,
     gatewaySummary,
+    residentialSummary,
+    workplaceSummary,
     nearestStopByEntityId
   };
 }

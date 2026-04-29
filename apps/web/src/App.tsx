@@ -268,8 +268,8 @@ const toolModeControlOptions: ReadonlyArray<{
       scenarioDemandArtifactState.status === 'failed' || scenarioDemandArtifactState.status === 'unloaded'
         ? scenarioDemandArtifactState.message
         : null,
-    scenarioDemandNodesCaptured: projections.scenarioDemandCaptureProjection.status === 'ready' ? projections.scenarioDemandCaptureProjection.nodeSummary.capturedCount : null,
-    scenarioDemandAttractorsCaptured: projections.scenarioDemandCaptureProjection.status === 'ready' ? projections.scenarioDemandCaptureProjection.attractorSummary.capturedCount : null,
+    scenarioDemandNodesCaptured: projections.scenarioDemandCaptureProjection.status === 'ready' ? projections.scenarioDemandCaptureProjection.residentialSummary.capturedCount : null,
+    scenarioDemandAttractorsCaptured: projections.scenarioDemandCaptureProjection.status === 'ready' ? projections.scenarioDemandCaptureProjection.workplaceSummary.capturedCount : null,
     scenarioDemandGatewaysCaptured: projections.scenarioDemandCaptureProjection.status === 'ready' ? projections.scenarioDemandCaptureProjection.gatewaySummary.capturedCount : null
   };
   const routingDiagnostics: DebugModalRoutingDiagnostics = {
