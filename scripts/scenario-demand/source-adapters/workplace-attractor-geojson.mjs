@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { getGeoJsonRepresentativePoint } from './geojson-representative-point.mjs';
 
 /**
  * Parses and normalizes a workplace attractor GeoJSON file into standard source records.
@@ -81,25 +82,26 @@ export function parseWorkplaceAttractorGeoJson(filePath, config = {}) {
     }
 
     let position = null;
-
-    if (type === 'Point') {
-      if (coords.length < 2 || typeof coords[0] !== 'number' || typeof coords[1] !== 'number') {
-        throw new Error(`Malformed geometry at ${featureIndexStr}: Point coordinates must be [lon, lat]`);
+    try {
+      position = getGeoJsonRepresentativePoint(geom, featureIndexStr);
+    } catch (err) {
+      if (err.message.includes('Unsupported geometry type')) {
+        throw new Error(`Unsupported geometry type at ${featureIndexStr}: ${type}`);
       }
-      position = { lng: coords[0], lat: coords[1] };
-    } else if (type === 'Polygon') {
-      position = computePolygonCenter(coords, featureIndexStr);
-    } else if (type === 'MultiPolygon') {
-      position = computeMultiPolygonCenter(coords, featureIndexStr);
-    } else {
-      throw new Error(`Unsupported geometry type at ${featureIndexStr}: ${type}`);
+      if (err.message.includes('Out-of-bounds longitude') || err.message.includes('Non-finite longitude')) {
+        throw new Error(`Invalid longitude at ${featureIndexStr}: ${coords[0]}`);
+      }
+      if (err.message.includes('Out-of-bounds latitude') || err.message.includes('Non-finite latitude')) {
+        throw new Error(`Invalid latitude at ${featureIndexStr}: ${coords[1]}`);
+      }
+      throw err;
     }
 
-    if (!Number.isFinite(position.lng) || position.lng < -180 || position.lng > 180) {
-      throw new Error(`Invalid longitude at ${featureIndexStr}: ${position.lng}`);
+    if (!Number.isFinite(position.longitude) || position.longitude < -180 || position.longitude > 180) {
+      throw new Error(`Invalid longitude at ${featureIndexStr}: ${position.longitude}`);
     }
-    if (!Number.isFinite(position.lat) || position.lat < -90 || position.lat > 90) {
-      throw new Error(`Invalid latitude at ${featureIndexStr}: ${position.lat}`);
+    if (!Number.isFinite(position.latitude) || position.latitude < -90 || position.latitude > 90) {
+      throw new Error(`Invalid latitude at ${featureIndexStr}: ${position.latitude}`);
     }
 
     const props = feature.properties || {};
@@ -142,8 +144,8 @@ export function parseWorkplaceAttractorGeoJson(filePath, config = {}) {
 
     records.push({
       id,
-      longitude: position.lng,
-      latitude: position.lat,
+      longitude: position.longitude,
+      latitude: position.latitude,
       weight,
       scale,
       ...(label ? { label } : {})
@@ -153,92 +155,4 @@ export function parseWorkplaceAttractorGeoJson(filePath, config = {}) {
   return records;
 }
 
-/**
- * Computes bounding box center for a single polygon geometry.
- * 
- * @private
- */
-function computePolygonCenter(rings, indexStr) {
-  let minLon = Infinity;
-  let maxLon = -Infinity;
-  let minLat = Infinity;
-  let maxLat = -Infinity;
-  let count = 0;
 
-  for (let r = 0; r < rings.length; r++) {
-    const ring = rings[r];
-    if (!Array.isArray(ring)) {
-      throw new Error(`Malformed Polygon at ${indexStr}: ring is not an array`);
-    }
-    for (let p = 0; p < ring.length; p++) {
-      const pt = ring[p];
-      if (!Array.isArray(pt) || pt.length < 2 || typeof pt[0] !== 'number' || typeof pt[1] !== 'number') {
-        throw new Error(`Malformed Polygon coordinate at ${indexStr}: expected [lon, lat]`);
-      }
-      const lon = pt[0];
-      const lat = pt[1];
-      if (lon < minLon) minLon = lon;
-      if (lon > maxLon) maxLon = lon;
-      if (lat < minLat) minLat = lat;
-      if (lat > maxLat) maxLat = lat;
-      count++;
-    }
-  }
-
-  if (count === 0) {
-    throw new Error(`Malformed Polygon at ${indexStr}: no coordinates found`);
-  }
-
-  return {
-    lng: (minLon + maxLon) / 2,
-    lat: (minLat + maxLat) / 2
-  };
-}
-
-/**
- * Computes bounding box center for a multi-polygon geometry.
- * 
- * @private
- */
-function computeMultiPolygonCenter(polygons, indexStr) {
-  let minLon = Infinity;
-  let maxLon = -Infinity;
-  let minLat = Infinity;
-  let maxLat = -Infinity;
-  let count = 0;
-
-  for (let p = 0; p < polygons.length; p++) {
-    const rings = polygons[p];
-    if (!Array.isArray(rings)) {
-      throw new Error(`Malformed MultiPolygon at ${indexStr}: polygon element is not an array`);
-    }
-    for (let r = 0; r < rings.length; r++) {
-      const ring = rings[r];
-      if (!Array.isArray(ring)) {
-        throw new Error(`Malformed MultiPolygon at ${indexStr}: ring is not an array`);
-      }
-      for (let ptIdx = 0; ptIdx < ring.length; ptIdx++) {
-        const pt = ring[ptIdx];
-        if (!Array.isArray(pt) || pt.length < 2 || typeof pt[0] !== 'number' || typeof pt[1] !== 'number') {
-          throw new Error(`Malformed MultiPolygon coordinate at ${indexStr}: expected [lon, lat]`);
-        }
-        const lon = pt[0];
-        const lat = pt[1];
-        if (lon < minLon) minLon = lon;
-        if (lon > maxLon) maxLon = lon;
-        if (lat < minLat) minLat = lat;
-        if (lat > maxLat) maxLat = lat;
-        count++;
-      }
-    }
-  }
-
-  if (count === 0) {
-    throw new Error(`Malformed MultiPolygon at ${indexStr}: no coordinates found`);
-  }
-
-  return {
-    lng: (minLon + maxLon) / 2,
-    lat: (minLat + maxLat) / 2
-  };
-}

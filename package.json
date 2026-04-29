@@ -21,11 +21,12 @@
     "routing:smoke-test": "tsx scripts/routing/smoke-test-osrm.ts",
     "routing:logs": "docker compose -f docker/routing/osrm/docker-compose.yml logs --tail 100 osrm",
     "routing:stop": "docker compose -f docker/routing/osrm/docker-compose.yml down",
-    "test": "pnpm test:web && tsx scripts/scenario-demand/build-scenario-demand.test.mjs && tsx scripts/scenario-demand/source-adapters/census-grid-csv.test.mjs && tsx scripts/scenario-demand/source-adapters/workplace-attractor-geojson.test.mjs"
+    "test": "pnpm test:web && tsx scripts/scenario-demand/build-scenario-demand.test.mjs && tsx scripts/scenario-demand/source-adapters/census-grid-csv.test.mjs && tsx scripts/scenario-demand/source-adapters/workplace-attractor-geojson.test.mjs && tsx scripts/scenario-demand/source-adapters/geojson-representative-point.test.mjs"
   },
   "packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@turf/turf": "^7.2.0",
     "@types/node": "^22.13.5",
     "eslint": "^10.2.1",
     "globals": "^17.5.0",
