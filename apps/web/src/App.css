@@ -9,6 +9,7 @@
 @import './styles/maplibre-overrides.css';
 @import './styles/simulation-control-bar.css';
 @import './styles/inspector.css';
+@import './styles/inspector-disclosure.css';
 @import './styles/inspector-compact-data.css';
 @import './styles/inspector-frequency.css';
 @import './styles/inspector-service-readiness.css';

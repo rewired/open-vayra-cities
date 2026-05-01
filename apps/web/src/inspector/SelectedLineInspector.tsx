@@ -5,6 +5,7 @@ import { FrequencyEditorDialog } from './FrequencyEditorDialog';
 import { InlineRenameField } from './InlineRenameField';
 import { ProjectedVehiclesDialog } from './ProjectedVehiclesDialog';
 import { ServicePlanDialog } from './ServicePlanDialog';
+import { InspectorDisclosure } from '../ui/InspectorDisclosure';
 import { MaterialIcon } from '../ui/icons/MaterialIcon';
 import type {
   LineFrequencyControlByTimeBand,
@@ -205,74 +206,85 @@ export function SelectedLineInspector({
                 <tr>
                   <th scope="row">Residential served</th>
                   <td>
-                    {Math.round(selectedLineDemandContribution.servedResidentialActiveWeight)} / {Math.round(selectedLineDemandContribution.capturedResidentialActiveWeight)} active demand
+                    {Math.round(selectedLineDemandContribution.servedResidentialActiveWeight)} / {Math.round(selectedLineDemandContribution.capturedResidentialActiveWeight)}
                   </td>
                 </tr>
                 <tr>
                   <th scope="row">Workplace reachable</th>
                   <td>
-                    {Math.round(selectedLineDemandContribution.reachableWorkplaceActiveWeight)} active demand
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Departures/hour</th>
-                  <td>{selectedLineDemandContribution.activeDeparturesPerHourEstimate.toFixed(1)}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Line pressure</th>
-                  <td className="inspector-compact-table__value--left">
-                    {selectedLineDemandContribution.servicePressureStatus.charAt(0).toUpperCase() + selectedLineDemandContribution.servicePressureStatus.slice(1)}
+                    {Math.round(selectedLineDemandContribution.reachableWorkplaceActiveWeight)}
                   </td>
                 </tr>
               </tbody>
             </table>
-            {selectedLineDemandContribution.notes.length > 0 && (
-              <div className="selected-line-inspector__demand-notes">
-                {selectedLineDemandContribution.notes.map((note, index) => (
-                  <p key={index} className="inspector-dialog__note">{note}</p>
-                ))}
-              </div>
-            )}
+            
+            <InspectorDisclosure summaryText="Contribution details">
+              <table className="inspector-compact-table">
+                <tbody>
+                  <tr>
+                    <th scope="row">Departures/hour</th>
+                    <td>{selectedLineDemandContribution.activeDeparturesPerHourEstimate.toFixed(1)}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Line pressure</th>
+                    <td className="inspector-compact-table__value--left">
+                      {selectedLineDemandContribution.servicePressureStatus.charAt(0).toUpperCase() + selectedLineDemandContribution.servicePressureStatus.slice(1)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              {selectedLineDemandContribution.notes.length > 0 && (
+                <div className="selected-line-inspector__demand-notes">
+                  {selectedLineDemandContribution.notes.map((note, index) => (
+                    <p key={index} className="inspector-dialog__note">{note}</p>
+                  ))}
+                </div>
+              )}
+            </InspectorDisclosure>
           </>
         )}
       </section>
 
       <section className="selected-line-inspector__route-sequence" aria-label="Selected line route sequence">
-        <h3>Route sequence</h3>
-        {orderedStopIds.length > 0 ? (
-          <ul className="selected-line-inspector__route-list" aria-label="Selected line route-ordered stop list">
-            {orderedStopIds.map((stopId, index) => {
-              const stop = placedStopsById.get(stopId);
-              const fallbackLabel = `Unknown stop (${stopId})`;
-              const stopLabel = stop?.label ?? fallbackLabel;
+        <InspectorDisclosure 
+          summaryText="Route sequence" 
+          summaryBadge={`${orderedStopIds.length} stops`}
+        >
+          {orderedStopIds.length > 0 ? (
+            <ul className="selected-line-inspector__route-list" aria-label="Selected line route-ordered stop list">
+              {orderedStopIds.map((stopId, index) => {
+                const stop = placedStopsById.get(stopId);
+                const fallbackLabel = `Unknown stop (${stopId})`;
+                const stopLabel = stop?.label ?? fallbackLabel;
 
-              return (
-                <li key={`${stopId}-${index}`} className="selected-line-inspector__route-item">
-                  <button
-                    type="button"
-                    className="selected-line-inspector__route-order-badge"
-                    onClick={() => onLineSequenceStopFocus(stopId)}
-                    title={`Focus ${stopLabel} on map`}
-                    aria-label={`Focus stop ${index + 1}: ${stopLabel}`}
-                  >
-                    {index + 1}
-                  </button>
-                  <span className="selected-line-inspector__route-stop-label" title={stopLabel}>
-                    {stopLabel}
-                  </span>
-                  <InlineRenameField
-                    value={stopLabel}
-                    entityLabel="stop"
-                    idleDisplayMode="edit-only"
-                    onAccept={(nextValue) => onStopRename(stopId, nextValue)}
-                  />
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p>No stops in this line route.</p>
-        )}
+                return (
+                  <li key={`${stopId}-${index}`} className="selected-line-inspector__route-item">
+                    <button
+                      type="button"
+                      className="selected-line-inspector__route-order-badge"
+                      onClick={() => onLineSequenceStopFocus(stopId)}
+                      title={`Focus ${stopLabel} on map`}
+                      aria-label={`Focus stop ${index + 1}: ${stopLabel}`}
+                    >
+                      {index + 1}
+                    </button>
+                    <span className="selected-line-inspector__route-stop-label" title={stopLabel}>
+                      {stopLabel}
+                    </span>
+                    <InlineRenameField
+                      value={stopLabel}
+                      entityLabel="stop"
+                      idleDisplayMode="edit-only"
+                      onAccept={(nextValue) => onStopRename(stopId, nextValue)}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p>No stops in this line route.</p>
+          )}
+        </InspectorDisclosure>
       </section>
 
       <FrequencyEditorDialog

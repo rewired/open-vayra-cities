@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### Slice 168: Inspector Information Architecture / Collapsible Projection Sections
+- Introduced a collapsible information architecture for the Inspector panel to reduce visual density and vertical scroll pressure.
+- Created the reusable `InspectorDisclosure` component using native `<details>` and `<summary>` elements with "whisper-weight" styling.
+- Refactored the Network tab to move secondary capture, service, pressure, and gap details into collapsible sections while keeping primary KPIs visible.
+- Refactored the Selected Line inspector to collapse route sequence and detailed demand contribution notes.
+- Added ADR 0168 documenting information architecture decisions and always-visible KPI requirements.
+
 ### Slice 158b: Wire OSM Attractor Import Commands and Local Manifest Flow
 - Added counted diagnostics for skipped unsupported geometries in `prepare-osm-attractors-source.mjs`.
 - Extended test coverage in `prepare-osm-attractors-source.test.mjs` for package scripts, missing census CSV, and invalid GeoJSON.

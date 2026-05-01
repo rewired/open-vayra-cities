@@ -6,6 +6,7 @@ import type { Line } from '../domain/types/line';
 import { InlineRenameField } from './InlineRenameField';
 import { SelectedLineInspector } from './SelectedLineInspector';
 import { NetworkInventory } from './NetworkInventory';
+import { InspectorDisclosure } from '../ui/InspectorDisclosure';
 import { INSPECTOR_TAB_IDS, INSPECTOR_TAB_LABELS, type InspectorTabId } from './inspectorTabs';
 import { OsmStopCandidateInspector } from './OsmStopCandidateInspector';
 import type { InspectorPanelState } from './types';
@@ -210,19 +211,11 @@ export function InspectorPanel({
                 <p className="inspector-dialog__note">Demand projection unavailable.</p>
               ) : (
                 <>
-                  {placedStops.length === 0 && (
                     <p className="inspector-dialog__note">
-                      Place stops to capture nearby scenario demand. Stops do not create demand.
+                      Place stops to capture nearby scenario demand.
                     </p>
-                  )}
                   <table className="inspector-compact-table inspector-network-summary__primary-table">
                     <tbody>
-                      <tr>
-                        <th scope="row">Access radius</th>
-                        <td>
-                          {scenarioDemandCaptureProjection.accessRadiusMeters}m
-                        </td>
-                      </tr>
                       <tr>
                         <th scope="row">Residential nodes</th>
                         <td>
@@ -235,16 +228,32 @@ export function InspectorPanel({
                           {scenarioDemandCaptureProjection.workplaceSummary.capturedCount} / {scenarioDemandCaptureProjection.workplaceSummary.totalCount}
                         </td>
                       </tr>
-                      {scenarioDemandCaptureProjection.gatewaySummary.totalCount > 0 && (
-                        <tr>
-                          <th scope="row">Gateways</th>
-                          <td>
-                            {scenarioDemandCaptureProjection.gatewaySummary.capturedCount} / {scenarioDemandCaptureProjection.gatewaySummary.totalCount}
-                          </td>
-                        </tr>
-                      )}
                     </tbody>
                   </table>
+
+                  <InspectorDisclosure summaryText="Capture details">
+                    <table className="inspector-compact-table">
+                      <tbody>
+                        <tr>
+                          <th scope="row">Access radius</th>
+                          <td>
+                            {scenarioDemandCaptureProjection.accessRadiusMeters}m
+                          </td>
+                        </tr>
+                        {scenarioDemandCaptureProjection.gatewaySummary.totalCount > 0 && (
+                          <tr>
+                            <th scope="row">Gateways</th>
+                            <td>
+                              {scenarioDemandCaptureProjection.gatewaySummary.capturedCount} / {scenarioDemandCaptureProjection.gatewaySummary.totalCount}
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                    <p className="inspector-dialog__note">
+                      Stops capture and serve demand. They do not generate it.
+                    </p>
+                  </InspectorDisclosure>
                 </>
               )}
 
@@ -252,77 +261,95 @@ export function InspectorPanel({
               {servedDemandProjection.status === 'unavailable' ? (
                 <p className="inspector-dialog__note">Served demand projection unavailable.</p>
               ) : (
-                <table className="inspector-compact-table inspector-network-summary__primary-table">
-                  <tbody>
-                    <tr>
-                      <th scope="row">Active band</th>
-                      <td className="inspector-compact-table__value--left">
-                        {TIME_BAND_DISPLAY_LABELS[servedDemandProjection.activeTimeBandId]}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Residential served</th>
-                      <td>
-                        {Math.round(servedDemandProjection.servedResidentialActiveWeight)} / {Math.round(servedDemandProjection.capturedResidentialActiveWeight)} active demand
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Workplace reachable</th>
-                      <td>
-                        {Math.round(servedDemandProjection.reachableWorkplaceActiveWeight)} / {Math.round(servedDemandProjection.capturedWorkplaceActiveWeight)} active demand
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Unserved captured res.</th>
-                      <td>
-                        {Math.round(servedDemandProjection.unservedResidentialActiveWeight)} active demand
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Active service lines</th>
-                      <td>{servedDemandProjection.activeServiceLineCount}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <>
+                  <table className="inspector-compact-table inspector-network-summary__primary-table">
+                    <tbody>
+                      <tr>
+                        <th scope="row">Residential served</th>
+                        <td>
+                          {Math.round(servedDemandProjection.servedResidentialActiveWeight)} / {Math.round(servedDemandProjection.capturedResidentialActiveWeight)}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Workplace reachable</th>
+                        <td>
+                          {Math.round(servedDemandProjection.reachableWorkplaceActiveWeight)} / {Math.round(servedDemandProjection.capturedWorkplaceActiveWeight)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <InspectorDisclosure summaryText="Service details">
+                    <table className="inspector-compact-table">
+                      <tbody>
+                        <tr>
+                          <th scope="row">Active band</th>
+                          <td className="inspector-compact-table__value--left">
+                            {TIME_BAND_DISPLAY_LABELS[servedDemandProjection.activeTimeBandId]}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Unserved captured res.</th>
+                          <td>
+                            {Math.round(servedDemandProjection.unservedResidentialActiveWeight)}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Active service lines</th>
+                          <td>{servedDemandProjection.activeServiceLineCount}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </InspectorDisclosure>
+                </>
               )}
 
               <h4 className="inspector-section-title">Service pressure</h4>
               {servicePressureProjection.activeDeparturesPerHourEstimate === 0 ? (
                 <p className="inspector-dialog__note">No active service frequency in the current time band.</p>
               ) : (
-                <table className="inspector-compact-table inspector-network-summary__primary-table">
-                  <tbody>
-                    <tr>
-                      <th scope="row">Active band</th>
-                      <td className="inspector-compact-table__value--left">
-                        {TIME_BAND_DISPLAY_LABELS[servicePressureProjection.activeTimeBandId]}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Departures/hour</th>
-                      <td>{servicePressureProjection.activeDeparturesPerHourEstimate.toFixed(2)}</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Average headway</th>
-                      <td>
-                        {servicePressureProjection.averageHeadwayMinutes !== null
-                          ? `${servicePressureProjection.averageHeadwayMinutes.toFixed(1)} min`
-                          : '—'}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Pressure</th>
-                      <td className="inspector-compact-table__value--left">
-                        {servicePressureProjection.servicePressureStatus.charAt(0).toUpperCase() +
-                          servicePressureProjection.servicePressureStatus.slice(1)}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Demand per departure</th>
-                      <td>{servicePressureProjection.servicePressureRatio.toFixed(1)}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <>
+                  <table className="inspector-compact-table inspector-network-summary__primary-table">
+                    <tbody>
+                      <tr>
+                        <th scope="row">Pressure</th>
+                        <td className="inspector-compact-table__value--left">
+                          {servicePressureProjection.servicePressureStatus.charAt(0).toUpperCase() +
+                            servicePressureProjection.servicePressureStatus.slice(1)}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">Departures/hour</th>
+                        <td>{servicePressureProjection.activeDeparturesPerHourEstimate.toFixed(1)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <InspectorDisclosure summaryText="Pressure details">
+                    <table className="inspector-compact-table">
+                      <tbody>
+                        <tr>
+                          <th scope="row">Active band</th>
+                          <td className="inspector-compact-table__value--left">
+                            {TIME_BAND_DISPLAY_LABELS[servicePressureProjection.activeTimeBandId]}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Average headway</th>
+                          <td>
+                            {servicePressureProjection.averageHeadwayMinutes !== null
+                              ? `${servicePressureProjection.averageHeadwayMinutes.toFixed(1)} min`
+                              : '—'}
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">Demand per departure</th>
+                          <td>{servicePressureProjection.servicePressureRatio.toFixed(1)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </InspectorDisclosure>
+                </>
               )}
 
               <h4 className="inspector-section-title">Demand gaps</h4>
@@ -333,9 +360,12 @@ export function InspectorPanel({
                   {demandGapRankingProjection.uncapturedResidentialGaps.length === 0 &&
                   demandGapRankingProjection.capturedButUnservedResidentialGaps.length === 0 &&
                   demandGapRankingProjection.capturedButUnreachableWorkplaceGaps.length === 0 ? (
-                    <p className="inspector-dialog__note">No major demand gaps identified in this time band.</p>
+                    <p className="inspector-dialog__note">No major demand gaps identified.</p>
                   ) : (
-                    <>
+                    <InspectorDisclosure
+                      summaryText="Identify gaps"
+                      summaryBadge={`${demandGapRankingProjection.uncapturedResidentialGaps.length + demandGapRankingProjection.capturedButUnservedResidentialGaps.length + demandGapRankingProjection.capturedButUnreachableWorkplaceGaps.length} areas`}
+                    >
                       {[
                         { title: 'Unserved homes', gaps: demandGapRankingProjection.capturedButUnservedResidentialGaps },
                         { title: 'Uncaptured homes', gaps: demandGapRankingProjection.uncapturedResidentialGaps },
@@ -350,7 +380,7 @@ export function InspectorPanel({
                                   <li key={gap.id} className="inspector-demand-gaps__item">
                                     <div className="inspector-demand-gaps__item-content">
                                       <span className="inspector-demand-gaps__item-label">
-                                        {gap.id} · {gap.activeWeight.toFixed(1)} active demand
+                                        {gap.id} · {gap.activeWeight.toFixed(1)} demand
                                       </span>
                                       <span className="inspector-demand-gaps__item-note">{gap.note}</span>
                                     </div>
@@ -368,18 +398,20 @@ export function InspectorPanel({
                             </div>
                           )
                       )}
-                    </>
+                    </InspectorDisclosure>
                   )}
                 </div>
               )}
 
-              <NetworkInventory
-                placedStops={placedStops}
-                completedLines={completedLines}
-                onStopSelect={onStopSelectionChange}
-                onLineSelect={onSelectedLineIdChange}
-                onLineRename={onLineRename}
-              />
+              <InspectorDisclosure summaryText="Network inventory">
+                <NetworkInventory
+                  placedStops={placedStops}
+                  completedLines={completedLines}
+                  onStopSelect={onStopSelectionChange}
+                  onLineSelect={onSelectedLineIdChange}
+                  onLineRename={onLineRename}
+                />
+              </InspectorDisclosure>
 
 
             </section>
