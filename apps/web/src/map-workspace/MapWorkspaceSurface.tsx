@@ -84,6 +84,7 @@ interface MapWorkspaceSurfaceProps {
   readonly onOsmCandidateAnchorResolved: (resolution: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | null) => void;
   readonly scenarioDemandArtifact: import('../domain/types/scenarioDemand').ScenarioDemandArtifact | null;
   readonly routingCoverage: import('../domain/scenario/scenarioRegistry').ScenarioRoutingCoverage | null;
+  readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
 }
 
 
@@ -135,7 +136,8 @@ export function MapWorkspaceSurface({
   osmStopCandidateGroups,
   onOsmCandidateAnchorResolved,
   scenarioDemandArtifact,
-  routingCoverage
+  routingCoverage,
+  demandGapRankingProjection
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -271,7 +273,8 @@ export function MapWorkspaceSurface({
         vehicleSync: {
           vehicleNetworkProjection: vehicleNetworkProjectionRef.current
         },
-        routingCoverage
+        routingCoverage,
+        demandGapRankingProjection
       });
 
       if (mapInstance) {
@@ -371,6 +374,7 @@ export function MapWorkspaceSurface({
     setFeatureDiagnostics,
     scenarioDemandArtifact,
     routingCoverage,
+    demandGapRankingProjection,
     isMapStyleReady
   });
 

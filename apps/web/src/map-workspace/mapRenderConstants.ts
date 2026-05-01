@@ -298,7 +298,110 @@ export const MAP_SCENARIO_ROUTING_COVERAGE_MASK_PAINT = {
   'fill-opacity': 0.6
 } as const;
 
+/**
+ * Canonical GeoJSON source id for the demand gap overlay.
+ */
+export const MAP_SOURCE_ID_DEMAND_GAP_OVERLAY = 'openvayra-cities-demand-gap-overlay';
 
+/**
+ * Canonical heatmap layer id for aggregate demand gap pressure.
+ */
+export const MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP = 'openvayra-cities-demand-gap-overlay-heatmap';
 
+/**
+ * Canonical circle layer id for point-level demand gap detail.
+ */
+export const MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE = 'openvayra-cities-demand-gap-overlay-circle';
+
+/**
+ * Canonical style layer ids for demand gap overlay rendering.
+ */
+export const MAP_DEMAND_GAP_OVERLAY_LAYER_IDS = [
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE
+] as const;
+
+/**
+ * Heatmap paint style for demand gap aggregate pressure.
+ * Weighted by activeWeight and intensity increases at higher zooms.
+ */
+export const MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT = {
+  'heatmap-weight': ['get', 'activeWeight'],
+  'heatmap-intensity': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    10,
+    1,
+    15,
+    3
+  ],
+  'heatmap-color': [
+    'interpolate',
+    ['linear'],
+    ['heatmap-density'],
+    0,
+    'rgba(255,255,255,0)',
+    0.2,
+    'rgba(254,243,199,0.5)',
+    0.4,
+    'rgba(252,211,77,0.6)',
+    0.6,
+    'rgba(251,191,36,0.7)',
+    0.8,
+    'rgba(245,158,11,0.8)',
+    1,
+    'rgba(217,119,6,0.9)'
+  ],
+  'heatmap-radius': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    10,
+    15,
+    15,
+    30
+  ],
+  'heatmap-opacity': 0.7
+} as const;
+
+/**
+ * Circle paint style for demand gap point-level detail.
+ * Fades in at higher zooms to avoid visual clutter at low zooms.
+ */
+export const MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT = {
+  'circle-radius': 4,
+  'circle-color': [
+    'match',
+    ['get', 'kind'],
+    'uncaptured-residential',
+    '#ef4444',
+    'captured-unserved-residential',
+    '#f97316',
+    'captured-unreachable-workplace',
+    '#8b5cf6',
+    '#6b7280'
+  ],
+  'circle-stroke-width': 1,
+  'circle-stroke-color': '#ffffff',
+  'circle-opacity': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    13,
+    0,
+    14,
+    0.8
+  ],
+  'circle-stroke-opacity': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    13,
+    0,
+    14,
+    0.8
+  ]
+} as const;
 
 

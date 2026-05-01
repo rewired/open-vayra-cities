@@ -220,7 +220,7 @@ export interface MapLibreGeoJsonSource<
  */
 export interface MapLibreLayerSpecification {
   readonly id: string;
-  readonly type: 'circle' | 'symbol' | 'line' | 'fill';
+  readonly type: 'circle' | 'symbol' | 'line' | 'fill' | 'heatmap';
   readonly source: string;
   readonly paint?: Readonly<Record<string, MapLibreExpressionValue>>;
   readonly layout?: Readonly<Record<string, MapLibreExpressionValue>>;

@@ -1,4 +1,4 @@
-export type MapLayerId = 'osm-stop-candidates' | 'scenario-demand-preview' | 'scenario-routing-coverage';
+export type MapLayerId = 'osm-stop-candidates' | 'scenario-demand-preview' | 'scenario-routing-coverage' | 'demand-gap-overlay';
 
 /**
  * Represents a registered map layer control item for the UI flyout.
@@ -58,11 +58,17 @@ export const INITIAL_REGISTERED_MAP_LAYERS: readonly MapLayerControlItem[] = [
     id: 'scenario-routing-coverage',
     label: 'Scenario routing coverage',
     description: 'Dim areas outside the routable scenario boundary.'
+  },
+  {
+    id: 'demand-gap-overlay',
+    label: 'Demand gaps',
+    description: 'Show spatial pressure from the current demand gap projection.'
   }
 ];
 
 export const INITIAL_MAP_LAYER_VISIBILITY: MapLayerVisibilityById = {
   'osm-stop-candidates': true,
   'scenario-demand-preview': false,
-  'scenario-routing-coverage': true
+  'scenario-routing-coverage': true,
+  'demand-gap-overlay': false
 };

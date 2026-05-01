@@ -1,6 +1,10 @@
 import type { MapLibreMap } from './maplibreGlobal';
 import type { MapLayerVisibilityById } from '../ui/constants/mapLayerUiConstants';
-import { MAP_OSM_STOP_CANDIDATE_LAYER_IDS, MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS } from './mapRenderConstants';
+import {
+  MAP_OSM_STOP_CANDIDATE_LAYER_IDS,
+  MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS,
+  MAP_DEMAND_GAP_OVERLAY_LAYER_IDS
+} from './mapRenderConstants';
 
 /**
  * Interface representing the minimal MapLibre API needed to apply layer visibility.
@@ -45,6 +49,17 @@ export function applyMapLayerVisibility(
     const visibilityValue = coverageVisible ? 'visible' : 'none';
     if (map.getLayer('openvayra-cities-scenario-routing-coverage-mask')) {
       map.setLayoutProperty('openvayra-cities-scenario-routing-coverage-mask', 'visibility', visibilityValue);
+    }
+  }
+
+  // demand-gap-overlay
+  const gapsVisible = visibility['demand-gap-overlay'];
+  if (gapsVisible !== undefined) {
+    const visibilityValue = gapsVisible ? 'visible' : 'none';
+    for (const layerId of MAP_DEMAND_GAP_OVERLAY_LAYER_IDS) {
+      if (map.getLayer(layerId)) {
+        map.setLayoutProperty(layerId, 'visibility', visibilityValue);
+      }
     }
   }
 }

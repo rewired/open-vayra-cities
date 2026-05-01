@@ -30,7 +30,12 @@ import {
   MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT,
   MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE,
   MAP_LAYER_ID_SCENARIO_ROUTING_COVERAGE_MASK,
-  MAP_SCENARIO_ROUTING_COVERAGE_MASK_PAINT
+  MAP_SCENARIO_ROUTING_COVERAGE_MASK_PAINT,
+  MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
+  MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT,
+  MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT
 } from './mapRenderConstants';
 import { buildScenarioDemandPreviewFeatureCollection } from './scenarioDemandPreviewGeoJson';
 import type { MapLibreMap } from './maplibreGlobal';
@@ -38,6 +43,7 @@ import { buildStopFeatureCollection } from './stopGeoJson';
 import { buildVehicleFeatureCollection } from './vehicleGeoJson';
 import { buildOsmStopCandidateFeatureCollection } from './osmStopCandidateGeoJson';
 import { buildScenarioRoutingCoverageMaskFeatureCollection } from './scenarioRoutingCoverageGeoJson';
+import { buildDemandGapOverlayFeatureCollection } from './demandGapOverlayGeoJson';
 
 
 
@@ -81,6 +87,7 @@ export interface SyncAllMapWorkspaceSourcesInput {
   readonly osmStopCandidateSync?: readonly OsmStopCandidateGroup[];
   readonly scenarioDemandArtifact?: import('../domain/types/scenarioDemand').ScenarioDemandArtifact | null;
   readonly routingCoverage?: import('../domain/scenario/scenarioRegistry').ScenarioRoutingCoverage | null;
+  readonly demandGapRankingProjection?: import('../domain/projection/demandGapProjection').DemandGapRankingProjection | null;
 }
 
 /**
@@ -104,6 +111,8 @@ const CUSTOM_LAYER_ORDER = [
   MAP_LAYER_ID_DRAFT_LINE,
   MAP_LAYER_ID_SCENARIO_ROUTING_COVERAGE_MASK,
   MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
   MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
   MAP_LAYER_ID_STOPS_CIRCLE,
   MAP_LAYER_ID_STOPS_LABEL,
@@ -128,7 +137,8 @@ const WORKSPACE_SOURCE_IDS = [
   MAP_SOURCE_ID_VEHICLES,
   MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
   MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
-  MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE
+  MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE,
+  MAP_SOURCE_ID_DEMAND_GAP_OVERLAY
 ] as const;
 
 
@@ -319,6 +329,33 @@ const ensureAllMapWorkspaceRenderSourcesAndLayers = (map: MapLibreMap): void => 
       layout: { visibility: 'visible' }
     });
   }
+
+  if (!map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OVERLAY)) {
+    map.addSource(MAP_SOURCE_ID_DEMAND_GAP_OVERLAY, {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
+      type: 'heatmap',
+      source: MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+      paint: MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT,
+      layout: { visibility: 'none' }
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
+      type: 'circle',
+      source: MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+      paint: MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT,
+      layout: { visibility: 'none' }
+    });
+  }
 };
 
 
@@ -399,6 +436,12 @@ const syncMapWorkspaceSourceData = ({
     const coverageFeatureCollection = buildScenarioRoutingCoverageMaskFeatureCollection(routingCoverage);
     const coverageSource = map.getSource(MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE);
     coverageSource?.setData(coverageFeatureCollection);
+  }
+
+  if (demandGapRankingProjection !== undefined) {
+    const demandGapFeatureCollection = buildDemandGapOverlayFeatureCollection(demandGapRankingProjection);
+    const demandGapSource = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OVERLAY);
+    demandGapSource?.setData(demandGapFeatureCollection);
   }
 
   enforceMapWorkspaceCustomLayerOrder(map);

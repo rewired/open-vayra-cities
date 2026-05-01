@@ -486,6 +486,7 @@ const toolModeControlOptions: ReadonlyArray<{
           onOsmCandidateAnchorResolved={setSelectedOsmCandidateAnchor}
           scenarioDemandArtifact={scenarioDemandArtifactState.status === 'loaded' ? scenarioDemandArtifactState.artifact : null}
           routingCoverage={selectedScenario?.scenario.routingCoverage ?? null}
+          demandGapRankingProjection={projections.demandGapRankingProjection}
         />
 
       </main>
