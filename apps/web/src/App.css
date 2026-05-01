@@ -15,6 +15,7 @@
 @import './styles/inspector-selected-stop.css';
 @import './styles/inspector-selected-line.css';
 @import './styles/inspector-osm-candidate.css';
+@import './styles/inspector-demand-gaps.css';
 @import './styles/network-inventory.css';
 @import './styles/dialogs.css';
 @import './styles/dialog-line-completion.css';

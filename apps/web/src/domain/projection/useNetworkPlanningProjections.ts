@@ -13,6 +13,7 @@ import type { TimeBandId } from '../types/timeBand';
 import type { SimulationMinuteOfDay, SimulationSecondOfDay } from '../types/simulationClock';
 import type { LineRouteSegment, RouteStatus } from '../types/lineRoute';
 import { projectSelectedLineDemandContribution, type SelectedLineDemandContributionProjection } from './selectedLineDemandContributionProjection';
+import { projectDemandGapRanking, type DemandGapRankingProjection } from './demandGapProjection';
 
 const MAX_READINESS_ISSUES_VISIBLE = 5;
 
@@ -67,6 +68,7 @@ export interface NetworkPlanningProjections {
   readonly servedDemandProjection: ServedDemandProjection;
   readonly servicePressureProjection: ServicePressureProjection;
   readonly selectedLineDemandContribution: SelectedLineDemandContributionProjection | null;
+  readonly demandGapRankingProjection: DemandGapRankingProjection;
 }
 
 
@@ -187,6 +189,13 @@ export const useNetworkPlanningProjections = (
     activeSimulationTimeBandId
   );
 
+  const demandGapRankingProjection = projectDemandGapRanking(
+    scenarioDemandArtifact,
+    sessionStops,
+    sessionLines,
+    activeTimeBandId
+  );
+
   return {
     staticNetworkSummaryKpis,
     selectedLineRouteBaseline,
@@ -201,6 +210,7 @@ export const useNetworkPlanningProjections = (
     scenarioDemandCaptureProjection,
     servedDemandProjection,
     servicePressureProjection,
-    selectedLineDemandContribution
+    selectedLineDemandContribution,
+    demandGapRankingProjection
   };
 };

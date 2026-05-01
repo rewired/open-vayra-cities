@@ -19,8 +19,11 @@ export interface SelectedLineDialogOpenIntent {
   readonly requestId: number;
 }
 
-/** Carries a programmatic map-focus request for a stop or line. */
+/** Carries a programmatic map-focus request for a stop, line, or specific position. */
 export interface MapFocusIntent {
-  readonly target: { type: 'stop'; id: StopId } | { type: 'line'; id: LineId };
+  readonly target:
+    | { type: 'stop'; id: StopId }
+    | { type: 'line'; id: LineId }
+    | { type: 'position'; position: { lng: number; lat: number } };
   readonly requestId: number;
 }

@@ -65,4 +65,14 @@ export type ScenarioDemandSourceKind = (typeof ALLOWED_DEMAND_SOURCE_KINDS)[numb
  */
 export const SCENARIO_DEMAND_STOP_ACCESS_RADIUS_METERS = 400;
 
+/**
+ * Maximum number of demand gap items to return per category for display.
+ */
+export const DEMAND_GAP_RANKING_MAX_ITEMS_PER_CATEGORY = 5;
+
+/**
+ * Minimum active demand weight to be considered for gap ranking.
+ */
+export const DEMAND_GAP_RANKING_MIN_ACTIVE_WEIGHT = 0.1;
+
 

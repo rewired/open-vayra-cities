@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactElement } from 'react';
+import { MaterialIcon } from '../ui/icons/MaterialIcon';
 
 import { TIME_BAND_DISPLAY_LABELS } from '../domain/constants/timeBands';
 import type { Line } from '../domain/types/line';
@@ -52,6 +53,8 @@ interface InspectorPanelProps {
   readonly servedDemandProjection: import('../domain/projection/servedDemandProjection').ServedDemandProjection;
   readonly servicePressureProjection: import('../domain/projection/servicePressureProjection').ServicePressureProjection;
   readonly selectedLineDemandContribution: import('../domain/projection/selectedLineDemandContributionProjection').SelectedLineDemandContributionProjection | null;
+  readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
+  readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
 }
 
 const resolveGlobalStateLabel = (panelState: InspectorPanelState): string => {
@@ -101,7 +104,9 @@ export function InspectorPanel({
   scenarioDemandCaptureProjection,
   servedDemandProjection,
   servicePressureProjection,
-  selectedLineDemandContribution
+  selectedLineDemandContribution,
+  demandGapRankingProjection,
+  onPositionFocus
 }: InspectorPanelProps): ReactElement {
   const [activeTabId, setActiveTabId] = useState<InspectorTabId>('network');
   const [linesViewMode, setLinesViewMode] = useState<'list' | 'detail'>('list');
@@ -318,6 +323,54 @@ export function InspectorPanel({
                     </tr>
                   </tbody>
                 </table>
+              )}
+
+              <h4 className="inspector-section-title">Demand gaps</h4>
+              {demandGapRankingProjection.status === 'unavailable' ? (
+                <p className="inspector-dialog__note">Demand gap ranking unavailable.</p>
+              ) : (
+                <div className="inspector-demand-gaps">
+                  {demandGapRankingProjection.uncapturedResidentialGaps.length === 0 &&
+                  demandGapRankingProjection.capturedButUnservedResidentialGaps.length === 0 &&
+                  demandGapRankingProjection.capturedButUnreachableWorkplaceGaps.length === 0 ? (
+                    <p className="inspector-dialog__note">No major demand gaps identified in this time band.</p>
+                  ) : (
+                    <>
+                      {[
+                        { title: 'Unserved homes', gaps: demandGapRankingProjection.capturedButUnservedResidentialGaps },
+                        { title: 'Uncaptured homes', gaps: demandGapRankingProjection.uncapturedResidentialGaps },
+                        { title: 'Unreachable workplaces', gaps: demandGapRankingProjection.capturedButUnreachableWorkplaceGaps }
+                      ].map(
+                        (section) =>
+                          section.gaps.length > 0 && (
+                            <div key={section.title} className="inspector-demand-gaps__section">
+                              <h5 className="inspector-demand-gaps__section-title">{section.title}</h5>
+                              <ul className="inspector-simple-list">
+                                {section.gaps.map((gap) => (
+                                  <li key={gap.id} className="inspector-demand-gaps__item">
+                                    <div className="inspector-demand-gaps__item-content">
+                                      <span className="inspector-demand-gaps__item-label">
+                                        {gap.id} · {gap.activeWeight.toFixed(1)} active demand
+                                      </span>
+                                      <span className="inspector-demand-gaps__item-note">{gap.note}</span>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      className="inspector-demand-gaps__focus-button"
+                                      title="Focus on map"
+                                      onClick={() => onPositionFocus(gap.position)}
+                                    >
+                                      <MaterialIcon name="center_focus_strong" />
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )
+                      )}
+                    </>
+                  )}
+                </div>
               )}
 
               <NetworkInventory

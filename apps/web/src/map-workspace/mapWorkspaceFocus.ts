@@ -93,5 +93,10 @@ export function applyMapWorkspaceFocusIntent(input: ApplyMapWorkspaceFocusIntent
         map.fitBounds(bounds, { padding: MAP_FOCUS_PADDING });
       }
     }
+  } else if (target.type === 'position') {
+    map.easeTo({
+      center: [target.position.lng, target.position.lat],
+      zoom: MAP_FOCUS_ZOOM_STOP
+    });
   }
 }

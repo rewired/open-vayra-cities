@@ -333,6 +333,13 @@ const toolModeControlOptions: ReadonlyArray<{
     []
   );
 
+  const handlePositionFocus = useCallback(
+    (position: { lng: number; lat: number }) => {
+      setMapFocusIntent({ target: { type: 'position', position }, requestId: Date.now() });
+    },
+    []
+  );
+
   if (registryState.status === 'loading') {
     return (
       <div className="scenario-loading-state" aria-label="Scenario loading state">
@@ -498,6 +505,7 @@ const toolModeControlOptions: ReadonlyArray<{
         servedDemandProjection={projections.servedDemandProjection}
         servicePressureProjection={projections.servicePressureProjection}
         selectedLineDemandContribution={projections.selectedLineDemandContribution}
+        demandGapRankingProjection={projections.demandGapRankingProjection}
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
         lineFrequencyControlByTimeBand={sessionController.lineFrequencyControlByTimeBand}
         lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}
@@ -505,6 +513,7 @@ const toolModeControlOptions: ReadonlyArray<{
         onSelectedLineIdChange={handleLineInventorySelection}
         onStopSelectionChange={handleStopInventorySelection}
         onLineSequenceStopFocus={handleLineSequenceStopFocus}
+        onPositionFocus={handlePositionFocus}
         onStopRename={sessionController.renameStopLabel}
         onLineRename={sessionController.renameLineLabel}
         openDialogIntent={sessionController.selectedLineDialogOpenIntent}
