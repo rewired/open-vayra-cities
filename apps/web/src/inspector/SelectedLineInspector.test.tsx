@@ -102,6 +102,7 @@ const renderInspector = (): RenderResult => {
         onFrequencyChange={vi.fn()}
         openDialogIntent={null}
         onOpenDialogIntentConsumed={vi.fn()}
+        selectedLineDemandContribution={null}
       />
     );
   });
@@ -163,6 +164,7 @@ describe('SelectedLineInspector route sequence', () => {
           onFrequencyChange={vi.fn()}
           openDialogIntent={null}
           onOpenDialogIntentConsumed={vi.fn()}
+          selectedLineDemandContribution={null}
         />
       );
     });

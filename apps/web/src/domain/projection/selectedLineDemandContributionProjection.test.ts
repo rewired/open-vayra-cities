@@ -1,86 +1,58 @@
 import { describe, it, expect } from 'vitest';
 import { projectSelectedLineDemandContribution } from './selectedLineDemandContributionProjection';
-import type { ScenarioDemandArtifact, ScenarioDemandNode } from '../types/scenarioDemand';
-import type { Stop } from '../types/stop';
-import type { Line } from '../types/line';
-import { createLineId, createLineFrequencyMinutes, createNoServiceLineServiceByTimeBand } from '../types/line';
+import type { TimeBandId } from '../types/timeBand';
+import { 
+  createLineFrequencyMinutes, 
+} from '../types/line';
+import { 
+  createTestStop, 
+  createTestLine, 
+  createTestScenarioDemandNode, 
+  createTestScenarioDemandArtifact 
+} from './testFixtures';
 
 describe('selectedLineDemandContributionProjection', () => {
-  const activeTimeBandId = 'morning-rush' as any;
+  const activeTimeBandId: TimeBandId = 'morning-rush';
 
-  const createMockNode = (id: string, lng: number, lat: number, role: 'origin' | 'destination', nodeClass: 'residential' | 'workplace', weight: number, timeBandWeights?: Record<string, number>): ScenarioDemandNode => ({
-    id,
-    position: { lng, lat },
-    role,
-    class: nodeClass,
-    baseWeight: weight,
-    timeBandWeights: (timeBandWeights || { 'morning-rush': 1.0 }) as any,
-  });
-
-  const createMockStop = (id: string, lng: number, lat: number): Stop => ({
-    id: id as any,
-    label: `Stop ${id}`,
-    position: { lng, lat }
-  });
-
-  const createMockLine = (id: string, stopIds: string[], topology: 'linear' | 'loop' = 'linear', servicePattern: 'one-way' | 'bidirectional' = 'one-way'): Line => {
-    const frequencyByTimeBand = createNoServiceLineServiceByTimeBand();
-    (frequencyByTimeBand as any)['morning-rush'] = { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) };
-
-    const routeSegments = stopIds.slice(0, topology === 'loop' ? undefined : -1).map((_, i) => {
-      const fromStopId = stopIds[i];
-      const toStopId = stopIds[(i + 1) % stopIds.length];
-      return {
-        id: `seg-${id}-${i}` as any,
-        lineId: createLineId(id),
-        fromStopId: fromStopId as any,
-        toStopId: toStopId as any,
-        inMotionTravelMinutes: 5,
-        dwellMinutes: 1,
-        totalTravelMinutes: 6,
-        status: 'routed' as const,
-        warnings: []
-      };
-    });
-
-    return {
-      id: createLineId(id),
-      label: `Line ${id}`,
-      stopIds: stopIds as any[],
-      topology,
-      servicePattern,
-      routeSegments,
-      frequencyByTimeBand
-    };
-  };
-
-  const artifact: ScenarioDemandArtifact = {
-    schemaVersion: 1,
-    scenarioId: 'test',
-    generatedAt: '',
-    sourceMetadata: {
-      generatedFrom: [],
-      generatorName: 'test',
-      generatorVersion: '0.1.0'
-    },
+  const artifact = createTestScenarioDemandArtifact({
     nodes: [
-      createMockNode('res1', 0, 0, 'origin', 'residential', 100, { 'morning-rush': 1.5 }),
-      createMockNode('work1', 0.01, 0, 'destination', 'workplace', 50, { 'morning-rush': 2.0 }),
-    ],
-    attractors: [],
-    gateways: []
-  };
+      createTestScenarioDemandNode({
+        id: 'res1',
+        lng: 0,
+        lat: 0,
+        role: 'origin',
+        class: 'residential',
+        baseWeight: 100,
+        timeBandWeights: { 'morning-rush': 1.5 }
+      }),
+      createTestScenarioDemandNode({
+        id: 'work1',
+        lng: 0.01,
+        lat: 0,
+        role: 'destination',
+        class: 'workplace',
+        baseWeight: 50,
+        timeBandWeights: { 'morning-rush': 2.0 }
+      }),
+    ]
+  });
 
   it('returns null when no line or artifact is provided', () => {
     expect(projectSelectedLineDemandContribution(null, [], null, activeTimeBandId)).toBeNull();
   });
 
   it('projects demand contribution for a linear one-way line', () => {
-    const stop1 = createMockStop('s1', 0, 0); // captures res1 (active weight 150)
-    const stop2 = createMockStop('s2', 0.01, 0); // captures work1 (active weight 100)
-    const line = createMockLine('l1', ['s1', 's2']);
+    const stop1 = createTestStop('s1', 0, 0); // captures res1 (active weight 150)
+    const stop2 = createTestStop('s2', 0.01, 0); // captures work1 (active weight 100)
+    const line = createTestLine({
+      id: 'l1',
+      stopIds: ['s1', 's2'],
+      frequencyOverrides: {
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
+      }
+    });
     
-    const result = projectSelectedLineDemandContribution(line, [stop1, stop2], artifact, 'morning-rush' as any);
+    const result = projectSelectedLineDemandContribution(line, [stop1, stop2], artifact, 'morning-rush');
     expect(result?.status).toBe('serving');
     expect(result?.capturedResidentialActiveWeight).toBe(150);
     expect(result?.servedResidentialActiveWeight).toBe(150);
@@ -90,9 +62,15 @@ describe('selectedLineDemandContributionProjection', () => {
   });
 
   it('returns captures-only when residential is after workplace in one-way line', () => {
-    const stop1 = createMockStop('s1', 0, 0); // captures res1
-    const stop2 = createMockStop('s2', 0.01, 0); // captures work1
-    const line = createMockLine('l1', ['s2', 's1']); // Reversed
+    const stop1 = createTestStop('s1', 0, 0); // captures res1
+    const stop2 = createTestStop('s2', 0.01, 0); // captures work1
+    const line = createTestLine({
+      id: 'l1',
+      stopIds: ['s2', 's1'],
+      frequencyOverrides: {
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
+      }
+    }); // Reversed
     
     const result = projectSelectedLineDemandContribution(line, [stop1, stop2], artifact, activeTimeBandId);
     expect(result?.status).toBe('captures-only');
@@ -101,9 +79,17 @@ describe('selectedLineDemandContributionProjection', () => {
   });
 
   it('serves both directions for a bidirectional line', () => {
-    const stop1 = createMockStop('s1', 0, 0); // captures res1
-    const stop2 = createMockStop('s2', 0.01, 0); // captures work1
-    const line = createMockLine('l1', ['s2', 's1'], 'linear', 'bidirectional');
+    const stop1 = createTestStop('s1', 0, 0); // captures res1
+    const stop2 = createTestStop('s2', 0.01, 0); // captures work1
+    const line = createTestLine({
+      id: 'l1',
+      stopIds: ['s2', 's1'],
+      topology: 'linear',
+      servicePattern: 'bidirectional',
+      frequencyOverrides: {
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
+      }
+    });
     
     const result = projectSelectedLineDemandContribution(line, [stop1, stop2], artifact, activeTimeBandId);
     expect(result?.status).toBe('serving');
@@ -111,9 +97,17 @@ describe('selectedLineDemandContributionProjection', () => {
   });
 
   it('serves any connection for a loop line', () => {
-    const stop1 = createMockStop('s1', 0, 0); // captures res1
-    const stop2 = createMockStop('s2', 0.01, 0); // captures work1
-    const line = createMockLine('l1', ['s2', 's1'], 'loop', 'one-way');
+    const stop1 = createTestStop('s1', 0, 0); // captures res1
+    const stop2 = createTestStop('s2', 0.01, 0); // captures work1
+    const line = createTestLine({
+      id: 'l1',
+      stopIds: ['s2', 's1'],
+      topology: 'loop',
+      servicePattern: 'one-way',
+      frequencyOverrides: {
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
+      }
+    });
     
     const result = projectSelectedLineDemandContribution(line, [stop1, stop2], artifact, activeTimeBandId);
     expect(result?.status).toBe('serving');
@@ -121,10 +115,15 @@ describe('selectedLineDemandContributionProjection', () => {
   });
 
   it('returns no-service when line is inactive', () => {
-    const stop1 = createMockStop('s1', 0, 0);
-    const stop2 = createMockStop('s2', 0.01, 0);
-    const line = createMockLine('l1', ['s1', 's2']);
-    (line.frequencyByTimeBand as any)['morning-rush'] = { kind: 'no-service' };
+    const stop1 = createTestStop('s1', 0, 0);
+    const stop2 = createTestStop('s2', 0.01, 0);
+    const line = createTestLine({
+      id: 'l1',
+      stopIds: ['s1', 's2'],
+      frequencyOverrides: {
+        'morning-rush': { kind: 'no-service' }
+      }
+    });
 
     const result = projectSelectedLineDemandContribution(line, [stop1, stop2], artifact, activeTimeBandId);
     expect(result?.status).toBe('no-service');
@@ -133,10 +132,16 @@ describe('selectedLineDemandContributionProjection', () => {
   });
 
   it('deduplicates nodes captured by multiple stops on the same line', () => {
-    const stop1 = createMockStop('s1', 0, 0);
-    const stop1b = createMockStop('s1b', 0.0001, 0); // also captures res1
-    const stop2 = createMockStop('s2', 0.01, 0);
-    const line = createMockLine('l1', ['s1', 's1b', 's2']);
+    const stop1 = createTestStop('s1', 0, 0);
+    const stop1b = createTestStop('s1b', 0.0001, 0); // also captures res1
+    const stop2 = createTestStop('s2', 0.01, 0);
+    const line = createTestLine({
+      id: 'l1',
+      stopIds: ['s1', 's1b', 's2'],
+      frequencyOverrides: {
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
+      }
+    });
 
     const result = projectSelectedLineDemandContribution(line, [stop1, stop1b, stop2], artifact, activeTimeBandId);
     expect(result?.capturedResidentialActiveWeight).toBe(150);
@@ -145,9 +150,15 @@ describe('selectedLineDemandContributionProjection', () => {
   });
 
   it('returns captures-only when only one type of demand is captured', () => {
-    const stop1 = createMockStop('s1', 0, 0); // captures res1
-    const stop2 = createMockStop('s2', 1, 1); // captures nothing
-    const line = createMockLine('l1', ['s1', 's2']);
+    const stop1 = createTestStop('s1', 0, 0); // captures res1
+    const stop2 = createTestStop('s2', 1, 1); // captures nothing
+    const line = createTestLine({
+      id: 'l1',
+      stopIds: ['s1', 's2'],
+      frequencyOverrides: {
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
+      }
+    });
     
     const result = projectSelectedLineDemandContribution(line, [stop1, stop2], artifact, activeTimeBandId);
     expect(result?.status).toBe('captures-only');
@@ -155,24 +166,65 @@ describe('selectedLineDemandContributionProjection', () => {
   });
 
   it('calculates service pressure correctly', () => {
-    const stop1 = createMockStop('s1', 0, 0); // res1: 150
-    const stop2 = createMockStop('s2', 0.01, 0); // work1: 100
-    const line = createMockLine('l1', ['s1', 's2']);
+    const stop1 = createTestStop('s1', 0, 0); // res1: 150
+    const stop2 = createTestStop('s2', 0.01, 0); // work1: 100
+    const line = createTestLine({
+      id: 'l1',
+      stopIds: ['s1', 's2'],
+      frequencyOverrides: {
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
+      }
+    });
     // Ratio = 150 / 6 = 25 -> balanced
     
     let result = projectSelectedLineDemandContribution(line, [stop1, stop2], artifact, activeTimeBandId);
     expect(result?.servicePressureStatus).toBe('balanced');
 
-    // Make it overloaded: demand 150, frequency 0.5 departures/hr (headway 120min)
-    (line.frequencyByTimeBand as any)['morning-rush'] = { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(120) };
-    // Ratio = 150 / 0.5 = 300 -> overloaded (> 200)
-    result = projectSelectedLineDemandContribution(line, [stop1, stop2], artifact, activeTimeBandId);
+    // Make it overloaded: demand 450 (3 * 150), frequency 0.5 departures/hr (headway 120min)
+    // Floor of 4.0 deps/hr applies: 450 / 4.0 = 112.5 -> overloaded (> 100)
+    const heavyArtifact = createTestScenarioDemandArtifact({
+      nodes: [
+        createTestScenarioDemandNode({
+          id: 'res1',
+          lng: 0,
+          lat: 0,
+          role: 'origin',
+          class: 'residential',
+          baseWeight: 450,
+          timeBandWeights: { 'morning-rush': 1.0 }
+        }),
+        createTestScenarioDemandNode({
+          id: 'work1',
+          lng: 0.01,
+          lat: 0,
+          role: 'destination',
+          class: 'workplace',
+          baseWeight: 100,
+          timeBandWeights: { 'morning-rush': 1.0 }
+        })
+      ]
+    });
+
+    const lineOverloaded = {
+      ...line,
+      frequencyByTimeBand: {
+        ...line.frequencyByTimeBand,
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(120) } as const
+      }
+    };
+    result = projectSelectedLineDemandContribution(lineOverloaded, [stop1, stop2], heavyArtifact, activeTimeBandId);
     expect(result?.servicePressureStatus).toBe('overloaded');
     expect(result?.status).toBe('degraded');
   });
 
   it('does not mutate inputs', () => {
-    const line = createMockLine('l1', ['s1', 's2']);
+    const line = createTestLine({
+      id: 'l1',
+      stopIds: ['s1', 's2'],
+      frequencyOverrides: {
+        'morning-rush': { kind: 'frequency', headwayMinutes: createLineFrequencyMinutes(10) }
+      }
+    });
     const lineJson = JSON.stringify(line);
     const artifactJson = JSON.stringify(artifact);
     

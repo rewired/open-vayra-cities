@@ -2,9 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { projectServicePressure } from './servicePressureProjection';
 import type { ServedDemandProjection } from './servedDemandProjection';
 import type { LineServicePlanProjection } from '../types/lineServicePlanProjection';
+import type { TimeBandId } from '../types/timeBand';
 
 describe('servicePressureProjection', () => {
-  const activeTimeBandId = 'morning-rush' as any;
+  const activeTimeBandId: TimeBandId = 'morning-rush';
 
   const createMockServedDemand = (servedWeight: number, capturedWeight: number = servedWeight): ServedDemandProjection => ({
     status: 'ready',

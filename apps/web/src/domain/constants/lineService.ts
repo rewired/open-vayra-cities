@@ -20,13 +20,6 @@ export const SERVICE_PRESSURE_RATIO_LOW_THRESHOLD = 10;
  */
 export const SERVICE_PRESSURE_RATIO_BALANCED_THRESHOLD = 50;
 
-/**
- * Service pressure ratio threshold for 'high' pressure status.
- */
 export const SERVICE_PRESSURE_RATIO_HIGH_THRESHOLD = 100;
 
-/**
- * Service pressure ratio threshold for 'overloaded' pressure status.
- */
-export const SERVICE_PRESSURE_RATIO_OVERLOADED_THRESHOLD = 200;
 

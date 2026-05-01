@@ -41,6 +41,7 @@ import {
   createMapWorkspaceInstance,
   setupMapResizeBinding
 } from './mapWorkspaceLifecycle';
+import { applyMapLayerVisibility } from './mapLayerVisibility';
 import { applyBasemapSemanticReadabilityOverrides } from './mapBaseStyleOverrides';
 import type { MapLibreMap } from './maplibreGlobal';
 import {

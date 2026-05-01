@@ -193,7 +193,7 @@ export const useNetworkPlanningProjections = (
     scenarioDemandArtifact,
     sessionStops,
     sessionLines,
-    activeTimeBandId
+    activeSimulationTimeBandId
   );
 
   return {
