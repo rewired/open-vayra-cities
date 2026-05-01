@@ -50,6 +50,7 @@ interface InspectorPanelProps {
   readonly adoptedOsmCandidateGroupIds: ReadonlySet<import('../domain/types/osmStopCandidate').OsmStopCandidateGroupId>;
   readonly scenarioDemandCaptureProjection: import('../domain/projection/scenarioDemandCaptureProjection').ScenarioDemandCaptureProjection;
   readonly servedDemandProjection: import('../domain/projection/servedDemandProjection').ServedDemandProjection;
+  readonly servicePressureProjection: import('../domain/projection/servicePressureProjection').ServicePressureProjection;
 }
 
 const resolveGlobalStateLabel = (panelState: InspectorPanelState): string => {
@@ -97,7 +98,8 @@ export function InspectorPanel({
   selectedOsmCandidateAnchor,
   adoptedOsmCandidateGroupIds,
   scenarioDemandCaptureProjection,
-  servedDemandProjection
+  servedDemandProjection,
+  servicePressureProjection
 }: InspectorPanelProps): ReactElement {
   const [activeTabId, setActiveTabId] = useState<InspectorTabId>('network');
   const [linesViewMode, setLinesViewMode] = useState<'list' | 'detail'>('list');
@@ -272,6 +274,45 @@ export function InspectorPanel({
                     <tr>
                       <th scope="row">Active service lines</th>
                       <td>{servedDemandProjection.activeServiceLineCount}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              )}
+
+              <h4 className="inspector-section-title">Service pressure</h4>
+              {servicePressureProjection.activeDeparturesPerHourEstimate === 0 ? (
+                <p className="inspector-dialog__note">No active service frequency in the current time band.</p>
+              ) : (
+                <table className="inspector-compact-table inspector-network-summary__primary-table">
+                  <tbody>
+                    <tr>
+                      <th scope="row">Active band</th>
+                      <td className="inspector-compact-table__value--left">
+                        {TIME_BAND_DISPLAY_LABELS[servicePressureProjection.activeTimeBandId]}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Departures/hour</th>
+                      <td>{servicePressureProjection.activeDeparturesPerHourEstimate.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Average headway</th>
+                      <td>
+                        {servicePressureProjection.averageHeadwayMinutes !== null
+                          ? `${servicePressureProjection.averageHeadwayMinutes.toFixed(1)} min`
+                          : '—'}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Pressure</th>
+                      <td className="inspector-compact-table__value--left">
+                        {servicePressureProjection.servicePressureStatus.charAt(0).toUpperCase() +
+                          servicePressureProjection.servicePressureStatus.slice(1)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Demand per departure</th>
+                      <td>{servicePressureProjection.servicePressureRatio.toFixed(1)}</td>
                     </tr>
                   </tbody>
                 </table>

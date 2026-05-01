@@ -7,6 +7,7 @@ import { projectLineServicePlan, projectLineServicePlanForLine, projectLineSelec
 import { projectLineVehicleNetwork } from './lineVehicleProjection';
 import { projectLinePlanningVehicles, projectNetworkPlanningVehicles } from './linePlanningVehicleProjection';
 import { resolveLineServiceBandHeadwayMinutes, type Line } from '../types/line';
+import { projectServicePressure, type ServicePressureProjection } from './servicePressureProjection';
 import type { Stop } from '../types/stop';
 import type { TimeBandId } from '../types/timeBand';
 import type { SimulationMinuteOfDay, SimulationSecondOfDay } from '../types/simulationClock';
@@ -63,6 +64,7 @@ export interface NetworkPlanningProjections {
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof projectLineSelectedServiceInspector> | null;
   readonly scenarioDemandCaptureProjection: ScenarioDemandCaptureProjection;
   readonly servedDemandProjection: ServedDemandProjection;
+  readonly servicePressureProjection: ServicePressureProjection;
 }
 
 
@@ -171,6 +173,11 @@ export const useNetworkPlanningProjections = (
     activeSimulationTimeBandId
   );
 
+  const servicePressureProjection = projectServicePressure(
+    servedDemandProjection,
+    networkServicePlanProjection
+  );
+
   return {
     staticNetworkSummaryKpis,
     selectedLineRouteBaseline,
@@ -183,6 +190,7 @@ export const useNetworkPlanningProjections = (
     networkServicePlanProjection,
     selectedLineServiceInspectorProjection,
     scenarioDemandCaptureProjection,
-    servedDemandProjection
+    servedDemandProjection,
+    servicePressureProjection
   };
 };
