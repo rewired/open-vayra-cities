@@ -26,6 +26,9 @@ import { WORKSPACE_MODE_ICONS } from './ui/icons/materialIcons';
 import type { MapFocusIntent } from './session/sessionTypes';
 import { BlockingDataOperationModal } from './ui/data-operation/BlockingDataOperationModal';
 import type { ActiveDataOperation } from './ui/data-operation/types';
+import type { Stop, StopId } from './domain/types/stop';
+import type { LineId } from './domain/types/line';
+import type { DemandGapRankingItem } from './domain/projection/demandGapProjection';
 
 import { AppShell } from './AppShell';
 import { loadScenarioRegistry } from './domain/scenario/loadScenarioRegistry';
@@ -53,7 +56,7 @@ const resolveInspectorPanelState = (
   selectedLine: ReturnType<typeof useNetworkSessionState>['selectedLine'],
   selectedStop: ReturnType<typeof useNetworkSessionState>['selectedStop'],
   selectedOsmCandidateGroupId: ReturnType<typeof useNetworkSessionState>['selectedOsmCandidateGroupId'],
-  sessionStops: readonly import('./domain/types/stop').Stop[]
+  sessionStops: readonly Stop[]
 ): InspectorPanelState => {
   if (selectedLine) {
     return {
@@ -307,7 +310,7 @@ const toolModeControlOptions: ReadonlyArray<{
   };
 
   const handleStopInventorySelection = useCallback(
-    (stopId: import('./domain/types/stop').StopId) => {
+    (stopId: StopId) => {
       sessionController.setSelectedLineId(null);
       sessionController.setSelectedStop({ selectedStopId: stopId });
       setFocusedDemandGapId(null);
@@ -317,7 +320,7 @@ const toolModeControlOptions: ReadonlyArray<{
   );
 
   const handleLineInventorySelection = useCallback(
-    (lineId: import('./domain/types/line').LineId) => {
+    (lineId: LineId) => {
       sessionController.setSelectedStop(null);
       sessionController.setSelectedLineId(lineId);
       setFocusedDemandGapId(null);
@@ -327,7 +330,7 @@ const toolModeControlOptions: ReadonlyArray<{
   );
 
   const handleLineSequenceStopFocus = useCallback(
-    (stopId: import('./domain/types/stop').StopId) => {
+    (stopId: StopId) => {
       setMapFocusIntent({ target: { type: 'stop', id: stopId }, requestId: Date.now() });
     },
     []
@@ -340,7 +343,7 @@ const toolModeControlOptions: ReadonlyArray<{
     []
   );
 
-  const handleDemandGapFocus = (gap: import('./domain/projection/demandGapProjection').DemandGapRankingItem | null): void => {
+  const handleDemandGapFocus = (gap: DemandGapRankingItem | null): void => {
     if (!gap) {
       setFocusedDemandGapId(null);
       return;

@@ -78,6 +78,10 @@ interface MapWorkspaceVehicleSyncInput {
   readonly vehicleNetworkProjection: LineVehicleNetworkProjection;
 }
 
+import type { ScenarioDemandArtifact } from '../domain/types/scenarioDemand';
+import type { ScenarioRoutingCoverage } from '../domain/scenario/scenarioRegistry';
+import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
+
 /**
  * Inputs for one lifecycle-safe source/layer synchronization pass.
  */
@@ -87,9 +91,9 @@ export interface SyncAllMapWorkspaceSourcesInput {
   readonly lineSync?: MapWorkspaceLineSyncInput;
   readonly vehicleSync?: MapWorkspaceVehicleSyncInput;
   readonly osmStopCandidateSync?: readonly OsmStopCandidateGroup[];
-  readonly scenarioDemandArtifact?: import('../domain/types/scenarioDemand').ScenarioDemandArtifact | null;
-  readonly routingCoverage?: import('../domain/scenario/scenarioRegistry').ScenarioRoutingCoverage | null;
-  readonly demandGapRankingProjection?: import('../domain/projection/demandGapProjection').DemandGapRankingProjection | null;
+  readonly scenarioDemandArtifact?: ScenarioDemandArtifact | null;
+  readonly routingCoverage?: ScenarioRoutingCoverage | null;
+  readonly demandGapRankingProjection?: DemandGapRankingProjection | null;
   readonly focusedDemandGapId?: string | null;
 }
 

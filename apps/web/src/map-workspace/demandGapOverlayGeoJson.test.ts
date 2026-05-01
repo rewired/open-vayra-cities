@@ -1,12 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { buildDemandGapOverlayFeatureCollection } from './demandGapOverlayGeoJson';
 import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
-import type { TimeBandId } from '../domain/types/timeBand';
 
 describe('demandGapOverlayGeoJson', () => {
   const mockProjection: DemandGapRankingProjection = {
     status: 'ready',
-    activeTimeBandId: 'morning-peak' as TimeBandId,
+    activeTimeBandId: 'morning-rush',
     uncapturedResidentialGaps: [
       {
         id: 'gap-1',
@@ -57,7 +56,7 @@ describe('demandGapOverlayGeoJson', () => {
   it('returns an empty collection when projection is unavailable', () => {
     const result = buildDemandGapOverlayFeatureCollection({
       status: 'unavailable',
-      activeTimeBandId: 'morning-peak' as TimeBandId,
+      activeTimeBandId: 'morning-rush',
       uncapturedResidentialGaps: [],
       capturedButUnservedResidentialGaps: [],
       capturedButUnreachableWorkplaceGaps: [],

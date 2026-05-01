@@ -11,7 +11,7 @@ import { INITIAL_REGISTERED_MAP_LAYERS, INITIAL_MAP_LAYER_VISIBILITY } from '../
 describe('applyMapLayerVisibility', () => {
   it('sets visible state to every OSM candidate layer', () => {
     const mockSetLayoutProperty = vi.fn();
-    const mockGetLayer = vi.fn().mockReturnValue({});
+    const mockGetLayer = vi.fn().mockReturnValue({ id: 'test-layer', type: 'circle', source: 'test-source' });
     const mockMap: VisibilityApplicableMap = {
       getLayer: mockGetLayer,
       setLayoutProperty: mockSetLayoutProperty,
@@ -27,7 +27,7 @@ describe('applyMapLayerVisibility', () => {
 
   it('sets hidden state to every OSM candidate layer', () => {
     const mockSetLayoutProperty = vi.fn();
-    const mockGetLayer = vi.fn().mockReturnValue({});
+    const mockGetLayer = vi.fn().mockReturnValue({ id: 'test-layer', type: 'circle', source: 'test-source' });
     const mockMap: VisibilityApplicableMap = {
       getLayer: mockGetLayer,
       setLayoutProperty: mockSetLayoutProperty,
@@ -43,7 +43,7 @@ describe('applyMapLayerVisibility', () => {
 
   it('sets visible state to every demand preview layer', () => {
     const mockSetLayoutProperty = vi.fn();
-    const mockGetLayer = vi.fn().mockReturnValue({});
+    const mockGetLayer = vi.fn().mockReturnValue({ id: 'test-layer', type: 'circle', source: 'test-source' });
     const mockMap: VisibilityApplicableMap = {
       getLayer: mockGetLayer,
       setLayoutProperty: mockSetLayoutProperty,
@@ -59,7 +59,7 @@ describe('applyMapLayerVisibility', () => {
 
   it('sets hidden state to every demand preview layer', () => {
     const mockSetLayoutProperty = vi.fn();
-    const mockGetLayer = vi.fn().mockReturnValue({});
+    const mockGetLayer = vi.fn().mockReturnValue({ id: 'test-layer', type: 'circle', source: 'test-source' });
     const mockMap: VisibilityApplicableMap = {
       getLayer: mockGetLayer,
       setLayoutProperty: mockSetLayoutProperty,
@@ -90,7 +90,7 @@ describe('applyMapLayerVisibility', () => {
 
   it('sets visible state to every demand gap overlay layer', () => {
     const mockSetLayoutProperty = vi.fn();
-    const mockGetLayer = vi.fn().mockReturnValue({});
+    const mockGetLayer = vi.fn().mockReturnValue({ id: 'test-layer', type: 'circle', source: 'test-source' });
     const mockMap: VisibilityApplicableMap = {
       getLayer: mockGetLayer,
       setLayoutProperty: mockSetLayoutProperty,
@@ -111,7 +111,7 @@ describe('applyMapLayerVisibility', () => {
 
   it('sets hidden state to every demand gap overlay layer', () => {
     const mockSetLayoutProperty = vi.fn();
-    const mockGetLayer = vi.fn().mockReturnValue({});
+    const mockGetLayer = vi.fn().mockReturnValue({ id: 'test-layer', type: 'circle', source: 'test-source' });
     const mockMap: VisibilityApplicableMap = {
       getLayer: mockGetLayer,
       setLayoutProperty: mockSetLayoutProperty,

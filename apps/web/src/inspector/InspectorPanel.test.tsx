@@ -14,7 +14,7 @@ import type { ScenarioDemandCaptureProjection, CapturedEntitySummary } from '../
 import type { ServedDemandProjection } from '../domain/projection/servedDemandProjection';
 import type { ServicePressureProjection } from '../domain/projection/servicePressureProjection';
 import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
-import type { LineFrequencyInputByTimeBand, LineFrequencyControlByTimeBand, LineFrequencyValidationByTimeBand } from '../session/useNetworkSessionState';
+import type { LineFrequencyInputByTimeBand, LineFrequencyControlByTimeBand, LineFrequencyValidationByTimeBand, LineFrequencyControlState } from '../session/useNetworkSessionState';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -49,14 +49,14 @@ const mockVehicleProjection: LineVehicleNetworkProjection = {
     totalProjectedVehicleCount: 15,
     totalDegradedProjectedVehicleCount: 0,
     linesWithProjectedVehiclesCount: 1,
-    activeTimeBandId: 'morning-rush' as TimeBandId
+    activeTimeBandId: 'morning-rush'
   },
   lines: []
 };
 
 const mockServicePlanProjection: LineServicePlanProjection = {
   summary: { 
-    activeTimeBandId: 'morning-rush' as TimeBandId, 
+    activeTimeBandId: 'morning-rush', 
     degradedLineCount: 0, 
     blockedLineCount: 0,
     configuredLineCount: 0,
@@ -75,7 +75,7 @@ const mockDemandCaptureProjection: ScenarioDemandCaptureProjection = {
   status: 'unavailable',
   accessRadiusMeters: 400,
   stopCount: 0,
-  activeTimeBandId: 'morning-rush' as TimeBandId,
+  activeTimeBandId: 'morning-rush',
   nodeSummary: createEmptyCapturedEntitySummary(),
   attractorSummary: createEmptyCapturedEntitySummary(),
   gatewaySummary: createEmptyCapturedEntitySummary(),
@@ -86,7 +86,7 @@ const mockDemandCaptureProjection: ScenarioDemandCaptureProjection = {
 
 const mockServedDemandProjection: ServedDemandProjection = { 
   status: 'unavailable',
-  activeTimeBandId: 'morning-rush' as TimeBandId,
+  activeTimeBandId: 'morning-rush',
   capturedResidentialActiveWeight: 0,
   capturedWorkplaceActiveWeight: 0,
   servedResidentialActiveWeight: 0,
@@ -104,7 +104,7 @@ const mockServedDemandProjection: ServedDemandProjection = {
 };
 
 const mockServicePressureProjection: ServicePressureProjection = { 
-  activeTimeBandId: 'morning-rush' as TimeBandId,
+  activeTimeBandId: 'morning-rush',
   activeDeparturesPerHourEstimate: 0,
   averageHeadwayMinutes: null,
   servicePressureRatio: 0,
@@ -114,16 +114,16 @@ const mockServicePressureProjection: ServicePressureProjection = {
 
 const mockDemandGapRankingProjection: DemandGapRankingProjection = { 
   status: 'unavailable',
-  activeTimeBandId: 'morning-rush' as TimeBandId,
+  activeTimeBandId: 'morning-rush',
   uncapturedResidentialGaps: [],
   capturedButUnservedResidentialGaps: [],
   capturedButUnreachableWorkplaceGaps: [],
   summary: { totalGapCount: 0 }
 };
 
-const mockLineFrequencyInput: LineFrequencyInputByTimeBand = MVP_TIME_BAND_IDS.reduce((acc, id) => ({ ...acc, [id]: '' }), {} as LineFrequencyInputByTimeBand);
-const mockLineFrequencyControl: LineFrequencyControlByTimeBand = MVP_TIME_BAND_IDS.reduce((acc, id) => ({ ...acc, [id]: { status: 'unset', message: 'Not configured' } }), {} as LineFrequencyControlByTimeBand);
-const mockLineFrequencyValidation: LineFrequencyValidationByTimeBand = MVP_TIME_BAND_IDS.reduce((acc, id) => ({ ...acc, [id]: { isValid: true, issues: [] } }), {} as LineFrequencyValidationByTimeBand);
+const mockLineFrequencyInput: LineFrequencyInputByTimeBand = MVP_TIME_BAND_IDS.reduce((acc, id) => ({ ...acc, [id]: '' }), {} as Record<string, string>) as LineFrequencyInputByTimeBand;
+const mockLineFrequencyControl: LineFrequencyControlByTimeBand = MVP_TIME_BAND_IDS.reduce((acc, id) => ({ ...acc, [id]: 'no-service' as LineFrequencyControlState }), {} as Record<string, LineFrequencyControlState>) as LineFrequencyControlByTimeBand;
+const mockLineFrequencyValidation: LineFrequencyValidationByTimeBand = MVP_TIME_BAND_IDS.reduce((acc, id) => ({ ...acc, [id]: null }), {} as Record<string, string | null>) as LineFrequencyValidationByTimeBand;
 
 interface RenderResult {
   readonly container: HTMLDivElement;

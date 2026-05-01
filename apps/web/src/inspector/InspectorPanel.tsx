@@ -10,6 +10,17 @@ import type {
 } from '../session/useNetworkSessionState';
 import type { TimeBandId } from '../domain/types/timeBand';
 import type { InspectorTabId } from './inspectorTabs';
+import type { StaticNetworkSummaryKpis } from '../domain/projection/useNetworkPlanningProjections';
+import type { LineRouteBaseline } from '../domain/types/routeBaseline';
+import type { Stop, StopId } from '../domain/types/stop';
+import type { SelectedLineDialogOpenIntent } from '../session/sessionTypes';
+import type { OsmStopCandidateGroup, OsmStopCandidateGroupId } from '../domain/types/osmStopCandidate';
+import type { OsmStopCandidateStreetAnchorResolution } from '../domain/osm/osmStopCandidateAnchorTypes';
+import type { ScenarioDemandCaptureProjection } from '../domain/projection/scenarioDemandCaptureProjection';
+import type { ServedDemandProjection } from '../domain/projection/servedDemandProjection';
+import type { ServicePressureProjection } from '../domain/projection/servicePressureProjection';
+import type { SelectedLineDemandContributionProjection } from '../domain/projection/selectedLineDemandContributionProjection';
+import type { DemandGapRankingProjection, DemandGapRankingItem } from '../domain/projection/demandGapProjection';
 
 import { InspectorTabBar } from './InspectorTabBar';
 import { InspectorScrollArea } from './InspectorScrollArea';
@@ -21,11 +32,11 @@ import { InspectorLinesTab } from './InspectorLinesTab';
 interface InspectorPanelProps {
   readonly inspectorPanelState: InspectorPanelState;
   readonly completedLines: readonly Line[];
-  readonly staticNetworkSummaryKpis: import('../domain/projection/useNetworkPlanningProjections').StaticNetworkSummaryKpis;
+  readonly staticNetworkSummaryKpis: StaticNetworkSummaryKpis;
   readonly networkServicePlanProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineServicePlan>;
   readonly vehicleNetworkProjection: ReturnType<typeof import('../domain/projection/lineVehicleProjection').projectLineVehicleNetwork>;
-  readonly selectedLineRouteBaseline: import('../domain/types/routeBaseline').LineRouteBaseline | null;
-  readonly placedStops: readonly import('../domain/types/stop').Stop[];
+  readonly selectedLineRouteBaseline: LineRouteBaseline | null;
+  readonly placedStops: readonly Stop[];
   readonly activeTimeBandId: TimeBandId;
   readonly selectedLineServiceProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineServicePlanForLine> | null;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof import('../domain/projection/lineServicePlanProjection').projectLineSelectedServiceInspector> | null;
@@ -39,24 +50,24 @@ interface InspectorPanelProps {
     action?: SelectedLineFrequencyUpdateAction
   ) => void;
   readonly onSelectedLineIdChange: (lineId: Line['id']) => void;
-  readonly onStopSelectionChange: (stopId: import('../domain/types/stop').StopId) => void;
+  readonly onStopSelectionChange: (stopId: StopId) => void;
   /** Callback for line-context stop focus (focuses on map without leaving selected-line inspector). */
-  readonly onLineSequenceStopFocus: (stopId: import('../domain/types/stop').StopId) => void;
-  readonly onStopRename: (stopId: import('../domain/types/stop').StopId, nextLabel: string) => void;
+  readonly onLineSequenceStopFocus: (stopId: StopId) => void;
+  readonly onStopRename: (stopId: StopId, nextLabel: string) => void;
   readonly onLineRename: (lineId: Line['id'], nextLabel: string) => void;
-  readonly openDialogIntent: import('../session/sessionTypes').SelectedLineDialogOpenIntent | null;
-  readonly onOpenDialogIntentConsumed: (intent: import('../session/sessionTypes').SelectedLineDialogOpenIntent | null) => void;
-  readonly onOsmCandidateAdopt: (group: import('../domain/types/osmStopCandidate').OsmStopCandidateGroup, anchor: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution) => void;
-  readonly osmStopCandidateGroups: readonly import('../domain/types/osmStopCandidate').OsmStopCandidateGroup[];
-  readonly selectedOsmCandidateAnchor: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | null;
-  readonly adoptedOsmCandidateGroupIds: ReadonlySet<import('../domain/types/osmStopCandidate').OsmStopCandidateGroupId>;
-  readonly scenarioDemandCaptureProjection: import('../domain/projection/scenarioDemandCaptureProjection').ScenarioDemandCaptureProjection;
-  readonly servedDemandProjection: import('../domain/projection/servedDemandProjection').ServedDemandProjection;
-  readonly servicePressureProjection: import('../domain/projection/servicePressureProjection').ServicePressureProjection;
-  readonly selectedLineDemandContribution: import('../domain/projection/selectedLineDemandContributionProjection').SelectedLineDemandContributionProjection | null;
-  readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
+  readonly openDialogIntent: SelectedLineDialogOpenIntent | null;
+  readonly onOpenDialogIntentConsumed: (intent: SelectedLineDialogOpenIntent | null) => void;
+  readonly onOsmCandidateAdopt: (group: OsmStopCandidateGroup, anchor: OsmStopCandidateStreetAnchorResolution) => void;
+  readonly osmStopCandidateGroups: readonly OsmStopCandidateGroup[];
+  readonly selectedOsmCandidateAnchor: OsmStopCandidateStreetAnchorResolution | null;
+  readonly adoptedOsmCandidateGroupIds: ReadonlySet<OsmStopCandidateGroupId>;
+  readonly scenarioDemandCaptureProjection: ScenarioDemandCaptureProjection;
+  readonly servedDemandProjection: ServedDemandProjection;
+  readonly servicePressureProjection: ServicePressureProjection;
+  readonly selectedLineDemandContribution: SelectedLineDemandContributionProjection | null;
+  readonly demandGapRankingProjection: DemandGapRankingProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
-  readonly onDemandGapFocus: (gap: import('../domain/projection/demandGapProjection').DemandGapRankingItem | null) => void;
+  readonly onDemandGapFocus: (gap: DemandGapRankingItem | null) => void;
   readonly focusedDemandGapId: string | null;
 }
 

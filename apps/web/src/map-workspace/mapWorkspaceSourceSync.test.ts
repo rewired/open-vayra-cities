@@ -15,7 +15,8 @@ import {
   MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
   MAP_LAYER_ID_SCENARIO_ROUTING_COVERAGE_MASK,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
-  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS
 } from './mapRenderConstants';
 import type { MapLibreLayerSpecification, MapLibreMap } from './maplibreGlobal';
 
@@ -64,6 +65,7 @@ describe('mapWorkspaceSourceSync custom-layer helpers', () => {
       MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
       MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
       MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
+      MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
       MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
       MAP_LAYER_ID_STOPS_CIRCLE,
       MAP_LAYER_ID_STOPS_LABEL,
@@ -98,33 +100,52 @@ describe('mapWorkspaceSourceSync custom-layer helpers', () => {
 import { vi } from 'vitest';
 import { syncAllMapWorkspaceSources, syncExistingMapWorkspaceSourceData } from './mapWorkspaceSourceSync';
 import { MAP_SOURCE_ID_DEMAND_GAP_OVERLAY } from './mapRenderConstants';
+import type { TimeBandId } from '../domain/types/timeBand';
+import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
+
+interface TestGeoJsonSource {
+  setData: ReturnType<typeof vi.fn>;
+}
+
+interface SourceSyncTestMap {
+  getSource: ReturnType<typeof vi.fn>;
+  addSource: ReturnType<typeof vi.fn>;
+  getLayer: ReturnType<typeof vi.fn>;
+  addLayer: ReturnType<typeof vi.fn>;
+  moveLayer: ReturnType<typeof vi.fn>;
+  querySourceFeatures: ReturnType<typeof vi.fn>;
+}
 
 describe('mapWorkspaceSourceSync integration', () => {
-  const createMockMap = () => {
-    const sources = new Map<string, { setData: any }>();
+  const createMockMap = (): MapLibreMap => {
+    const sources = new Map<string, TestGeoJsonSource>();
     const layers = new Set<string>();
 
-    return {
+    const mockMap: SourceSyncTestMap = {
       getSource: vi.fn((id: string) => sources.get(id)),
       addSource: vi.fn((id: string) => {
         sources.set(id, { setData: vi.fn() });
       }),
-      getLayer: vi.fn((id: string) => layers.has(id) ? {} : undefined),
-      addLayer: vi.fn((spec: any) => {
+      getLayer: vi.fn((id: string) => layers.has(id) ? { id, type: 'circle', source: 'test' } : undefined),
+      addLayer: vi.fn((spec: MapLibreLayerSpecification) => {
         layers.add(spec.id);
       }),
       moveLayer: vi.fn(),
       querySourceFeatures: vi.fn(() => []),
-    } as any as MapLibreMap;
+    };
+
+    return mockMap as unknown as MapLibreMap;
   };
 
   it('syncAllMapWorkspaceSources ensures demand gap source and sets data', () => {
     const map = createMockMap();
-    const mockProjection: any = { 
+    const mockProjection: DemandGapRankingProjection = { 
       status: 'ready', 
+      activeTimeBandId: 'morning-rush' as TimeBandId,
       uncapturedResidentialGaps: [],
       capturedButUnservedResidentialGaps: [],
-      capturedButUnreachableWorkplaceGaps: []
+      capturedButUnreachableWorkplaceGaps: [],
+      summary: { totalGapCount: 0 }
     };
 
     syncAllMapWorkspaceSources({
@@ -146,13 +167,15 @@ describe('mapWorkspaceSourceSync integration', () => {
       'osm-stop-candidates', 'openvayra-cities-scenario-demand-preview', 
       'openvayra-cities-scenario-routing-coverage'
     ];
-    otherSourceIds.forEach(id => map.addSource(id, {} as any));
+    otherSourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
-    const mockProjection: any = { 
+    const mockProjection: DemandGapRankingProjection = { 
       status: 'ready', 
+      activeTimeBandId: 'morning-rush' as TimeBandId,
       uncapturedResidentialGaps: [],
       capturedButUnservedResidentialGaps: [],
-      capturedButUnreachableWorkplaceGaps: []
+      capturedButUnreachableWorkplaceGaps: [],
+      summary: { totalGapCount: 0 }
     };
 
     const result = syncExistingMapWorkspaceSourceData({
@@ -174,7 +197,7 @@ describe('mapWorkspaceSourceSync integration', () => {
       'osm-stop-candidates', 'openvayra-cities-scenario-demand-preview', 
       'openvayra-cities-scenario-routing-coverage', 'openvayra-cities-demand-gap-overlay'
     ];
-    sourceIds.forEach(id => map.addSource(id, {} as any));
+    sourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
     syncExistingMapWorkspaceSourceData({
       map,
