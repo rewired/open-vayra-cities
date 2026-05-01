@@ -12,6 +12,28 @@ export interface MapWorkspaceInteractionBinding {
 }
 
 /**
+ * Minimal MapLibre surface required for rendered feature queries on existing layers.
+ */
+export interface RenderedFeatureLayerQueryMap {
+  /** Returns whether the provided layer id exists in the current style. */
+  readonly getLayer: MapLibreMap['getLayer'];
+  /** Queries rendered features at a screen point or box, optionally filtered by layers. */
+  readonly queryRenderedFeatures: MapLibreMap['queryRenderedFeatures'];
+}
+
+/**
+ * Minimal MapLibre surface required for safe layer-scoped interaction binding.
+ */
+export interface LayerInteractionBindingMap {
+  /** Returns whether the provided layer id exists in the current style. */
+  readonly getLayer: MapLibreMap['getLayer'];
+  /** Registers an interaction listener for a style layer id. */
+  readonly on: MapLibreMap['on'];
+  /** Removes a previously registered interaction listener. */
+  readonly off: MapLibreMap['off'];
+}
+
+/**
  * Filters the requested layer IDs to only those currently present in the map style.
  * 
  * MapLibre throws an error if queryRenderedFeatures is called with layer IDs
@@ -21,7 +43,7 @@ export interface MapWorkspaceInteractionBinding {
  * @param layerIds The candidate layer IDs to query.
  * @returns The subset of layer IDs that actually exist in the style.
  */
-export const filterExistingLayerIds = (map: MapLibreMap, layerIds: readonly string[]): string[] => {
+export const filterExistingLayerIds = (map: RenderedFeatureLayerQueryMap, layerIds: readonly string[]): string[] => {
   return layerIds.filter((layerId) => map.getLayer(layerId) !== undefined);
 };
 
@@ -36,7 +58,7 @@ export const filterExistingLayerIds = (map: MapLibreMap, layerIds: readonly stri
  * @returns The rendered features found in the existing layers.
  */
 export const queryRenderedFeaturesForExistingLayers = (
-  map: MapLibreMap,
+  map: RenderedFeatureLayerQueryMap,
   pointOrBox: MapEventPoint | MapLibreRenderedFeatureQueryBox,
   layerIds: readonly string[]
 ): readonly MapLibreRenderedFeature[] => {
@@ -61,7 +83,7 @@ export const queryRenderedFeaturesForExistingLayers = (
  * @returns A disposable binding.
  */
 export const bindSafeLayerInteraction = (
-  map: MapLibreMap,
+  map: LayerInteractionBindingMap,
   type: 'click' | 'mouseenter' | 'mouseleave' | 'mousemove',
   layerId: string,
   listener: (event: MapLibreInteractionEvent) => void

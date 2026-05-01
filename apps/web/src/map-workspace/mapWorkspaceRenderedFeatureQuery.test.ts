@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { queryRenderedFeaturesForExistingLayers, filterExistingLayerIds } from './mapWorkspaceRenderedFeatureQuery';
+import { queryRenderedFeaturesForExistingLayers, filterExistingLayerIds, type RenderedFeatureLayerQueryMap } from './mapWorkspaceRenderedFeatureQuery';
 import type { MapLibreLayerSpecification, MapLibreMap, MapEventPoint } from './maplibreGlobal';
 
-const createMapMock = (presentLayerIds: string[]) => {
+const createMapMock = (presentLayerIds: string[]): RenderedFeatureLayerQueryMap => {
   const layerSet = new Set(presentLayerIds);
   const queryRenderedFeatures = vi.fn().mockReturnValue([{ id: 'feature-1' }]);
 
@@ -10,7 +10,7 @@ const createMapMock = (presentLayerIds: string[]) => {
     getLayer: (id: string): MapLibreLayerSpecification | undefined => 
       layerSet.has(id) ? { id, type: 'circle', source: 'test' } : undefined,
     queryRenderedFeatures,
-  } as unknown as MapLibreMap;
+  };
 };
 
 describe('mapWorkspaceRenderedFeatureQuery', () => {

@@ -17,7 +17,8 @@ import {
 import { 
   queryRenderedFeaturesForExistingLayers,
   bindSafeLayerInteraction,
-  type MapWorkspaceInteractionBinding
+  type MapWorkspaceInteractionBinding,
+  type RenderedFeatureLayerQueryMap
 } from './mapWorkspaceRenderedFeatureQuery';
 import {
   isEligibleStopPlacementClickForLayers,
@@ -163,7 +164,7 @@ export const decodeOsmCandidateGroupIdFromFeatureProperties = (
 };
 
 /** Returns true when the click point intersects stop or completed-line interactive feature layers. */
-export const hasInteractiveSelectionFeatureAtPoint = (map: MapLibreMap, event: MapLibreInteractionEvent): boolean => {
+export const hasInteractiveSelectionFeatureAtPoint = (map: RenderedFeatureLayerQueryMap, event: MapLibreInteractionEvent): boolean => {
   const interactiveSelectionLayers: readonly string[] = [
     MAP_LAYER_ID_STOPS_CIRCLE,
     MAP_LAYER_ID_COMPLETED_LINES,
