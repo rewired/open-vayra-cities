@@ -49,6 +49,7 @@ interface InspectorPanelProps {
   readonly selectedOsmCandidateAnchor: import('../domain/osm/osmStopCandidateAnchorTypes').OsmStopCandidateStreetAnchorResolution | null;
   readonly adoptedOsmCandidateGroupIds: ReadonlySet<import('../domain/types/osmStopCandidate').OsmStopCandidateGroupId>;
   readonly scenarioDemandCaptureProjection: import('../domain/projection/scenarioDemandCaptureProjection').ScenarioDemandCaptureProjection;
+  readonly servedDemandProjection: import('../domain/projection/servedDemandProjection').ServedDemandProjection;
 }
 
 const resolveGlobalStateLabel = (panelState: InspectorPanelState): string => {
@@ -95,7 +96,8 @@ export function InspectorPanel({
   osmStopCandidateGroups,
   selectedOsmCandidateAnchor,
   adoptedOsmCandidateGroupIds,
-  scenarioDemandCaptureProjection
+  scenarioDemandCaptureProjection,
+  servedDemandProjection
 }: InspectorPanelProps): ReactElement {
   const [activeTabId, setActiveTabId] = useState<InspectorTabId>('network');
   const [linesViewMode, setLinesViewMode] = useState<'list' | 'detail'>('list');
@@ -235,6 +237,44 @@ export function InspectorPanel({
                     </tbody>
                   </table>
                 </>
+              )}
+
+              <h4 className="inspector-section-title">Served demand</h4>
+              {servedDemandProjection.status === 'unavailable' ? (
+                <p className="inspector-dialog__note">Served demand projection unavailable.</p>
+              ) : (
+                <table className="inspector-compact-table inspector-network-summary__primary-table">
+                  <tbody>
+                    <tr>
+                      <th scope="row">Active band</th>
+                      <td className="inspector-compact-table__value--left">
+                        {TIME_BAND_DISPLAY_LABELS[servedDemandProjection.activeTimeBandId]}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Residential served</th>
+                      <td>
+                        {Math.round(servedDemandProjection.servedResidentialWeight)} / {Math.round(servedDemandProjection.capturedResidentialWeight)} captured
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Workplace reachable</th>
+                      <td>
+                        {Math.round(servedDemandProjection.reachableWorkplaceWeight)} / {Math.round(servedDemandProjection.capturedWorkplaceWeight)} captured
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Unserved captured res.</th>
+                      <td>
+                        {Math.round(servedDemandProjection.unservedResidentialWeight)}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Active service lines</th>
+                      <td>{servedDemandProjection.activeServiceLineCount}</td>
+                    </tr>
+                  </tbody>
+                </table>
               )}
 
               <NetworkInventory

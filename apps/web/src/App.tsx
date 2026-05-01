@@ -495,6 +495,7 @@ const toolModeControlOptions: ReadonlyArray<{
         selectedLineServiceInspectorProjection={projections.selectedLineServiceInspectorProjection}
         selectedLinePlanningVehicleProjection={projections.selectedLinePlanningVehicleProjection}
         scenarioDemandCaptureProjection={projections.scenarioDemandCaptureProjection}
+        servedDemandProjection={projections.servedDemandProjection}
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
         lineFrequencyControlByTimeBand={sessionController.lineFrequencyControlByTimeBand}
         lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}

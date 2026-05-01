@@ -1,5 +1,6 @@
 import { MVP_TIME_BAND_IDS } from '../constants/timeBands';
 import { projectScenarioDemandCapture, type ScenarioDemandCaptureProjection } from './scenarioDemandCaptureProjection';
+import { projectServedDemand, type ServedDemandProjection } from './servedDemandProjection';
 import type { ScenarioDemandArtifact } from '../types/scenarioDemand';
 import { projectLineDepartureScheduleForLine, projectLineDepartureScheduleNetwork } from './lineDepartureScheduleProjection';
 import { projectLineServicePlan, projectLineServicePlanForLine, projectLineSelectedServiceInspector } from './lineServicePlanProjection';
@@ -61,6 +62,7 @@ export interface NetworkPlanningProjections {
   readonly networkServicePlanProjection: ReturnType<typeof projectLineServicePlan>;
   readonly selectedLineServiceInspectorProjection: ReturnType<typeof projectLineSelectedServiceInspector> | null;
   readonly scenarioDemandCaptureProjection: ScenarioDemandCaptureProjection;
+  readonly servedDemandProjection: ServedDemandProjection;
 }
 
 
@@ -161,6 +163,13 @@ export const useNetworkPlanningProjections = (
     stops: sessionStops
   });
 
+  const servedDemandProjection = projectServedDemand(
+    scenarioDemandArtifact,
+    sessionStops,
+    sessionLines,
+    activeSimulationTimeBandId
+  );
+
   return {
     staticNetworkSummaryKpis,
     selectedLineRouteBaseline,
@@ -172,6 +181,7 @@ export const useNetworkPlanningProjections = (
     selectedLinePlanningVehicleProjection,
     networkServicePlanProjection,
     selectedLineServiceInspectorProjection,
-    scenarioDemandCaptureProjection
+    scenarioDemandCaptureProjection,
+    servedDemandProjection
   };
 };
