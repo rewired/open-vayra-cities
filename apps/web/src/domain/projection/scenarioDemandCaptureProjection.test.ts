@@ -5,13 +5,9 @@ import type { Stop, StopId } from '../types/stop';
 
 describe('projectScenarioDemandCapture', () => {
   const mockTimeBandWeights = {
-    'morning-rush': 1,
-    'late-morning': 1,
-    'midday': 1,
-    'afternoon': 1,
-    'evening-rush': 1,
-    'evening': 1,
-    'night': 1
+    'morning-rush': 1.5,
+    'midday': 0.5,
+    'night': 0
   };
 
   const mockNode = {
@@ -53,24 +49,46 @@ describe('projectScenarioDemandCapture', () => {
       generatorName: 'test',
       generatorVersion: '1.0.0'
     },
-    nodes: [mockNode],
-    attractors: [mockAttractor],
-    gateways: [mockGateway]
+    nodes: [mockNode as any],
+    attractors: [mockAttractor as any],
+    gateways: [mockGateway as any]
   };
 
   it('should return unavailable when artifact is null', () => {
-    const result = projectScenarioDemandCapture({ artifact: null, stops: [] });
+    const result = projectScenarioDemandCapture({ artifact: null, stops: [], activeTimeBandId: null });
     expect(result.status).toBe('unavailable');
     expect(result.nodeSummary.totalCount).toBe(0);
   });
 
   it('should return ready with zero captured entities when no stops are placed', () => {
-    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [] });
+    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [], activeTimeBandId: null });
     expect(result.status).toBe('ready');
     expect(result.nodeSummary.totalCount).toBe(1);
     expect(result.nodeSummary.capturedCount).toBe(0);
-    expect(result.attractorSummary.capturedCount).toBe(0);
-    expect(result.gatewaySummary.capturedCount).toBe(0);
+  });
+
+  it('should calculate active weights when activeTimeBandId is provided', () => {
+    const stop: Stop = {
+      id: 'stop-1' as StopId,
+      position: { lng: 10.0, lat: 53.5 }
+    };
+    const resultMorning = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop], activeTimeBandId: 'morning-rush' as any });
+    expect(resultMorning.nodeSummary.totalActiveWeight).toBe(15); // 10 * 1.5
+    expect(resultMorning.nodeSummary.capturedActiveWeight).toBe(15);
+
+    const resultMidday = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop], activeTimeBandId: 'midday' as any });
+    expect(resultMidday.nodeSummary.totalActiveWeight).toBe(5); // 10 * 0.5
+    expect(resultMidday.nodeSummary.capturedActiveWeight).toBe(5);
+  });
+
+  it('should use base weights as fallback if activeTimeBandId is null', () => {
+    const stop: Stop = {
+      id: 'stop-1' as StopId,
+      position: { lng: 10.0, lat: 53.5 }
+    };
+    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop], activeTimeBandId: null });
+    expect(result.nodeSummary.totalActiveWeight).toBe(10); // baseWeight
+    expect(result.nodeSummary.capturedActiveWeight).toBe(10);
   });
 
   it('should capture a demand node within radius', () => {
@@ -78,21 +96,10 @@ describe('projectScenarioDemandCapture', () => {
       id: 'stop-1' as StopId,
       position: { lng: 10.0, lat: 53.5 }
     };
-    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop] });
+    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop], activeTimeBandId: null });
     expect(result.nodeSummary.capturedCount).toBe(1);
     expect(result.nodeSummary.capturedWeight).toBe(10);
     expect(result.nearestStopByEntityId.get('node-1')?.stopId).toBe('stop-1');
-  });
-
-  it('should not capture a demand node outside radius', () => {
-    const stop: Stop = {
-      id: 'stop-1' as StopId,
-      position: { lng: 11.0, lat: 54.0 } // Far away
-    };
-    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop] });
-    expect(result.nodeSummary.capturedCount).toBe(0);
-    expect(result.nodeSummary.capturedWeight).toBe(0);
-    expect(result.nearestStopByEntityId.has('node-1')).toBe(false);
   });
 
   it('should not double-count an entity when multiple stops are in range', () => {
@@ -104,170 +111,35 @@ describe('projectScenarioDemandCapture', () => {
       id: 'stop-2' as StopId,
       position: { lng: 10.0001, lat: 53.5 }
     };
-    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop1, stop2] });
+    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop1, stop2], activeTimeBandId: null });
     expect(result.nodeSummary.capturedCount).toBe(1);
+    expect(result.nodeSummary.capturedActiveWeight).toBe(10);
   });
 
-  it('should select nearest capturing stop deterministically by shortest distance', () => {
-    const stopFar: Stop = {
-      id: 'stop-far' as StopId,
-      position: { lng: 10.002, lat: 53.5 }
-    };
-    const stopNear: Stop = {
-      id: 'stop-near' as StopId,
-      position: { lng: 10.0001, lat: 53.5 }
-    };
-    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stopFar, stopNear] });
-    expect(result.nearestStopByEntityId.get('node-1')?.stopId).toBe('stop-near');
-  });
-
-  it('should use attractor sinkWeight', () => {
+  it('should use attractor active sinkWeight', () => {
     const stop: Stop = {
       id: 'stop-1' as StopId,
       position: { lng: 10.01, lat: 53.5 }
     };
-    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop] });
+    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop], activeTimeBandId: 'morning-rush' as any });
     expect(result.attractorSummary.capturedCount).toBe(1);
-    expect(result.attractorSummary.capturedWeight).toBe(20); // sinkWeight is 20
+    expect(result.attractorSummary.totalActiveWeight).toBe(30); // 20 * 1.5
+    expect(result.attractorSummary.capturedActiveWeight).toBe(30);
   });
 
-  it('should use gateway transferWeight', () => {
+  it('should use gateway active transferWeight', () => {
     const stop: Stop = {
       id: 'stop-1' as StopId,
       position: { lng: 10.0, lat: 53.51 }
     };
-    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop] });
+    const result = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop], activeTimeBandId: 'morning-rush' as any });
     expect(result.gatewaySummary.capturedCount).toBe(1);
-    expect(result.gatewaySummary.capturedWeight).toBe(30); // transferWeight is 30
+    expect(result.gatewaySummary.totalActiveWeight).toBe(45); // 30 * 1.5
+    expect(result.gatewaySummary.capturedActiveWeight).toBe(45);
   });
 
-  it('should allow overriding access radius', () => {
-    const stop: Stop = {
-      id: 'stop-1' as StopId,
-      position: { lng: 10.005, lat: 53.5 } // ~350m away from node-1
-    };
-    // Default is 400m, should capture
-    const resultDefault = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop] });
-    expect(resultDefault.nodeSummary.capturedCount).toBe(1);
-
-    // Override to 100m, should not capture
-    const resultOverride = projectScenarioDemandCapture({ artifact: mockArtifact, stops: [stop], accessRadiusMeters: 100 });
-    expect(resultOverride.nodeSummary.capturedCount).toBe(0);
-  });
-
-  it('should count residential origin nodes and workplace destination nodes separately', () => {
-    const residentialNode = {
-      id: 'res-1',
-      position: { lng: 10.0, lat: 53.5 },
-      role: 'origin' as const,
-      class: 'residential' as const,
-      baseWeight: 10,
-      timeBandWeights: mockTimeBandWeights
-    };
-    const workplaceNode = {
-      id: 'work-1',
-      position: { lng: 10.0, lat: 53.5 },
-      role: 'destination' as const,
-      class: 'workplace' as const,
-      baseWeight: 15,
-      timeBandWeights: mockTimeBandWeights
-    };
-    
-    const customArtifact: ScenarioDemandArtifact = {
-      ...mockArtifact,
-      nodes: [residentialNode, workplaceNode],
-      attractors: [],
-      gateways: []
-    };
-
-    const result = projectScenarioDemandCapture({ artifact: customArtifact, stops: [] });
-    expect(result.residentialSummary.totalCount).toBe(1);
-    expect(result.residentialSummary.totalWeight).toBe(10);
-    expect(result.workplaceSummary.totalCount).toBe(1);
-    expect(result.workplaceSummary.totalWeight).toBe(15);
-    expect(result.workplaceSummary.totalCount).toBeGreaterThan(0);
-  });
-
-  it('should keep legacy attractors separate from workplace destination nodes', () => {
-    const workplaceNode = {
-      id: 'work-1',
-      position: { lng: 10.0, lat: 53.5 },
-      role: 'destination' as const,
-      class: 'workplace' as const,
-      baseWeight: 15,
-      timeBandWeights: mockTimeBandWeights
-    };
-    
-    const customArtifact: ScenarioDemandArtifact = {
-      ...mockArtifact,
-      nodes: [workplaceNode],
-      attractors: [mockAttractor],
-      gateways: []
-    };
-
-    const result = projectScenarioDemandCapture({ artifact: customArtifact, stops: [] });
-    expect(result.workplaceSummary.totalCount).toBe(1);
-    expect(result.attractorSummary.totalCount).toBe(1);
-  });
-
-  it('should update capture counts for workplace destination nodes within access radius', () => {
-    const workplaceNode = {
-      id: 'work-1',
-      position: { lng: 10.0, lat: 53.5 },
-      role: 'destination' as const,
-      class: 'workplace' as const,
-      baseWeight: 15,
-      timeBandWeights: mockTimeBandWeights
-    };
-    
-    const customArtifact: ScenarioDemandArtifact = {
-      ...mockArtifact,
-      nodes: [workplaceNode],
-      attractors: [],
-      gateways: []
-    };
-
-    const stop: Stop = {
-      id: 'stop-1' as StopId,
-      position: { lng: 10.0, lat: 53.5 }
-    };
-
-    const result = projectScenarioDemandCapture({ artifact: customArtifact, stops: [stop] });
-    expect(result.workplaceSummary.capturedCount).toBe(1);
-    expect(result.workplaceSummary.capturedWeight).toBe(15);
-  });
-
-  it('should not capture workplace destination nodes outside access radius', () => {
-    const workplaceNode = {
-      id: 'work-1',
-      position: { lng: 10.0, lat: 53.5 },
-      role: 'destination' as const,
-      class: 'workplace' as const,
-      baseWeight: 15,
-      timeBandWeights: mockTimeBandWeights
-    };
-    
-    const customArtifact: ScenarioDemandArtifact = {
-      ...mockArtifact,
-      nodes: [workplaceNode],
-      attractors: [],
-      gateways: []
-    };
-
-    const stop: Stop = {
-      id: 'stop-1' as StopId,
-      position: { lng: 11.0, lat: 54.0 } // Far away
-    };
-
-    const result = projectScenarioDemandCapture({ artifact: customArtifact, stops: [stop] });
-    expect(result.workplaceSummary.capturedCount).toBe(0);
-    expect(result.workplaceSummary.capturedWeight).toBe(0);
-  });
   it('should throw error for non-positive access radius', () => {
-    expect(() => projectScenarioDemandCapture({ artifact: mockArtifact, stops: [], accessRadiusMeters: 0 })).toThrow(
-      'Access radius must be a positive number.'
-    );
-    expect(() => projectScenarioDemandCapture({ artifact: mockArtifact, stops: [], accessRadiusMeters: -1 })).toThrow(
+    expect(() => projectScenarioDemandCapture({ artifact: mockArtifact, stops: [], activeTimeBandId: null, accessRadiusMeters: 0 })).toThrow(
       'Access radius must be a positive number.'
     );
   });

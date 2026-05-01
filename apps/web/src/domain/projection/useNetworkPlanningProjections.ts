@@ -160,7 +160,8 @@ export const useNetworkPlanningProjections = (
 
   const scenarioDemandCaptureProjection = projectScenarioDemandCapture({
     artifact: scenarioDemandArtifact,
-    stops: sessionStops
+    stops: sessionStops,
+    activeTimeBandId: activeSimulationTimeBandId
   });
 
   const servedDemandProjection = projectServedDemand(

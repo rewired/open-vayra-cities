@@ -254,19 +254,19 @@ export function InspectorPanel({
                     <tr>
                       <th scope="row">Residential served</th>
                       <td>
-                        {Math.round(servedDemandProjection.servedResidentialWeight)} / {Math.round(servedDemandProjection.capturedResidentialWeight)} captured
+                        {Math.round(servedDemandProjection.servedResidentialActiveWeight)} / {Math.round(servedDemandProjection.capturedResidentialActiveWeight)} active demand
                       </td>
                     </tr>
                     <tr>
                       <th scope="row">Workplace reachable</th>
                       <td>
-                        {Math.round(servedDemandProjection.reachableWorkplaceWeight)} / {Math.round(servedDemandProjection.capturedWorkplaceWeight)} captured
+                        {Math.round(servedDemandProjection.reachableWorkplaceActiveWeight)} / {Math.round(servedDemandProjection.capturedWorkplaceActiveWeight)} active demand
                       </td>
                     </tr>
                     <tr>
                       <th scope="row">Unserved captured res.</th>
                       <td>
-                        {Math.round(servedDemandProjection.unservedResidentialWeight)}
+                        {Math.round(servedDemandProjection.unservedResidentialActiveWeight)} active demand
                       </td>
                     </tr>
                     <tr>

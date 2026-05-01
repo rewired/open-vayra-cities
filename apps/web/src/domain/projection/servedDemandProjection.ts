@@ -13,17 +13,17 @@ export interface ServedDemandProjection {
   readonly status: 'unavailable' | 'ready';
   readonly activeTimeBandId: TimeBandId;
   
-  /** Total weight of residential origin nodes captured by at least one stop. */
-  readonly capturedResidentialWeight: number;
-  /** Total weight of workplace destination nodes captured by at least one stop. */
-  readonly capturedWorkplaceWeight: number;
+  /** Total active weight of residential origin nodes captured by at least one stop. */
+  readonly capturedResidentialActiveWeight: number;
+  /** Total active weight of workplace destination nodes captured by at least one stop. */
+  readonly capturedWorkplaceActiveWeight: number;
   
-  /** Total weight of residential origin nodes served by active service. */
-  readonly servedResidentialWeight: number;
-  /** Total weight of residential origin nodes not served despite being captured. */
-  readonly unservedResidentialWeight: number;
-  /** Total weight of workplace destination nodes reachable by active service. */
-  readonly reachableWorkplaceWeight: number;
+  /** Total active weight of residential origin nodes served by active service. */
+  readonly servedResidentialActiveWeight: number;
+  /** Total active weight of residential origin nodes not served despite being captured. */
+  readonly unservedResidentialActiveWeight: number;
+  /** Total active weight of workplace destination nodes reachable by active service. */
+  readonly reachableWorkplaceActiveWeight: number;
   
   /** Number of lines with active service in the current time band. */
   readonly activeServiceLineCount: number;
@@ -167,15 +167,15 @@ export function projectServedDemand(
   }
 
   // 4. Final Aggregation
-  const calculateWeight = (nodes: readonly ScenarioDemandNode[], ids: Set<string>): number =>
-    nodes.filter(n => ids.has(n.id)).reduce((sum, n) => sum + n.baseWeight, 0);
+  const calculateActiveWeight = (nodes: readonly ScenarioDemandNode[], ids: Set<string>): number =>
+    nodes.filter(n => ids.has(n.id)).reduce((sum, n) => sum + calculateActiveDemandWeight(n, activeTimeBandId), 0);
 
-  const capturedResidentialWeight = calculateWeight(residentialNodes, capturedResidentialNodeIds);
-  const capturedWorkplaceWeight = calculateWeight(workplaceNodes, capturedWorkplaceNodeIds);
-  const servedResidentialWeight = calculateWeight(residentialNodes, servedResidentialNodeIds);
-  const reachableWorkplaceWeight = calculateWeight(workplaceNodes, reachableWorkplaceNodeIds);
+  const capturedResidentialActiveWeight = calculateActiveWeight(residentialNodes, capturedResidentialNodeIds);
+  const capturedWorkplaceActiveWeight = calculateActiveWeight(workplaceNodes, capturedWorkplaceNodeIds);
+  const servedResidentialActiveWeight = calculateActiveWeight(residentialNodes, servedResidentialNodeIds);
+  const reachableWorkplaceActiveWeight = calculateActiveWeight(workplaceNodes, reachableWorkplaceNodeIds);
 
-  const unservedResidentialWeight = capturedResidentialWeight - servedResidentialWeight;
+  const unservedResidentialActiveWeight = capturedResidentialActiveWeight - servedResidentialActiveWeight;
 
   // Reason counts (by node count, as requested "compact reason counts")
   const residentialCapturedButNoReachableWorkplace = Array.from(capturedResidentialNodeIds).filter(id => !servedResidentialNodeIds.has(id)).length;
@@ -211,11 +211,11 @@ export function projectServedDemand(
   return {
     status: 'ready',
     activeTimeBandId,
-    capturedResidentialWeight,
-    capturedWorkplaceWeight,
-    servedResidentialWeight,
-    unservedResidentialWeight,
-    reachableWorkplaceWeight,
+    capturedResidentialActiveWeight,
+    capturedWorkplaceActiveWeight,
+    servedResidentialActiveWeight,
+    unservedResidentialActiveWeight,
+    reachableWorkplaceActiveWeight,
     activeServiceLineCount,
     inactiveOrNoServiceLineCount,
     blockedLineCount,
@@ -228,15 +228,17 @@ export function projectServedDemand(
   };
 }
 
+import { calculateActiveDemandWeight } from './demandWeight';
+
 function createEmptyProjection(activeTimeBandId: TimeBandId): ServedDemandProjection {
   return {
     status: 'unavailable',
     activeTimeBandId,
-    capturedResidentialWeight: 0,
-    capturedWorkplaceWeight: 0,
-    servedResidentialWeight: 0,
-    unservedResidentialWeight: 0,
-    reachableWorkplaceWeight: 0,
+    capturedResidentialActiveWeight: 0,
+    capturedWorkplaceActiveWeight: 0,
+    servedResidentialActiveWeight: 0,
+    unservedResidentialActiveWeight: 0,
+    reachableWorkplaceActiveWeight: 0,
     activeServiceLineCount: 0,
     inactiveOrNoServiceLineCount: 0,
     blockedLineCount: 0,

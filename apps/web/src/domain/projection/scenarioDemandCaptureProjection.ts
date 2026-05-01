@@ -11,6 +11,8 @@ export interface ScenarioDemandCaptureProjectionInput {
   readonly artifact: ScenarioDemandArtifact | null;
   /** The currently placed player stops. */
   readonly stops: readonly Stop[];
+  /** Optional active time band to compute weighted demand pressure. */
+  readonly activeTimeBandId: import('../types/timeBand').TimeBandId | null;
   /** Optional access radius override in meters. Defaults to 400m. */
   readonly accessRadiusMeters?: number;
 }
@@ -25,16 +27,24 @@ export interface CapturedEntitySummary {
   readonly capturedCount: number;
   /** Number of entities outside the access radius of all stops. */
   readonly uncapturedCount: number;
-  /** Total cumulative weight of all entities. */
+  /** Total cumulative base weight of all entities. */
   readonly totalWeight: number;
-  /** Cumulative weight of captured entities. */
+  /** Cumulative base weight of captured entities. */
   readonly capturedWeight: number;
-  /** Cumulative weight of uncaptured entities. */
+  /** Cumulative base weight of uncaptured entities. */
   readonly uncapturedWeight: number;
+  /** Total cumulative active weight for the selected time band. */
+  readonly totalActiveWeight: number;
+  /** Cumulative active weight of captured entities for the selected time band. */
+  readonly capturedActiveWeight: number;
+  /** Cumulative active weight of uncaptured entities for the selected time band. */
+  readonly uncapturedActiveWeight: number;
   /** Percentage of entities captured by count (0-100). */
   readonly capturedPercentageByCount: number;
-  /** Percentage of entities captured by weight (0-100). */
+  /** Percentage of entities captured by base weight (0-100). */
   readonly capturedPercentageByWeight: number;
+  /** Percentage of entities captured by active weight (0-100). */
+  readonly capturedPercentageByActiveWeight: number;
 }
 
 /**
@@ -57,6 +67,8 @@ export interface ScenarioDemandCaptureProjection {
   readonly accessRadiusMeters: number;
   /** The number of stops evaluated. */
   readonly stopCount: number;
+  /** The active time band evaluated, if any. */
+  readonly activeTimeBandId: import('../types/timeBand').TimeBandId | null;
   /** Capture breakdown for demand nodes (residential/source). */
   readonly nodeSummary: CapturedEntitySummary;
   /** Capture breakdown for workplace/destination attractors. */
@@ -80,7 +92,7 @@ export interface ScenarioDemandCaptureProjection {
 export function projectScenarioDemandCapture(
   input: ScenarioDemandCaptureProjectionInput
 ): ScenarioDemandCaptureProjection {
-  const { artifact, stops, accessRadiusMeters = SCENARIO_DEMAND_STOP_ACCESS_RADIUS_METERS } = input;
+  const { artifact, stops, activeTimeBandId, accessRadiusMeters = SCENARIO_DEMAND_STOP_ACCESS_RADIUS_METERS } = input;
 
   if (accessRadiusMeters <= 0) {
     throw new Error('Access radius must be a positive number.');
@@ -91,6 +103,7 @@ export function projectScenarioDemandCapture(
       status: 'unavailable',
       accessRadiusMeters,
       stopCount: stops.length,
+      activeTimeBandId,
       nodeSummary: createEmptySummary(),
       attractorSummary: createEmptySummary(),
       gatewaySummary: createEmptySummary(),
@@ -104,17 +117,23 @@ export function projectScenarioDemandCapture(
 
   const processEntities = <T extends { id: string; position: { lng: number; lat: number } }>(
     entities: readonly T[],
-    getWeight: (entity: T) => number
+    getBaseWeight: (entity: T) => number,
+    getActiveWeight: (entity: T) => number
   ): CapturedEntitySummary => {
     let totalCount = 0;
     let capturedCount = 0;
     let totalWeight = 0;
     let capturedWeight = 0;
+    let totalActiveWeight = 0;
+    let capturedActiveWeight = 0;
 
     for (const entity of entities) {
       totalCount++;
-      const weight = getWeight(entity);
-      totalWeight += weight;
+      const baseWeight = getBaseWeight(entity);
+      totalWeight += baseWeight;
+      
+      const activeWeight = getActiveWeight(entity);
+      totalActiveWeight += activeWeight;
 
       let nearestStop: CapturingStopReference | null = null;
 
@@ -133,13 +152,15 @@ export function projectScenarioDemandCapture(
 
       if (nearestStop) {
         capturedCount++;
-        capturedWeight += weight;
+        capturedWeight += baseWeight;
+        capturedActiveWeight += activeWeight;
         nearestStopByEntityId.set(entity.id, nearestStop);
       }
     }
 
     const uncapturedCount = totalCount - capturedCount;
     const uncapturedWeight = totalWeight - capturedWeight;
+    const uncapturedActiveWeight = totalActiveWeight - capturedActiveWeight;
 
     return {
       totalCount,
@@ -148,25 +169,57 @@ export function projectScenarioDemandCapture(
       totalWeight,
       capturedWeight,
       uncapturedWeight,
+      totalActiveWeight,
+      capturedActiveWeight,
+      uncapturedActiveWeight,
       capturedPercentageByCount: totalCount > 0 ? (capturedCount / totalCount) * 100 : 0,
-      capturedPercentageByWeight: totalWeight > 0 ? (capturedWeight / totalWeight) * 100 : 0
+      capturedPercentageByWeight: totalWeight > 0 ? (capturedWeight / totalWeight) * 100 : 0,
+      capturedPercentageByActiveWeight: totalActiveWeight > 0 ? (capturedActiveWeight / totalActiveWeight) * 100 : 0
     };
   };
 
-  const nodeSummary = processEntities(artifact.nodes, (n: ScenarioDemandNode) => n.baseWeight);
-  const attractorSummary = processEntities(artifact.attractors, (a: ScenarioDemandAttractor) => a.sinkWeight);
-  const gatewaySummary = processEntities(artifact.gateways, (g: ScenarioDemandGateway) => g.transferWeight);
+  const getActiveDemandWeight = (node: ScenarioDemandNode) =>
+    activeTimeBandId ? calculateActiveDemandWeight(node, activeTimeBandId) : node.baseWeight;
+  const getActiveAttractorSinkWeight = (attractor: ScenarioDemandAttractor) =>
+    activeTimeBandId ? calculateActiveAttractorSinkWeight(attractor, activeTimeBandId) : attractor.sinkWeight;
+  const getActiveGatewayTransferWeight = (gateway: ScenarioDemandGateway) =>
+    activeTimeBandId ? calculateActiveGatewayTransferWeight(gateway, activeTimeBandId) : gateway.transferWeight;
+
+  const nodeSummary = processEntities(
+    artifact.nodes,
+    (n) => n.baseWeight,
+    getActiveDemandWeight
+  );
+  const attractorSummary = processEntities(
+    artifact.attractors,
+    (a) => a.sinkWeight,
+    getActiveAttractorSinkWeight
+  );
+  const gatewaySummary = processEntities(
+    artifact.gateways,
+    (g) => g.transferWeight,
+    getActiveGatewayTransferWeight
+  );
 
   const residentialNodes = artifact.nodes.filter(n => n.role === 'origin' && n.class === 'residential');
   const workplaceNodes = artifact.nodes.filter(n => n.role === 'destination' && n.class === 'workplace');
 
-  const residentialSummary = processEntities(residentialNodes, (n: ScenarioDemandNode) => n.baseWeight);
-  const workplaceSummary = processEntities(workplaceNodes, (n: ScenarioDemandNode) => n.baseWeight);
+  const residentialSummary = processEntities(
+    residentialNodes,
+    (n) => n.baseWeight,
+    getActiveDemandWeight
+  );
+  const workplaceSummary = processEntities(
+    workplaceNodes,
+    (n) => n.baseWeight,
+    getActiveDemandWeight
+  );
 
   return {
     status: 'ready',
     accessRadiusMeters,
     stopCount: stops.length,
+    activeTimeBandId,
     nodeSummary,
     attractorSummary,
     gatewaySummary,
@@ -176,6 +229,8 @@ export function projectScenarioDemandCapture(
   };
 }
 
+import { calculateActiveAttractorSinkWeight, calculateActiveDemandWeight, calculateActiveGatewayTransferWeight } from './demandWeight';
+
 function createEmptySummary(): CapturedEntitySummary {
   return {
     totalCount: 0,
@@ -184,7 +239,11 @@ function createEmptySummary(): CapturedEntitySummary {
     totalWeight: 0,
     capturedWeight: 0,
     uncapturedWeight: 0,
+    totalActiveWeight: 0,
+    capturedActiveWeight: 0,
+    uncapturedActiveWeight: 0,
     capturedPercentageByCount: 0,
-    capturedPercentageByWeight: 0
+    capturedPercentageByWeight: 0,
+    capturedPercentageByActiveWeight: 0
   };
 }
