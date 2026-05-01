@@ -18,9 +18,14 @@
   min-width: 0;
 }
 
+.workspace {
+  padding-left: 6px;
+  padding-right: 0;
+}
+
 .left-panel {
   grid-area: left;
-  background: #111824;
+  background: var(--openvayra-cities-color-bg-dark);
   padding: 12px var(--openvayra-cities-shell-padding-x);
 }
 
@@ -83,7 +88,7 @@
   grid-area: workspace;
   display: flex;
   position: relative;
-  background: #0f1723;
+  background: var(--openvayra-cities-color-bg-dark);
 }
 
 .right-panel p {
@@ -93,7 +98,7 @@
 
 .right-panel {
   grid-area: right;
-  background: #121a27;
+  background: var(--openvayra-cities-color-bg-dark);
   display: flex;
   flex-direction: column;
 }
