@@ -8,7 +8,15 @@ interface InspectorDemandTabProps {
   readonly servedDemandProjection: import('../domain/projection/servedDemandProjection').ServedDemandProjection;
   readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
+  readonly onDemandGapFocus: (gap: import('../domain/projection/demandGapProjection').DemandGapRankingItem | null) => void;
+  readonly focusedDemandGapId: string | null;
 }
+
+const PLANNING_GUIDANCE: Record<import('../domain/projection/demandGapProjection').DemandGapKind, string> = {
+  'uncaptured-residential': 'Place a stop near this location to capture residential demand.',
+  'captured-unserved-residential': 'Connect capturing stops to workplace destinations to serve this demand.',
+  'captured-unreachable-workplace': 'Connect this workplace to residential areas via active bus lines.'
+};
 
 /**
  * Renders demand-related projections, including capture summaries, served demand, and identified gaps.
@@ -17,8 +25,47 @@ export function InspectorDemandTab({
   scenarioDemandCaptureProjection,
   servedDemandProjection,
   demandGapRankingProjection,
-  onPositionFocus
+  onPositionFocus,
+  onDemandGapFocus,
+  focusedDemandGapId
 }: InspectorDemandTabProps): ReactElement {
+  const renderGapList = (gaps: readonly import('../domain/projection/demandGapProjection').DemandGapRankingItem[], title: string): ReactElement | null => {
+    if (gaps.length === 0) return null;
+
+    return (
+      <div className="inspector-demand-gaps__section">
+        <h4 className="inspector-demand-gaps__section-title">{title}</h4>
+        {gaps.map((gap) => {
+          const isFocused = gap.id === focusedDemandGapId;
+          return (
+            <div key={gap.id} className={`inspector-demand-gaps__item ${isFocused ? 'inspector-demand-gaps__item--focused' : ''}`}>
+              <div className="inspector-demand-gaps__item-content">
+                <span className="inspector-demand-gaps__item-label">
+                  Pressure: {gap.activeWeight.toFixed(1)}
+                </span>
+                <span className="inspector-demand-gaps__item-note">{gap.note}</span>
+                {isFocused && (
+                  <div className="inspector-demand-gaps__guidance" aria-live="polite">
+                    <MaterialIcon name="info" />
+                    <span>{PLANNING_GUIDANCE[gap.kind]}</span>
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                className={`inspector-demand-gaps__focus-button ${isFocused ? 'inspector-demand-gaps__focus-button--active' : ''}`}
+                title="Focus on map"
+                onClick={() => onDemandGapFocus(gap)}
+              >
+                <MaterialIcon name="center_focus_strong" />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <section className="inspector-demand-tab" aria-label="Demand">
       <h3>Demand</h3>
@@ -132,38 +179,9 @@ export function InspectorDemandTab({
               summaryText="Identify gaps"
               summaryBadge={`${demandGapRankingProjection.uncapturedResidentialGaps.length + demandGapRankingProjection.capturedButUnservedResidentialGaps.length + demandGapRankingProjection.capturedButUnreachableWorkplaceGaps.length} areas`}
             >
-              {[
-                { title: 'Unserved homes', gaps: demandGapRankingProjection.capturedButUnservedResidentialGaps },
-                { title: 'Uncaptured homes', gaps: demandGapRankingProjection.uncapturedResidentialGaps },
-                { title: 'Unreachable workplaces', gaps: demandGapRankingProjection.capturedButUnreachableWorkplaceGaps }
-              ].map(
-                (section) =>
-                  section.gaps.length > 0 && (
-                    <div key={section.title} className="inspector-demand-gaps__section">
-                      <h5 className="inspector-demand-gaps__section-title">{section.title}</h5>
-                      <ul className="inspector-simple-list">
-                        {section.gaps.map((gap) => (
-                          <li key={gap.id} className="inspector-demand-gaps__item">
-                            <div className="inspector-demand-gaps__item-content">
-                              <span className="inspector-demand-gaps__item-label">
-                                {gap.id} · {gap.activeWeight.toFixed(1)} demand
-                              </span>
-                              <span className="inspector-demand-gaps__item-note">{gap.note}</span>
-                            </div>
-                            <button
-                              type="button"
-                              className="inspector-demand-gaps__focus-button"
-                              title="Focus on map"
-                              onClick={() => onPositionFocus(gap.position)}
-                            >
-                              <MaterialIcon name="center_focus_strong" />
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )
-              )}
+              {renderGapList(demandGapRankingProjection.capturedButUnservedResidentialGaps, 'Unserved homes')}
+              {renderGapList(demandGapRankingProjection.uncapturedResidentialGaps, 'Uncaptured homes')}
+              {renderGapList(demandGapRankingProjection.capturedButUnreachableWorkplaceGaps, 'Unreachable workplaces')}
             </InspectorDisclosure>
           )}
         </div>

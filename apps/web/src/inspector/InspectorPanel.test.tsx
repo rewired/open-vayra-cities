@@ -170,6 +170,8 @@ const renderInspectorPanel = (): RenderResult => {
         selectedOsmCandidateAnchor={null}
         adoptedOsmCandidateGroupIds={new Set()}
         selectedLineDemandContribution={null}
+        onDemandGapFocus={vi.fn()}
+        focusedDemandGapId={null}
       />
     );
   });

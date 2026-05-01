@@ -142,9 +142,7 @@ export default function App(): ReactElement {
   
   const [osmStopCandidates, setOsmStopCandidates] = useState<readonly OsmStopCandidate[]>([]);
   const [selectedOsmCandidateAnchor, setSelectedOsmCandidateAnchor] = useState<OsmStopCandidateStreetAnchorResolution | null>(null);
-
-
-
+  const [focusedDemandGapId, setFocusedDemandGapId] = useState<string | null>(null);
 
   const osmStopCandidateGroups = useMemo(
     () => consolidateOsmStopCandidates(osmStopCandidates),
@@ -312,6 +310,7 @@ const toolModeControlOptions: ReadonlyArray<{
     (stopId: import('./domain/types/stop').StopId) => {
       sessionController.setSelectedLineId(null);
       sessionController.setSelectedStop({ selectedStopId: stopId });
+      setFocusedDemandGapId(null);
       setMapFocusIntent({ target: { type: 'stop', id: stopId }, requestId: Date.now() });
     },
     [sessionController]
@@ -321,6 +320,7 @@ const toolModeControlOptions: ReadonlyArray<{
     (lineId: import('./domain/types/line').LineId) => {
       sessionController.setSelectedStop(null);
       sessionController.setSelectedLineId(lineId);
+      setFocusedDemandGapId(null);
       setMapFocusIntent({ target: { type: 'line', id: lineId }, requestId: Date.now() });
     },
     [sessionController]
@@ -339,6 +339,15 @@ const toolModeControlOptions: ReadonlyArray<{
     },
     []
   );
+
+  const handleDemandGapFocus = (gap: import('./domain/projection/demandGapProjection').DemandGapRankingItem | null): void => {
+    if (!gap) {
+      setFocusedDemandGapId(null);
+      return;
+    }
+    setFocusedDemandGapId(gap.id);
+    handlePositionFocus(gap.position);
+  };
 
   if (registryState.status === 'loading') {
     return (
@@ -487,6 +496,7 @@ const toolModeControlOptions: ReadonlyArray<{
           scenarioDemandArtifact={scenarioDemandArtifactState.status === 'loaded' ? scenarioDemandArtifactState.artifact : null}
           routingCoverage={selectedScenario?.scenario.routingCoverage ?? null}
           demandGapRankingProjection={projections.demandGapRankingProjection}
+          focusedDemandGapId={focusedDemandGapId}
         />
 
       </main>
@@ -516,6 +526,8 @@ const toolModeControlOptions: ReadonlyArray<{
         onStopSelectionChange={handleStopInventorySelection}
         onLineSequenceStopFocus={handleLineSequenceStopFocus}
         onPositionFocus={handlePositionFocus}
+        onDemandGapFocus={handleDemandGapFocus}
+        focusedDemandGapId={focusedDemandGapId}
         onStopRename={sessionController.renameStopLabel}
         onLineRename={sessionController.renameLineLabel}
         openDialogIntent={sessionController.selectedLineDialogOpenIntent}

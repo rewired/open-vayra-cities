@@ -19,6 +19,8 @@ export interface DemandGapOverlayFeatureProperties {
   readonly nearestStopDistanceMeters: number | null;
   /** Number of stops currently capturing this node. */
   readonly capturingStopCount: number;
+  /** Whether this gap is currently focused in the UI. */
+  readonly focused: boolean;
 }
 
 /**
@@ -26,9 +28,11 @@ export interface DemandGapOverlayFeatureProperties {
  * Flattens all gap categories from the projection into a single collection.
  * 
  * @param projection The current demand gap ranking projection.
+ * @param focusedGapId Optional ID of the currently focused demand gap.
  */
 export function buildDemandGapOverlayFeatureCollection(
-  projection: DemandGapRankingProjection | null
+  projection: DemandGapRankingProjection | null,
+  focusedGapId: string | null = null
 ): MapLibreGeoJsonFeatureCollection<DemandGapOverlayFeatureProperties> {
   if (!projection || projection.status === 'unavailable') {
     return {
@@ -60,7 +64,8 @@ export function buildDemandGapOverlayFeatureCollection(
         visualWeight: Math.max(1, Math.min(20, item.activeWeight)),
         baseWeight: item.baseWeight,
         nearestStopDistanceMeters: item.nearestStopDistanceMeters,
-        capturingStopCount: item.capturingStopCount
+        capturingStopCount: item.capturingStopCount,
+        focused: item.id === focusedGapId
       }
     }))
   };

@@ -56,6 +56,8 @@ interface InspectorPanelProps {
   readonly selectedLineDemandContribution: import('../domain/projection/selectedLineDemandContributionProjection').SelectedLineDemandContributionProjection | null;
   readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
+  readonly onDemandGapFocus: (gap: import('../domain/projection/demandGapProjection').DemandGapRankingItem | null) => void;
+  readonly focusedDemandGapId: string | null;
 }
 
 const resolveGlobalStateLabel = (panelState: InspectorPanelState): string => {
@@ -110,7 +112,9 @@ export function InspectorPanel({
   servicePressureProjection,
   selectedLineDemandContribution,
   demandGapRankingProjection,
-  onPositionFocus
+  onPositionFocus,
+  onDemandGapFocus,
+  focusedDemandGapId
 }: InspectorPanelProps): ReactElement {
   const [activeTabId, setActiveTabId] = useState<InspectorTabId>('overview');
   const globalStateLabel = useMemo(() => resolveGlobalStateLabel(inspectorPanelState), [inspectorPanelState]);
@@ -166,6 +170,8 @@ export function InspectorPanel({
                 servedDemandProjection={servedDemandProjection}
                 demandGapRankingProjection={demandGapRankingProjection}
                 onPositionFocus={onPositionFocus}
+                onDemandGapFocus={onDemandGapFocus}
+                focusedDemandGapId={focusedDemandGapId}
               />
             )}
 

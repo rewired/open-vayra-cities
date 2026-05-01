@@ -314,11 +314,17 @@ export const MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP = 'openvayra-cities-demand-
 export const MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE = 'openvayra-cities-demand-gap-overlay-circle';
 
 /**
+ * Canonical focus layer id for demand gap point-level focus highlight.
+ */
+export const MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS = 'openvayra-cities-demand-gap-overlay-focus';
+
+/**
  * Canonical style layer ids for demand gap overlay rendering.
  */
 export const MAP_DEMAND_GAP_OVERLAY_LAYER_IDS = [
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
-  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS
 ] as const;
 
 /**
@@ -404,4 +410,30 @@ export const MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT = {
   ]
 } as const;
 
-
+/**
+ * Circle paint style for demand gap point-level focus highlight.
+ * Large, high-contrast ring that sits above the gap point but below interaction layers.
+ */
+export const MAP_DEMAND_GAP_OVERLAY_FOCUS_CIRCLE_PAINT = {
+  'circle-radius': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    12,
+    8,
+    15,
+    16
+  ],
+  'circle-color': 'transparent',
+  'circle-stroke-width': 2,
+  'circle-stroke-color': '#ffffff',
+  'circle-stroke-opacity': [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    11,
+    0,
+    12,
+    0.9
+  ]
+} as const;

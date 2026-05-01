@@ -28,6 +28,40 @@
   justify-content: space-between;
   padding: 6px 0;
   gap: 12px;
+  transition: all 0.15s ease-in-out;
+}
+
+.inspector-demand-gaps__item--focused {
+  background: var(--openvayra-cities-color-surface-hover);
+  border-left: 3px solid var(--openvayra-cities-color-accent-blue);
+  padding-left: 12px;
+  margin-left: -12px;
+  border-radius: 0 4px 4px 0;
+}
+
+.inspector-demand-gaps__guidance {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 10px;
+  background: var(--openvayra-cities-color-bg-dark);
+  border-radius: 4px;
+  border: 1px solid var(--openvayra-cities-color-border-subtle);
+  color: var(--openvayra-cities-color-text-secondary);
+}
+
+.inspector-demand-gaps__guidance .material-icons {
+  font-size: 16px;
+  color: var(--openvayra-cities-color-accent-blue);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.inspector-demand-gaps__guidance span {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 400;
 }
 
 .inspector-demand-gaps__item-content {
@@ -70,6 +104,17 @@
 .inspector-demand-gaps__focus-button:hover {
   background: var(--openvayra-cities-color-surface-active);
   border-color: var(--openvayra-cities-color-accent-blue);
+}
+
+.inspector-demand-gaps__focus-button--active {
+  background: var(--openvayra-cities-color-accent-blue);
+  color: var(--openvayra-cities-color-text-on-accent);
+  border-color: var(--openvayra-cities-color-accent-blue);
+}
+
+.inspector-demand-gaps__focus-button--active:hover {
+  background: var(--openvayra-cities-color-accent-blue-hover);
+  border-color: var(--openvayra-cities-color-accent-blue-hover);
 }
 
 .inspector-demand-gaps__focus-button .material-icons {

@@ -113,4 +113,16 @@ describe('demandGapOverlayGeoJson', () => {
     const resultSmall = buildDemandGapOverlayFeatureCollection(projectionWithSmallWeight);
     expect(resultSmall.features[0]!.properties.visualWeight).toBe(1);
   });
+
+  it('marks the focused gap correctly', () => {
+    const result = buildDemandGapOverlayFeatureCollection(mockProjection, 'gap-2');
+    
+    const gap1 = result.features.find(f => f.properties.gapId === 'gap-1')!;
+    const gap2 = result.features.find(f => f.properties.gapId === 'gap-2')!;
+    const gap3 = result.features.find(f => f.properties.gapId === 'gap-3')!;
+    
+    expect(gap1.properties.focused).toBe(false);
+    expect(gap2.properties.focused).toBe(true);
+    expect(gap3.properties.focused).toBe(false);
+  });
 });

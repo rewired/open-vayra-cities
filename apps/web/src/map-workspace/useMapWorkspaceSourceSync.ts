@@ -51,6 +51,7 @@ export interface UseMapWorkspaceSourceSyncInput {
   readonly scenarioDemandArtifact: import('../domain/types/scenarioDemand').ScenarioDemandArtifact | null;
   readonly routingCoverage: import('../domain/scenario/scenarioRegistry').ScenarioRoutingCoverage | null;
   readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
+  readonly focusedDemandGapId: string | null;
   readonly isMapStyleReady: boolean;
 }
 
@@ -76,6 +77,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
     scenarioDemandArtifact,
     routingCoverage,
     demandGapRankingProjection,
+    focusedDemandGapId,
     isMapStyleReady
   } = input;
 
@@ -366,7 +368,8 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
 
     const sourceSyncDiagnostics = syncExistingMapWorkspaceSourceData({
       map: mapInstance,
-      demandGapRankingProjection
+      demandGapRankingProjection,
+      focusedDemandGapId
     });
 
     if (sourceSyncDiagnostics) {
@@ -378,11 +381,12 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
       applyBasemapSemanticReadabilityOverrides(mapInstance);
       syncAllMapWorkspaceSources({
         map: mapInstance,
-        demandGapRankingProjection
+        demandGapRankingProjection,
+        focusedDemandGapId
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
     });
-  }, [demandGapRankingProjection, isMapStyleReady]);
+  }, [demandGapRankingProjection, focusedDemandGapId, isMapStyleReady]);
 
 
 

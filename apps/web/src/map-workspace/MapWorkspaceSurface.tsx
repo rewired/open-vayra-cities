@@ -86,6 +86,7 @@ interface MapWorkspaceSurfaceProps {
   readonly scenarioDemandArtifact: import('../domain/types/scenarioDemand').ScenarioDemandArtifact | null;
   readonly routingCoverage: import('../domain/scenario/scenarioRegistry').ScenarioRoutingCoverage | null;
   readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
+  readonly focusedDemandGapId: string | null;
 }
 
 
@@ -138,7 +139,8 @@ export function MapWorkspaceSurface({
   onOsmCandidateAnchorResolved,
   scenarioDemandArtifact,
   routingCoverage,
-  demandGapRankingProjection
+  demandGapRankingProjection,
+  focusedDemandGapId
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -376,6 +378,7 @@ export function MapWorkspaceSurface({
     scenarioDemandArtifact,
     routingCoverage,
     demandGapRankingProjection,
+    focusedDemandGapId,
     isMapStyleReady
   });
 

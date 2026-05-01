@@ -34,8 +34,10 @@ import {
   MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
   MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT,
-  MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT
+  MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT,
+  MAP_DEMAND_GAP_OVERLAY_FOCUS_CIRCLE_PAINT
 } from './mapRenderConstants';
 import { buildScenarioDemandPreviewFeatureCollection } from './scenarioDemandPreviewGeoJson';
 import type { MapLibreMap } from './maplibreGlobal';
@@ -88,6 +90,7 @@ export interface SyncAllMapWorkspaceSourcesInput {
   readonly scenarioDemandArtifact?: import('../domain/types/scenarioDemand').ScenarioDemandArtifact | null;
   readonly routingCoverage?: import('../domain/scenario/scenarioRegistry').ScenarioRoutingCoverage | null;
   readonly demandGapRankingProjection?: import('../domain/projection/demandGapProjection').DemandGapRankingProjection | null;
+  readonly focusedDemandGapId?: string | null;
 }
 
 /**
@@ -113,6 +116,7 @@ const CUSTOM_LAYER_ORDER = [
   MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
   MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
   MAP_LAYER_ID_STOPS_CIRCLE,
   MAP_LAYER_ID_STOPS_LABEL,
@@ -356,6 +360,17 @@ const ensureAllMapWorkspaceRenderSourcesAndLayers = (map: MapLibreMap): void => 
       layout: { visibility: 'none' }
     });
   }
+
+  if (!map.getLayer(MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
+      type: 'circle',
+      source: MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+      paint: MAP_DEMAND_GAP_OVERLAY_FOCUS_CIRCLE_PAINT,
+      layout: { visibility: 'none' },
+      filter: ['==', ['get', 'focused'], true]
+    });
+  }
 };
 
 
@@ -367,7 +382,8 @@ const syncMapWorkspaceSourceData = ({
   osmStopCandidateSync,
   scenarioDemandArtifact,
   routingCoverage,
-  demandGapRankingProjection
+  demandGapRankingProjection,
+  focusedDemandGapId
 }: SyncAllMapWorkspaceSourcesInput): MapWorkspaceSourceSyncDiagnostics => {
 
   let stopBuilderFeatureCount: number | undefined;
@@ -440,7 +456,10 @@ const syncMapWorkspaceSourceData = ({
   }
 
   if (demandGapRankingProjection !== undefined) {
-    const demandGapFeatureCollection = buildDemandGapOverlayFeatureCollection(demandGapRankingProjection);
+    const demandGapFeatureCollection = buildDemandGapOverlayFeatureCollection(
+      demandGapRankingProjection,
+      focusedDemandGapId ?? null
+    );
     const demandGapSource = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OVERLAY);
     demandGapSource?.setData(demandGapFeatureCollection);
   }
