@@ -28,6 +28,7 @@ export function buildDemandGapOdContextFeatureCollection(
     projection.status !== 'ready' ||
     !projection.focusedPosition ||
     !projection.focusedGapId ||
+    !projection.problemSide ||
     projection.candidates.length === 0
   ) {
     return {
@@ -60,7 +61,7 @@ export function buildDemandGapOdContextFeatureCollection(
       properties: {
         focusedGapId: projection.focusedGapId,
         candidateId: candidate.id,
-        problemSide: projection.problemSide!,
+        problemSide: projection.problemSide,
         candidateRole: candidate.role,
         candidateDemandClass: candidate.demandClass,
         activeWeight: candidate.activeWeight,

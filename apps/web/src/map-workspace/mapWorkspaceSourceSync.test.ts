@@ -87,9 +87,9 @@ describe('mapWorkspaceSourceSync custom-layer helpers', () => {
 
 import { vi } from 'vitest';
 import { syncAllMapWorkspaceSources, syncExistingMapWorkspaceSourceData } from './mapWorkspaceSourceSync';
-import { MAP_SOURCE_ID_DEMAND_GAP_OVERLAY } from './mapRenderConstants';
-import type { TimeBandId } from '../domain/types/timeBand';
+import { MAP_SOURCE_ID_DEMAND_GAP_OVERLAY, MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT } from './mapRenderConstants';
 import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
+import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
 
 interface TestGeoJsonSource {
   setData: ReturnType<typeof vi.fn>;
@@ -129,7 +129,7 @@ describe('mapWorkspaceSourceSync integration', () => {
     const map = createMockMap();
     const mockProjection: DemandGapRankingProjection = { 
       status: 'ready', 
-      activeTimeBandId: 'morning-rush' as TimeBandId,
+      activeTimeBandId: 'morning-rush',
       uncapturedResidentialGaps: [],
       capturedButUnservedResidentialGaps: [],
       capturedButUnreachableWorkplaceGaps: [],
@@ -159,7 +159,7 @@ describe('mapWorkspaceSourceSync integration', () => {
 
     const mockProjection: DemandGapRankingProjection = { 
       status: 'ready', 
-      activeTimeBandId: 'morning-rush' as TimeBandId,
+      activeTimeBandId: 'morning-rush',
       uncapturedResidentialGaps: [],
       capturedButUnservedResidentialGaps: [],
       capturedButUnreachableWorkplaceGaps: [],
@@ -199,4 +199,60 @@ describe('mapWorkspaceSourceSync integration', () => {
       features: []
     }));
   });
+
+  it('syncAllMapWorkspaceSources ensures demand gap OD context source and sets data', () => {
+    const map = createMockMap();
+    const mockOdProjection: DemandGapOdContextProjection = {
+      status: 'ready',
+      activeTimeBandId: 'morning-rush',
+      focusedPosition: { lat: 0, lng: 0 },
+      focusedGapId: 'gap-1',
+      focusedGapKind: 'uncaptured-residential',
+      problemSide: 'origin',
+      candidates: [],
+      summary: { candidateCount: 0, topActiveWeight: 0 },
+      guidance: null
+    };
+
+    syncAllMapWorkspaceSources({
+      map,
+      demandGapOdContextProjection: mockOdProjection
+    });
+
+    expect(map.addSource).toHaveBeenCalled();
+    const source = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT);
+    expect(source?.setData).toHaveBeenCalled();
+  });
+
+  it('syncExistingMapWorkspaceSourceData skips OD context sync if source is missing', () => {
+    const map = createMockMap();
+    const otherSourceIds = [
+      'openvayra-cities-completed-lines', 'openvayra-cities-draft-line', 
+      'openvayra-cities-stops', 'openvayra-cities-vehicles', 
+      'osm-stop-candidates', 'openvayra-cities-scenario-demand-preview', 
+      'openvayra-cities-scenario-routing-coverage', 'openvayra-cities-demand-gap-overlay'
+    ];
+    otherSourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
+
+    const mockOdProjection: DemandGapOdContextProjection = {
+      status: 'ready',
+      activeTimeBandId: 'morning-rush',
+      focusedPosition: { lat: 0, lng: 0 },
+      focusedGapId: 'gap-1',
+      focusedGapKind: 'uncaptured-residential',
+      problemSide: 'origin',
+      candidates: [],
+      summary: { candidateCount: 0, topActiveWeight: 0 },
+      guidance: null
+    };
+
+    const result = syncExistingMapWorkspaceSourceData({
+      map,
+      demandGapOdContextProjection: mockOdProjection
+    });
+
+    expect(result).toBeNull();
+    expect(map.getSource).toHaveBeenCalledWith(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT);
+  });
 });
+
