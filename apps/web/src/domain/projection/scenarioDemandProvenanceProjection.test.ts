@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { projectScenarioDemandProvenance } from './scenarioDemandProvenanceProjection';
 import type { ScenarioDemandArtifact } from '../types/scenarioDemand';
+import { ALLOWED_DEMAND_SOURCE_KINDS } from '../constants/scenarioDemand';
 
 describe('projectScenarioDemandProvenance', () => {
   it('returns unavailable status when artifact is null', () => {
@@ -66,7 +67,7 @@ describe('projectScenarioDemandProvenance', () => {
     });
   });
 
-  it('handles unknown source kinds gracefully', () => {
+  it('provides labels for all canonical source kinds', () => {
     const artifact: ScenarioDemandArtifact = {
       schemaVersion: 1,
       scenarioId: 'test-scenario',
@@ -74,12 +75,10 @@ describe('projectScenarioDemandProvenance', () => {
       sourceMetadata: {
         generatorName: 'test',
         generatorVersion: '1.0.0',
-        generatedFrom: [
-          {
-            sourceKind: 'future-kind' as any,
-            label: 'Future Data'
-          }
-        ]
+        generatedFrom: ALLOWED_DEMAND_SOURCE_KINDS.map(kind => ({
+          sourceKind: kind,
+          label: `Label for ${kind}`
+        }))
       },
       nodes: [],
       attractors: [],
@@ -87,7 +86,11 @@ describe('projectScenarioDemandProvenance', () => {
     };
 
     const projection = projectScenarioDemandProvenance(artifact);
-    expect(projection.sourceRows[0]?.sourceKindLabel).toBe('Source: future-kind');
+    expect(projection.sourceRows).toHaveLength(ALLOWED_DEMAND_SOURCE_KINDS.length);
+    projection.sourceRows.forEach(row => {
+      expect(row.sourceKindLabel).toBeTypeOf('string');
+      expect(row.sourceKindLabel).not.toBe('');
+    });
   });
 
   it('does not mutate input artifact', () => {

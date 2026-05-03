@@ -51,6 +51,7 @@ const SOURCE_KIND_LABELS: Record<ScenarioDemandSourceKind, string> = {
 
 /**
  * Projects scenario demand provenance from artifact metadata.
+ * Provides a structured summary of data origins, model limitations, and generator info.
  * 
  * @param artifact - The loaded scenario demand artifact, or null if none is active.
  * @returns A strictly typed provenance projection.
@@ -73,7 +74,7 @@ export function projectScenarioDemandProvenance(
   const { sourceMetadata } = artifact;
 
   const sourceRows: ScenarioDemandProvenanceSourceRow[] = sourceMetadata.generatedFrom.map((entry) => ({
-    sourceKindLabel: SOURCE_KIND_LABELS[entry.sourceKind] ?? `Source: ${entry.sourceKind}`,
+    sourceKindLabel: SOURCE_KIND_LABELS[entry.sourceKind],
     label: entry.label,
     sourceDateLabel: entry.sourceDate ?? null,
     datasetYearLabel: entry.datasetYear?.toString() ?? null,
