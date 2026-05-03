@@ -6,6 +6,16 @@ import {
   type FocusedDemandGapPlanningEntrypointHandlers
 } from './focusedDemandGapPlanningEntrypoint';
 
+const getSingleInvocationOrder = (
+  mockFn: { readonly mock: { readonly invocationCallOrder: readonly number[] } },
+  label: string
+): number => {
+  const [callOrder] = mockFn.mock.invocationCallOrder;
+  if (callOrder === undefined) {
+    throw new Error(`Expected ${label} to have been called.`);
+  }
+  return callOrder;
+};
 describe('focusedDemandGapPlanningEntrypoint', () => {
   describe('resolveFocusedDemandGapPlanningEntrypointToolMode', () => {
     it('resolves start-stop-placement-near-gap to place-stop', () => {
@@ -34,9 +44,9 @@ describe('focusedDemandGapPlanningEntrypoint', () => {
       expect(selectToolMode).toHaveBeenCalledWith('place-stop');
       
       // Ensure focus happens before tool mode selection for better UX sequencing
-      const focusCallOrder = focusPosition.mock.invocationCallOrder[0];
-      const selectModeCallOrder = selectToolMode.mock.invocationCallOrder[0];
-      expect(focusCallOrder).toBeLessThan(selectModeCallOrder as number);
+      const focusCallOrder = getSingleInvocationOrder(focusPosition, 'focusPosition');
+      const selectModeCallOrder = getSingleInvocationOrder(selectToolMode, 'selectToolMode');
+      expect(focusCallOrder).toBeLessThan(selectModeCallOrder);
     });
 
     it('focuses map and selects build-line mode for line planning request', () => {
@@ -54,9 +64,9 @@ describe('focusedDemandGapPlanningEntrypoint', () => {
       expect(focusPosition).toHaveBeenCalledWith({ lng: 30, lat: 40 });
       expect(selectToolMode).toHaveBeenCalledWith('build-line');
       
-      const focusCallOrder = focusPosition.mock.invocationCallOrder[0];
-      const selectModeCallOrder = selectToolMode.mock.invocationCallOrder[0];
-      expect(focusCallOrder).toBeLessThan(selectModeCallOrder as number);
+      const focusCallOrder = getSingleInvocationOrder(focusPosition, 'focusPosition');
+      const selectModeCallOrder = getSingleInvocationOrder(selectToolMode, 'selectToolMode');
+      expect(focusCallOrder).toBeLessThan(selectModeCallOrder);
     });
   });
 });
