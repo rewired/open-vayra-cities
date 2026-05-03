@@ -146,6 +146,14 @@ const mockFocusedDemandGapPlanningProjection: FocusedDemandGapPlanningProjection
   evidence: []
 };
 
+const mockFocusedDemandGapLifecycleProjection: import('../domain/projection/focusedDemandGapLifecycleProjection').FocusedDemandGapLifecycleProjection = {
+  status: 'unfocused',
+  focusedGapId: null,
+  title: null,
+  message: null,
+  shouldOfferClearFocus: false
+};
+
 const mockDemandGapOdCandidateListProjection: import('../domain/projection/demandGapOdCandidateListProjection').DemandGapOdCandidateListProjection = {
   status: 'unavailable',
   heading: null,
@@ -215,6 +223,7 @@ const renderInspectorPanel = (): RenderResult => {
         demandGapOdContextProjection={mockDemandGapOdContextProjection}
         demandGapOdCandidateListProjection={mockDemandGapOdCandidateListProjection}
         focusedDemandGapPlanningProjection={mockFocusedDemandGapPlanningProjection}
+        focusedDemandGapLifecycleProjection={mockFocusedDemandGapLifecycleProjection}
         selectedLineRouteBaseline={null}
         selectedLineServiceProjection={null}
         selectedLineServiceInspectorProjection={null}

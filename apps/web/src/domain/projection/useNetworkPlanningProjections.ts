@@ -17,6 +17,7 @@ import { projectDemandGapRanking, type DemandGapRankingProjection } from './dema
 import { projectDemandGapOdContext, type DemandGapOdContextProjection } from './demandGapOdContextProjection';
 import { projectFocusedDemandGapPlanningSummary, type FocusedDemandGapPlanningProjection } from './focusedDemandGapPlanningProjection';
 import { projectDemandGapOdCandidateList, type DemandGapOdCandidateListProjection } from './demandGapOdCandidateListProjection';
+import { projectFocusedDemandGapLifecycle, type FocusedDemandGapLifecycleProjection } from './focusedDemandGapLifecycleProjection';
 
 const MAX_READINESS_ISSUES_VISIBLE = 5;
 
@@ -75,6 +76,7 @@ export interface NetworkPlanningProjections {
   readonly demandGapOdContextProjection: DemandGapOdContextProjection;
   readonly demandGapOdCandidateListProjection: DemandGapOdCandidateListProjection;
   readonly focusedDemandGapPlanningProjection: FocusedDemandGapPlanningProjection;
+  readonly focusedDemandGapLifecycleProjection: FocusedDemandGapLifecycleProjection;
 }
 
 
@@ -220,6 +222,11 @@ export const useNetworkPlanningProjections = (
     demandGapOdContextProjection
   );
 
+  const focusedDemandGapLifecycleProjection = projectFocusedDemandGapLifecycle(
+    focusedDemandGapId,
+    demandGapRankingProjection
+  );
+
   return {
     staticNetworkSummaryKpis,
     selectedLineRouteBaseline,
@@ -238,6 +245,7 @@ export const useNetworkPlanningProjections = (
     demandGapRankingProjection,
     demandGapOdContextProjection,
     demandGapOdCandidateListProjection,
-    focusedDemandGapPlanningProjection
+    focusedDemandGapPlanningProjection,
+    focusedDemandGapLifecycleProjection
   };
 };

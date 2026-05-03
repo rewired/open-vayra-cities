@@ -10,6 +10,7 @@ import type { DemandGapOdContextProjection } from '../domain/projection/demandGa
 import type { DemandGapOdCandidateListProjection } from '../domain/projection/demandGapOdCandidateListProjection';
 import type { ScenarioDemandCaptureProjection, CapturedEntitySummary } from '../domain/projection/scenarioDemandCaptureProjection';
 import type { ServedDemandProjection } from '../domain/projection/servedDemandProjection';
+import type { FocusedDemandGapLifecycleProjection } from '../domain/projection/focusedDemandGapLifecycleProjection';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -27,6 +28,17 @@ const createEmptyCapturedEntitySummary = (): CapturedEntitySummary => ({
   capturedPercentageByWeight: 0,
   capturedPercentageByActiveWeight: 0
 });
+
+const MOCK_PLANNING_UNAVAILABLE: FocusedDemandGapPlanningProjection = {
+  status: 'unavailable',
+  focusedGapId: null,
+  actionKind: null,
+  title: null,
+  primaryAction: null,
+  supportingContext: null,
+  caveat: null,
+  evidence: []
+};
 
 const MOCK_SCENARIO_PROJECTION: ScenarioDemandCaptureProjection = {
   status: 'unavailable',
@@ -76,6 +88,14 @@ const MOCK_CANDIDATE_LIST: DemandGapOdCandidateListProjection = {
   status: 'unavailable',
   heading: null,
   rows: []
+};
+
+const MOCK_LIFECYCLE_ACTIVE: FocusedDemandGapLifecycleProjection = {
+  status: 'active',
+  focusedGapId: 'gap-123',
+  title: null,
+  message: null,
+  shouldOfferClearFocus: true
 };
 
 interface RenderResult {
@@ -152,6 +172,7 @@ describe('InspectorDemandTab', () => {
       onPositionFocus: vi.fn(),
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: 'gap-123',
+      focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
       onPlanningEntrypoint: vi.fn()
     });
 
@@ -207,6 +228,7 @@ describe('InspectorDemandTab', () => {
       onPositionFocus: vi.fn(),
       onDemandGapFocus,
       focusedDemandGapId: 'gap-123',
+      focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
       onPlanningEntrypoint: vi.fn()
     });
 
@@ -279,6 +301,7 @@ describe('InspectorDemandTab', () => {
       onPositionFocus,
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: 'gap-123',
+      focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
       onPlanningEntrypoint: vi.fn()
     });
 
@@ -343,6 +366,7 @@ describe('InspectorDemandTab', () => {
       onPositionFocus: vi.fn(),
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: 'gap-123',
+      focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
       onPlanningEntrypoint
     });
 
@@ -406,6 +430,13 @@ describe('InspectorDemandTab', () => {
       onPositionFocus: vi.fn(),
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: 'gap-456',
+      focusedDemandGapLifecycleProjection: { 
+        status: 'active', 
+        focusedGapId: 'gap-456',
+        title: null,
+        message: null,
+        shouldOfferClearFocus: false
+      },
       onPlanningEntrypoint
     });
 
@@ -423,5 +454,46 @@ describe('InspectorDemandTab', () => {
       kind: 'start-line-planning-near-gap',
       position: { lng: 30, lat: 40 }
     });
+  });
+
+  it('renders neutral lifecycle feedback when focused gap is no longer ranked', () => {
+    const mockRanking: DemandGapRankingProjection = {
+      status: 'ready',
+      activeTimeBandId: 'morning-rush',
+      uncapturedResidentialGaps: [],
+      capturedButUnservedResidentialGaps: [],
+      capturedButUnreachableWorkplaceGaps: [],
+      summary: { totalGapCount: 0 }
+    };
+
+    const mockLifecycle: FocusedDemandGapLifecycleProjection = {
+      status: 'not-currently-ranked',
+      focusedGapId: 'gap-999',
+      title: 'This focused gap no longer appears in current gaps.',
+      message: 'It may be resolved, filtered, or below threshold in the current time band.',
+      shouldOfferClearFocus: true
+    };
+
+    mounted = renderTab({
+      scenarioDemandCaptureProjection: MOCK_SCENARIO_PROJECTION,
+      servedDemandProjection: MOCK_SERVED_PROJECTION,
+      demandGapRankingProjection: mockRanking,
+      demandGapOdContextProjection: MOCK_OD_CONTEXT,
+      demandGapOdCandidateListProjection: MOCK_CANDIDATE_LIST,
+      focusedDemandGapPlanningProjection: MOCK_PLANNING_UNAVAILABLE,
+      focusedDemandGapLifecycleProjection: mockLifecycle,
+      onPositionFocus: vi.fn(),
+      onDemandGapFocus: vi.fn(),
+      focusedDemandGapId: 'gap-999',
+      onPlanningEntrypoint: vi.fn()
+    });
+
+    const textContent = mounted.container.textContent;
+    expect(textContent).toContain('This focused gap no longer appears in current gaps.');
+    expect(textContent).toContain('It may be resolved, filtered, or below threshold in the current time band.');
+    
+    // Clear focus should still be available
+    const clearButton = Array.from(mounted.container.querySelectorAll('button')).find(b => b.textContent === 'Clear focus');
+    expect(clearButton).toBeDefined();
   });
 });

@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Slice 178 — Focused Demand Gap Lifecycle Feedback**:
+    - Added a pure `focusedDemandGapLifecycleProjection` to track whether a focused gap is still active in current ranking or has fallen out.
+    - Updated `InspectorDemandTab` to render neutral lifecycle feedback when a focused gap is no longer currently ranked.
+    - Wired lifecycle projection into the `NetworkPlanningProjections` bundle.
+    - Added ADR 0179 documenting the projection-only lifecycle feedback design and non-authoritative resolution claims.
 - **Slice 177 — Demand Gap Planning Entrypoint Context Banner**:
     - Added a transient, dismissible planning context banner in the UI shell after triggering a planning entrypoint from a demand gap.
     - Implemented shell-owned state and transient context model to provide guided workflow continuity.

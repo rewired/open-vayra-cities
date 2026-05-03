@@ -9,6 +9,7 @@ import type { DemandGapRankingProjection, DemandGapRankingItem } from '../domain
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
 import type { DemandGapOdCandidateListProjection } from '../domain/projection/demandGapOdCandidateListProjection';
 import type { FocusedDemandGapPlanningProjection } from '../domain/projection/focusedDemandGapPlanningProjection';
+import type { FocusedDemandGapLifecycleProjection } from '../domain/projection/focusedDemandGapLifecycleProjection';
 
 import type { FocusedDemandGapPlanningEntrypointKind, FocusedDemandGapPlanningEntrypointRequest } from '../app/focusedDemandGapPlanningEntrypoint';
 
@@ -19,6 +20,7 @@ interface InspectorDemandTabProps {
   readonly demandGapOdContextProjection: DemandGapOdContextProjection;
   readonly demandGapOdCandidateListProjection: DemandGapOdCandidateListProjection;
   readonly focusedDemandGapPlanningProjection: FocusedDemandGapPlanningProjection;
+  readonly focusedDemandGapLifecycleProjection: FocusedDemandGapLifecycleProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
   readonly onDemandGapFocus: (gap: DemandGapRankingItem | null) => void;
   readonly focusedDemandGapId: string | null;
@@ -37,6 +39,7 @@ export function InspectorDemandTab({
   demandGapOdContextProjection,
   demandGapOdCandidateListProjection,
   focusedDemandGapPlanningProjection,
+  focusedDemandGapLifecycleProjection,
   onPositionFocus,
   onDemandGapFocus,
   focusedDemandGapId,
@@ -179,31 +182,46 @@ export function InspectorDemandTab({
         <div className="inspector-demand-gaps">
           {demandGapRankingProjection.uncapturedResidentialGaps.length === 0 &&
             demandGapRankingProjection.capturedButUnservedResidentialGaps.length === 0 &&
-            demandGapRankingProjection.capturedButUnreachableWorkplaceGaps.length === 0 ? (
+            demandGapRankingProjection.capturedButUnreachableWorkplaceGaps.length === 0 &&
+            !focusedDemandGapId ? (
             <p className="inspector-dialog__note">No major demand gaps identified.</p>
           ) : (
             <>
-              <InspectorDisclosure
-                summaryText="Identify gaps"
-                summaryBadge={`${demandGapRankingProjection.uncapturedResidentialGaps.length + demandGapRankingProjection.capturedButUnservedResidentialGaps.length + demandGapRankingProjection.capturedButUnreachableWorkplaceGaps.length} areas`}
-              >
-                {renderGapList(demandGapRankingProjection.capturedButUnservedResidentialGaps, 'Unserved homes')}
-                {renderGapList(demandGapRankingProjection.uncapturedResidentialGaps, 'Uncaptured homes')}
-                {renderGapList(demandGapRankingProjection.capturedButUnreachableWorkplaceGaps, 'Unreachable workplaces')}
-              </InspectorDisclosure>
+              {demandGapRankingProjection.summary.totalGapCount > 0 && (
+                <InspectorDisclosure
+                  summaryText="Identify gaps"
+                  summaryBadge={`${demandGapRankingProjection.uncapturedResidentialGaps.length + demandGapRankingProjection.capturedButUnservedResidentialGaps.length + demandGapRankingProjection.capturedButUnreachableWorkplaceGaps.length} areas`}
+                >
+                  {renderGapList(demandGapRankingProjection.capturedButUnservedResidentialGaps, 'Unserved homes')}
+                  {renderGapList(demandGapRankingProjection.uncapturedResidentialGaps, 'Uncaptured homes')}
+                  {renderGapList(demandGapRankingProjection.capturedButUnreachableWorkplaceGaps, 'Unreachable workplaces')}
+                </InspectorDisclosure>
+              )}
 
               {focusedDemandGapId && (
                 <div className="inspector-demand-gaps__od-context">
                   <div className="inspector-demand-gaps__od-context-header">
                     <h4 className="inspector-demand-gaps__section-title">Planning context</h4>
-                    <button
-                      type="button"
-                      className="inspector-button-secondary inspector-button-secondary--small"
-                      onClick={() => onDemandGapFocus(null)}
-                    >
-                      Clear focus
-                    </button>
+                    {focusedDemandGapLifecycleProjection.shouldOfferClearFocus && (
+                      <button
+                        type="button"
+                        className="inspector-button-secondary inspector-button-secondary--small"
+                        onClick={() => onDemandGapFocus(null)}
+                      >
+                        Clear focus
+                      </button>
+                    )}
                   </div>
+
+                  {focusedDemandGapLifecycleProjection.status === 'not-currently-ranked' && (
+                    <div className="inspector-demand-gaps__guidance inspector-demand-gaps__guidance--neutral" aria-live="polite">
+                      <MaterialIcon name="info" />
+                      <div>
+                        <strong>{focusedDemandGapLifecycleProjection.title}</strong>
+                        <p className="inspector-demand-gaps__guidance-supporting">{focusedDemandGapLifecycleProjection.message}</p>
+                      </div>
+                    </div>
+                  )}
                   
                   {focusedDemandGapPlanningProjection.status === 'ready' && (
                     <div className="inspector-demand-gaps__planning-summary">

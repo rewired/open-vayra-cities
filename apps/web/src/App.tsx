@@ -553,6 +553,7 @@ const toolModeControlOptions: ReadonlyArray<{
         demandGapOdContextProjection={projections.demandGapOdContextProjection}
         demandGapOdCandidateListProjection={projections.demandGapOdCandidateListProjection}
         focusedDemandGapPlanningProjection={projections.focusedDemandGapPlanningProjection}
+        focusedDemandGapLifecycleProjection={projections.focusedDemandGapLifecycleProjection}
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
         lineFrequencyControlByTimeBand={sessionController.lineFrequencyControlByTimeBand}
         lineFrequencyValidationByTimeBand={sessionController.lineFrequencyValidationByTimeBand}
