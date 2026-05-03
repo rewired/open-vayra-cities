@@ -22,7 +22,7 @@ import type { ServicePressureProjection } from '../domain/projection/servicePres
 import type { SelectedLineDemandContributionProjection } from '../domain/projection/selectedLineDemandContributionProjection';
 import type { DemandGapRankingProjection, DemandGapRankingItem } from '../domain/projection/demandGapProjection';
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
-import type { FocusedDemandGapPlanningEntrypointRequest } from './InspectorDemandTab';
+import type { FocusedDemandGapPlanningEntrypointRequest } from '../app/focusedDemandGapPlanningEntrypoint';
 
 import { InspectorTabBar } from './InspectorTabBar';
 import { InspectorScrollArea } from './InspectorScrollArea';

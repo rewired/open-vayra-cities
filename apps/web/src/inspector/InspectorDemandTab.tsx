@@ -10,14 +10,7 @@ import type { DemandGapOdContextProjection } from '../domain/projection/demandGa
 import type { DemandGapOdCandidateListProjection } from '../domain/projection/demandGapOdCandidateListProjection';
 import type { FocusedDemandGapPlanningProjection } from '../domain/projection/focusedDemandGapPlanningProjection';
 
-export type FocusedDemandGapPlanningEntrypointKind =
-  | 'start-stop-placement-near-gap'
-  | 'start-line-planning-near-gap';
-
-export interface FocusedDemandGapPlanningEntrypointRequest {
-  readonly kind: FocusedDemandGapPlanningEntrypointKind;
-  readonly position: { readonly lng: number; readonly lat: number };
-}
+import type { FocusedDemandGapPlanningEntrypointKind, FocusedDemandGapPlanningEntrypointRequest } from '../app/focusedDemandGapPlanningEntrypoint';
 
 interface InspectorDemandTabProps {
   readonly scenarioDemandCaptureProjection: ScenarioDemandCaptureProjection;
