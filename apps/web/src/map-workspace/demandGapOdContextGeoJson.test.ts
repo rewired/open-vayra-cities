@@ -1,6 +1,17 @@
 import { describe, it, expect } from 'vitest';
 import { buildDemandGapOdContextFeatureCollection } from './demandGapOdContextGeoJson';
+import type { MapLibreGeoJsonFeature } from './maplibreGlobal';
+import type { DemandGapOdContextHintProperties } from './demandGapOdContextGeoJson';
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
+
+const expectSingleFeature = (
+  features: readonly MapLibreGeoJsonFeature<DemandGapOdContextHintProperties>[]
+): MapLibreGeoJsonFeature<DemandGapOdContextHintProperties> => {
+  expect(features).toHaveLength(1);
+  const [feature] = features;
+  expect(feature).toBeDefined();
+  return feature as MapLibreGeoJsonFeature<DemandGapOdContextHintProperties>;
+};
 
 describe('demandGapOdContextGeoJson', () => {
   const mockReadyProjection: DemandGapOdContextProjection = {
@@ -58,29 +69,41 @@ describe('demandGapOdContextGeoJson', () => {
     expect(result.features).toHaveLength(0);
   });
 
+  it('returns empty collection when problemSide is null', () => {
+    const result = buildDemandGapOdContextFeatureCollection({
+      ...mockReadyProjection,
+      problemSide: null
+    });
+    expect(result.features).toHaveLength(0);
+  });
+
   it('emits deterministic LineString features for origin problem side', () => {
     const result = buildDemandGapOdContextFeatureCollection(mockReadyProjection);
     expect(result.features).toHaveLength(2);
 
-    const feature1 = result.features[0]!;
-    expect(feature1.geometry.type).toBe('LineString');
-    // Origin -> Destination
-    expect(feature1.geometry.coordinates).toEqual([
-      [10, 20], // Focused gap
-      [10.1, 20.1] // Workplace
-    ]);
+    const [feature1, feature2] = result.features;
+    expect(feature1).toBeDefined();
+    expect(feature2).toBeDefined();
 
-    expect(feature1.properties.focusedGapId).toBe('gap-1');
-    expect(feature1.properties.candidateId).toBe('workplace-1');
-    expect(feature1.properties.problemSide).toBe('origin');
-    expect(feature1.properties.candidateRole).toBe('destination');
-    expect(feature1.properties.candidateDemandClass).toBe('workplace');
-    expect(feature1.properties.activeWeight).toBe(50);
-    expect(feature1.properties.distanceMeters).toBe(1000);
-    expect(feature1.properties.ordinal).toBe(1);
+    if (feature1 && feature2) {
+      expect(feature1.geometry.type).toBe('LineString');
+      // Origin -> Destination
+      expect(feature1.geometry.coordinates).toEqual([
+        [10, 20], // Focused gap
+        [10.1, 20.1] // Workplace
+      ]);
 
-    const feature2 = result.features[1]!;
-    expect(feature2.properties.ordinal).toBe(2);
+      expect(feature1.properties.focusedGapId).toBe('gap-1');
+      expect(feature1.properties.candidateId).toBe('workplace-1');
+      expect(feature1.properties.problemSide).toBe('origin');
+      expect(feature1.properties.candidateRole).toBe('destination');
+      expect(feature1.properties.candidateDemandClass).toBe('workplace');
+      expect(feature1.properties.activeWeight).toBe(50);
+      expect(feature1.properties.distanceMeters).toBe(1000);
+      expect(feature1.properties.ordinal).toBe(1);
+
+      expect(feature2.properties.ordinal).toBe(2);
+    }
   });
 
   it('emits deterministic LineString features for destination problem side', () => {
@@ -102,9 +125,8 @@ describe('demandGapOdContextGeoJson', () => {
     };
 
     const result = buildDemandGapOdContextFeatureCollection(destProjection);
-    expect(result.features).toHaveLength(1);
+    const feature1 = expectSingleFeature(result.features);
 
-    const feature1 = result.features[0]!;
     expect(feature1.geometry.type).toBe('LineString');
     // Origin -> Destination
     expect(feature1.geometry.coordinates).toEqual([

@@ -39,9 +39,7 @@ export function buildDemandGapOdContextFeatureCollection(
 
   const features: MapLibreGeoJsonFeatureCollection<DemandGapOdContextHintProperties>['features'][number][] = [];
 
-  for (let i = 0; i < projection.candidates.length; i++) {
-    const candidate = projection.candidates[i]!;
-
+  for (const [candidateIndex, candidate] of projection.candidates.entries()) {
     // Create a straight LineString.
     // By convention, lines are drawn Origin -> Destination.
     const isOriginProblem = projection.problemSide === 'origin';
@@ -66,7 +64,7 @@ export function buildDemandGapOdContextFeatureCollection(
         candidateDemandClass: candidate.demandClass,
         activeWeight: candidate.activeWeight,
         distanceMeters: candidate.distanceMeters,
-        ordinal: i + 1
+        ordinal: candidateIndex + 1
       }
     });
   }

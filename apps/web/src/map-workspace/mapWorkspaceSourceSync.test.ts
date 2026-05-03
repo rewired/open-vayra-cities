@@ -219,7 +219,14 @@ describe('mapWorkspaceSourceSync integration', () => {
       demandGapOdContextProjection: mockOdProjection
     });
 
-    expect(map.addSource).toHaveBeenCalled();
+    expect(map.addSource).toHaveBeenCalledWith(
+      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT,
+      expect.anything()
+    );
+    expect(map.addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES })
+    );
+
     const source = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT);
     expect(source?.setData).toHaveBeenCalled();
   });
@@ -241,8 +248,18 @@ describe('mapWorkspaceSourceSync integration', () => {
       focusedGapId: 'gap-1',
       focusedGapKind: 'uncaptured-residential',
       problemSide: 'origin',
-      candidates: [],
-      summary: { candidateCount: 0, topActiveWeight: 0 },
+      candidates: [
+        {
+          id: 'workplace-1',
+          role: 'destination',
+          demandClass: 'workplace',
+          position: { lng: 1, lat: 1 },
+          activeWeight: 10,
+          baseWeight: 10,
+          distanceMeters: 500
+        }
+      ],
+      summary: { candidateCount: 1, topActiveWeight: 10 },
       guidance: null
     };
 
