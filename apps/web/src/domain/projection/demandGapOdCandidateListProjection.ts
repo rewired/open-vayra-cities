@@ -1,5 +1,6 @@
 import type { DemandGapOdContextProjection } from './demandGapOdContextProjection';
 
+/** Player-facing display row for one projected OD context candidate. */
 export interface DemandGapOdCandidateDisplayRow {
   readonly ordinal: number;
   readonly candidateId: string;
@@ -11,6 +12,7 @@ export interface DemandGapOdCandidateDisplayRow {
   readonly position: { readonly lng: number; readonly lat: number };
 }
 
+/** Read-only projection state representing a list of OD candidates for a focused demand gap. */
 export interface DemandGapOdCandidateListProjection {
   readonly status: 'unavailable' | 'ready';
   readonly heading: string | null;
@@ -30,7 +32,11 @@ const createEmptyProjection = (): DemandGapOdCandidateListProjection => ({
 export function projectDemandGapOdCandidateList(
   context: DemandGapOdContextProjection
 ): DemandGapOdCandidateListProjection {
-  if (context.status !== 'ready' || context.candidates.length === 0) {
+  if (
+    context.status !== 'ready' ||
+    context.candidates.length === 0 ||
+    context.problemSide === null
+  ) {
     return createEmptyProjection();
   }
 

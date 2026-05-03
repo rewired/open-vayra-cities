@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { act } from 'react';
+import { act, type ComponentProps } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { InspectorDemandTab } from './InspectorDemandTab';
@@ -83,7 +83,7 @@ interface RenderResult {
   readonly root: Root;
 }
 
-const renderTab = (props: React.ComponentProps<typeof InspectorDemandTab>): RenderResult => {
+const renderTab = (props: ComponentProps<typeof InspectorDemandTab>): RenderResult => {
   const container = document.createElement('div');
   document.body.appendChild(container);
   const root = createRoot(container);
@@ -282,6 +282,7 @@ describe('InspectorDemandTab', () => {
     const textContent = mounted.container.textContent;
     expect(textContent).toContain('Likely workplace candidates');
     expect(textContent).toContain('#1 Workplace candidate');
+    expect(textContent).not.toContain('cand-456');
     expect(textContent).toContain('15.5');
     expect(textContent).toContain('800m');
 

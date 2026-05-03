@@ -23,13 +23,13 @@ describe('projectDemandGapOdCandidateList', () => {
     expect(projection.rows).toHaveLength(0);
   });
 
-  it('creates workplace candidates when problem side is origin', () => {
+  it('returns unavailable when context is ready but problem side is null', () => {
     const readyContext: DemandGapOdContextProjection = {
       status: 'ready',
       activeTimeBandId: 'morning-rush',
       focusedGapId: 'gap-1',
       focusedGapKind: 'uncaptured-residential',
-      problemSide: 'origin',
+      problemSide: null,
       focusedPosition: { lng: 0, lat: 0 },
       candidates: [
         {
@@ -48,11 +48,59 @@ describe('projectDemandGapOdCandidateList', () => {
 
     const projection = projectDemandGapOdCandidateList(readyContext);
 
+    expect(projection.status).toBe('unavailable');
+    expect(projection.heading).toBeNull();
+    expect(projection.rows).toHaveLength(0);
+  });
+
+  it('creates workplace candidates when problem side is origin', () => {
+    const readyContext: DemandGapOdContextProjection = {
+      status: 'ready',
+      activeTimeBandId: 'morning-rush',
+      focusedGapId: 'gap-1',
+      focusedGapKind: 'uncaptured-residential',
+      problemSide: 'origin',
+      focusedPosition: { lng: 0, lat: 0 },
+      candidates: [
+        {
+          id: 'candidate-a',
+          role: 'destination',
+          demandClass: 'workplace',
+          position: { lng: 1, lat: 1 },
+          activeWeight: 25.54,
+          baseWeight: 25,
+          distanceMeters: 800
+        },
+        {
+          id: 'candidate-b',
+          role: 'destination',
+          demandClass: 'workplace',
+          position: { lng: 2, lat: 2 },
+          activeWeight: 25.0,
+          baseWeight: 25,
+          distanceMeters: 1200
+        }
+      ],
+      summary: { candidateCount: 2, topActiveWeight: 25.54 },
+      guidance: 'test'
+    };
+
+    const projection = projectDemandGapOdCandidateList(readyContext);
+
     expect(projection.status).toBe('ready');
     expect(projection.heading).toBe('Likely workplace candidates');
+    
+    // Check row 0 (matches candidate-a)
+    expect(projection.rows[0]?.candidateId).toBe('candidate-a');
     expect(projection.rows[0]?.displayLabel).toBe('#1 Workplace candidate');
     expect(projection.rows[0]?.activeWeightLabel).toBe('25.5');
     expect(projection.rows[0]?.distanceLabel).toBe('800m');
+    
+    // Check row 1 (matches candidate-b, confirming deterministic order and .0 formatting)
+    expect(projection.rows[1]?.candidateId).toBe('candidate-b');
+    expect(projection.rows[1]?.displayLabel).toBe('#2 Workplace candidate');
+    expect(projection.rows[1]?.activeWeightLabel).toBe('25.0');
+    expect(projection.rows[1]?.distanceLabel).toBe('1.2km');
   });
 
   it('creates residential candidates when problem side is destination', () => {

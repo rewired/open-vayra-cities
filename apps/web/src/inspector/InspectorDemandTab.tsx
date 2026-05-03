@@ -38,7 +38,7 @@ export function InspectorDemandTab({
   onDemandGapFocus,
   focusedDemandGapId
 }: InspectorDemandTabProps): ReactElement {
-  const renderGapList = (gaps: readonly import('../domain/projection/demandGapProjection').DemandGapRankingItem[], title: string): ReactElement | null => {
+  const renderGapList = (gaps: readonly DemandGapRankingItem[], title: string): ReactElement | null => {
     if (gaps.length === 0) return null;
 
     return (
@@ -251,7 +251,7 @@ export function InspectorDemandTab({
                             </td>
                             <td>{row.activeWeightLabel}</td>
                             <td>{row.distanceLabel}</td>
-                            <td style={{ textAlign: 'right' }}>
+                            <td className="inspector-demand-gaps__candidate-action-cell">
                               <button
                                 type="button"
                                 className="inspector-demand-gaps__focus-button"

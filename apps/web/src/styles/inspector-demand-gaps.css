@@ -120,3 +120,7 @@
 .inspector-demand-gaps__focus-button .material-icons {
   font-size: 18px;
 }
+
+.inspector-demand-gaps__candidate-action-cell {
+  text-align: right;
+}
