@@ -25,8 +25,16 @@
   }
 }
 
-.demand-gap-legend__header {
+.demand-gap-legend__section {
+  margin-bottom: 12px;
+}
+
+.demand-gap-legend__section:last-of-type {
   margin-bottom: 8px;
+}
+
+.demand-gap-legend__header {
+  margin-bottom: 6px;
 }
 
 .demand-gap-legend__header h4 {
@@ -71,6 +79,11 @@
 
 .demand-gap-legend__swatch--unreachable {
   background-color: #8b5cf6;
+}
+
+.demand-gap-legend__swatch--od-hint {
+  background-color: #9ca3af;
+  border-style: dashed;
 }
 
 .demand-gap-legend__label {

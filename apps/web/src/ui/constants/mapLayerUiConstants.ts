@@ -62,7 +62,7 @@ export const INITIAL_REGISTERED_MAP_LAYERS: readonly MapLayerControlItem[] = [
   {
     id: 'demand-gap-overlay',
     label: 'Demand gaps',
-    description: 'Show spatial pressure from the current demand gap projection.'
+    description: 'Show projected gap pressure from generated scenario demand.'
   },
   {
     id: 'demand-gap-od-context',
