@@ -159,6 +159,16 @@ const mockDemandGapOdCandidateListProjection: import('../domain/projection/deman
   heading: null,
   rows: []
 };
+ 
+const mockScenarioDemandProvenanceProjection: import('../domain/projection/scenarioDemandProvenanceProjection').ScenarioDemandProvenanceProjection = {
+  status: 'unavailable',
+  title: null,
+  summary: null,
+  modelCaveat: null,
+  stopBoundaryNote: null,
+  generatorLabel: null,
+  sourceRows: []
+};
 
 const mockLineFrequencyInput: LineFrequencyInputByTimeBand = {
   'morning-rush': '',
@@ -224,6 +234,7 @@ const renderInspectorPanel = (): RenderResult => {
         demandGapOdCandidateListProjection={mockDemandGapOdCandidateListProjection}
         focusedDemandGapPlanningProjection={mockFocusedDemandGapPlanningProjection}
         focusedDemandGapLifecycleProjection={mockFocusedDemandGapLifecycleProjection}
+        scenarioDemandProvenanceProjection={mockScenarioDemandProvenanceProjection}
         selectedLineRouteBaseline={null}
         selectedLineServiceProjection={null}
         selectedLineServiceInspectorProjection={null}

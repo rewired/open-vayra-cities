@@ -11,6 +11,7 @@ import type { DemandGapOdCandidateListProjection } from '../domain/projection/de
 import type { ScenarioDemandCaptureProjection, CapturedEntitySummary } from '../domain/projection/scenarioDemandCaptureProjection';
 import type { ServedDemandProjection } from '../domain/projection/servedDemandProjection';
 import type { FocusedDemandGapLifecycleProjection } from '../domain/projection/focusedDemandGapLifecycleProjection';
+import type { ScenarioDemandProvenanceProjection } from '../domain/projection/scenarioDemandProvenanceProjection';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -97,6 +98,35 @@ const MOCK_LIFECYCLE_ACTIVE: FocusedDemandGapLifecycleProjection = {
   message: null,
   shouldOfferClearFocus: true
 };
+ 
+const MOCK_PROVENANCE_READY: ScenarioDemandProvenanceProjection = {
+  status: 'ready',
+  title: 'Demand model',
+  summary: 'This is generated scenario demand.',
+  modelCaveat: 'Demand is planning context, not observed flow.',
+  stopBoundaryNote: 'Stops do not generate demand.',
+  generatorLabel: 'test-gen 1.0.0',
+  sourceRows: [
+    {
+      sourceKindLabel: 'Population grid',
+      label: 'Census 2026',
+      sourceDateLabel: '2026-01-01',
+      datasetYearLabel: '2026',
+      licenseHint: 'ODbL',
+      attributionHint: 'Test Author'
+    }
+  ]
+};
+ 
+const MOCK_PROVENANCE_UNAVAILABLE: ScenarioDemandProvenanceProjection = {
+  status: 'unavailable',
+  title: null,
+  summary: null,
+  modelCaveat: null,
+  stopBoundaryNote: null,
+  generatorLabel: null,
+  sourceRows: []
+};
 
 interface RenderResult {
   readonly container: HTMLDivElement;
@@ -173,6 +203,7 @@ describe('InspectorDemandTab', () => {
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: 'gap-123',
       focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
+      scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       onPlanningEntrypoint: vi.fn()
     });
 
@@ -229,6 +260,7 @@ describe('InspectorDemandTab', () => {
       onDemandGapFocus,
       focusedDemandGapId: 'gap-123',
       focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
+      scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       onPlanningEntrypoint: vi.fn()
     });
 
@@ -302,6 +334,7 @@ describe('InspectorDemandTab', () => {
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: 'gap-123',
       focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
+      scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       onPlanningEntrypoint: vi.fn()
     });
 
@@ -367,6 +400,7 @@ describe('InspectorDemandTab', () => {
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: 'gap-123',
       focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
+      scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       onPlanningEntrypoint
     });
 
@@ -437,6 +471,7 @@ describe('InspectorDemandTab', () => {
         message: null,
         shouldOfferClearFocus: false
       },
+      scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       onPlanningEntrypoint
     });
 
@@ -485,6 +520,7 @@ describe('InspectorDemandTab', () => {
       onPositionFocus: vi.fn(),
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: 'gap-999',
+      scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       onPlanningEntrypoint: vi.fn()
     });
 
@@ -495,5 +531,45 @@ describe('InspectorDemandTab', () => {
     // Clear focus should still be available
     const clearButton = Array.from(mounted.container.querySelectorAll('button')).find(b => b.textContent === 'Clear focus');
     expect(clearButton).toBeDefined();
+  });
+
+  it('renders demand model provenance when projection is ready', () => {
+    mounted = renderTab({
+      scenarioDemandCaptureProjection: MOCK_SCENARIO_PROJECTION,
+      servedDemandProjection: MOCK_SERVED_PROJECTION,
+      demandGapRankingProjection: {
+        status: 'ready',
+        activeTimeBandId: 'morning-rush',
+        uncapturedResidentialGaps: [],
+        capturedButUnservedResidentialGaps: [],
+        capturedButUnreachableWorkplaceGaps: [],
+        summary: { totalGapCount: 0 }
+      },
+      demandGapOdContextProjection: MOCK_OD_CONTEXT,
+      demandGapOdCandidateListProjection: MOCK_CANDIDATE_LIST,
+      focusedDemandGapPlanningProjection: MOCK_PLANNING_UNAVAILABLE,
+      focusedDemandGapLifecycleProjection: {
+        status: 'unfocused',
+        focusedGapId: null,
+        title: null,
+        message: null,
+        shouldOfferClearFocus: false
+      },
+      scenarioDemandProvenanceProjection: MOCK_PROVENANCE_READY,
+      onPositionFocus: vi.fn(),
+      onDemandGapFocus: vi.fn(),
+      focusedDemandGapId: null,
+      onPlanningEntrypoint: vi.fn()
+    });
+
+    const textContent = mounted.container.textContent;
+    expect(textContent).toContain('Demand model');
+    expect(textContent).toContain('This is generated scenario demand.');
+    expect(textContent).toContain('Demand is planning context, not observed flow.');
+    expect(textContent).toContain('Stops do not generate demand.');
+    expect(textContent).toContain('Population grid');
+    expect(textContent).toContain('Census 2026');
+    expect(textContent).toContain('© Test Author');
+    expect(textContent).toContain('Generated by: test-gen 1.0.0');
   });
 });

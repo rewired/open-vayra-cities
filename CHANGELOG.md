@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Slice 179 — Scenario Demand Provenance and Model Caveat Projection**:
+    - Added a pure `scenarioDemandProvenanceProjection` to transform scenario demand artifact metadata into player-readable display rows.
+    - Implemented a "Demand model" disclosure in `InspectorDemandTab` providing data provenance, model caveats, and stop-boundary notes.
+    - Wired provenance projection into the `NetworkPlanningProjections` bundle via `useNetworkPlanningProjections.ts`.
+    - Added ADR 0180 documenting the non-authoritative data provenance and model transparency design.
 - **Slice 178 — Focused Demand Gap Lifecycle Feedback**:
     - Added a pure `focusedDemandGapLifecycleProjection` to track whether a focused gap is still active in current ranking or has fallen out.
     - Updated `InspectorDemandTab` to render neutral lifecycle feedback when a focused gap is no longer currently ranked.

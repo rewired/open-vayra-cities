@@ -22,6 +22,7 @@ import type { ServicePressureProjection } from '../domain/projection/servicePres
 import type { SelectedLineDemandContributionProjection } from '../domain/projection/selectedLineDemandContributionProjection';
 import type { DemandGapRankingProjection, DemandGapRankingItem } from '../domain/projection/demandGapProjection';
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
+import type { ScenarioDemandProvenanceProjection } from '../domain/projection/scenarioDemandProvenanceProjection';
 import type { FocusedDemandGapPlanningEntrypointRequest } from '../app/focusedDemandGapPlanningEntrypoint';
 
 import { InspectorTabBar } from './InspectorTabBar';
@@ -72,6 +73,7 @@ interface InspectorPanelProps {
   readonly demandGapOdCandidateListProjection: import('../domain/projection/demandGapOdCandidateListProjection').DemandGapOdCandidateListProjection;
   readonly focusedDemandGapPlanningProjection: import('../domain/projection/focusedDemandGapPlanningProjection').FocusedDemandGapPlanningProjection;
   readonly focusedDemandGapLifecycleProjection: import('../domain/projection/focusedDemandGapLifecycleProjection').FocusedDemandGapLifecycleProjection;
+  readonly scenarioDemandProvenanceProjection: ScenarioDemandProvenanceProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
   readonly onDemandGapFocus: (gap: DemandGapRankingItem | null) => void;
   readonly focusedDemandGapId: string | null;
@@ -134,6 +136,7 @@ export function InspectorPanel({
   demandGapOdCandidateListProjection,
   focusedDemandGapPlanningProjection,
   focusedDemandGapLifecycleProjection,
+  scenarioDemandProvenanceProjection,
   onPositionFocus,
   onDemandGapFocus,
   focusedDemandGapId,
@@ -196,6 +199,7 @@ export function InspectorPanel({
                 demandGapOdCandidateListProjection={demandGapOdCandidateListProjection}
                 focusedDemandGapPlanningProjection={focusedDemandGapPlanningProjection}
                 focusedDemandGapLifecycleProjection={focusedDemandGapLifecycleProjection}
+                scenarioDemandProvenanceProjection={scenarioDemandProvenanceProjection}
                 onPositionFocus={onPositionFocus}
                 onDemandGapFocus={onDemandGapFocus}
                 focusedDemandGapId={focusedDemandGapId}
