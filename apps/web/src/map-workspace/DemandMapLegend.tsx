@@ -56,7 +56,7 @@ export function DemandMapLegend({
       )}
 
       <div className="demand-gap-legend__hint">
-        Generated scenario demand. Planning context only, not observed passenger flows.
+        Generated scenario demand. Planning context only.
       </div>
     </div>
   );

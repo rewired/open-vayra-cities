@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Slice 180b — Demand Map Legend Bottom Placement Repair**:
+    - Relocated the `DemandMapLegend` from top-right to bottom-left to improve visual separation from map layer controls.
+    - Refined the legend caveat copy to "Generated scenario demand. Planning context only." for improved compactness.
+    - Updated ADR 0181 to reflect the new placement and framing decisions.
+
 - **Slice 179 — Scenario Demand Provenance and Model Caveat Projection**:
     - Added a pure `scenarioDemandProvenanceProjection` to transform scenario demand artifact metadata into player-readable display rows.
     - Implemented a "Demand model" disclosure in `InspectorDemandTab` providing data provenance, model caveats, and stop-boundary notes.

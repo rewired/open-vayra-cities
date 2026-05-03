@@ -15,10 +15,11 @@ After Slice 180, we aligned the Inspector UI with the truth that demand is gener
 We will align the map legend and overlay copy with the generated scenario-demand reality.
 
 1.  **Refactor Legend**: The `DemandGapLegend` is refactored into a `DemandMapLegend` that handles both demand gaps and OD context hints.
-2.  **Explicit Caveat**: The legend will include a mandatory, compact caveat: `Generated scenario demand. Planning context only, not observed passenger flows.`
-3.  **Non-Claim Wording**: All player-facing copy in the legend and map layer flyout will avoid precision claims such as "actual demand", "real flow", or "true OD". Instead, it will use terms like "Demand gap pressure" and "Straight planning hints".
-4.  **Context-Aware Rendering**: The legend will dynamically show sections based on which demand layers are currently visible (`demand-gap-overlay` or `demand-gap-od-context`).
-5.  **Visual Integrity**: OD hints will be explicitly labeled as "Straight planning hints" to reinforce that they are not routed geometries or playable bus lines.
+2.  **Explicit Caveat**: The legend will include a mandatory, compact caveat: `Generated scenario demand. Planning context only.`
+3.  **Bottom Placement**: The legend is positioned at the bottom-left of the map to separate interpretation from the map layer flyout controls (top-right).
+4.  **Non-Claim Wording**: All player-facing copy in the legend and map layer flyout will avoid precision claims such as "actual demand", "real flow", or "true OD". Instead, it will use terms like "Demand gap pressure" and "Straight planning hints".
+5.  **Context-Aware Rendering**: The legend will dynamically show sections based on which demand layers are currently visible (`demand-gap-overlay` or `demand-gap-od-context`).
+6.  **Visual Integrity**: OD hints will be explicitly labeled as "Straight planning hints" to reinforce that they are not routed geometries or playable bus lines.
 
 ## Consequences
 
