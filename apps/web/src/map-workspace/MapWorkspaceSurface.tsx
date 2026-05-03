@@ -87,6 +87,7 @@ interface MapWorkspaceSurfaceProps {
   readonly routingCoverage: import('../domain/scenario/scenarioRegistry').ScenarioRoutingCoverage | null;
   readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
   readonly focusedDemandGapId: string | null;
+  readonly demandGapOdContextProjection: import('../domain/projection/demandGapOdContextProjection').DemandGapOdContextProjection | null;
 }
 
 
@@ -140,7 +141,8 @@ export function MapWorkspaceSurface({
   scenarioDemandArtifact,
   routingCoverage,
   demandGapRankingProjection,
-  focusedDemandGapId
+  focusedDemandGapId,
+  demandGapOdContextProjection
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -277,7 +279,8 @@ export function MapWorkspaceSurface({
           vehicleNetworkProjection: vehicleNetworkProjectionRef.current
         },
         routingCoverage,
-        demandGapRankingProjection
+        demandGapRankingProjection,
+        demandGapOdContextProjection
       });
 
       if (mapInstance) {
@@ -379,6 +382,7 @@ export function MapWorkspaceSurface({
     routingCoverage,
     demandGapRankingProjection,
     focusedDemandGapId,
+    demandGapOdContextProjection,
     isMapStyleReady
   });
 

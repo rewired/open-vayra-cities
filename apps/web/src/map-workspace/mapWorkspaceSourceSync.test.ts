@@ -17,7 +17,8 @@ import {
   MAP_LAYER_ID_SCENARIO_ROUTING_COVERAGE_MASK,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
-  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS
+  MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
+  MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES
 } from './mapRenderConstants';
 import type { MapLibreLayerSpecification, MapLibreMap } from './maplibreGlobal';
 
@@ -52,6 +53,7 @@ describe('mapWorkspaceSourceSync custom-layer helpers', () => {
       MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
       MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
       MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
+      MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES,
       MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
       MAP_LAYER_ID_STOPS_CIRCLE,
       MAP_LAYER_ID_STOPS_LABEL,
@@ -151,7 +153,7 @@ describe('mapWorkspaceSourceSync integration', () => {
       'openvayra-cities-completed-lines', 'openvayra-cities-draft-line', 
       'openvayra-cities-stops', 'openvayra-cities-vehicles', 
       'osm-stop-candidates', 'openvayra-cities-scenario-demand-preview', 
-      'openvayra-cities-scenario-routing-coverage'
+      'openvayra-cities-scenario-routing-coverage', 'openvayra-cities-demand-gap-od-context'
     ];
     otherSourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
@@ -181,7 +183,8 @@ describe('mapWorkspaceSourceSync integration', () => {
       'openvayra-cities-completed-lines', 'openvayra-cities-draft-line', 
       'openvayra-cities-stops', 'openvayra-cities-vehicles', 
       'osm-stop-candidates', 'openvayra-cities-scenario-demand-preview', 
-      'openvayra-cities-scenario-routing-coverage', 'openvayra-cities-demand-gap-overlay'
+      'openvayra-cities-scenario-routing-coverage', 'openvayra-cities-demand-gap-overlay',
+      'openvayra-cities-demand-gap-od-context'
     ];
     sourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 

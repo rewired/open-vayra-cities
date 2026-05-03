@@ -37,7 +37,10 @@ import {
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
   MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT,
   MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT,
-  MAP_DEMAND_GAP_OVERLAY_FOCUS_CIRCLE_PAINT
+  MAP_DEMAND_GAP_OVERLAY_FOCUS_CIRCLE_PAINT,
+  MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT,
+  MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES,
+  MAP_DEMAND_GAP_OD_CONTEXT_HINT_PAINT
 } from './mapRenderConstants';
 import { buildScenarioDemandPreviewFeatureCollection } from './scenarioDemandPreviewGeoJson';
 import type { MapLibreMap } from './maplibreGlobal';
@@ -46,6 +49,7 @@ import { buildVehicleFeatureCollection } from './vehicleGeoJson';
 import { buildOsmStopCandidateFeatureCollection } from './osmStopCandidateGeoJson';
 import { buildScenarioRoutingCoverageMaskFeatureCollection } from './scenarioRoutingCoverageGeoJson';
 import { buildDemandGapOverlayFeatureCollection } from './demandGapOverlayGeoJson';
+import { buildDemandGapOdContextFeatureCollection } from './demandGapOdContextGeoJson';
 
 
 /**
@@ -101,6 +105,7 @@ interface MapWorkspaceVehicleSyncInput {
 import type { ScenarioDemandArtifact } from '../domain/types/scenarioDemand';
 import type { ScenarioRoutingCoverage } from '../domain/scenario/scenarioRegistry';
 import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
+import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
 
 /**
  * Inputs for one lifecycle-safe source/layer synchronization pass.
@@ -115,6 +120,7 @@ export interface SyncAllMapWorkspaceSourcesInput {
   readonly routingCoverage?: ScenarioRoutingCoverage | null;
   readonly demandGapRankingProjection?: DemandGapRankingProjection | null;
   readonly focusedDemandGapId?: string | null;
+  readonly demandGapOdContextProjection?: DemandGapOdContextProjection | null;
 }
 
 /**
@@ -141,6 +147,7 @@ const CUSTOM_LAYER_ORDER = [
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
+  MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES,
   MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
   MAP_LAYER_ID_STOPS_CIRCLE,
   MAP_LAYER_ID_STOPS_LABEL,
@@ -166,7 +173,8 @@ const WORKSPACE_SOURCE_IDS = [
   MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
   MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
   MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE,
-  MAP_SOURCE_ID_DEMAND_GAP_OVERLAY
+  MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+  MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
 ] as const;
 
 
@@ -395,6 +403,23 @@ const ensureAllMapWorkspaceRenderSourcesAndLayers = (map: MapWorkspaceSourceSync
       filter: ['==', ['get', 'focused'], true]
     });
   }
+
+  if (!map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT)) {
+    map.addSource(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT, {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES,
+      type: 'line',
+      source: MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT,
+      paint: MAP_DEMAND_GAP_OD_CONTEXT_HINT_PAINT,
+      layout: { visibility: 'none' }
+    });
+  }
 };
 
 
@@ -407,7 +432,8 @@ const syncMapWorkspaceSourceData = ({
   scenarioDemandArtifact,
   routingCoverage,
   demandGapRankingProjection,
-  focusedDemandGapId
+  focusedDemandGapId,
+  demandGapOdContextProjection
 }: SyncAllMapWorkspaceSourcesInput): MapWorkspaceSourceSyncDiagnostics => {
 
   let stopBuilderFeatureCount: number | undefined;
@@ -486,6 +512,12 @@ const syncMapWorkspaceSourceData = ({
     );
     const demandGapSource = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OVERLAY);
     demandGapSource?.setData(demandGapFeatureCollection);
+  }
+
+  if (demandGapOdContextProjection !== undefined) {
+    const odContextFeatureCollection = buildDemandGapOdContextFeatureCollection(demandGapOdContextProjection);
+    const odContextSource = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT);
+    odContextSource?.setData(odContextFeatureCollection);
   }
 
   enforceMapWorkspaceCustomLayerOrder(map);

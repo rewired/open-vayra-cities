@@ -304,6 +304,11 @@ export const MAP_SCENARIO_ROUTING_COVERAGE_MASK_PAINT = {
 export const MAP_SOURCE_ID_DEMAND_GAP_OVERLAY = 'openvayra-cities-demand-gap-overlay';
 
 /**
+ * Canonical GeoJSON source id for the demand gap OD context desire hints.
+ */
+export const MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT = 'openvayra-cities-demand-gap-od-context';
+
+/**
  * Canonical heatmap layer id for aggregate demand gap pressure.
  */
 export const MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP = 'openvayra-cities-demand-gap-overlay-heatmap';
@@ -319,12 +324,24 @@ export const MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE = 'openvayra-cities-demand-g
 export const MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS = 'openvayra-cities-demand-gap-overlay-focus';
 
 /**
+ * Canonical line layer id for demand gap OD context desire hints.
+ */
+export const MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES = 'openvayra-cities-demand-gap-od-context-lines';
+
+/**
  * Canonical style layer ids for demand gap overlay rendering.
  */
 export const MAP_DEMAND_GAP_OVERLAY_LAYER_IDS = [
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS
+] as const;
+
+/**
+ * Canonical style layer ids for demand gap OD context hints.
+ */
+export const MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS = [
+  MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES
 ] as const;
 
 /**
@@ -436,4 +453,15 @@ export const MAP_DEMAND_GAP_OVERLAY_FOCUS_CIRCLE_PAINT = {
     12,
     0.9
   ]
+} as const;
+
+/**
+ * Line paint style for demand gap OD context desire hints.
+ * Dashed, visually subordinate contextual planning hints.
+ */
+export const MAP_DEMAND_GAP_OD_CONTEXT_HINT_PAINT = {
+  'line-color': '#9ca3af',
+  'line-width': 2,
+  'line-opacity': 0.8,
+  'line-dasharray': [2, 2]
 } as const;

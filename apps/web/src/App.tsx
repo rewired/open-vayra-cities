@@ -501,6 +501,7 @@ const toolModeControlOptions: ReadonlyArray<{
           routingCoverage={selectedScenario?.scenario.routingCoverage ?? null}
           demandGapRankingProjection={projections.demandGapRankingProjection}
           focusedDemandGapId={focusedDemandGapId}
+          demandGapOdContextProjection={projections.demandGapOdContextProjection}
         />
 
       </main>

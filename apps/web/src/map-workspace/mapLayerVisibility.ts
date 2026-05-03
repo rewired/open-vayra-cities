@@ -3,7 +3,8 @@ import type { MapLayerVisibilityById } from '../ui/constants/mapLayerUiConstants
 import {
   MAP_OSM_STOP_CANDIDATE_LAYER_IDS,
   MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS,
-  MAP_DEMAND_GAP_OVERLAY_LAYER_IDS
+  MAP_DEMAND_GAP_OVERLAY_LAYER_IDS,
+  MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS
 } from './mapRenderConstants';
 
 /**
@@ -57,6 +58,17 @@ export function applyMapLayerVisibility(
   if (gapsVisible !== undefined) {
     const visibilityValue = gapsVisible ? 'visible' : 'none';
     for (const layerId of MAP_DEMAND_GAP_OVERLAY_LAYER_IDS) {
+      if (map.getLayer(layerId)) {
+        map.setLayoutProperty(layerId, 'visibility', visibilityValue);
+      }
+    }
+  }
+
+  // demand-gap-od-context
+  const odContextVisible = visibility['demand-gap-od-context'];
+  if (odContextVisible !== undefined) {
+    const visibilityValue = odContextVisible ? 'visible' : 'none';
+    for (const layerId of MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS) {
       if (map.getLayer(layerId)) {
         map.setLayoutProperty(layerId, 'visibility', visibilityValue);
       }
