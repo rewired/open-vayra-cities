@@ -9,8 +9,10 @@ const expectSingleFeature = (
 ): MapLibreGeoJsonFeature<DemandGapOdContextHintProperties> => {
   expect(features).toHaveLength(1);
   const [feature] = features;
-  expect(feature).toBeDefined();
-  return feature as MapLibreGeoJsonFeature<DemandGapOdContextHintProperties>;
+  if (!feature) {
+    throw new Error('Expected a single OD context hint feature.');
+  }
+  return feature;
 };
 
 describe('demandGapOdContextGeoJson', () => {

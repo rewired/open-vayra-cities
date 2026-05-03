@@ -87,7 +87,17 @@ describe('mapWorkspaceSourceSync custom-layer helpers', () => {
 
 import { vi } from 'vitest';
 import { syncAllMapWorkspaceSources, syncExistingMapWorkspaceSourceData } from './mapWorkspaceSourceSync';
-import { MAP_SOURCE_ID_DEMAND_GAP_OVERLAY, MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT } from './mapRenderConstants';
+import {
+  MAP_SOURCE_ID_COMPLETED_LINES,
+  MAP_SOURCE_ID_DRAFT_LINE,
+  MAP_SOURCE_ID_STOPS,
+  MAP_SOURCE_ID_VEHICLES,
+  MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
+  MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
+  MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE,
+  MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+  MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
+} from './mapRenderConstants';
 import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
 
@@ -150,10 +160,10 @@ describe('mapWorkspaceSourceSync integration', () => {
     const map = createMockMap();
     // Add all other sources except demand-gap
     const otherSourceIds = [
-      'openvayra-cities-completed-lines', 'openvayra-cities-draft-line', 
-      'openvayra-cities-stops', 'openvayra-cities-vehicles', 
-      'osm-stop-candidates', 'openvayra-cities-scenario-demand-preview', 
-      'openvayra-cities-scenario-routing-coverage', 'openvayra-cities-demand-gap-od-context'
+      MAP_SOURCE_ID_COMPLETED_LINES, MAP_SOURCE_ID_DRAFT_LINE, 
+      MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES, 
+      MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW, 
+      MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
     ];
     otherSourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
@@ -180,11 +190,11 @@ describe('mapWorkspaceSourceSync integration', () => {
     
     // We need to make sure all sources are present for syncExisting to not return null
     const sourceIds = [
-      'openvayra-cities-completed-lines', 'openvayra-cities-draft-line', 
-      'openvayra-cities-stops', 'openvayra-cities-vehicles', 
-      'osm-stop-candidates', 'openvayra-cities-scenario-demand-preview', 
-      'openvayra-cities-scenario-routing-coverage', 'openvayra-cities-demand-gap-overlay',
-      'openvayra-cities-demand-gap-od-context'
+      MAP_SOURCE_ID_COMPLETED_LINES, MAP_SOURCE_ID_DRAFT_LINE, 
+      MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES, 
+      MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW, 
+      MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
     ];
     sourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
@@ -234,10 +244,10 @@ describe('mapWorkspaceSourceSync integration', () => {
   it('syncExistingMapWorkspaceSourceData skips OD context sync if source is missing', () => {
     const map = createMockMap();
     const otherSourceIds = [
-      'openvayra-cities-completed-lines', 'openvayra-cities-draft-line', 
-      'openvayra-cities-stops', 'openvayra-cities-vehicles', 
-      'osm-stop-candidates', 'openvayra-cities-scenario-demand-preview', 
-      'openvayra-cities-scenario-routing-coverage', 'openvayra-cities-demand-gap-overlay'
+      MAP_SOURCE_ID_COMPLETED_LINES, MAP_SOURCE_ID_DRAFT_LINE, 
+      MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES, 
+      MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW, 
+      MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OVERLAY
     ];
     otherSourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
@@ -270,6 +280,67 @@ describe('mapWorkspaceSourceSync integration', () => {
 
     expect(result).toBeNull();
     expect(map.getSource).toHaveBeenCalledWith(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT);
+  });
+
+  it('syncExistingMapWorkspaceSourceData sets data for OD context when source is present and projection is ready', () => {
+    const map = createMockMap();
+    const sourceIds = [
+      MAP_SOURCE_ID_COMPLETED_LINES, MAP_SOURCE_ID_DRAFT_LINE, 
+      MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES, 
+      MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW, 
+      MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
+    ];
+    sourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
+
+    const mockOdProjection: DemandGapOdContextProjection = {
+      status: 'ready',
+      activeTimeBandId: 'morning-rush',
+      focusedPosition: { lat: 10, lng: 10 },
+      focusedGapId: 'gap-1',
+      focusedGapKind: 'uncaptured-residential',
+      problemSide: 'origin',
+      candidates: [
+        {
+          id: 'workplace-1',
+          role: 'destination',
+          demandClass: 'workplace',
+          position: { lng: 11, lat: 11 },
+          activeWeight: 10,
+          baseWeight: 10,
+          distanceMeters: 500
+        }
+      ],
+      summary: { candidateCount: 1, topActiveWeight: 10 },
+      guidance: null
+    };
+
+    const result = syncExistingMapWorkspaceSourceData({
+      map,
+      demandGapOdContextProjection: mockOdProjection
+    });
+
+    expect(result).not.toBeNull();
+    
+    const source = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT);
+    if (!source) throw new Error('Expected source to be defined');
+
+    expect(source.setData).toHaveBeenCalledTimes(1);
+    expect(source.setData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'FeatureCollection',
+        features: [
+          expect.objectContaining({
+            type: 'Feature',
+            properties: expect.objectContaining({
+              candidateId: 'workplace-1',
+              problemSide: 'origin',
+              ordinal: 1
+            })
+          })
+        ]
+      })
+    );
   });
 });
 
