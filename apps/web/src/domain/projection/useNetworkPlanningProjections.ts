@@ -15,6 +15,7 @@ import type { LineRouteSegment, RouteStatus } from '../types/lineRoute';
 import { projectSelectedLineDemandContribution, type SelectedLineDemandContributionProjection } from './selectedLineDemandContributionProjection';
 import { projectDemandGapRanking, type DemandGapRankingProjection } from './demandGapProjection';
 import { projectDemandGapOdContext, type DemandGapOdContextProjection } from './demandGapOdContextProjection';
+import { projectFocusedDemandGapPlanningSummary, type FocusedDemandGapPlanningProjection } from './focusedDemandGapPlanningProjection';
 
 const MAX_READINESS_ISSUES_VISIBLE = 5;
 
@@ -71,6 +72,7 @@ export interface NetworkPlanningProjections {
   readonly selectedLineDemandContribution: SelectedLineDemandContributionProjection | null;
   readonly demandGapRankingProjection: DemandGapRankingProjection;
   readonly demandGapOdContextProjection: DemandGapOdContextProjection;
+  readonly focusedDemandGapPlanningProjection: FocusedDemandGapPlanningProjection;
 }
 
 
@@ -206,6 +208,12 @@ export const useNetworkPlanningProjections = (
     activeSimulationTimeBandId
   );
 
+  const focusedDemandGapPlanningProjection = projectFocusedDemandGapPlanningSummary(
+    demandGapRankingProjection,
+    demandGapOdContextProjection,
+    focusedDemandGapId
+  );
+
   return {
     staticNetworkSummaryKpis,
     selectedLineRouteBaseline,
@@ -222,6 +230,7 @@ export const useNetworkPlanningProjections = (
     servicePressureProjection,
     selectedLineDemandContribution,
     demandGapRankingProjection,
-    demandGapOdContextProjection
+    demandGapOdContextProjection,
+    focusedDemandGapPlanningProjection
   };
 };

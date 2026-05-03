@@ -15,6 +15,7 @@ import type { ServedDemandProjection } from '../domain/projection/servedDemandPr
 import type { ServicePressureProjection } from '../domain/projection/servicePressureProjection';
 import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
+import type { FocusedDemandGapPlanningProjection } from '../domain/projection/focusedDemandGapPlanningProjection';
 import type { LineFrequencyInputByTimeBand, LineFrequencyControlByTimeBand, LineFrequencyValidationByTimeBand, LineFrequencyControlState } from '../session/useNetworkSessionState';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -134,6 +135,17 @@ const mockDemandGapOdContextProjection: DemandGapOdContextProjection = {
   guidance: null
 };
 
+const mockFocusedDemandGapPlanningProjection: FocusedDemandGapPlanningProjection = {
+  status: 'unavailable',
+  focusedGapId: null,
+  actionKind: null,
+  title: null,
+  primaryAction: null,
+  supportingContext: null,
+  caveat: null,
+  evidence: []
+};
+
 const mockLineFrequencyInput: LineFrequencyInputByTimeBand = {
   'morning-rush': '',
   'late-morning': '',
@@ -195,6 +207,7 @@ const renderInspectorPanel = (): RenderResult => {
         servicePressureProjection={mockServicePressureProjection}
         demandGapRankingProjection={mockDemandGapRankingProjection}
         demandGapOdContextProjection={mockDemandGapOdContextProjection}
+        focusedDemandGapPlanningProjection={mockFocusedDemandGapPlanningProjection}
         selectedLineRouteBaseline={null}
         selectedLineServiceProjection={null}
         selectedLineServiceInspectorProjection={null}

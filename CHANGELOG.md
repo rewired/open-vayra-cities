@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Slice 174 — Focused Demand Gap Planning Summary Projection**:
+    - Extracted legacy component-local planning guidance semantics into a pure projection module (`focusedDemandGapPlanningProjection.ts`).
+    - Wired the new projection into the `NetworkPlanningProjections` bundle via `useNetworkPlanningProjections.ts`.
+    - Updated `InspectorDemandTab.tsx` to consume the new projection, rendering deterministic actionable guidance, evidence facts, and an explicit "Clear focus" button.
+    - Repaired type issues and established unit test coverage for deterministic guidance derivation.
+    - Added ADR 0175 documenting the pure-projection planning guidance architecture.
 - **Slice 168d — Shell Panel Spacing and Inspector Disclosure Polish**:
     - Removed vertical separator lines between `left-panel`, `workspace`, and `right-panel` for a more integrated look.
     - Normalized and reduced horizontal padding across shell panels to recover map space.

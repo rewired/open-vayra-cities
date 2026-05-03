@@ -8,16 +8,13 @@ interface InspectorDemandTabProps {
   readonly servedDemandProjection: import('../domain/projection/servedDemandProjection').ServedDemandProjection;
   readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
   readonly demandGapOdContextProjection: import('../domain/projection/demandGapOdContextProjection').DemandGapOdContextProjection;
+  readonly focusedDemandGapPlanningProjection: import('../domain/projection/focusedDemandGapPlanningProjection').FocusedDemandGapPlanningProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
   readonly onDemandGapFocus: (gap: import('../domain/projection/demandGapProjection').DemandGapRankingItem | null) => void;
   readonly focusedDemandGapId: string | null;
 }
 
-const PLANNING_GUIDANCE: Record<import('../domain/projection/demandGapProjection').DemandGapKind, string> = {
-  'uncaptured-residential': 'Place a stop near this location to capture residential demand.',
-  'captured-unserved-residential': 'Connect capturing stops to workplace destinations to serve this demand.',
-  'captured-unreachable-workplace': 'Connect this workplace to residential areas via active bus lines.'
-};
+
 
 /**
  * Renders demand-related projections, including capture summaries, served demand, and identified gaps.
@@ -27,6 +24,7 @@ export function InspectorDemandTab({
   servedDemandProjection,
   demandGapRankingProjection,
   demandGapOdContextProjection,
+  focusedDemandGapPlanningProjection,
   onPositionFocus,
   onDemandGapFocus,
   focusedDemandGapId
@@ -46,12 +44,6 @@ export function InspectorDemandTab({
                   Pressure: {gap.activeWeight.toFixed(1)}
                 </span>
                 <span className="inspector-demand-gaps__item-note">{gap.note}</span>
-                {isFocused && (
-                  <div className="inspector-demand-gaps__guidance" aria-live="polite">
-                    <MaterialIcon name="info" />
-                    <span>{PLANNING_GUIDANCE[gap.kind]}</span>
-                  </div>
-                )}
               </div>
               <button
                 type="button"
@@ -187,11 +179,52 @@ export function InspectorDemandTab({
                 {renderGapList(demandGapRankingProjection.capturedButUnreachableWorkplaceGaps, 'Unreachable workplaces')}
               </InspectorDisclosure>
 
-              {focusedDemandGapId && demandGapOdContextProjection.status === 'ready' && (
+              {focusedDemandGapId && (
                 <div className="inspector-demand-gaps__od-context">
-                  <h4 className="inspector-demand-gaps__section-title">Planning context</h4>
-                  <p className="inspector-dialog__note">{demandGapOdContextProjection.guidance}</p>
-                  {demandGapOdContextProjection.candidates.length > 0 && (
+                  <div className="inspector-demand-gaps__od-context-header">
+                    <h4 className="inspector-demand-gaps__section-title">Planning context</h4>
+                    <button
+                      type="button"
+                      className="inspector-button-secondary inspector-button-secondary--small"
+                      onClick={() => onDemandGapFocus(null)}
+                    >
+                      Clear focus
+                    </button>
+                  </div>
+                  
+                  {focusedDemandGapPlanningProjection.status === 'ready' && (
+                    <div className="inspector-demand-gaps__planning-summary">
+                      <div className="inspector-demand-gaps__guidance" aria-live="polite">
+                        <MaterialIcon name="info" />
+                        <div>
+                          <strong>{focusedDemandGapPlanningProjection.title}</strong>
+                          <p>{focusedDemandGapPlanningProjection.primaryAction}</p>
+                          <p className="inspector-demand-gaps__guidance-supporting">{focusedDemandGapPlanningProjection.supportingContext}</p>
+                        </div>
+                      </div>
+                      
+                      {focusedDemandGapPlanningProjection.evidence.length > 0 && (
+                        <table className="inspector-compact-table inspector-compact-table--evidence">
+                          <tbody>
+                            {focusedDemandGapPlanningProjection.evidence.map((item, idx) => (
+                              <tr key={idx}>
+                                <th scope="row">{item.label}</th>
+                                <td>{item.value}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                      
+                      <p className="inspector-dialog__note inspector-dialog__note--caveat">
+                        {focusedDemandGapPlanningProjection.caveat}
+                      </p>
+                    </div>
+                  )}
+
+                  {demandGapOdContextProjection.status === 'ready' && demandGapOdContextProjection.candidates.length > 0 && (
+                    <>
+                      <h4 className="inspector-demand-gaps__section-title">Candidates</h4>
                     <table className="inspector-compact-table">
                       <thead>
                         <tr>
@@ -210,6 +243,7 @@ export function InspectorDemandTab({
                         ))}
                       </tbody>
                     </table>
+                    </>
                   )}
                 </div>
               )}

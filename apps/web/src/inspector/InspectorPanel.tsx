@@ -68,6 +68,7 @@ interface InspectorPanelProps {
   readonly selectedLineDemandContribution: SelectedLineDemandContributionProjection | null;
   readonly demandGapRankingProjection: DemandGapRankingProjection;
   readonly demandGapOdContextProjection: DemandGapOdContextProjection;
+  readonly focusedDemandGapPlanningProjection: import('../domain/projection/focusedDemandGapPlanningProjection').FocusedDemandGapPlanningProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
   readonly onDemandGapFocus: (gap: DemandGapRankingItem | null) => void;
   readonly focusedDemandGapId: string | null;
@@ -126,6 +127,7 @@ export function InspectorPanel({
   selectedLineDemandContribution,
   demandGapRankingProjection,
   demandGapOdContextProjection,
+  focusedDemandGapPlanningProjection,
   onPositionFocus,
   onDemandGapFocus,
   focusedDemandGapId
@@ -184,6 +186,7 @@ export function InspectorPanel({
                 servedDemandProjection={servedDemandProjection}
                 demandGapRankingProjection={demandGapRankingProjection}
                 demandGapOdContextProjection={demandGapOdContextProjection}
+                focusedDemandGapPlanningProjection={focusedDemandGapPlanningProjection}
                 onPositionFocus={onPositionFocus}
                 onDemandGapFocus={onDemandGapFocus}
                 focusedDemandGapId={focusedDemandGapId}
