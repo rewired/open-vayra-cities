@@ -1,13 +1,16 @@
 import type { DemandGapOdContextProjection } from './demandGapOdContextProjection';
 import type { DemandGapRankingItem, DemandGapRankingProjection } from './demandGapProjection';
 
+/** Availability state for the focused demand gap planning summary projection. */
 export type FocusedDemandGapPlanningStatus = 'unavailable' | 'ready';
 
+/** Recommended planning action kinds for addressing a focused demand gap. */
 export type FocusedDemandGapPlanningActionKind =
   | 'add-stop-coverage'
   | 'connect-origin-to-destination'
   | 'connect-destination-from-origin';
 
+/** A single piece of supporting evidence for the recommended planning action. */
 export interface FocusedDemandGapPlanningEvidenceItem {
   readonly label: string;
   readonly value: string;

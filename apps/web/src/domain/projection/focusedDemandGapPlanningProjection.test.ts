@@ -21,9 +21,9 @@ const createMockOdContext = (candidateCount: number = 0, topActiveWeight: number
   focusedGapKind: 'uncaptured-residential',
   problemSide: 'origin',
   focusedPosition: { lng: 0, lat: 0 },
-  candidates: Array(candidateCount).fill({
-    id: 'mock-candidate', role: 'destination', demandClass: 'workplace', position: { lng: 1, lat: 1 }, activeWeight: topActiveWeight, baseWeight: 10, distanceMeters: 500
-  }),
+  candidates: Array.from({ length: candidateCount }, (_, i) => ({
+    id: `mock-candidate-${i}`, role: 'destination', demandClass: 'workplace', position: { lng: 1, lat: 1 }, activeWeight: topActiveWeight, baseWeight: 10, distanceMeters: 500
+  })),
   summary: { candidateCount, topActiveWeight },
   guidance: 'Mock guidance'
 });
@@ -154,5 +154,80 @@ describe('focusedDemandGapPlanningProjection', () => {
     expect(result.status).toBe('ready');
     const nearestStopEvidence = result.evidence.find(e => e.label === 'Nearest stop');
     expect(nearestStopEvidence?.value).toBe('Outside access');
+  });
+
+  it('returns unavailable if focusedGapId is null', () => {
+    const gapItem: DemandGapRankingItem = {
+      id: 'mock-gap',
+      kind: 'uncaptured-residential',
+      position: { lng: 0, lat: 0 },
+      activeWeight: 15.4,
+      baseWeight: 20,
+      nearestStopDistanceMeters: 1250,
+      capturingStopCount: 0,
+      note: 'Mock note'
+    };
+    const ranking = createMockRanking([gapItem]);
+    const odContext = createMockOdContext();
+    
+    const result = projectFocusedDemandGapPlanningSummary(ranking, odContext, null);
+    expect(result.status).toBe('unavailable');
+  });
+
+  it('omits OD candidate evidence when odContext is unavailable', () => {
+    const gapItem: DemandGapRankingItem = {
+      id: 'mock-gap',
+      kind: 'uncaptured-residential',
+      position: { lng: 0, lat: 0 },
+      activeWeight: 15.4,
+      baseWeight: 20,
+      nearestStopDistanceMeters: 1250,
+      capturingStopCount: 0,
+      note: 'Mock note'
+    };
+    const ranking = createMockRanking([gapItem]);
+    const odContext: DemandGapOdContextProjection = {
+      ...createMockOdContext(),
+      status: 'unavailable'
+    };
+
+    const result = projectFocusedDemandGapPlanningSummary(ranking, odContext, 'mock-gap');
+    
+    expect(result.status).toBe('ready');
+    const odEvidence = result.status === 'ready' ? result.evidence.find(e => e.label === 'OD candidates') : undefined;
+    expect(odEvidence).toBeUndefined();
+  });
+
+  it('does not contain wording claiming exact passenger flows or real-world routing', () => {
+    const gapItem: DemandGapRankingItem = {
+      id: 'mock-gap',
+      kind: 'uncaptured-residential',
+      position: { lng: 0, lat: 0 },
+      activeWeight: 15.4,
+      baseWeight: 20,
+      nearestStopDistanceMeters: 1250,
+      capturingStopCount: 0,
+      note: 'Mock note'
+    };
+    const ranking = createMockRanking([gapItem]);
+    const odContext = createMockOdContext(2, 10.5);
+
+    const result = projectFocusedDemandGapPlanningSummary(ranking, odContext, 'mock-gap');
+    expect(result.status).toBe('ready');
+    
+    if (result.status === 'ready') {
+      const allText = [
+        result.title,
+        result.primaryAction,
+        result.supportingContext,
+        result.caveat
+      ].filter(Boolean).join(' ').toLowerCase();
+
+      expect(allText).not.toContain('actual flow');
+      expect(allText).not.toContain('exact flow');
+      expect(allText).not.toContain('assigned passengers');
+      expect(allText).not.toContain('passengers are assigned');
+      expect(allText).not.toContain('real-world route');
+    }
   });
 });

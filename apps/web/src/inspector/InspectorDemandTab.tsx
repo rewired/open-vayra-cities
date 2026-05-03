@@ -3,14 +3,20 @@ import { MaterialIcon } from '../ui/icons/MaterialIcon';
 import { InspectorDisclosure } from '../ui/InspectorDisclosure';
 import { TIME_BAND_DISPLAY_LABELS } from '../domain/constants/timeBands';
 
+import type { ScenarioDemandCaptureProjection } from '../domain/projection/scenarioDemandCaptureProjection';
+import type { ServedDemandProjection } from '../domain/projection/servedDemandProjection';
+import type { DemandGapRankingProjection, DemandGapRankingItem } from '../domain/projection/demandGapProjection';
+import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
+import type { FocusedDemandGapPlanningProjection } from '../domain/projection/focusedDemandGapPlanningProjection';
+
 interface InspectorDemandTabProps {
-  readonly scenarioDemandCaptureProjection: import('../domain/projection/scenarioDemandCaptureProjection').ScenarioDemandCaptureProjection;
-  readonly servedDemandProjection: import('../domain/projection/servedDemandProjection').ServedDemandProjection;
-  readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
-  readonly demandGapOdContextProjection: import('../domain/projection/demandGapOdContextProjection').DemandGapOdContextProjection;
-  readonly focusedDemandGapPlanningProjection: import('../domain/projection/focusedDemandGapPlanningProjection').FocusedDemandGapPlanningProjection;
+  readonly scenarioDemandCaptureProjection: ScenarioDemandCaptureProjection;
+  readonly servedDemandProjection: ServedDemandProjection;
+  readonly demandGapRankingProjection: DemandGapRankingProjection;
+  readonly demandGapOdContextProjection: DemandGapOdContextProjection;
+  readonly focusedDemandGapPlanningProjection: FocusedDemandGapPlanningProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
-  readonly onDemandGapFocus: (gap: import('../domain/projection/demandGapProjection').DemandGapRankingItem | null) => void;
+  readonly onDemandGapFocus: (gap: DemandGapRankingItem | null) => void;
   readonly focusedDemandGapId: string | null;
 }
 
