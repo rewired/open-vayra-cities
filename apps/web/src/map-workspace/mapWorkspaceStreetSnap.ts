@@ -21,6 +21,7 @@ import {
 import type { StopPosition } from '../domain/types/stop';
 import { extractStreetLabelCandidate } from './streetFeatureLabel';
 import { calculateGreatCircleDistanceMeters } from '../lib/geometry';
+import type { NearbyLabelQueryMap, StreetSnapQueryMap } from './mapWorkspaceRenderedFeatureQuery';
 
 interface ScreenPoint {
   readonly x: number;
@@ -95,7 +96,7 @@ const toFeatureSourceKey = (source: string | undefined, sourceLayer: string | un
 };
 
 const hasStreetLineGeometryInSourceFallback = (
-  map: MapLibreMap,
+  map: StreetSnapQueryMap,
   event: MapLibreInteractionEvent,
   streetLayerIds: readonly string[]
 ): boolean => {
@@ -217,7 +218,7 @@ const resolveFeatureLayerMatchStrength = (
 };
 
 const resolveSnapCandidateForLineCoordinates = (
-  map: MapLibreMap,
+  map: Pick<MapLibreMap, 'project'>,
   clickPoint: ScreenPoint,
   coordinates: readonly (readonly [number, number])[],
   ranking: SnapCandidateRankingMetadata,
@@ -263,7 +264,7 @@ const resolveSnapCandidateForLineCoordinates = (
 };
 
 const resolveBestSnapCandidateFromFeatures = (
-  map: MapLibreMap,
+  map: Pick<MapLibreMap, 'project'>,
   clickPoint: ScreenPoint,
   features: readonly MapLibreRenderedFeature[],
   streetLayerIds: readonly string[],
@@ -304,7 +305,7 @@ const resolveBestSnapCandidateFromFeatures = (
 };
 
 const resolveDirectHitSnapCandidate = (
-  map: MapLibreMap,
+  map: Pick<MapLibreMap, 'project' | 'queryRenderedFeatures'>,
   point: ScreenPoint,
   streetLayerIds: readonly string[]
 ): SnapCandidate | null => {
@@ -322,7 +323,7 @@ const resolveDirectHitSnapCandidate = (
 };
 
 const resolveFallbackSnapCandidate = (
-  map: MapLibreMap,
+  map: Pick<MapLibreMap, 'project' | 'queryRenderedFeatures'>,
   point: ScreenPoint,
   streetLayerIds: readonly string[]
 ): SnapCandidate | null => {
@@ -383,7 +384,7 @@ const resolveFallbackSnapCandidate = (
  *    - Stable lexical tie-breaker
  */
 export const resolveNearbyStreetLabelCandidate = (
-  map: MapLibreMap,
+  map: NearbyLabelQueryMap,
   snappedPoint: GeographicPoint
 ): string | null => {
   const queryPoint = map.project([snappedPoint.lng, snappedPoint.lat]);
@@ -431,7 +432,7 @@ export const resolveNearbyStreetLabelCandidate = (
 };
 
 /** Resolves style layer ids that likely represent street LineString sources in the active map style. */
-export const resolveStreetLayerIdsFromStyle = (map: MapLibreMap): readonly string[] => {
+export const resolveStreetLayerIdsFromStyle = (map: Pick<MapLibreMap, 'getStyle'>): readonly string[] => {
   const styleDefinition = map.getStyle();
 
   if (!styleDefinition?.layers) {
@@ -453,7 +454,7 @@ export const resolveStreetLayerIdsFromStyle = (map: MapLibreMap): readonly strin
 
 /** Validates whether a click can place a stop by requiring street line geometry at the clicked map point. */
 export const isEligibleStopPlacementClickForLayers = (
-  map: MapLibreMap,
+  map: StreetSnapQueryMap,
   event: MapLibreInteractionEvent,
   streetLayerIds: readonly string[]
 ): boolean => {
@@ -471,7 +472,7 @@ export const isEligibleStopPlacementClickForLayers = (
 
 /** Resolves the final snapped street lng/lat for stop placement using direct-hit-first candidate ranking. */
 export const resolveSnappedStreetPosition = (
-  map: MapLibreMap,
+  map: StreetSnapQueryMap,
   event: MapLibreInteractionEvent,
   streetLayerIds: readonly string[]
 ): Readonly<{ lng: number; lat: number; streetLabelCandidate: string | null }> | null => {
@@ -515,7 +516,7 @@ export const resolveSnappedStreetPosition = (
  * and performing the same staged direct-hit/fallback snapping as used for map clicks.
  */
 export function resolveSnappedStreetPositionForGeographicPoint(
-  map: MapLibreMap,
+  map: StreetSnapQueryMap,
   position: StopPosition,
   streetLayerIds: readonly string[]
 ): Readonly<{ lng: number; lat: number; streetLabelCandidate: string | null }> | null {
@@ -568,7 +569,7 @@ export function resolveSnappedStreetPositionForGeographicPoint(
  * 4. Calculates final quality by great-circle distance.
  */
 export function resolveNearestRenderedStreetPositionForGeographicPoint(
-  map: MapLibreMap,
+  map: StreetSnapQueryMap,
   position: GeographicPoint,
   streetLayerIds: readonly string[],
   maxDistanceMeters: number

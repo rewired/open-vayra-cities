@@ -1,14 +1,17 @@
 import { describe, it, expect, vi } from 'vitest';
 import { resolveSnappedStreetPositionForGeographicPoint } from './mapWorkspaceStreetSnap';
-import type { MapLibreMap } from './maplibreGlobal';
+import type { StreetSnapQueryMap } from './mapWorkspaceRenderedFeatureQuery';
 
 describe('mapWorkspaceStreetSnap', () => {
   describe('resolveSnappedStreetPositionForGeographicPoint', () => {
     it('should return null when no street layers exist', () => {
-      const mockMap = {
+      const mockMap: StreetSnapQueryMap = {
         project: vi.fn().mockReturnValue({ x: 100, y: 100 }),
-        queryRenderedFeatures: vi.fn().mockReturnValue([])
-      } as unknown as MapLibreMap;
+        queryRenderedFeatures: vi.fn().mockReturnValue([]),
+        getZoom: vi.fn().mockReturnValue(15),
+        getStyle: vi.fn().mockReturnValue({ layers: [] }),
+        querySourceFeatures: vi.fn().mockReturnValue([])
+      };
 
       const result = resolveSnappedStreetPositionForGeographicPoint(mockMap, { lng: 13.4, lat: 52.5 }, []);
 
@@ -16,7 +19,7 @@ describe('mapWorkspaceStreetSnap', () => {
     });
 
     it('should return snapped point when street features are found', () => {
-      const mockMap = {
+      const mockMap: StreetSnapQueryMap = {
         project: vi.fn().mockReturnValue({ x: 100, y: 100 }),
         queryRenderedFeatures: vi.fn().mockReturnValue([
           {
@@ -31,8 +34,11 @@ describe('mapWorkspaceStreetSnap', () => {
             source: 'osm',
             layer: { id: 'streets' }
           }
-        ])
-      } as unknown as MapLibreMap;
+        ]),
+        getZoom: vi.fn().mockReturnValue(15),
+        getStyle: vi.fn().mockReturnValue({ layers: [{ id: 'streets', type: 'line', source: 'osm' }] }),
+        querySourceFeatures: vi.fn().mockReturnValue([])
+      };
 
       const result = resolveSnappedStreetPositionForGeographicPoint(mockMap, { lng: 13.4001, lat: 52.5001 }, ['streets']);
 

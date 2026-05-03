@@ -1,15 +1,18 @@
 import { describe, it, expect, vi } from 'vitest';
 import { resolveOsmStopCandidateGroupStreetAnchor } from './osmStopCandidateStreetAnchorResolution';
 import { createOsmStopCandidateGroupId, type OsmStopCandidateGroup } from '../domain/types/osmStopCandidate';
-import type { MapLibreMap } from './maplibreGlobal';
+import type { StreetSnapQueryMap } from './mapWorkspaceRenderedFeatureQuery';
 import * as streetSnap from './mapWorkspaceStreetSnap';
 import { OSM_STOP_CANDIDATE_STREET_ANCHOR_REVIEW_MAX_DISTANCE_METERS } from '../domain/osm/osmStopCandidateAnchorConstants';
 
 describe('osmStopCandidateStreetAnchorResolution', () => {
-  const mockMap = {
+  const mockMap: StreetSnapQueryMap = {
     project: vi.fn(),
-    getZoom: vi.fn().mockReturnValue(15)
-  } as unknown as MapLibreMap;
+    getZoom: vi.fn().mockReturnValue(15),
+    queryRenderedFeatures: vi.fn(),
+    getStyle: vi.fn(),
+    querySourceFeatures: vi.fn()
+  };
 
   const mockGroup: OsmStopCandidateGroup = {
     id: createOsmStopCandidateGroupId('group-1'),

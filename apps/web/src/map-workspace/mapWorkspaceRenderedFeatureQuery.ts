@@ -34,6 +34,32 @@ export interface LayerInteractionBindingMap {
 }
 
 /**
+ * Minimal MapLibre surface required for nearby street label lookups.
+ */
+export interface NearbyLabelQueryMap {
+  /** Projects geographic coordinates into current map viewport screen-space coordinates. */
+  readonly project: MapLibreMap['project'];
+  /** Queries rendered features at a clicked screen point, optionally filtered by style layer ids. */
+  readonly queryRenderedFeatures: MapLibreMap['queryRenderedFeatures'];
+}
+
+/**
+ * Minimal MapLibre surface required for street snap resolution.
+ */
+export interface StreetSnapQueryMap {
+  /** Returns the active style document for layer/source-level click validation. */
+  readonly getStyle: MapLibreMap['getStyle'];
+  /** Returns the current zoom level of the map. */
+  readonly getZoom: MapLibreMap['getZoom'];
+  /** Projects geographic coordinates into current map viewport screen-space coordinates. */
+  readonly project: MapLibreMap['project'];
+  /** Queries rendered features at a clicked screen point, optionally filtered by style layer ids. */
+  readonly queryRenderedFeatures: MapLibreMap['queryRenderedFeatures'];
+  /** Queries source features for a known source id and optional source-layer constraint. */
+  readonly querySourceFeatures: MapLibreMap['querySourceFeatures'];
+}
+
+/**
  * Filters the requested layer IDs to only those currently present in the map style.
  * 
  * MapLibre throws an error if queryRenderedFeatures is called with layer IDs

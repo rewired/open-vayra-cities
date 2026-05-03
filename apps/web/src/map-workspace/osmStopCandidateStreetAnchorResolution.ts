@@ -5,9 +5,9 @@ import type {
 } from '../domain/osm/osmStopCandidateAnchorTypes';
 import { classifyOsmStopCandidateStreetAnchorDistance } from '../domain/osm/osmStopCandidateStreetAnchor';
 import { calculateGreatCircleDistanceMeters } from '../lib/geometry';
-import type { MapLibreMap } from './maplibreGlobal';
 import { resolveNearestRenderedStreetPositionForGeographicPoint } from './mapWorkspaceStreetSnap';
 import { OSM_STOP_CANDIDATE_STREET_ANCHOR_REVIEW_MAX_DISTANCE_METERS } from '../domain/osm/osmStopCandidateAnchorConstants';
+import type { StreetSnapQueryMap } from './mapWorkspaceRenderedFeatureQuery';
 
 /**
  * Resolves the street routing anchor for an OSM candidate group by snapping its
@@ -20,7 +20,7 @@ import { OSM_STOP_CANDIDATE_STREET_ANCHOR_REVIEW_MAX_DISTANCE_METERS } from '../
  * 4. Preserves original anchor source intent (stop-position vs display-position).
  */
 export function resolveOsmStopCandidateGroupStreetAnchor(
-  map: MapLibreMap,
+  map: StreetSnapQueryMap,
   group: OsmStopCandidateGroup,
   streetLayerIds: readonly string[]
 ): OsmStopCandidateStreetAnchorResolution {
