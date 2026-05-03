@@ -7,6 +7,7 @@ import type { ScenarioDemandCaptureProjection } from '../domain/projection/scena
 import type { ServedDemandProjection } from '../domain/projection/servedDemandProjection';
 import type { DemandGapRankingProjection, DemandGapRankingItem } from '../domain/projection/demandGapProjection';
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
+import type { DemandGapOdCandidateListProjection } from '../domain/projection/demandGapOdCandidateListProjection';
 import type { FocusedDemandGapPlanningProjection } from '../domain/projection/focusedDemandGapPlanningProjection';
 
 interface InspectorDemandTabProps {
@@ -14,6 +15,7 @@ interface InspectorDemandTabProps {
   readonly servedDemandProjection: ServedDemandProjection;
   readonly demandGapRankingProjection: DemandGapRankingProjection;
   readonly demandGapOdContextProjection: DemandGapOdContextProjection;
+  readonly demandGapOdCandidateListProjection: DemandGapOdCandidateListProjection;
   readonly focusedDemandGapPlanningProjection: FocusedDemandGapPlanningProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
   readonly onDemandGapFocus: (gap: DemandGapRankingItem | null) => void;
@@ -30,6 +32,7 @@ export function InspectorDemandTab({
   servedDemandProjection,
   demandGapRankingProjection,
   demandGapOdContextProjection,
+  demandGapOdCandidateListProjection,
   focusedDemandGapPlanningProjection,
   onPositionFocus,
   onDemandGapFocus,
@@ -228,23 +231,37 @@ export function InspectorDemandTab({
                     </div>
                   )}
 
-                  {demandGapOdContextProjection.status === 'ready' && demandGapOdContextProjection.candidates.length > 0 && (
+                  {demandGapOdCandidateListProjection.status === 'ready' && demandGapOdCandidateListProjection.rows.length > 0 && (
                     <>
-                      <h4 className="inspector-demand-gaps__section-title">Candidates</h4>
+                      <h4 className="inspector-demand-gaps__section-title">{demandGapOdCandidateListProjection.heading}</h4>
                     <table className="inspector-compact-table">
                       <thead>
                         <tr>
-                          <th scope="col">Candidate {demandGapOdContextProjection.problemSide === 'origin' ? 'destination' : 'origin'}</th>
+                          <th scope="col">Candidate</th>
                           <th scope="col">Weight</th>
                           <th scope="col">Dist.</th>
+                          <th scope="col" aria-label="Action" />
                         </tr>
                       </thead>
                       <tbody>
-                        {demandGapOdContextProjection.candidates.map(candidate => (
-                          <tr key={candidate.id}>
-                            <td>{candidate.id.split('-').pop()?.slice(0, 8)}</td>
-                            <td>{candidate.activeWeight.toFixed(1)}</td>
-                            <td>{(candidate.distanceMeters / 1000).toFixed(1)}km</td>
+                        {demandGapOdCandidateListProjection.rows.map(row => (
+                          <tr key={row.candidateId}>
+                            <td>
+                              <span title={row.candidateId}>{row.displayLabel}</span>
+                            </td>
+                            <td>{row.activeWeightLabel}</td>
+                            <td>{row.distanceLabel}</td>
+                            <td style={{ textAlign: 'right' }}>
+                              <button
+                                type="button"
+                                className="inspector-demand-gaps__focus-button"
+                                title={`Focus ${row.displayLabel} on map`}
+                                aria-label={`Focus ${row.displayLabel} on map`}
+                                onClick={() => onPositionFocus(row.position)}
+                              >
+                                <MaterialIcon name="center_focus_strong" />
+                              </button>
+                            </td>
                           </tr>
                         ))}
                       </tbody>

@@ -524,6 +524,7 @@ const toolModeControlOptions: ReadonlyArray<{
         selectedLineDemandContribution={projections.selectedLineDemandContribution}
         demandGapRankingProjection={projections.demandGapRankingProjection}
         demandGapOdContextProjection={projections.demandGapOdContextProjection}
+        demandGapOdCandidateListProjection={projections.demandGapOdCandidateListProjection}
         focusedDemandGapPlanningProjection={projections.focusedDemandGapPlanningProjection}
         lineFrequencyInputByTimeBand={sessionController.lineFrequencyInputByTimeBand}
         lineFrequencyControlByTimeBand={sessionController.lineFrequencyControlByTimeBand}

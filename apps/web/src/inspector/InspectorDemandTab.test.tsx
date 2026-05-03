@@ -7,6 +7,7 @@ import { InspectorDemandTab } from './InspectorDemandTab';
 import type { DemandGapRankingProjection, DemandGapRankingItem } from '../domain/projection/demandGapProjection';
 import type { FocusedDemandGapPlanningProjection } from '../domain/projection/focusedDemandGapPlanningProjection';
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
+import type { DemandGapOdCandidateListProjection } from '../domain/projection/demandGapOdCandidateListProjection';
 import type { ScenarioDemandCaptureProjection, CapturedEntitySummary } from '../domain/projection/scenarioDemandCaptureProjection';
 import type { ServedDemandProjection } from '../domain/projection/servedDemandProjection';
 
@@ -69,6 +70,12 @@ const MOCK_OD_CONTEXT: DemandGapOdContextProjection = {
   candidates: [],
   summary: { candidateCount: 0, topActiveWeight: 0 },
   guidance: null
+};
+
+const MOCK_CANDIDATE_LIST: DemandGapOdCandidateListProjection = {
+  status: 'unavailable',
+  heading: null,
+  rows: []
 };
 
 interface RenderResult {
@@ -140,6 +147,7 @@ describe('InspectorDemandTab', () => {
       servedDemandProjection: MOCK_SERVED_PROJECTION,
       demandGapRankingProjection: mockRanking,
       demandGapOdContextProjection: MOCK_OD_CONTEXT,
+      demandGapOdCandidateListProjection: MOCK_CANDIDATE_LIST,
       focusedDemandGapPlanningProjection: mockPlanning,
       onPositionFocus: vi.fn(),
       onDemandGapFocus: vi.fn(),
@@ -193,6 +201,7 @@ describe('InspectorDemandTab', () => {
       servedDemandProjection: MOCK_SERVED_PROJECTION,
       demandGapRankingProjection: mockRanking,
       demandGapOdContextProjection: MOCK_OD_CONTEXT,
+      demandGapOdCandidateListProjection: MOCK_CANDIDATE_LIST,
       focusedDemandGapPlanningProjection: mockPlanning,
       onPositionFocus: vi.fn(),
       onDemandGapFocus,
@@ -207,5 +216,82 @@ describe('InspectorDemandTab', () => {
     });
 
     expect(onDemandGapFocus).toHaveBeenCalledWith(null);
+  });
+
+  it('renders readable candidates and handles focus action', () => {
+    const mockGap: DemandGapRankingItem = {
+      id: 'gap-123',
+      kind: 'uncaptured-residential',
+      position: { lng: 0, lat: 0 },
+      activeWeight: 10,
+      baseWeight: 10,
+      nearestStopDistanceMeters: 500,
+      capturingStopCount: 0,
+      note: 'Test note'
+    };
+
+    const mockRanking: DemandGapRankingProjection = {
+      status: 'ready',
+      activeTimeBandId: 'morning-rush',
+      uncapturedResidentialGaps: [mockGap],
+      capturedButUnservedResidentialGaps: [],
+      capturedButUnreachableWorkplaceGaps: [],
+      summary: { totalGapCount: 1 }
+    };
+
+    const mockCandidateList: DemandGapOdCandidateListProjection = {
+      status: 'ready',
+      heading: 'Likely workplace candidates',
+      rows: [
+        {
+          ordinal: 1,
+          candidateId: 'cand-456',
+          roleLabel: 'destination',
+          demandClassLabel: 'workplace',
+          displayLabel: '#1 Workplace candidate',
+          activeWeightLabel: '15.5',
+          distanceLabel: '800m',
+          position: { lng: 1, lat: 1 }
+        }
+      ]
+    };
+
+    const onPositionFocus = vi.fn();
+
+    mounted = renderTab({
+      scenarioDemandCaptureProjection: MOCK_SCENARIO_PROJECTION,
+      servedDemandProjection: MOCK_SERVED_PROJECTION,
+      demandGapRankingProjection: mockRanking,
+      demandGapOdContextProjection: MOCK_OD_CONTEXT,
+      demandGapOdCandidateListProjection: mockCandidateList,
+      focusedDemandGapPlanningProjection: {
+        status: 'ready',
+        focusedGapId: 'gap-123',
+        actionKind: 'add-stop-coverage',
+        title: 'Title',
+        primaryAction: 'Action',
+        supportingContext: 'Context',
+        caveat: 'Caveat',
+        evidence: []
+      },
+      onPositionFocus,
+      onDemandGapFocus: vi.fn(),
+      focusedDemandGapId: 'gap-123'
+    });
+
+    const textContent = mounted.container.textContent;
+    expect(textContent).toContain('Likely workplace candidates');
+    expect(textContent).toContain('#1 Workplace candidate');
+    expect(textContent).toContain('15.5');
+    expect(textContent).toContain('800m');
+
+    const focusButton = Array.from(mounted.container.querySelectorAll('button')).find(b => b.title === 'Focus #1 Workplace candidate on map');
+    expect(focusButton).toBeDefined();
+
+    act(() => {
+      focusButton?.click();
+    });
+
+    expect(onPositionFocus).toHaveBeenCalledWith({ lng: 1, lat: 1 });
   });
 });
