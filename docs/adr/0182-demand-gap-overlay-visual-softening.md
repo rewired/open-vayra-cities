@@ -15,18 +15,19 @@ Slice 181 focuses on softening this presentation to make it read more naturally 
 We will tune the MapLibre paint constants and associated UI legend styles to achieve a more restrained, "planning-first" aesthetic.
 
 ### Heatmap Tuning
-- Reduce `heatmap-opacity` from 0.85 to 0.7 to allow the basemap to show through more clearly.
-- Reduce `heatmap-intensity` range (from 2-6 to 1-4) to soften the "stain" look.
-- Subdue the `heatmap-color` ramp, using less saturated colors and darker peak values.
-- Increase `heatmap-radius` at low zooms to avoid overly sharp clusters.
+- Reduce `heatmap-opacity` from 0.85 to 0.6 to allow the basemap to show through more clearly.
+- Reduce `heatmap-intensity` range (from 2-6 to 1.1-2.6) to soften the "stain" look.
+- Subdue the `heatmap-color` ramp, using less saturated colors and lower alpha values (peak opacity 0.6).
+- Adjust `heatmap-radius` (30-58) to manage cluster density.
 
 ### Gap Circle Tuning
-- Subdue semantic colors for uncaptured (red), unserved (orange), and unreachable (purple) gaps to use less bright, more grounded hex codes.
-- Lower `circle-opacity` and `circle-stroke-opacity` to 0.6.
+- Subdue semantic colors for uncaptured (`#991b1b`), unserved (`#9a3412`), and unreachable (`#5b21b6`) gaps to use more grounded codes.
+- Lower `circle-radius` to 4.
+- Lower `circle-opacity` to 0.5 and `circle-stroke-opacity` to 0.55.
 - Soften the `circle-stroke-color` from stark white to a semi-transparent white (rgba 0.5).
 
 ### Focus and Hint Layer Tuning
-- Reduce `circle-stroke-opacity` of the focus ring to 0.7 to avoid it looking like an emergency marker.
+- Reduce `circle-stroke-opacity` of the focus ring to 0.65 to avoid it looking like an emergency marker.
 - Reduce OD hint `line-width` (1.5) and `line-opacity` (0.5) to ensure they read as subordinate planning hints.
 
 ### Legend Alignment

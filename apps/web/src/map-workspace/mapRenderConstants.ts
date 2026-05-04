@@ -355,9 +355,9 @@ export const MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT = {
     ['linear'],
     ['zoom'],
     10,
-    1,
+    1.1,
     15,
-    4
+    2.6
   ],
   'heatmap-color': [
     'interpolate',
@@ -366,15 +366,15 @@ export const MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT = {
     0,
     'rgba(255,255,255,0)',
     0.2,
-    'rgba(254,243,199,0.4)',
+    'rgba(254,243,199,0.3)',
     0.4,
-    'rgba(252,211,77,0.5)',
+    'rgba(252,211,77,0.4)',
     0.6,
-    'rgba(251,191,36,0.6)',
+    'rgba(251,191,36,0.45)',
     0.8,
-    'rgba(245,158,11,0.7)',
+    'rgba(180,83,9,0.5)',
     1,
-    'rgba(180,83,9,0.8)'
+    'rgba(160,70,10,0.6)'
   ],
   'heatmap-radius': [
     'interpolate',
@@ -383,9 +383,9 @@ export const MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT = {
     10,
     30,
     15,
-    60
+    58
   ],
-  'heatmap-opacity': 0.7
+  'heatmap-opacity': 0.6
 } as const;
 
 /**
@@ -393,16 +393,16 @@ export const MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT = {
  * Fades in at higher zooms to avoid visual clutter at low zooms.
  */
 export const MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT = {
-  'circle-radius': 5,
+  'circle-radius': 4,
   'circle-color': [
     'match',
     ['get', 'kind'],
     'uncaptured-residential',
-    '#b91c1c',
+    '#991b1b',
     'captured-unserved-residential',
-    '#c2410c',
+    '#9a3412',
     'captured-unreachable-workplace',
-    '#6d28d9',
+    '#5b21b6',
     '#4b5563'
   ],
   'circle-stroke-width': 1,
@@ -414,7 +414,7 @@ export const MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT = {
     11,
     0,
     12,
-    0.6
+    0.5
   ],
   'circle-stroke-opacity': [
     'interpolate',
@@ -423,7 +423,7 @@ export const MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT = {
     11,
     0,
     12,
-    0.6
+    0.55
   ]
 } as const;
 
@@ -451,7 +451,7 @@ export const MAP_DEMAND_GAP_OVERLAY_FOCUS_CIRCLE_PAINT = {
     11,
     0,
     12,
-    0.7
+    0.65
   ]
 } as const;
 

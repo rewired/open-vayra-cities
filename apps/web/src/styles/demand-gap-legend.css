@@ -70,15 +70,15 @@
 }
 
 .demand-gap-legend__swatch--uncaptured {
-  background-color: #b91c1c;
+  background-color: #991b1b;
 }
 
 .demand-gap-legend__swatch--unserved {
-  background-color: #c2410c;
+  background-color: #9a3412;
 }
 
 .demand-gap-legend__swatch--unreachable {
-  background-color: #6d28d9;
+  background-color: #5b21b6;
 }
 
 .demand-gap-legend__swatch--od-hint {

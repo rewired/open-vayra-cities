@@ -6,9 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - **Slice 181 — Demand Gap Overlay Visual Softening**:
-    - Softened the demand gap heatmap by reducing opacity (0.85 → 0.7) and intensity (2-6 → 1-4) to better integrate with the dark basemap.
-    - Subdued the demand gap category colors (Red/Orange/Purple) to less saturated versions and lowered point opacity to 0.6.
-    - Reduced visual dominance of OD hint lines (opacity 0.8 → 0.5, width 2 → 1.5) and focus ring (stroke opacity 0.9 → 0.7).
+    - Softened the demand gap heatmap by reducing opacity (0.85 → 0.6) and intensity (2-6 → 1.1-2.6) to better integrate with the dark basemap.
+    - Subdued the demand gap category colors (Red/Orange/Purple) to more grounded versions and lowered point radius (5 → 4px) and opacity (0.8 → 0.5).
+    - Reduced visual dominance of OD hint lines (opacity 0.8 → 0.5, width 2 → 1.5) and focus ring (stroke opacity 0.9 → 0.65).
     - Updated the demand map legend styles to remain truthful to the updated map rendering.
     - Added ADR 0182 documenting the visual softening rationale and non-authoritative presentation goals.
 
