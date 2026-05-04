@@ -218,6 +218,7 @@ describe('projectSelectedDemandNodeServiceCoverage', () => {
 
     expect(result.status).toBe('covered-no-line');
     expect(result.coveringStops.map((stop) => stop.stopId)).toEqual([stopOrigin.id]);
+    expect(result.coveringStops.map((stop) => stop.position)).toEqual([stopOrigin.position]);
     expect(result.diagnostics.selectedSideCoveringStopCount).toBe(1);
   });
 
@@ -237,6 +238,8 @@ describe('projectSelectedDemandNodeServiceCoverage', () => {
     expect(result.status).toBe('served-by-active-line');
     expect(result.summaryLabel).toBe('Active structural service available');
     expect(requireFirst(result.activeLines, 'Expected an active line').serviceLabel).toBe('12 min headway');
+    expect(requireFirst(result.activeLines, 'Expected an active line').selectedSideStopIds).toEqual([stopOrigin.id]);
+    expect(requireFirst(result.activeLines, 'Expected an active line').oppositeSideStopIds).toEqual([stopWork.id]);
   });
 
   it('returns line-no-active-service when a structural line has explicit no-service in the inspected band', () => {

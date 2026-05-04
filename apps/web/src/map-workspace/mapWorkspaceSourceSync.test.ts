@@ -18,7 +18,8 @@ import {
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
-  MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES
+  MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES,
+  MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE
 } from './mapRenderConstants';
 import type { MapLibreLayerSpecification, MapLibreMap } from './maplibreGlobal';
 
@@ -55,6 +56,7 @@ describe('mapWorkspaceSourceSync custom-layer helpers', () => {
       MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
       MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES,
       MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+      MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE,
       MAP_LAYER_ID_STOPS_CIRCLE,
       MAP_LAYER_ID_STOPS_LABEL,
       MAP_LAYER_ID_VEHICLES
@@ -96,12 +98,15 @@ import {
   MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
   MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE,
   MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
-  MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
+  MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT,
+  MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE
 } from './mapRenderConstants';
 import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
 import type { DemandNodeInspectionProjection } from '../domain/projection/demandNodeInspectionProjection';
-import type { DemandNodeContextHintProperties } from './demandNodeContextHintGeoJson';
+import type { SelectedDemandNodeServiceCoverageProjection } from '../domain/projection/selectedDemandNodeServiceCoverageProjection';
+import { createStopId } from '../domain/types/stop';
+import { createLineId } from '../domain/types/line';
 
 interface TestGeoJsonSource {
   setData: ReturnType<typeof vi.fn>;
@@ -116,12 +121,26 @@ interface SourceSyncTestMap extends MapWorkspaceSourceSyncMap {
   querySourceFeatures: ReturnType<typeof vi.fn>;
 }
 
+interface SourceSyncTestMapWithSources extends SourceSyncTestMap {
+  readonly testSources: ReadonlyMap<string, TestGeoJsonSource>;
+}
+
+const requireTestSource = (map: SourceSyncTestMapWithSources, sourceId: string): TestGeoJsonSource => {
+  const source = map.testSources.get(sourceId);
+  if (!source) {
+    throw new Error(`Expected test source ${sourceId} to exist.`);
+  }
+
+  return source;
+};
+
 describe('mapWorkspaceSourceSync integration', () => {
-  const createMockMap = (): MapWorkspaceSourceSyncMap => {
+  const createMockMap = (): SourceSyncTestMapWithSources => {
     const sources = new Map<string, TestGeoJsonSource>();
     const layers = new Set<string>();
 
-    const mockMap: SourceSyncTestMap = {
+    const mockMap: SourceSyncTestMapWithSources = {
+      testSources: sources,
       getSource: vi.fn((id: string) => sources.get(id)),
       addSource: vi.fn((id: string) => {
         sources.set(id, { setData: vi.fn() });
@@ -135,6 +154,89 @@ describe('mapWorkspaceSourceSync integration', () => {
     };
 
     return mockMap;
+  };
+
+  const createServiceCoverageProjection = (
+    overrides: Partial<SelectedDemandNodeServiceCoverageProjection> = {}
+  ): SelectedDemandNodeServiceCoverageProjection => {
+    const selectedStopId = createStopId('stop-selected');
+    const oppositeStopId = createStopId('stop-opposite');
+
+    return {
+      status: 'served-by-active-line',
+      selectedNodeId: 'node-selected',
+      selectedNodeRole: 'origin',
+      inspectedTimeBandId: 'morning-rush',
+      inspectedTimeBandLabel: 'Morning Rush',
+      accessRadiusMeters: 400,
+      summaryLabel: 'Active structural service available',
+      reason: 'At least one completed bus line structurally connects this selected side with a covered context-candidate side and has active service.',
+      coveringStops: [
+        {
+          stopId: selectedStopId,
+          label: 'Selected Stop',
+          position: { lng: 10, lat: 50 },
+          distanceMeters: 100,
+          distanceLabel: '100m'
+        }
+      ],
+      candidateMatches: [
+        {
+          candidateId: 'node-work',
+          label: 'Workplace',
+          distanceLabel: '500m',
+          coveringStops: [
+            {
+              stopId: oppositeStopId,
+              label: 'Opposite Stop',
+              position: { lng: 10.01, lat: 50.01 },
+              distanceMeters: 120,
+              distanceLabel: '120m'
+            }
+          ],
+          connectingLineLabels: ['Line 1']
+        }
+      ],
+      connectingLines: [
+        {
+          lineId: createLineId('line-1'),
+          label: 'Line 1',
+          topologyLabel: 'Linear',
+          servicePatternLabel: 'One-way',
+          serviceLabel: '10 min headway',
+          selectedSideStopIds: [selectedStopId],
+          selectedSideStopLabels: ['Selected Stop'],
+          oppositeSideStopIds: [oppositeStopId],
+          oppositeSideStopLabels: ['Opposite Stop']
+        }
+      ],
+      activeLines: [
+        {
+          lineId: createLineId('line-1'),
+          label: 'Line 1',
+          topologyLabel: 'Linear',
+          servicePatternLabel: 'One-way',
+          serviceLabel: '10 min headway',
+          selectedSideStopIds: [selectedStopId],
+          selectedSideStopLabels: ['Selected Stop'],
+          oppositeSideStopIds: [oppositeStopId],
+          oppositeSideStopLabels: ['Opposite Stop']
+        }
+      ],
+      diagnostics: {
+        selectedSideCoveringStopCount: 1,
+        hiddenSelectedSideCoveringStopCount: 0,
+        oppositeCandidateWithStopCoverageCount: 1,
+        hiddenOppositeCandidateMatchCount: 0,
+        lineWithSelectedSideStopCount: 1,
+        structurallyConnectingLineCount: 1,
+        hiddenStructurallyConnectingLineCount: 0,
+        activeConnectingLineCount: 1,
+        hiddenActiveConnectingLineCount: 0
+      },
+      caveat: 'This is a planning projection, not observed travel behavior.',
+      ...overrides
+    };
   };
 
   it('syncAllMapWorkspaceSources ensures demand gap source and sets data', () => {
@@ -165,7 +267,8 @@ describe('mapWorkspaceSourceSync integration', () => {
       MAP_SOURCE_ID_COMPLETED_LINES, MAP_SOURCE_ID_DRAFT_LINE, 
       MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES, 
       MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW, 
-      MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
+      MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT,
+      MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE
     ];
     otherSourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
@@ -196,7 +299,7 @@ describe('mapWorkspaceSourceSync integration', () => {
       MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES, 
       MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW, 
       MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
-      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
+      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT, MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE
     ];
     sourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
@@ -243,13 +346,97 @@ describe('mapWorkspaceSourceSync integration', () => {
     expect(source?.setData).toHaveBeenCalled();
   });
 
+  it('syncAllMapWorkspaceSources ensures selected demand node service coverage source and sets data', () => {
+    const map = createMockMap();
+
+    syncAllMapWorkspaceSources({
+      map,
+      selectedDemandNodeServiceCoverageProjection: createServiceCoverageProjection()
+    });
+
+    expect(map.addSource).toHaveBeenCalledWith(
+      MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE,
+      expect.anything()
+    );
+    expect(map.addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({ id: MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE })
+    );
+
+    const source = requireTestSource(map, MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE);
+    expect(source.setData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'FeatureCollection',
+        features: expect.arrayContaining([
+          expect.objectContaining({
+            properties: expect.objectContaining({
+              stopId: createStopId('stop-selected'),
+              role: 'selected-side-stop',
+              coverageStatus: 'active-service'
+            })
+          })
+        ])
+      })
+    );
+  });
+
+  it('syncExistingMapWorkspaceSourceData skips service coverage sync if source is missing', () => {
+    const map = createMockMap();
+    const otherSourceIds = [
+      MAP_SOURCE_ID_COMPLETED_LINES, MAP_SOURCE_ID_DRAFT_LINE,
+      MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES,
+      MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
+      MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
+    ];
+    otherSourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
+
+    const result = syncExistingMapWorkspaceSourceData({
+      map,
+      selectedDemandNodeServiceCoverageProjection: createServiceCoverageProjection()
+    });
+
+    expect(result).toBeNull();
+    expect(map.getSource).toHaveBeenCalledWith(MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE);
+  });
+
+  it('syncExistingMapWorkspaceSourceData empties service coverage source when projection has no stop coverage', () => {
+    const map = createMockMap();
+    const sourceIds = [
+      MAP_SOURCE_ID_COMPLETED_LINES, MAP_SOURCE_ID_DRAFT_LINE,
+      MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES,
+      MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
+      MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT, MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE
+    ];
+    sourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
+
+    const result = syncExistingMapWorkspaceSourceData({
+      map,
+      selectedDemandNodeServiceCoverageProjection: createServiceCoverageProjection({
+        status: 'no-stop-coverage',
+        coveringStops: [],
+        candidateMatches: [],
+        connectingLines: [],
+        activeLines: []
+      })
+    });
+
+    expect(result).not.toBeNull();
+    const source = requireTestSource(map, MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE);
+    expect(source.setData).toHaveBeenCalledWith({
+      type: 'FeatureCollection',
+      features: []
+    });
+  });
+
   it('syncExistingMapWorkspaceSourceData skips OD context sync if source is missing', () => {
     const map = createMockMap();
     const otherSourceIds = [
       MAP_SOURCE_ID_COMPLETED_LINES, MAP_SOURCE_ID_DRAFT_LINE, 
       MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES, 
       MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW, 
-      MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OVERLAY
+      MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
+      MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE
     ];
     otherSourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
@@ -291,7 +478,7 @@ describe('mapWorkspaceSourceSync integration', () => {
       MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES, 
       MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW, 
       MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
-      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
+      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT, MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE
     ];
     sourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
@@ -352,7 +539,7 @@ describe('mapWorkspaceSourceSync integration', () => {
       MAP_SOURCE_ID_STOPS, MAP_SOURCE_ID_VEHICLES, 
       MAP_SOURCE_ID_OSM_STOP_CANDIDATES, MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW, 
       MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE, MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
-      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
+      MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT, MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE
     ];
     sourceIds.forEach(id => map.addSource(id, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } }));
 
@@ -412,8 +599,7 @@ describe('mapWorkspaceSourceSync integration', () => {
       demandNodeInspectionProjection: mockInspectionProjection
     });
 
-    const source = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT) as unknown as TestGeoJsonSource;
-    if (!source) throw new Error('Expected source to be defined');
+    const source = requireTestSource(map, MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT);
 
     // Should contain the inspection candidate, not the OD candidate
     expect(source.setData).toHaveBeenCalledWith(
@@ -429,11 +615,16 @@ describe('mapWorkspaceSourceSync integration', () => {
       })
     );
     
-    // Verify it does NOT contain the OD candidate
-    const setDataCall = source.setData.mock.calls[0]![0];
-    const features = setDataCall.features as Array<{ properties: DemandNodeContextHintProperties }>;
-    const candidateIds = features.map((f) => f.properties.candidateId);
-    expect(candidateIds).not.toContain('workplace-od');
+    expect(source.setData).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        features: expect.arrayContaining([
+          expect.objectContaining({
+            properties: expect.objectContaining({
+              candidateId: 'workplace-od'
+            })
+          })
+        ])
+      })
+    );
   });
 });
-

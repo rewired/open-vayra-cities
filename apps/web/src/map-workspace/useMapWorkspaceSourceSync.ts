@@ -54,6 +54,7 @@ export interface UseMapWorkspaceSourceSyncInput {
   readonly focusedDemandGapId: string | null;
   readonly demandGapOdContextProjection: import('../domain/projection/demandGapOdContextProjection').DemandGapOdContextProjection | null;
   readonly demandNodeInspectionProjection: import('../domain/projection/demandNodeInspectionProjection').DemandNodeInspectionProjection | null;
+  readonly selectedDemandNodeServiceCoverageProjection: import('../domain/projection/selectedDemandNodeServiceCoverageProjection').SelectedDemandNodeServiceCoverageProjection | null;
   readonly isMapStyleReady: boolean;
 }
 
@@ -82,6 +83,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
     focusedDemandGapId,
     demandGapOdContextProjection,
     demandNodeInspectionProjection,
+    selectedDemandNodeServiceCoverageProjection,
     isMapStyleReady
   } = input;
 
@@ -422,9 +424,37 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
     });
   }, [demandGapOdContextProjection, demandNodeInspectionProjection, isMapStyleReady]);
 
+  // 9. Selected demand node service coverage source sync
+  useEffect(() => {
+    const mapInstance = mapRef.current;
+
+    if (!mapInstance) {
+      return;
+    }
+
+    const sourceSyncDiagnostics = syncExistingMapWorkspaceSourceData({
+      map: mapInstance,
+      selectedDemandNodeServiceCoverageProjection
+    });
+
+    if (sourceSyncDiagnostics) {
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
+      return;
+    }
+
+    return runWhenMapStyleReady(mapInstance, () => {
+      applyBasemapSemanticReadabilityOverrides(mapInstance);
+      syncAllMapWorkspaceSources({
+        map: mapInstance,
+        selectedDemandNodeServiceCoverageProjection
+      });
+      applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
+    });
+  }, [selectedDemandNodeServiceCoverageProjection, isMapStyleReady]);
 
 
-  // 9. Visibility application effect
+
+  // 10. Visibility application effect
   useEffect(() => {
     const mapInstance = mapRef.current;
     if (!mapInstance) {

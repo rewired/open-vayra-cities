@@ -4,7 +4,8 @@ import {
   MAP_OSM_STOP_CANDIDATE_LAYER_IDS,
   MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS,
   MAP_DEMAND_GAP_OVERLAY_LAYER_IDS,
-  MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS
+  MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS,
+  MAP_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_LAYER_IDS
 } from './mapRenderConstants';
 
 /**
@@ -69,6 +70,17 @@ export function applyMapLayerVisibility(
   if (odContextVisible !== undefined) {
     const visibilityValue = odContextVisible ? 'visible' : 'none';
     for (const layerId of MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS) {
+      if (map.getLayer(layerId)) {
+        map.setLayoutProperty(layerId, 'visibility', visibilityValue);
+      }
+    }
+  }
+
+  // selected-demand-node-service-coverage
+  const selectedDemandNodeServiceCoverageVisible = visibility['selected-demand-node-service-coverage'];
+  if (selectedDemandNodeServiceCoverageVisible !== undefined) {
+    const visibilityValue = selectedDemandNodeServiceCoverageVisible ? 'visible' : 'none';
+    for (const layerId of MAP_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_LAYER_IDS) {
       if (map.getLayer(layerId)) {
         map.setLayoutProperty(layerId, 'visibility', visibilityValue);
       }

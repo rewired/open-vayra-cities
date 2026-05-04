@@ -31,6 +31,8 @@ export interface SelectedDemandNodeCoverageStopSummary {
   readonly stopId: StopId;
   /** Player-facing stop label, falling back to the stop id. */
   readonly label: string;
+  /** Canonical stop position used by display-only map projections. */
+  readonly position: Stop['position'];
   /** Great-circle distance from the demand node or candidate to the stop. */
   readonly distanceMeters: number;
   /** Compact distance label for inspector rendering. */
@@ -63,8 +65,12 @@ export interface SelectedDemandNodeCoverageLineSummary {
   readonly servicePatternLabel: string;
   /** Current inspected-band service label for this line. */
   readonly serviceLabel: string;
+  /** Covering selected-side stop ids participating in the connection. */
+  readonly selectedSideStopIds: readonly StopId[];
   /** Covering selected-side stop labels participating in the connection. */
   readonly selectedSideStopLabels: readonly string[];
+  /** Covering opposite-side stop ids participating in the connection. */
+  readonly oppositeSideStopIds: readonly StopId[];
   /** Covering opposite-side stop labels participating in the connection. */
   readonly oppositeSideStopLabels: readonly string[];
 }
@@ -235,6 +241,7 @@ const sortStopDistances = (items: readonly StopDistanceSummary[]): readonly Stop
 const toStopSummary = (item: StopDistanceSummary): SelectedDemandNodeCoverageStopSummary => ({
   stopId: item.stop.id,
   label: resolveStopLabel(item.stop),
+  position: item.stop.position,
   distanceMeters: item.distanceMeters,
   distanceLabel: formatDistanceLabel(item.distanceMeters)
 });
@@ -297,7 +304,9 @@ const toLineSummary = (match: StructuralLineMatch): SelectedDemandNodeCoverageLi
   topologyLabel: topologyLabel(match.line.topology),
   servicePatternLabel: servicePatternLabel(match.line.servicePattern),
   serviceLabel: match.serviceLabel,
+  selectedSideStopIds: sortStopDistances(match.selectedSideStops).map((item) => item.stop.id),
   selectedSideStopLabels: sortStopDistances(match.selectedSideStops).map((item) => resolveStopLabel(item.stop)),
+  oppositeSideStopIds: sortStopDistances(match.oppositeSideStops).map((item) => item.stop.id),
   oppositeSideStopLabels: sortStopDistances(match.oppositeSideStops).map((item) => resolveStopLabel(item.stop))
 });
 

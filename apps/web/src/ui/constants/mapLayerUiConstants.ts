@@ -1,4 +1,10 @@
-export type MapLayerId = 'osm-stop-candidates' | 'scenario-demand-preview' | 'scenario-routing-coverage' | 'demand-gap-overlay' | 'demand-gap-od-context';
+export type MapLayerId =
+  | 'osm-stop-candidates'
+  | 'scenario-demand-preview'
+  | 'scenario-routing-coverage'
+  | 'demand-gap-overlay'
+  | 'demand-gap-od-context'
+  | 'selected-demand-node-service-coverage';
 
 /**
  * Represents a registered map layer control item for the UI flyout.
@@ -68,6 +74,11 @@ export const INITIAL_REGISTERED_MAP_LAYERS: readonly MapLayerControlItem[] = [
     id: 'demand-gap-od-context',
     label: 'Demand context hints',
     description: 'Show straight planning hints from focused demand context to likely candidates.'
+  },
+  {
+    id: 'selected-demand-node-service-coverage',
+    label: 'Demand service coverage',
+    description: 'Show stops involved in the selected demand node coverage projection.'
   }
 ];
 
@@ -76,5 +87,6 @@ export const INITIAL_MAP_LAYER_VISIBILITY: MapLayerVisibilityById = {
   'scenario-demand-preview': false,
   'scenario-routing-coverage': true,
   'demand-gap-overlay': false,
-  'demand-gap-od-context': false
+  'demand-gap-od-context': false,
+  'selected-demand-node-service-coverage': true
 };

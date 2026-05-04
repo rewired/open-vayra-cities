@@ -569,6 +569,7 @@ const toolModeControlOptions: ReadonlyArray<{
           onDemandGapFocus={handleDemandGapFocusById}
           onDemandNodeSelectionChange={handleDemandNodeSelection}
           demandNodeInspectionProjection={projections.demandNodeInspectionProjection}
+          selectedDemandNodeServiceCoverageProjection={projections.selectedDemandNodeServiceCoverageProjection}
         />
 
         {transientPlanningContext && (

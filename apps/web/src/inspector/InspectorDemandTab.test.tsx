@@ -230,6 +230,7 @@ const MOCK_NETWORK_COVERAGE_ACTIVE: SelectedDemandNodeServiceCoverageProjection 
     {
       stopId: createStopId('stop-origin'),
       label: 'Origin Stop',
+      position: { lng: 0, lat: 0 },
       distanceMeters: 100,
       distanceLabel: '100m'
     }
@@ -243,6 +244,7 @@ const MOCK_NETWORK_COVERAGE_ACTIVE: SelectedDemandNodeServiceCoverageProjection 
         {
           stopId: createStopId('stop-work'),
           label: 'Work Stop',
+          position: { lng: 0.01, lat: 0 },
           distanceMeters: 120,
           distanceLabel: '120m'
         }
@@ -257,7 +259,9 @@ const MOCK_NETWORK_COVERAGE_ACTIVE: SelectedDemandNodeServiceCoverageProjection 
       topologyLabel: 'Linear',
       servicePatternLabel: 'One-way',
       serviceLabel: '10 min headway',
+      selectedSideStopIds: [createStopId('stop-origin')],
       selectedSideStopLabels: ['Origin Stop'],
+      oppositeSideStopIds: [createStopId('stop-work')],
       oppositeSideStopLabels: ['Work Stop']
     }
   ],
@@ -268,7 +272,9 @@ const MOCK_NETWORK_COVERAGE_ACTIVE: SelectedDemandNodeServiceCoverageProjection 
       topologyLabel: 'Linear',
       servicePatternLabel: 'One-way',
       serviceLabel: '10 min headway',
+      selectedSideStopIds: [createStopId('stop-origin')],
       selectedSideStopLabels: ['Origin Stop'],
+      oppositeSideStopIds: [createStopId('stop-work')],
       oppositeSideStopLabels: ['Work Stop']
     }
   ],

@@ -4,7 +4,8 @@ import {
   MAP_OSM_STOP_CANDIDATE_LAYER_IDS,
   MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS,
   MAP_DEMAND_GAP_OVERLAY_LAYER_IDS,
-  MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS
+  MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS,
+  MAP_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_LAYER_IDS
 } from './mapRenderConstants';
 import type { VisibilityApplicableMap } from './mapLayerVisibility';
 import { INITIAL_REGISTERED_MAP_LAYERS, INITIAL_MAP_LAYER_VISIBILITY } from '../ui/constants/mapLayerUiConstants';
@@ -18,7 +19,7 @@ describe('applyMapLayerVisibility', () => {
       setLayoutProperty: mockSetLayoutProperty,
     };
 
-    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': true, 'scenario-demand-preview': false, 'scenario-routing-coverage': false, 'demand-gap-overlay': false, 'demand-gap-od-context': false });
+    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': true, 'scenario-demand-preview': false, 'scenario-routing-coverage': false, 'demand-gap-overlay': false, 'demand-gap-od-context': false, 'selected-demand-node-service-coverage': false });
 
     for (const layerId of MAP_OSM_STOP_CANDIDATE_LAYER_IDS) {
       expect(mockGetLayer).toHaveBeenCalledWith(layerId);
@@ -34,7 +35,7 @@ describe('applyMapLayerVisibility', () => {
       setLayoutProperty: mockSetLayoutProperty,
     };
 
-    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': false, 'scenario-demand-preview': false, 'scenario-routing-coverage': false, 'demand-gap-overlay': false, 'demand-gap-od-context': false });
+    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': false, 'scenario-demand-preview': false, 'scenario-routing-coverage': false, 'demand-gap-overlay': false, 'demand-gap-od-context': false, 'selected-demand-node-service-coverage': false });
 
     for (const layerId of MAP_OSM_STOP_CANDIDATE_LAYER_IDS) {
       expect(mockGetLayer).toHaveBeenCalledWith(layerId);
@@ -50,7 +51,7 @@ describe('applyMapLayerVisibility', () => {
       setLayoutProperty: mockSetLayoutProperty,
     };
 
-    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': false, 'scenario-demand-preview': true, 'scenario-routing-coverage': false, 'demand-gap-overlay': false, 'demand-gap-od-context': false });
+    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': false, 'scenario-demand-preview': true, 'scenario-routing-coverage': false, 'demand-gap-overlay': false, 'demand-gap-od-context': false, 'selected-demand-node-service-coverage': false });
 
     for (const layerId of MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS) {
       expect(mockGetLayer).toHaveBeenCalledWith(layerId);
@@ -66,7 +67,7 @@ describe('applyMapLayerVisibility', () => {
       setLayoutProperty: mockSetLayoutProperty,
     };
 
-    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': false, 'scenario-demand-preview': false, 'scenario-routing-coverage': false, 'demand-gap-overlay': false, 'demand-gap-od-context': false });
+    applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': false, 'scenario-demand-preview': false, 'scenario-routing-coverage': false, 'demand-gap-overlay': false, 'demand-gap-od-context': false, 'selected-demand-node-service-coverage': false });
 
     for (const layerId of MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS) {
       expect(mockGetLayer).toHaveBeenCalledWith(layerId);
@@ -83,7 +84,7 @@ describe('applyMapLayerVisibility', () => {
     };
 
     expect(() => {
-      applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': true, 'scenario-demand-preview': true, 'scenario-routing-coverage': true, 'demand-gap-overlay': true, 'demand-gap-od-context': true });
+      applyMapLayerVisibility(mockMap, { 'osm-stop-candidates': true, 'scenario-demand-preview': true, 'scenario-routing-coverage': true, 'demand-gap-overlay': true, 'demand-gap-od-context': true, 'selected-demand-node-service-coverage': true });
     }).not.toThrow();
 
     expect(mockSetLayoutProperty).not.toHaveBeenCalled();
@@ -102,7 +103,8 @@ describe('applyMapLayerVisibility', () => {
       'scenario-demand-preview': false,
       'scenario-routing-coverage': false,
       'demand-gap-overlay': true,
-      'demand-gap-od-context': false
+      'demand-gap-od-context': false,
+      'selected-demand-node-service-coverage': false
     });
 
     for (const layerId of MAP_DEMAND_GAP_OVERLAY_LAYER_IDS) {
@@ -124,7 +126,8 @@ describe('applyMapLayerVisibility', () => {
       'scenario-demand-preview': false,
       'scenario-routing-coverage': false,
       'demand-gap-overlay': false,
-      'demand-gap-od-context': false
+      'demand-gap-od-context': false,
+      'selected-demand-node-service-coverage': false
     });
 
     for (const layerId of MAP_DEMAND_GAP_OVERLAY_LAYER_IDS) {
@@ -146,7 +149,8 @@ describe('applyMapLayerVisibility', () => {
       'scenario-demand-preview': false,
       'scenario-routing-coverage': false,
       'demand-gap-overlay': false,
-      'demand-gap-od-context': true
+      'demand-gap-od-context': true,
+      'selected-demand-node-service-coverage': false
     });
 
     for (const layerId of MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS) {
@@ -168,10 +172,57 @@ describe('applyMapLayerVisibility', () => {
       'scenario-demand-preview': false,
       'scenario-routing-coverage': false,
       'demand-gap-overlay': false,
-      'demand-gap-od-context': false
+      'demand-gap-od-context': false,
+      'selected-demand-node-service-coverage': false
     });
 
     for (const layerId of MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS) {
+      expect(mockGetLayer).toHaveBeenCalledWith(layerId);
+      expect(mockSetLayoutProperty).toHaveBeenCalledWith(layerId, 'visibility', 'none');
+    }
+  });
+
+  it('sets visible state to selected demand node service coverage layers only through the registry mapping', () => {
+    const mockSetLayoutProperty = vi.fn();
+    const mockGetLayer = vi.fn().mockReturnValue({ id: 'test-layer', type: 'circle', source: 'test-source' });
+    const mockMap: VisibilityApplicableMap = {
+      getLayer: mockGetLayer,
+      setLayoutProperty: mockSetLayoutProperty,
+    };
+
+    applyMapLayerVisibility(mockMap, {
+      'osm-stop-candidates': false,
+      'scenario-demand-preview': false,
+      'scenario-routing-coverage': false,
+      'demand-gap-overlay': false,
+      'demand-gap-od-context': false,
+      'selected-demand-node-service-coverage': true
+    });
+
+    for (const layerId of MAP_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_LAYER_IDS) {
+      expect(mockGetLayer).toHaveBeenCalledWith(layerId);
+      expect(mockSetLayoutProperty).toHaveBeenCalledWith(layerId, 'visibility', 'visible');
+    }
+  });
+
+  it('sets hidden state to selected demand node service coverage layers', () => {
+    const mockSetLayoutProperty = vi.fn();
+    const mockGetLayer = vi.fn().mockReturnValue({ id: 'test-layer', type: 'circle', source: 'test-source' });
+    const mockMap: VisibilityApplicableMap = {
+      getLayer: mockGetLayer,
+      setLayoutProperty: mockSetLayoutProperty,
+    };
+
+    applyMapLayerVisibility(mockMap, {
+      'osm-stop-candidates': false,
+      'scenario-demand-preview': false,
+      'scenario-routing-coverage': false,
+      'demand-gap-overlay': false,
+      'demand-gap-od-context': false,
+      'selected-demand-node-service-coverage': false
+    });
+
+    for (const layerId of MAP_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_LAYER_IDS) {
       expect(mockGetLayer).toHaveBeenCalledWith(layerId);
       expect(mockSetLayoutProperty).toHaveBeenCalledWith(layerId, 'visibility', 'none');
     }

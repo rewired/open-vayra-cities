@@ -309,6 +309,12 @@ export const MAP_SOURCE_ID_DEMAND_GAP_OVERLAY = 'openvayra-cities-demand-gap-ove
 export const MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT = 'openvayra-cities-demand-gap-od-context';
 
 /**
+ * Canonical GeoJSON source id for selected demand node service coverage stop highlights.
+ */
+export const MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE =
+  'openvayra-cities-selected-demand-node-service-coverage';
+
+/**
  * Canonical heatmap layer id for aggregate demand gap pressure.
  */
 export const MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP = 'openvayra-cities-demand-gap-overlay-heatmap';
@@ -329,6 +335,12 @@ export const MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS = 'openvayra-cities-demand-ga
 export const MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES = 'openvayra-cities-demand-gap-od-context-lines';
 
 /**
+ * Canonical circle layer id for selected demand node service coverage stop highlight rings.
+ */
+export const MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE =
+  'openvayra-cities-selected-demand-node-service-coverage-circle';
+
+/**
  * Canonical style layer ids for demand gap overlay rendering.
  */
 export const MAP_DEMAND_GAP_OVERLAY_LAYER_IDS = [
@@ -342,6 +354,13 @@ export const MAP_DEMAND_GAP_OVERLAY_LAYER_IDS = [
  */
 export const MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS = [
   MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES
+] as const;
+
+/**
+ * Canonical style layer ids for selected demand node service coverage stop highlights.
+ */
+export const MAP_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_LAYER_IDS = [
+  MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE
 ] as const;
 
 /**
@@ -464,4 +483,47 @@ export const MAP_DEMAND_GAP_OD_CONTEXT_HINT_PAINT = {
   'line-width': 1.5,
   'line-opacity': 0.5,
   'line-dasharray': [2, 2]
+} as const;
+
+/**
+ * Circle ring paint style for display-only selected demand node service coverage stop highlights.
+ */
+export const MAP_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE_PAINT = {
+  'circle-radius': [
+    'match',
+    ['get', 'coverageStatus'],
+    'active-service',
+    19,
+    'structural-connection',
+    17,
+    15
+  ],
+  'circle-color': 'transparent',
+  'circle-stroke-color': [
+    'match',
+    ['get', 'role'],
+    'selected-side-stop',
+    '#0ea5e9',
+    'opposite-side-stop',
+    '#f97316',
+    '#64748b'
+  ],
+  'circle-stroke-width': [
+    'match',
+    ['get', 'coverageStatus'],
+    'active-service',
+    4,
+    'structural-connection',
+    3,
+    2
+  ],
+  'circle-stroke-opacity': [
+    'match',
+    ['get', 'coverageStatus'],
+    'active-service',
+    0.95,
+    'structural-connection',
+    0.85,
+    0.65
+  ]
 } as const;

@@ -40,7 +40,10 @@ import {
   MAP_DEMAND_GAP_OVERLAY_FOCUS_CIRCLE_PAINT,
   MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT,
   MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES,
-  MAP_DEMAND_GAP_OD_CONTEXT_HINT_PAINT
+  MAP_DEMAND_GAP_OD_CONTEXT_HINT_PAINT,
+  MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE,
+  MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE,
+  MAP_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE_PAINT
 } from './mapRenderConstants';
 import { buildScenarioDemandPreviewFeatureCollection } from './scenarioDemandPreviewGeoJson';
 import type { MapLibreMap } from './maplibreGlobal';
@@ -51,6 +54,7 @@ import { buildScenarioRoutingCoverageMaskFeatureCollection } from './scenarioRou
 import { buildDemandGapOverlayFeatureCollection } from './demandGapOverlayGeoJson';
 import { buildDemandGapOdContextFeatureCollection } from './demandGapOdContextGeoJson';
 import { buildDemandNodeContextHintFeatureCollection } from './demandNodeContextHintGeoJson';
+import { buildSelectedDemandNodeServiceCoverageFeatureCollection } from './selectedDemandNodeServiceCoverageGeoJson';
 
 
 /**
@@ -108,6 +112,7 @@ import type { ScenarioRoutingCoverage } from '../domain/scenario/scenarioRegistr
 import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
 import type { DemandNodeInspectionProjection } from '../domain/projection/demandNodeInspectionProjection';
+import type { SelectedDemandNodeServiceCoverageProjection } from '../domain/projection/selectedDemandNodeServiceCoverageProjection';
 
 /**
  * Inputs for one lifecycle-safe source/layer synchronization pass.
@@ -124,6 +129,7 @@ export interface SyncAllMapWorkspaceSourcesInput {
   readonly focusedDemandGapId?: string | null;
   readonly demandGapOdContextProjection?: DemandGapOdContextProjection | null;
   readonly demandNodeInspectionProjection?: DemandNodeInspectionProjection | null;
+  readonly selectedDemandNodeServiceCoverageProjection?: SelectedDemandNodeServiceCoverageProjection | null;
 }
 
 /**
@@ -152,6 +158,7 @@ const CUSTOM_LAYER_ORDER = [
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
   MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES,
   MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+  MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE,
   MAP_LAYER_ID_STOPS_CIRCLE,
   MAP_LAYER_ID_STOPS_LABEL,
   MAP_LAYER_ID_VEHICLES
@@ -177,7 +184,8 @@ const WORKSPACE_SOURCE_IDS = [
   MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
   MAP_SOURCE_ID_SCENARIO_ROUTING_COVERAGE,
   MAP_SOURCE_ID_DEMAND_GAP_OVERLAY,
-  MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT
+  MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT,
+  MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE
 ] as const;
 
 
@@ -423,6 +431,23 @@ const ensureAllMapWorkspaceRenderSourcesAndLayers = (map: MapWorkspaceSourceSync
       layout: { visibility: 'none' }
     });
   }
+
+  if (!map.getSource(MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE)) {
+    map.addSource(MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE, {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] }
+    });
+  }
+
+  if (!map.getLayer(MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE)) {
+    map.addLayer({
+      id: MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE,
+      type: 'circle',
+      source: MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE,
+      paint: MAP_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE_PAINT,
+      layout: { visibility: 'visible' }
+    });
+  }
 };
 
 
@@ -437,7 +462,8 @@ const syncMapWorkspaceSourceData = ({
   demandGapRankingProjection,
   focusedDemandGapId,
   demandGapOdContextProjection,
-  demandNodeInspectionProjection
+  demandNodeInspectionProjection,
+  selectedDemandNodeServiceCoverageProjection
 }: SyncAllMapWorkspaceSourcesInput): MapWorkspaceSourceSyncDiagnostics => {
 
   let stopBuilderFeatureCount: number | undefined;
@@ -532,6 +558,14 @@ const syncMapWorkspaceSourceData = ({
 
     const odContextSource = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT);
     odContextSource?.setData(odContextFeatureCollection);
+  }
+
+  if (selectedDemandNodeServiceCoverageProjection !== undefined) {
+    const serviceCoverageFeatureCollection = buildSelectedDemandNodeServiceCoverageFeatureCollection(
+      selectedDemandNodeServiceCoverageProjection
+    );
+    const serviceCoverageSource = map.getSource(MAP_SOURCE_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE);
+    serviceCoverageSource?.setData(serviceCoverageFeatureCollection);
   }
 
   enforceMapWorkspaceCustomLayerOrder(map);

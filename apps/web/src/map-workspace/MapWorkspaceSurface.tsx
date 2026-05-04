@@ -91,6 +91,7 @@ interface MapWorkspaceSurfaceProps {
   readonly onDemandGapFocus: (gapId: string | null) => void;
   readonly onDemandNodeSelectionChange: (nodeId: string | null) => void;
   readonly demandNodeInspectionProjection: import('../domain/projection/demandNodeInspectionProjection').DemandNodeInspectionProjection | null;
+  readonly selectedDemandNodeServiceCoverageProjection: import('../domain/projection/selectedDemandNodeServiceCoverageProjection').SelectedDemandNodeServiceCoverageProjection | null;
 }
 
 
@@ -148,7 +149,8 @@ export function MapWorkspaceSurface({
   demandGapOdContextProjection,
   onDemandGapFocus,
   onDemandNodeSelectionChange,
-  demandNodeInspectionProjection
+  demandNodeInspectionProjection,
+  selectedDemandNodeServiceCoverageProjection
 }: MapWorkspaceSurfaceProps): ReactElement {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<MapLibreMap | null>(null);
@@ -286,7 +288,9 @@ export function MapWorkspaceSurface({
         },
         routingCoverage,
         demandGapRankingProjection,
-        demandGapOdContextProjection
+        demandGapOdContextProjection,
+        demandNodeInspectionProjection,
+        selectedDemandNodeServiceCoverageProjection
       });
 
       if (mapInstance) {
@@ -392,6 +396,7 @@ export function MapWorkspaceSurface({
     focusedDemandGapId,
     demandGapOdContextProjection,
     demandNodeInspectionProjection,
+    selectedDemandNodeServiceCoverageProjection,
     isMapStyleReady
   });
 
