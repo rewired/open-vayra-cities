@@ -1,36 +1,50 @@
 import type { ReactElement } from 'react';
 import { MaterialIcon } from '../ui/icons/MaterialIcon';
-import type { OsmStopCandidateGroupId, OsmStopCandidateGroup } from '../domain/types/osmStopCandidate';
+import type { OsmStopCandidateGroup } from '../domain/types/osmStopCandidate';
 import type { OsmStopCandidateStreetAnchorResolution } from '../domain/osm/osmStopCandidateAnchorTypes';
-import { evaluateOsmStopCandidateAdoptionEligibility } from '../domain/osm/osmStopCandidateAdoption';
-import type { Stop } from '../domain/types/stop';
+import type { OsmStopCandidateInspectionProjection } from '../domain/projection/osmStopCandidateInspectionProjection';
 
 interface OsmStopCandidateInspectorProps {
-  readonly candidateGroup: OsmStopCandidateGroup;
+  readonly projection: OsmStopCandidateInspectionProjection;
+  readonly candidateGroup: OsmStopCandidateGroup | null;
   readonly anchorResolution: OsmStopCandidateStreetAnchorResolution | null;
-  readonly existingStops: readonly Stop[];
-  readonly adoptedCandidateGroupIds: ReadonlySet<OsmStopCandidateGroupId>;
   readonly onAdopt: (group: OsmStopCandidateGroup, anchor: OsmStopCandidateStreetAnchorResolution) => void;
 }
 
 /**
- * Renders details and adoption actions for a selected OSM stop candidate group.
+ * Renders inspection-only details and an explicit adoption action for a selected OSM stop candidate group.
  */
 export function OsmStopCandidateInspector({
+  projection,
   candidateGroup,
   anchorResolution,
-  existingStops,
-  adoptedCandidateGroupIds,
   onAdopt
 }: OsmStopCandidateInspectorProps): ReactElement {
-  const eligibility = evaluateOsmStopCandidateAdoptionEligibility({
-    group: candidateGroup,
-    anchor: anchorResolution,
-    existingStops,
-    adoptedCandidateGroupIds
-  });
+  if (projection.status !== 'ready') {
+    return (
+      <div className="inspector-panel__content inspector-panel__content--osm-candidate">
+        <header className="inspector-panel__header">
+          <div className="inspector-panel__header-main">
+            <div className="inspector-panel__title-row">
+              <MaterialIcon name="add_location_alt" className="inspector-panel__title-icon" />
+              <h2 className="inspector-panel__title">OSM stop candidate</h2>
+            </div>
+            <p className="inspector-panel__subtitle">Not yet a game stop</p>
+          </div>
+        </header>
 
-  const memberKinds = Array.from(new Set(candidateGroup.memberKinds)).join(', ');
+        <div className="inspector-panel__body">
+          <section className="inspector-panel__section">
+            <h3 className="inspector-panel__section-title">Selection</h3>
+            <p className="inspector-panel__summary">{projection.summaryLabel}</p>
+            <p className="inspector-panel__caveat">{projection.caveat}</p>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
+  const canRunAdoption = projection.canAdopt && candidateGroup !== null && anchorResolution !== null;
 
   return (
     <div className="inspector-panel__content inspector-panel__content--osm-candidate">
@@ -38,26 +52,39 @@ export function OsmStopCandidateInspector({
         <div className="inspector-panel__header-main">
           <div className="inspector-panel__title-row">
             <MaterialIcon name="add_location_alt" className="inspector-panel__title-icon" />
-            <h2 className="inspector-panel__title">{candidateGroup.label}</h2>
+            <h2 className="inspector-panel__title">{projection.displayLabel}</h2>
           </div>
-          <p className="inspector-panel__subtitle">OSM Candidate Group</p>
+          <p className="inspector-panel__subtitle">OSM stop candidate</p>
         </div>
       </header>
 
       <div className="inspector-panel__body">
         <section className="inspector-panel__section">
+          <h3 className="inspector-panel__section-title">Status</h3>
+          <div className="inspector-panel__osm-readiness">
+            <span className={`status-badge status-badge--${projection.adoptionReadiness}`}>
+              {projection.adoptionReadinessLabel}
+            </span>
+            <strong>{projection.summaryLabel}</strong>
+            <p>{projection.caveat}</p>
+          </div>
+        </section>
+
+        <section className="inspector-panel__section">
           <h3 className="inspector-panel__section-title">Candidate Details</h3>
           <table className="inspector-panel__table">
             <tbody>
-              <tr>
-                <th>Members</th>
-                <td>{candidateGroup.memberCount} ({memberKinds})</td>
-              </tr>
+              {projection.detailRows.map((row) => (
+                <tr key={row.label}>
+                  <th>{row.label}</th>
+                  <td>{row.value}</td>
+                </tr>
+              ))}
               <tr>
                 <th>Anchor Status</th>
                 <td>
-                  <span className={`status-badge status-badge--${anchorResolution?.status ?? 'unknown'}`}>
-                    {anchorResolution?.status ?? 'unresolved'}
+                  <span className={`status-badge status-badge--${anchorResolution?.status ?? 'blocked'}`}>
+                    {projection.streetAnchorStatusLabel}
                   </span>
                 </td>
               </tr>
@@ -78,20 +105,21 @@ export function OsmStopCandidateInspector({
         </section>
 
         <section className="inspector-panel__section">
-          <h3 className="inspector-panel__section-title">Adoption</h3>
+          <h3 className="inspector-panel__section-title">Next action</h3>
           <div className="inspector-panel__adoption-actions">
-            {!eligibility.canAdopt && (
+            <p className="inspector-panel__next-action">{projection.nextActionGuidance}</p>
+            {projection.blockedReason && (
               <div className="inspector-panel__adoption-blocked-reason">
                 <MaterialIcon name="info" />
-                <span>{eligibility.reason}</span>
+                <span>{projection.blockedReason}</span>
               </div>
             )}
             <button
               type="button"
               className="inspector-panel__action-button inspector-panel__action-button--primary"
-              disabled={!eligibility.canAdopt}
+              disabled={!canRunAdoption}
               onClick={() => {
-                if (anchorResolution) {
+                if (canRunAdoption) {
                   onAdopt(candidateGroup, anchorResolution);
                 }
               }}

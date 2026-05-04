@@ -90,7 +90,19 @@
   border: 1px solid #4a7a58;
 }
 
+.status-badge--ready-for-adoption {
+  background: #2d4a35;
+  color: var(--openvayra-cities-color-success);
+  border: 1px solid #4a7a58;
+}
+
 .status-badge--review {
+  background: #4a452d;
+  color: var(--openvayra-cities-color-warning);
+  border: 1px solid #7a734a;
+}
+
+.status-badge--needs-anchor-review {
   background: #4a452d;
   color: var(--openvayra-cities-color-warning);
   border: 1px solid #7a734a;
@@ -100,6 +112,54 @@
   background: #4a2d2d;
   color: var(--openvayra-cities-color-danger);
   border: 1px solid #7a4a4a;
+}
+
+.status-badge--needs-street-anchor,
+.status-badge--blocked-by-existing-stop {
+  background: #4a2d2d;
+  color: var(--openvayra-cities-color-danger);
+  border: 1px solid #7a4a4a;
+}
+
+.status-badge--already-adopted {
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--openvayra-cities-color-text-muted);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.inspector-panel__summary,
+.inspector-panel__caveat,
+.inspector-panel__next-action {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--openvayra-cities-color-text-muted);
+}
+
+.inspector-panel__caveat {
+  color: var(--openvayra-cities-color-warning);
+}
+
+.inspector-panel__osm-readiness {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.32);
+}
+
+.inspector-panel__osm-readiness strong {
+  color: #e8eef9;
+  font-size: 0.9rem;
+}
+
+.inspector-panel__osm-readiness p {
+  margin: 0;
+  color: var(--openvayra-cities-color-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
 }
 
 .inspector-panel__adoption-actions {

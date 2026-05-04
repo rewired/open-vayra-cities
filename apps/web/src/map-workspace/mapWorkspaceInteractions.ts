@@ -171,6 +171,18 @@ export const decodeOsmCandidateGroupIdFromFeatureProperties = (
   return createOsmStopCandidateGroupId(groupIdValue);
 };
 
+/** Resolves inspect-mode OSM candidate feature clicks without creating canonical stops. */
+export const resolveOsmCandidateFeatureInteractionSelection = (
+  properties: Record<string, unknown> | undefined,
+  activeToolMode: WorkspaceToolMode
+): OsmStopCandidateGroupId | null => {
+  if (activeToolMode !== 'inspect') {
+    return null;
+  }
+
+  return decodeOsmCandidateGroupIdFromFeatureProperties(properties);
+};
+
 /** Returns true when the click point intersects stop or completed-line interactive feature layers. */
 export const hasInteractiveSelectionFeatureAtPoint = (map: RenderedFeatureLayerQueryMap, event: MapLibreInteractionEvent): boolean => {
   const interactiveSelectionLayers: readonly string[] = [

@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
-import { hasInteractiveSelectionFeatureAtPoint, isPointInScenarioRoutingCoverage } from './mapWorkspaceInteractions';
+import {
+  decodeOsmCandidateGroupIdFromFeatureProperties,
+  decodeStopIdFromFeatureProperties,
+  hasInteractiveSelectionFeatureAtPoint,
+  isPointInScenarioRoutingCoverage,
+  resolveInspectModeMapClickSelection,
+  resolveOsmCandidateFeatureInteractionSelection
+} from './mapWorkspaceInteractions';
 import type { MapLibreInteractionEvent, MapLibreRenderedFeature, MapLibreLayerSpecification } from './maplibreGlobal';
 import { 
   MAP_LAYER_ID_STOPS_CIRCLE, 
@@ -75,6 +82,50 @@ describe('mapWorkspaceInteractions', () => {
       expect(map.queryRenderedFeatures).toHaveBeenCalledWith(event.point, { 
         layers: [MAP_LAYER_ID_COMPLETED_LINES] 
       });
+    });
+
+    it('keeps placed stops ahead of OSM candidates in the interactive query order', () => {
+      const map = createMapMock([MAP_LAYER_ID_STOPS_CIRCLE, MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE], []);
+      const event: MapLibreInteractionEvent = { point: { x: 10, y: 10 } };
+
+      hasInteractiveSelectionFeatureAtPoint(map, event);
+
+      expect(map.queryRenderedFeatures).toHaveBeenCalledWith(event.point, {
+        layers: [MAP_LAYER_ID_STOPS_CIRCLE, MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE]
+      });
+    });
+  });
+
+  describe('OSM candidate feature interaction decoding', () => {
+    it('decodes OSM candidate group ids from typed feature properties', () => {
+      const decoded = decodeOsmCandidateGroupIdFromFeatureProperties({
+        candidateGroupId: 'osm-group:test-1',
+        label: 'Test candidate'
+      });
+
+      expect(decoded).toBe('osm-group:test-1');
+    });
+
+    it('rejects missing or invalid OSM candidate group ids', () => {
+      expect(decodeOsmCandidateGroupIdFromFeatureProperties({ candidateGroupId: 5 })).toBeNull();
+      expect(decodeOsmCandidateGroupIdFromFeatureProperties(undefined)).toBeNull();
+    });
+
+    it('selects OSM candidate context only in inspect mode', () => {
+      const properties = { candidateGroupId: 'osm-group:test-1' };
+
+      expect(resolveOsmCandidateFeatureInteractionSelection(properties, 'inspect')).toBe('osm-group:test-1');
+      expect(resolveOsmCandidateFeatureInteractionSelection(properties, 'build-line')).toBeNull();
+    });
+
+    it('does not decode OSM candidate properties as canonical stop properties', () => {
+      const properties = { candidateGroupId: 'osm-group:test-1' };
+
+      expect(decodeStopIdFromFeatureProperties(properties)).toBeNull();
+    });
+
+    it('empty inspect clicks clear selection state through a null stop selection result', () => {
+      expect(resolveInspectModeMapClickSelection()).toBeNull();
     });
   });
 

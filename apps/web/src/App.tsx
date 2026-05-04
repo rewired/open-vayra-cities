@@ -357,6 +357,22 @@ const toolModeControlOptions: ReadonlyArray<{
     []
   );
 
+  const handleOsmCandidateSelectionChange = useCallback(
+    (candidateGroupId: OsmStopCandidateGroupId | null) => {
+      sessionController.setSelectedOsmCandidateGroupId(candidateGroupId);
+
+      if (!candidateGroupId) {
+        setSelectedOsmCandidateAnchor(null);
+        return;
+      }
+
+      setFocusedDemandGapId(null);
+      setSelectedDemandNodeId(null);
+      setTransientPlanningContext(null);
+    },
+    [sessionController]
+  );
+
   const handleDemandGapFocus = (gap: DemandGapRankingItem | null): void => {
     if (!gap) {
       setFocusedDemandGapId(null);
@@ -364,6 +380,8 @@ const toolModeControlOptions: ReadonlyArray<{
       return;
     }
     setFocusedDemandGapId(gap.id);
+    sessionController.setSelectedOsmCandidateGroupId(null);
+    setSelectedOsmCandidateAnchor(null);
     handlePositionFocus(gap.position);
     setActiveInspectorTabId('demand');
   };
@@ -392,6 +410,8 @@ const toolModeControlOptions: ReadonlyArray<{
   const handleDemandNodeSelection = useCallback((nodeId: string | null) => {
     setSelectedDemandNodeId(nodeId);
     if (nodeId) {
+      sessionController.setSelectedOsmCandidateGroupId(null);
+      setSelectedOsmCandidateAnchor(null);
       const node = scenarioDemandArtifactState.status === 'loaded' 
         ? scenarioDemandArtifactState.artifact.nodes.find(n => n.id === nodeId)
         : null;
@@ -400,7 +420,7 @@ const toolModeControlOptions: ReadonlyArray<{
       }
       setActiveInspectorTabId('demand');
     }
-  }, [scenarioDemandArtifactState, handlePositionFocus]);
+  }, [scenarioDemandArtifactState, handlePositionFocus, sessionController]);
 
   useEffect(() => {
     // Clear planning context if user manually returns to inspect mode
@@ -558,7 +578,7 @@ const toolModeControlOptions: ReadonlyArray<{
           mapFocusIntent={mapFocusIntent}
           onMapFocusIntentConsumed={setMapFocusIntent}
           onDebugSnapshotChange={handleMapDebugSnapshotChange}
-          onOsmCandidateSelectionChange={sessionController.setSelectedOsmCandidateGroupId}
+          onOsmCandidateSelectionChange={handleOsmCandidateSelectionChange}
           osmStopCandidateGroups={osmStopCandidateGroups}
           onOsmCandidateAnchorResolved={setSelectedOsmCandidateAnchor}
           scenarioDemandArtifact={scenarioDemandArtifactState.status === 'loaded' ? scenarioDemandArtifactState.artifact : null}

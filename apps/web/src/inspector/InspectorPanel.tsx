@@ -24,6 +24,7 @@ import type { DemandGapRankingProjection } from '../domain/projection/demandGapP
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
 import type { ScenarioDemandProvenanceProjection } from '../domain/projection/scenarioDemandProvenanceProjection';
 import type { FocusedDemandGapPlanningEntrypointRequest } from '../app/focusedDemandGapPlanningEntrypoint';
+import { projectOsmStopCandidateInspection } from '../domain/projection/osmStopCandidateInspectionProjection';
 
 import { InspectorTabBar } from './InspectorTabBar';
 import { InspectorScrollArea } from './InspectorScrollArea';
@@ -167,15 +168,20 @@ export function InspectorPanel({
       {inspectorPanelState.mode === 'osm-candidate-selected' ? (
         (() => {
           const candidateGroup = osmStopCandidateGroups.find((g) => g.id === inspectorPanelState.candidateGroupId);
-          if (!candidateGroup) return null;
+          const projection = projectOsmStopCandidateInspection({
+            candidateGroups: osmStopCandidateGroups,
+            selectedCandidateGroupId: inspectorPanelState.candidateGroupId,
+            anchorResolution: selectedOsmCandidateAnchor,
+            existingStops: placedStops,
+            adoptedCandidateGroupIds: adoptedOsmCandidateGroupIds
+          });
 
           return (
             <InspectorScrollArea>
               <OsmStopCandidateInspector
-                candidateGroup={candidateGroup}
+                projection={projection}
+                candidateGroup={candidateGroup ?? null}
                 anchorResolution={selectedOsmCandidateAnchor}
-                existingStops={placedStops}
-                adoptedCandidateGroupIds={adoptedOsmCandidateGroupIds}
                 onAdopt={onOsmCandidateAdopt}
               />
             </InspectorScrollArea>

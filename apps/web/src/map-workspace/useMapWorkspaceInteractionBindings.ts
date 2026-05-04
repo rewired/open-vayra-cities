@@ -19,8 +19,8 @@ import {
   bindDemandNodeFeatureInteractions,
   decodeLineIdFromFeatureProperties,
   decodeStopIdFromFeatureProperties,
-  decodeOsmCandidateGroupIdFromFeatureProperties,
   handleStopFeatureInteraction,
+  resolveOsmCandidateFeatureInteractionSelection,
   resolveInspectModeMapClickSelection,
   setupMapWorkspaceInteractions
 } from './mapWorkspaceInteractions';
@@ -96,6 +96,8 @@ export function useMapWorkspaceInteractionBindings(input: UseMapWorkspaceInterac
         onInspectModeNonFeatureMapClick: () => {
           input.onStopSelectionChange(resolveInspectModeMapClickSelection());
           input.onSelectedLineIdChange(null);
+          input.onOsmCandidateSelectionChange(null);
+          input.onOsmCandidateAnchorResolved(null);
         }
       },
       onOsmCandidateHoverChange: (nextHover) => {
@@ -130,12 +132,11 @@ export function useMapWorkspaceInteractionBindings(input: UseMapWorkspaceInterac
     });
 
     const osmCandidateInteractionBinding = bindOsmCandidateFeatureInteractions(mapInstance, (event) => {
-      if (input.activeToolModeRef.current !== 'inspect') {
-        return;
-      }
-
       const clickedFeature = event.features?.[0];
-      const groupId = decodeOsmCandidateGroupIdFromFeatureProperties(clickedFeature?.properties);
+      const groupId = resolveOsmCandidateFeatureInteractionSelection(
+        clickedFeature?.properties,
+        input.activeToolModeRef.current
+      );
 
       if (!groupId) {
         return;
@@ -238,6 +239,7 @@ export function useMapWorkspaceInteractionBindings(input: UseMapWorkspaceInterac
           });
         }
       });
+      input.onOsmCandidateAnchorResolved(null);
       input.setHoveredStop(null);
     });
 
@@ -267,6 +269,7 @@ export function useMapWorkspaceInteractionBindings(input: UseMapWorkspaceInterac
 
       input.onStopSelectionChangeRef.current(null);
       input.onSelectedLineIdChange(clickedLineId);
+      input.onOsmCandidateAnchorResolved(null);
     });
 
     return () => {
