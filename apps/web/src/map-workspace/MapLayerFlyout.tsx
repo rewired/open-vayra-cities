@@ -26,27 +26,42 @@ export function MapLayerFlyout({
 }: MapLayerFlyoutProps): ReactElement {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const toggleFlyout = (): void => {
-    setIsOpen((prev) => !prev);
+  const openFlyout = (): void => {
+    setIsOpen(true);
+  };
+
+  const closeFlyout = (): void => {
+    setIsOpen(false);
   };
 
   return (
     <div className="map-workspace-layers" aria-label="Map layer controller">
-      <button
-        type="button"
-        className={`map-workspace-layers__button ${isOpen ? 'map-workspace-layers__button--active' : ''}`}
-        onClick={toggleFlyout}
-        aria-expanded={isOpen}
-        aria-label={MAP_LAYER_UI_LABELS.BUTTON_ARIA_LABEL}
-        title={MAP_LAYER_UI_LABELS.BUTTON_ARIA_LABEL}
-      >
-        <MaterialIcon name="stacks" />
-      </button>
+      {!isOpen ? (
+        <button
+          type="button"
+          className="map-workspace-layers__button"
+          onClick={openFlyout}
+          aria-expanded={isOpen}
+          aria-label={MAP_LAYER_UI_LABELS.BUTTON_ARIA_LABEL}
+          title={MAP_LAYER_UI_LABELS.BUTTON_ARIA_LABEL}
+        >
+          <MaterialIcon name="stacks" />
+        </button>
+      ) : null}
 
       {isOpen ? (
         <div className="map-workspace-layers__flyout" role="dialog" aria-label={MAP_LAYER_UI_LABELS.FLYOUT_HEADING}>
           <header className="map-workspace-layers__flyout-header">
             <h4>{MAP_LAYER_UI_LABELS.FLYOUT_HEADING}</h4>
+            <button
+              type="button"
+              className="map-workspace-layers__close-button"
+              onClick={closeFlyout}
+              aria-label={MAP_LAYER_UI_LABELS.CLOSE_BUTTON_ARIA_LABEL}
+              title={MAP_LAYER_UI_LABELS.CLOSE_BUTTON_ARIA_LABEL}
+            >
+              <MaterialIcon name="close" />
+            </button>
           </header>
 
           <div className="map-workspace-layers__flyout-content">

@@ -7,6 +7,8 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
+  min-width: 36px;
+  min-height: 36px;
   pointer-events: auto;
 }
 
@@ -29,13 +31,10 @@
   color: var(--openvayra-cities-color-accent-blue);
 }
 
-.map-workspace-layers__button--active {
-  background: var(--openvayra-cities-color-accent-blue);
-  color: #ffffff;
-  border-color: var(--openvayra-cities-color-accent-blue);
-}
-
 .map-workspace-layers__flyout {
+  position: absolute;
+  top: 0;
+  right: 0;
   width: 260px;
   border: 1px solid var(--openvayra-cities-color-border);
   border-radius: var(--openvayra-cities-radius-md);
@@ -58,7 +57,11 @@
 }
 
 .map-workspace-layers__flyout-header {
-  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
   border-bottom: 1px solid var(--openvayra-cities-color-border);
   background: rgb(22 38 61 / 50%);
 }
@@ -69,6 +72,30 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--openvayra-cities-color-text-light);
+}
+
+.map-workspace-layers__close-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid transparent;
+  border-radius: var(--openvayra-cities-radius-sm);
+  background: transparent;
+  color: var(--openvayra-cities-color-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.map-workspace-layers__close-button:hover {
+  border-color: var(--openvayra-cities-color-border);
+  background: rgb(13 23 38 / 70%);
+  color: var(--openvayra-cities-color-text-light);
+}
+
+.map-workspace-layers__close-button .app-material-icon {
+  font-size: 0.95rem;
 }
 
 .map-workspace-layers__flyout-content {

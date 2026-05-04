@@ -40,6 +40,7 @@ export interface MapLayerControlState {
  */
 export const MAP_LAYER_UI_LABELS = {
   BUTTON_ARIA_LABEL: 'Map layers',
+  CLOSE_BUTTON_ARIA_LABEL: 'Close map layers',
   FLYOUT_HEADING: 'Map Overlays',
   EMPTY_STATE: 'No optional overlays registered.',
   TOGGLE_ON: 'On',
