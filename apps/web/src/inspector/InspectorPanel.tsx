@@ -75,6 +75,7 @@ interface InspectorPanelProps {
   readonly focusedDemandGapLifecycleProjection: import('../domain/projection/focusedDemandGapLifecycleProjection').FocusedDemandGapLifecycleProjection;
   readonly scenarioDemandProvenanceProjection: ScenarioDemandProvenanceProjection;
   readonly demandNodeInspectionProjection: import('../domain/projection/demandNodeInspectionProjection').DemandNodeInspectionProjection;
+  readonly selectedDemandNodeServiceCoverageProjection: import('../domain/projection/selectedDemandNodeServiceCoverageProjection').SelectedDemandNodeServiceCoverageProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
   readonly onDemandGapFocus: (gapId: string | null) => void;
   readonly focusedDemandGapId: string | null;
@@ -144,6 +145,7 @@ export function InspectorPanel({
   focusedDemandGapLifecycleProjection,
   scenarioDemandProvenanceProjection,
   demandNodeInspectionProjection,
+  selectedDemandNodeServiceCoverageProjection,
   onPositionFocus,
   onDemandGapFocus,
   focusedDemandGapId,
@@ -212,6 +214,7 @@ export function InspectorPanel({
                 focusedDemandGapLifecycleProjection={focusedDemandGapLifecycleProjection}
                 scenarioDemandProvenanceProjection={scenarioDemandProvenanceProjection}
                 demandNodeInspectionProjection={demandNodeInspectionProjection}
+                selectedDemandNodeServiceCoverageProjection={selectedDemandNodeServiceCoverageProjection}
                 onPositionFocus={onPositionFocus}
                 onDemandGapFocus={onDemandGapFocus}
                 focusedDemandGapId={focusedDemandGapId}

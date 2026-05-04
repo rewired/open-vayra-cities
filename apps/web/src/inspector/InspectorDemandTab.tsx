@@ -12,6 +12,7 @@ import type { FocusedDemandGapPlanningProjection } from '../domain/projection/fo
 import type { FocusedDemandGapLifecycleProjection } from '../domain/projection/focusedDemandGapLifecycleProjection';
 import type { ScenarioDemandProvenanceProjection } from '../domain/projection/scenarioDemandProvenanceProjection';
 import type { DemandNodeInspectionProjection } from '../domain/projection/demandNodeInspectionProjection';
+import type { SelectedDemandNodeServiceCoverageProjection } from '../domain/projection/selectedDemandNodeServiceCoverageProjection';
 
 import type { FocusedDemandGapPlanningEntrypointRequest, FocusedDemandGapPlanningEntrypointKind } from '../app/focusedDemandGapPlanningEntrypoint';
 import type { TimeBandId } from '../domain/types/timeBand';
@@ -26,6 +27,7 @@ interface InspectorDemandTabProps {
   readonly focusedDemandGapLifecycleProjection: FocusedDemandGapLifecycleProjection;
   readonly scenarioDemandProvenanceProjection: ScenarioDemandProvenanceProjection;
   readonly demandNodeInspectionProjection: DemandNodeInspectionProjection;
+  readonly selectedDemandNodeServiceCoverageProjection: SelectedDemandNodeServiceCoverageProjection;
   readonly onPositionFocus: (position: { lng: number; lat: number }) => void;
   readonly onDemandGapFocus: (gapId: string | null) => void;
   readonly focusedDemandGapId: string | null;
@@ -49,6 +51,7 @@ export function InspectorDemandTab(props: InspectorDemandTabProps): ReactElement
     focusedDemandGapLifecycleProjection,
     scenarioDemandProvenanceProjection,
     demandNodeInspectionProjection,
+    selectedDemandNodeServiceCoverageProjection,
     onPositionFocus,
     onDemandGapFocus,
     focusedDemandGapId,
@@ -96,6 +99,95 @@ export function InspectorDemandTab(props: InspectorDemandTabProps): ReactElement
       </div>
     );
   };
+
+  const renderSelectedNodeNetworkCoverage = (): ReactElement => (
+    <div className="inspector-demand-network-coverage" aria-label="Network coverage">
+      <div className="inspector-demand-network-coverage__header">
+        <h4 className="inspector-demand-network-coverage__title">Network coverage</h4>
+        {selectedDemandNodeServiceCoverageProjection.inspectedTimeBandLabel && (
+          <span className="inspector-demand-network-coverage__band">
+            {selectedDemandNodeServiceCoverageProjection.inspectedTimeBandLabel}
+          </span>
+        )}
+      </div>
+
+      <div className={`inspector-demand-network-coverage__status inspector-demand-network-coverage__status--${selectedDemandNodeServiceCoverageProjection.status}`}>
+        <strong>{selectedDemandNodeServiceCoverageProjection.summaryLabel}</strong>
+        <p>{selectedDemandNodeServiceCoverageProjection.reason}</p>
+      </div>
+
+      {selectedDemandNodeServiceCoverageProjection.coveringStops.length > 0 && (
+        <div className="inspector-demand-network-coverage__detail">
+          <span className="inspector-demand-network-coverage__detail-label">Nearby stops</span>
+          <ul className="inspector-demand-network-coverage__chip-list">
+            {selectedDemandNodeServiceCoverageProjection.coveringStops.map((stop) => (
+              <li key={stop.stopId} className="inspector-demand-network-coverage__chip">
+                <span>{stop.label}</span>
+                <span>{stop.distanceLabel}</span>
+              </li>
+            ))}
+          </ul>
+          {selectedDemandNodeServiceCoverageProjection.diagnostics.hiddenSelectedSideCoveringStopCount > 0 && (
+            <span className="inspector-demand-network-coverage__hidden-count">
+              +{selectedDemandNodeServiceCoverageProjection.diagnostics.hiddenSelectedSideCoveringStopCount} more stops
+            </span>
+          )}
+        </div>
+      )}
+
+      {selectedDemandNodeServiceCoverageProjection.candidateMatches.length > 0 && (
+        <div className="inspector-demand-network-coverage__detail">
+          <span className="inspector-demand-network-coverage__detail-label">Covered context candidates</span>
+          <ul className="inspector-demand-network-coverage__match-list">
+            {selectedDemandNodeServiceCoverageProjection.candidateMatches.map((candidate) => (
+              <li key={candidate.candidateId} className="inspector-demand-network-coverage__match">
+                <span className="inspector-demand-network-coverage__match-title">{candidate.label}</span>
+                <span className="inspector-demand-network-coverage__match-meta">
+                  {candidate.coveringStops.length} stop{candidate.coveringStops.length === 1 ? '' : 's'} nearby
+                  {candidate.connectingLineLabels.length > 0
+                    ? `, ${candidate.connectingLineLabels.length} connecting line${candidate.connectingLineLabels.length === 1 ? '' : 's'}`
+                    : ''}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {selectedDemandNodeServiceCoverageProjection.activeLines.length > 0 && (
+        <div className="inspector-demand-network-coverage__detail">
+          <span className="inspector-demand-network-coverage__detail-label">Active lines</span>
+          <ul className="inspector-demand-network-coverage__line-list">
+            {selectedDemandNodeServiceCoverageProjection.activeLines.map((line) => (
+              <li key={line.lineId} className="inspector-demand-network-coverage__line">
+                <span>{line.label}</span>
+                <span>{line.serviceLabel}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {selectedDemandNodeServiceCoverageProjection.activeLines.length === 0 &&
+        selectedDemandNodeServiceCoverageProjection.connectingLines.length > 0 && (
+          <div className="inspector-demand-network-coverage__detail">
+            <span className="inspector-demand-network-coverage__detail-label">Connecting lines</span>
+            <ul className="inspector-demand-network-coverage__line-list">
+              {selectedDemandNodeServiceCoverageProjection.connectingLines.map((line) => (
+                <li key={line.lineId} className="inspector-demand-network-coverage__line">
+                  <span>{line.label}</span>
+                  <span>{line.serviceLabel}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+      <p className="inspector-demand-network-coverage__caveat">
+        {selectedDemandNodeServiceCoverageProjection.caveat}
+      </p>
+    </div>
+  );
 
   return (
     <section className="inspector-demand-tab" aria-label="Demand">
@@ -157,10 +249,12 @@ export function InspectorDemandTab(props: InspectorDemandTabProps): ReactElement
             </div>
           )}
 
+          {renderSelectedNodeNetworkCoverage()}
+
           {demandNodeInspectionProjection.contextCandidates.length > 0 && (
             <div className="inspector-demand-candidates">
               <h4 className="inspector-demand-candidates-title">
-                Likely {demandNodeInspectionProjection.selectedNodeId?.includes('res') ? 'workplace' : 'residential'} context:
+                Likely {demandNodeInspectionProjection.selectedNodeRole === 'origin' ? 'workplace' : 'residential'} context:
               </h4>
               <ul className="inspector-demand-candidate-list">
                 {demandNodeInspectionProjection.contextCandidates.map((candidate) => (

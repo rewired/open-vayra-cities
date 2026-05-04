@@ -86,3 +86,18 @@ export const DEMAND_GAP_OD_CONTEXT_MAX_CANDIDATES = 5;
  * This is a ranking weight decay, not a walking/access radius.
  */
 export const DEMAND_NODE_CONTEXT_DISTANCE_DECAY_METERS = 4000;
+
+/**
+ * Maximum selected demand node covering stops to expose in compact inspector projections.
+ */
+export const SELECTED_DEMAND_NODE_SERVICE_COVERAGE_MAX_STOPS = 5;
+
+/**
+ * Maximum selected demand node candidate-side matches to expose in compact inspector projections.
+ */
+export const SELECTED_DEMAND_NODE_SERVICE_COVERAGE_MAX_CANDIDATE_MATCHES = 5;
+
+/**
+ * Maximum selected demand node connecting lines to expose in compact inspector projections.
+ */
+export const SELECTED_DEMAND_NODE_SERVICE_COVERAGE_MAX_LINES = 5;

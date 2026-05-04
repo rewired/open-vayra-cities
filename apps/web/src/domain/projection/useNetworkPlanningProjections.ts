@@ -20,6 +20,10 @@ import { projectDemandGapOdCandidateList, type DemandGapOdCandidateListProjectio
 import { projectFocusedDemandGapLifecycle, type FocusedDemandGapLifecycleProjection } from './focusedDemandGapLifecycleProjection';
 import { projectScenarioDemandProvenance, type ScenarioDemandProvenanceProjection } from './scenarioDemandProvenanceProjection';
 import { projectDemandNodeInspection, type DemandNodeInspectionProjection } from './demandNodeInspectionProjection';
+import {
+  projectSelectedDemandNodeServiceCoverage,
+  type SelectedDemandNodeServiceCoverageProjection
+} from './selectedDemandNodeServiceCoverageProjection';
 
 const MAX_READINESS_ISSUES_VISIBLE = 5;
 
@@ -81,6 +85,7 @@ export interface NetworkPlanningProjections {
   readonly focusedDemandGapLifecycleProjection: FocusedDemandGapLifecycleProjection;
   readonly scenarioDemandProvenanceProjection: ScenarioDemandProvenanceProjection;
   readonly demandNodeInspectionProjection: DemandNodeInspectionProjection;
+  readonly selectedDemandNodeServiceCoverageProjection: SelectedDemandNodeServiceCoverageProjection;
 }
 
 
@@ -251,6 +256,12 @@ export const useNetworkPlanningProjections = (
     servedDemandProjection
   });
 
+  const selectedDemandNodeServiceCoverageProjection = projectSelectedDemandNodeServiceCoverage({
+    demandNodeInspectionProjection,
+    placedStops: sessionStops,
+    completedLines: sessionLines
+  });
+
   return {
     staticNetworkSummaryKpis,
     selectedLineRouteBaseline,
@@ -272,6 +283,7 @@ export const useNetworkPlanningProjections = (
     focusedDemandGapPlanningProjection,
     focusedDemandGapLifecycleProjection,
     scenarioDemandProvenanceProjection,
-    demandNodeInspectionProjection
+    demandNodeInspectionProjection,
+    selectedDemandNodeServiceCoverageProjection
   };
 };

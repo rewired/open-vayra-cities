@@ -13,6 +13,9 @@ import type { ServedDemandProjection } from '../domain/projection/servedDemandPr
 import type { FocusedDemandGapLifecycleProjection } from '../domain/projection/focusedDemandGapLifecycleProjection';
 import { type ScenarioDemandProvenanceProjection } from '../domain/projection/scenarioDemandProvenanceProjection';
 import { type DemandNodeInspectionProjection } from '../domain/projection/demandNodeInspectionProjection';
+import { type SelectedDemandNodeServiceCoverageProjection } from '../domain/projection/selectedDemandNodeServiceCoverageProjection';
+import { createLineId } from '../domain/types/line';
+import { createStopId } from '../domain/types/stop';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -180,6 +183,108 @@ const MOCK_INSPECTION_UNAVAILABLE: DemandNodeInspectionProjection = {
   selectedNodeRole: null
 };
 
+const MOCK_NETWORK_COVERAGE_NO_SELECTED: SelectedDemandNodeServiceCoverageProjection = {
+  status: 'no-selected-node',
+  selectedNodeId: null,
+  selectedNodeRole: null,
+  inspectedTimeBandId: null,
+  inspectedTimeBandLabel: null,
+  accessRadiusMeters: 400,
+  summaryLabel: 'No demand node selected',
+  reason: 'Select a demand node on the map to inspect network coverage.',
+  coveringStops: [],
+  candidateMatches: [],
+  connectingLines: [],
+  activeLines: [],
+  diagnostics: {
+    selectedSideCoveringStopCount: 0,
+    hiddenSelectedSideCoveringStopCount: 0,
+    oppositeCandidateWithStopCoverageCount: 0,
+    hiddenOppositeCandidateMatchCount: 0,
+    lineWithSelectedSideStopCount: 0,
+    structurallyConnectingLineCount: 0,
+    hiddenStructurallyConnectingLineCount: 0,
+    activeConnectingLineCount: 0,
+    hiddenActiveConnectingLineCount: 0
+  },
+  caveat: 'This is a planning projection, not observed travel behavior.'
+};
+
+const MOCK_NETWORK_COVERAGE_NO_STOP: SelectedDemandNodeServiceCoverageProjection = {
+  ...MOCK_NETWORK_COVERAGE_NO_SELECTED,
+  status: 'no-stop-coverage',
+  selectedNodeId: 'node-res-1',
+  selectedNodeRole: 'origin',
+  inspectedTimeBandId: 'morning-rush',
+  inspectedTimeBandLabel: 'Morning rush',
+  summaryLabel: 'No nearby stop coverage',
+  reason: 'No placed stop is within 400m of this selected demand node.'
+};
+
+const MOCK_NETWORK_COVERAGE_ACTIVE: SelectedDemandNodeServiceCoverageProjection = {
+  ...MOCK_NETWORK_COVERAGE_NO_STOP,
+  status: 'served-by-active-line',
+  summaryLabel: 'Active structural service available',
+  reason: 'At least one completed bus line structurally connects this selected side with a covered context-candidate side and has active service.',
+  coveringStops: [
+    {
+      stopId: createStopId('stop-origin'),
+      label: 'Origin Stop',
+      distanceMeters: 100,
+      distanceLabel: '100m'
+    }
+  ],
+  candidateMatches: [
+    {
+      candidateId: 'node-work-1',
+      label: 'node-work-1',
+      distanceLabel: '500m',
+      coveringStops: [
+        {
+          stopId: createStopId('stop-work'),
+          label: 'Work Stop',
+          distanceMeters: 120,
+          distanceLabel: '120m'
+        }
+      ],
+      connectingLineLabels: ['Line 1']
+    }
+  ],
+  connectingLines: [
+    {
+      lineId: createLineId('line-1'),
+      label: 'Line 1',
+      topologyLabel: 'Linear',
+      servicePatternLabel: 'One-way',
+      serviceLabel: '10 min headway',
+      selectedSideStopLabels: ['Origin Stop'],
+      oppositeSideStopLabels: ['Work Stop']
+    }
+  ],
+  activeLines: [
+    {
+      lineId: createLineId('line-1'),
+      label: 'Line 1',
+      topologyLabel: 'Linear',
+      servicePatternLabel: 'One-way',
+      serviceLabel: '10 min headway',
+      selectedSideStopLabels: ['Origin Stop'],
+      oppositeSideStopLabels: ['Work Stop']
+    }
+  ],
+  diagnostics: {
+    selectedSideCoveringStopCount: 1,
+    hiddenSelectedSideCoveringStopCount: 0,
+    oppositeCandidateWithStopCoverageCount: 1,
+    hiddenOppositeCandidateMatchCount: 0,
+    lineWithSelectedSideStopCount: 1,
+    structurallyConnectingLineCount: 1,
+    hiddenStructurallyConnectingLineCount: 0,
+    activeConnectingLineCount: 1,
+    hiddenActiveConnectingLineCount: 0
+  }
+};
+
 interface RenderResult {
   readonly container: HTMLDivElement;
   readonly root: Root;
@@ -257,6 +362,7 @@ describe('InspectorDemandTab', () => {
       focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
       scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       demandNodeInspectionProjection: MOCK_INSPECTION_UNAVAILABLE,
+      selectedDemandNodeServiceCoverageProjection: MOCK_NETWORK_COVERAGE_NO_SELECTED,
       onDemandNodeSelectionChange: vi.fn(),
       onInspectDemandTimeBandSelectionChange: vi.fn(),
       inspectDemandTimeBandSelection: 'follow-simulation',
@@ -318,6 +424,7 @@ describe('InspectorDemandTab', () => {
       focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
       scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       demandNodeInspectionProjection: MOCK_INSPECTION_UNAVAILABLE,
+      selectedDemandNodeServiceCoverageProjection: MOCK_NETWORK_COVERAGE_NO_SELECTED,
       onDemandNodeSelectionChange: vi.fn(),
       onInspectDemandTimeBandSelectionChange: vi.fn(),
       inspectDemandTimeBandSelection: 'follow-simulation',
@@ -396,6 +503,7 @@ describe('InspectorDemandTab', () => {
       focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
       scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       demandNodeInspectionProjection: MOCK_INSPECTION_UNAVAILABLE,
+      selectedDemandNodeServiceCoverageProjection: MOCK_NETWORK_COVERAGE_NO_SELECTED,
       onDemandNodeSelectionChange: vi.fn(),
       onInspectDemandTimeBandSelectionChange: vi.fn(),
       inspectDemandTimeBandSelection: 'follow-simulation',
@@ -466,6 +574,7 @@ describe('InspectorDemandTab', () => {
       focusedDemandGapLifecycleProjection: MOCK_LIFECYCLE_ACTIVE,
       scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       demandNodeInspectionProjection: MOCK_INSPECTION_UNAVAILABLE,
+      selectedDemandNodeServiceCoverageProjection: MOCK_NETWORK_COVERAGE_NO_SELECTED,
       onDemandNodeSelectionChange: vi.fn(),
       onInspectDemandTimeBandSelectionChange: vi.fn(),
       inspectDemandTimeBandSelection: 'follow-simulation',
@@ -541,6 +650,7 @@ describe('InspectorDemandTab', () => {
       },
       scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       demandNodeInspectionProjection: MOCK_INSPECTION_UNAVAILABLE,
+      selectedDemandNodeServiceCoverageProjection: MOCK_NETWORK_COVERAGE_NO_SELECTED,
       onDemandNodeSelectionChange: vi.fn(),
       onInspectDemandTimeBandSelectionChange: vi.fn(),
       inspectDemandTimeBandSelection: 'follow-simulation',
@@ -591,6 +701,7 @@ describe('InspectorDemandTab', () => {
       focusedDemandGapLifecycleProjection: mockLifecycle,
       scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       demandNodeInspectionProjection: MOCK_INSPECTION_UNAVAILABLE,
+      selectedDemandNodeServiceCoverageProjection: MOCK_NETWORK_COVERAGE_NO_SELECTED,
       onPositionFocus: vi.fn(),
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: 'gap-999',
@@ -633,6 +744,7 @@ describe('InspectorDemandTab', () => {
       },
       scenarioDemandProvenanceProjection: MOCK_PROVENANCE_READY,
       demandNodeInspectionProjection: MOCK_INSPECTION_UNAVAILABLE,
+      selectedDemandNodeServiceCoverageProjection: MOCK_NETWORK_COVERAGE_NO_SELECTED,
       onPositionFocus: vi.fn(),
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: null,
@@ -680,6 +792,7 @@ describe('InspectorDemandTab', () => {
       },
       scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
       demandNodeInspectionProjection: MOCK_INSPECTION_READY,
+      selectedDemandNodeServiceCoverageProjection: MOCK_NETWORK_COVERAGE_NO_STOP,
       onPositionFocus: vi.fn(),
       onDemandGapFocus: vi.fn(),
       focusedDemandGapId: null,
@@ -697,16 +810,22 @@ describe('InspectorDemandTab', () => {
     expect(textContent).toContain('Uncaptured');
     expect(textContent).toContain('node-work-1');
     expect(textContent).toContain('150.0 weight');
+    expect(textContent).toContain('Network coverage');
+    expect(textContent).toContain('No nearby stop coverage');
 
-    const clearButton = mounted.container.querySelector('#inspector-demand-clear-node-selection') as HTMLButtonElement;
-    expect(clearButton).toBeDefined();
+    const clearButton = mounted.container.querySelector('#inspector-demand-clear-node-selection');
+    if (!(clearButton instanceof HTMLButtonElement)) {
+      throw new Error('Expected selected demand node clear button.');
+    }
     act(() => {
       clearButton.click();
     });
     expect(onDemandNodeSelectionChange).toHaveBeenCalledWith(null);
 
-    const select = mounted.container.querySelector('#inspector-demand-timeband-select') as HTMLSelectElement;
-    expect(select).toBeDefined();
+    const select = mounted.container.querySelector('#inspector-demand-timeband-select');
+    if (!(select instanceof HTMLSelectElement)) {
+      throw new Error('Expected selected demand node time-band select.');
+    }
     expect(select.value).toBe('follow-simulation');
 
     act(() => {
@@ -714,5 +833,99 @@ describe('InspectorDemandTab', () => {
       select.dispatchEvent(new Event('change', { bubbles: true }));
     });
     expect(onInspectDemandTimeBandSelectionChange).toHaveBeenCalledWith('morning-rush');
+  });
+
+  it('renders active selected demand node network coverage without exact travel claims', () => {
+    mounted = renderTab({
+      scenarioDemandCaptureProjection: MOCK_SCENARIO_PROJECTION,
+      servedDemandProjection: MOCK_SERVED_PROJECTION,
+      demandGapRankingProjection: {
+        status: 'ready',
+        activeTimeBandId: 'morning-rush',
+        uncapturedResidentialGaps: [],
+        capturedButUnservedResidentialGaps: [],
+        capturedButUnreachableWorkplaceGaps: [],
+        summary: { totalGapCount: 0 }
+      },
+      demandGapOdContextProjection: MOCK_OD_CONTEXT,
+      demandGapOdCandidateListProjection: MOCK_CANDIDATE_LIST,
+      focusedDemandGapPlanningProjection: MOCK_PLANNING_UNAVAILABLE,
+      focusedDemandGapLifecycleProjection: {
+        status: 'unfocused',
+        focusedGapId: null,
+        title: null,
+        message: null,
+        shouldOfferClearFocus: false
+      },
+      scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
+      demandNodeInspectionProjection: MOCK_INSPECTION_READY,
+      selectedDemandNodeServiceCoverageProjection: MOCK_NETWORK_COVERAGE_ACTIVE,
+      onPositionFocus: vi.fn(),
+      onDemandGapFocus: vi.fn(),
+      focusedDemandGapId: null,
+      onDemandNodeSelectionChange: vi.fn(),
+      onInspectDemandTimeBandSelectionChange: vi.fn(),
+      inspectDemandTimeBandSelection: 'follow-simulation',
+      onPlanningEntrypoint: vi.fn()
+    });
+
+    const textContent = mounted.container.textContent ?? '';
+    expect(textContent).toContain('Network coverage');
+    expect(textContent).toContain('Active structural service available');
+    expect(textContent).toContain('Origin Stop');
+    expect(textContent).toContain('Line 1');
+    expect(textContent).toContain('10 min headway');
+    expect(textContent).toContain('This is a planning projection, not observed travel behavior.');
+    expect(textContent).not.toContain('passengers flow');
+    expect(textContent).not.toContain('OD route');
+    expect(textContent).not.toContain('served trips');
+  });
+
+  it('renders selected demand node network coverage unavailable state without crashing', () => {
+    mounted = renderTab({
+      scenarioDemandCaptureProjection: MOCK_SCENARIO_PROJECTION,
+      servedDemandProjection: MOCK_SERVED_PROJECTION,
+      demandGapRankingProjection: {
+        status: 'ready',
+        activeTimeBandId: 'morning-rush',
+        uncapturedResidentialGaps: [],
+        capturedButUnservedResidentialGaps: [],
+        capturedButUnreachableWorkplaceGaps: [],
+        summary: { totalGapCount: 0 }
+      },
+      demandGapOdContextProjection: MOCK_OD_CONTEXT,
+      demandGapOdCandidateListProjection: MOCK_CANDIDATE_LIST,
+      focusedDemandGapPlanningProjection: MOCK_PLANNING_UNAVAILABLE,
+      focusedDemandGapLifecycleProjection: {
+        status: 'unfocused',
+        focusedGapId: null,
+        title: null,
+        message: null,
+        shouldOfferClearFocus: false
+      },
+      scenarioDemandProvenanceProjection: MOCK_PROVENANCE_UNAVAILABLE,
+      demandNodeInspectionProjection: MOCK_INSPECTION_READY,
+      selectedDemandNodeServiceCoverageProjection: {
+        ...MOCK_NETWORK_COVERAGE_NO_SELECTED,
+        status: 'unavailable',
+        selectedNodeId: 'node-res-1',
+        selectedNodeRole: 'origin',
+        inspectedTimeBandId: 'morning-rush',
+        inspectedTimeBandLabel: 'Morning rush',
+        summaryLabel: 'Network coverage unavailable',
+        reason: 'Demand node inspection is unavailable for the selected node.'
+      },
+      onPositionFocus: vi.fn(),
+      onDemandGapFocus: vi.fn(),
+      focusedDemandGapId: null,
+      onDemandNodeSelectionChange: vi.fn(),
+      onInspectDemandTimeBandSelectionChange: vi.fn(),
+      inspectDemandTimeBandSelection: 'follow-simulation',
+      onPlanningEntrypoint: vi.fn()
+    });
+
+    const textContent = mounted.container.textContent;
+    expect(textContent).toContain('Network coverage');
+    expect(textContent).toContain('Network coverage unavailable');
   });
 });

@@ -174,6 +174,33 @@ const mockDemandNodeInspectionProjection: import('../domain/projection/demandNod
   selectedNodeRole: null
 };
 
+const mockSelectedDemandNodeServiceCoverageProjection: import('../domain/projection/selectedDemandNodeServiceCoverageProjection').SelectedDemandNodeServiceCoverageProjection = {
+  status: 'no-selected-node',
+  selectedNodeId: null,
+  selectedNodeRole: null,
+  inspectedTimeBandId: null,
+  inspectedTimeBandLabel: null,
+  accessRadiusMeters: 400,
+  summaryLabel: 'No demand node selected',
+  reason: 'Select a demand node on the map to inspect network coverage.',
+  coveringStops: [],
+  candidateMatches: [],
+  connectingLines: [],
+  activeLines: [],
+  diagnostics: {
+    selectedSideCoveringStopCount: 0,
+    hiddenSelectedSideCoveringStopCount: 0,
+    oppositeCandidateWithStopCoverageCount: 0,
+    hiddenOppositeCandidateMatchCount: 0,
+    lineWithSelectedSideStopCount: 0,
+    structurallyConnectingLineCount: 0,
+    hiddenStructurallyConnectingLineCount: 0,
+    activeConnectingLineCount: 0,
+    hiddenActiveConnectingLineCount: 0
+  },
+  caveat: 'This is a planning projection, not observed travel behavior.'
+};
+
 const mockLineFrequencyInput: LineFrequencyInputByTimeBand = {
   'morning-rush': '',
   'late-morning': '',
@@ -240,6 +267,7 @@ const renderInspectorPanel = (activeTabId: import('./inspectorTabs').InspectorTa
         focusedDemandGapLifecycleProjection={mockFocusedDemandGapLifecycleProjection}
         scenarioDemandProvenanceProjection={mockScenarioDemandProvenanceProjection}
         demandNodeInspectionProjection={mockDemandNodeInspectionProjection}
+        selectedDemandNodeServiceCoverageProjection={mockSelectedDemandNodeServiceCoverageProjection}
         selectedLineRouteBaseline={null}
         selectedLineServiceProjection={null}
         selectedLineServiceInspectorProjection={null}
@@ -316,6 +344,7 @@ describe('InspectorPanel', () => {
             focusedDemandGapLifecycleProjection={mockFocusedDemandGapLifecycleProjection}
             scenarioDemandProvenanceProjection={mockScenarioDemandProvenanceProjection}
             demandNodeInspectionProjection={mockDemandNodeInspectionProjection}
+            selectedDemandNodeServiceCoverageProjection={mockSelectedDemandNodeServiceCoverageProjection}
             selectedLineRouteBaseline={null}
             selectedLineServiceProjection={null}
             selectedLineServiceInspectorProjection={null}
