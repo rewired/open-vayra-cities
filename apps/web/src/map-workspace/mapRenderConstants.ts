@@ -355,9 +355,9 @@ export const MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT = {
     ['linear'],
     ['zoom'],
     10,
-    2,
+    1,
     15,
-    6
+    4
   ],
   'heatmap-color': [
     'interpolate',
@@ -366,26 +366,26 @@ export const MAP_DEMAND_GAP_OVERLAY_HEATMAP_PAINT = {
     0,
     'rgba(255,255,255,0)',
     0.2,
-    'rgba(254,243,199,0.6)',
+    'rgba(254,243,199,0.4)',
     0.4,
-    'rgba(252,211,77,0.7)',
+    'rgba(252,211,77,0.5)',
     0.6,
-    'rgba(251,191,36,0.8)',
+    'rgba(251,191,36,0.6)',
     0.8,
-    'rgba(245,158,11,0.9)',
+    'rgba(245,158,11,0.7)',
     1,
-    'rgba(217,119,6,0.95)'
+    'rgba(180,83,9,0.8)'
   ],
   'heatmap-radius': [
     'interpolate',
     ['linear'],
     ['zoom'],
     10,
-    25,
+    30,
     15,
-    50
+    60
   ],
-  'heatmap-opacity': 0.85
+  'heatmap-opacity': 0.7
 } as const;
 
 /**
@@ -398,15 +398,15 @@ export const MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT = {
     'match',
     ['get', 'kind'],
     'uncaptured-residential',
-    '#ef4444',
+    '#b91c1c',
     'captured-unserved-residential',
-    '#f97316',
+    '#c2410c',
     'captured-unreachable-workplace',
-    '#8b5cf6',
-    '#6b7280'
+    '#6d28d9',
+    '#4b5563'
   ],
   'circle-stroke-width': 1,
-  'circle-stroke-color': '#ffffff',
+  'circle-stroke-color': 'rgba(255, 255, 255, 0.5)',
   'circle-opacity': [
     'interpolate',
     ['linear'],
@@ -414,7 +414,7 @@ export const MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT = {
     11,
     0,
     12,
-    0.8
+    0.6
   ],
   'circle-stroke-opacity': [
     'interpolate',
@@ -423,7 +423,7 @@ export const MAP_DEMAND_GAP_OVERLAY_CIRCLE_PAINT = {
     11,
     0,
     12,
-    0.8
+    0.6
   ]
 } as const;
 
@@ -451,7 +451,7 @@ export const MAP_DEMAND_GAP_OVERLAY_FOCUS_CIRCLE_PAINT = {
     11,
     0,
     12,
-    0.9
+    0.7
   ]
 } as const;
 
@@ -461,7 +461,7 @@ export const MAP_DEMAND_GAP_OVERLAY_FOCUS_CIRCLE_PAINT = {
  */
 export const MAP_DEMAND_GAP_OD_CONTEXT_HINT_PAINT = {
   'line-color': '#9ca3af',
-  'line-width': 2,
-  'line-opacity': 0.8,
+  'line-width': 1.5,
+  'line-opacity': 0.5,
   'line-dasharray': [2, 2]
 } as const;
