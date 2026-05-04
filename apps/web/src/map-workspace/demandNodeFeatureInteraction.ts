@@ -1,5 +1,10 @@
-import type { MapLibreGeoJsonFeature } from './maplibreGlobal';
-import type { ScenarioDemandPreviewFeatureProperties } from './scenarioDemandPreviewGeoJson';
+/**
+ * Minimal rendered demand feature shape required to decode scenario demand node IDs.
+ */
+export interface DemandNodeFeatureInteractionFeature {
+  /** Raw MapLibre feature properties emitted by the scenario demand preview layer. */
+  readonly properties?: Record<string, unknown>;
+}
 
 /**
  * Safely decodes a scenario demand node ID from raw MapLibre feature properties.
@@ -26,7 +31,7 @@ export function decodeDemandNodeIdFromFeatureProperties(
  * @param feature A MapLibre feature from the scenario demand preview layer.
  */
 export function decodeDemandNodeIdFromFeature(
-  feature: MapLibreGeoJsonFeature<ScenarioDemandPreviewFeatureProperties> | undefined
+  feature: DemandNodeFeatureInteractionFeature | undefined
 ): string | null {
   return decodeDemandNodeIdFromFeatureProperties(feature?.properties);
 }

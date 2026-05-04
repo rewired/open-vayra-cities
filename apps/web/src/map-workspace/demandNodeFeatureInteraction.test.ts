@@ -3,16 +3,13 @@ import {
   decodeDemandNodeIdFromFeature, 
   decodeDemandNodeIdFromFeatureProperties 
 } from './demandNodeFeatureInteraction';
-import type { MapLibreGeoJsonFeature } from './maplibreGlobal';
-import type { ScenarioDemandPreviewFeatureProperties } from './scenarioDemandPreviewGeoJson';
+import type { DemandNodeFeatureInteractionFeature } from './demandNodeFeatureInteraction';
 
 const createMockFeature = (
-  properties?: Partial<ScenarioDemandPreviewFeatureProperties>
-): MapLibreGeoJsonFeature<ScenarioDemandPreviewFeatureProperties> => ({
-  type: 'Feature',
-  geometry: { type: 'Point', coordinates: [0, 0] },
-  properties: properties as ScenarioDemandPreviewFeatureProperties
-});
+  properties?: Record<string, unknown>
+): DemandNodeFeatureInteractionFeature => (
+  properties ? { properties } : {}
+);
 
 describe('decodeDemandNodeIdFromFeatureProperties', () => {
   it('returns null for undefined properties', () => {
@@ -30,21 +27,21 @@ describe('decodeDemandNodeIdFromFeatureProperties', () => {
   });
 
   it('returns null for missing entityId', () => {
-    const properties = {
+    const properties: Record<string, unknown> = {
       entityKind: 'node',
       label: 'Node 123'
     };
 
-    expect(decodeDemandNodeIdFromFeatureProperties(properties as Record<string, unknown>)).toBeNull();
+    expect(decodeDemandNodeIdFromFeatureProperties(properties)).toBeNull();
   });
 
   it('returns null for non-string entityId', () => {
-    const properties = {
+    const properties: Record<string, unknown> = {
       entityId: 123,
       entityKind: 'node'
     };
 
-    expect(decodeDemandNodeIdFromFeatureProperties(properties as unknown as Record<string, unknown>)).toBeNull();
+    expect(decodeDemandNodeIdFromFeatureProperties(properties)).toBeNull();
   });
 
   it('returns null for empty entityId', () => {
