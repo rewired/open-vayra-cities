@@ -13,13 +13,16 @@ import {
   MAP_LAYER_ID_STOPS_LABEL,
   MAP_LAYER_ID_VEHICLES,
   MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
   MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
+  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
   MAP_LAYER_ID_SCENARIO_ROUTING_COVERAGE_MASK,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
   MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
   MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES,
-  MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE
+  MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE,
+  MAP_ENTITY_HOVER_EMPTY_FILTER
 } from './mapRenderConstants';
 import type { MapLibreLayerSpecification, MapLibreMap } from './maplibreGlobal';
 
@@ -51,11 +54,13 @@ describe('mapWorkspaceSourceSync custom-layer helpers', () => {
       MAP_LAYER_ID_DRAFT_LINE,
       MAP_LAYER_ID_SCENARIO_ROUTING_COVERAGE_MASK,
       MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
+      MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
       MAP_LAYER_ID_DEMAND_GAP_OVERLAY_HEATMAP,
       MAP_LAYER_ID_DEMAND_GAP_OVERLAY_CIRCLE,
       MAP_LAYER_ID_DEMAND_GAP_OVERLAY_FOCUS,
       MAP_LAYER_ID_DEMAND_GAP_OD_CONTEXT_LINES,
       MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+      MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
       MAP_LAYER_ID_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_CIRCLE,
       MAP_LAYER_ID_STOPS_CIRCLE,
       MAP_LAYER_ID_STOPS_LABEL,
@@ -344,6 +349,27 @@ describe('mapWorkspaceSourceSync integration', () => {
 
     const source = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT);
     expect(source?.setData).toHaveBeenCalled();
+  });
+
+  it('syncAllMapWorkspaceSources ensures hover highlight layers without creating new sources', () => {
+    const map = createMockMap();
+
+    syncAllMapWorkspaceSources({ map });
+
+    expect(map.addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
+        source: MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW,
+        filter: MAP_ENTITY_HOVER_EMPTY_FILTER
+      })
+    );
+    expect(map.addLayer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
+        source: MAP_SOURCE_ID_OSM_STOP_CANDIDATES,
+        filter: MAP_ENTITY_HOVER_EMPTY_FILTER
+      })
+    );
   });
 
   it('syncAllMapWorkspaceSources ensures selected demand node service coverage source and sets data', () => {

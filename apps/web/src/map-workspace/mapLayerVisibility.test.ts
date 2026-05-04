@@ -2,7 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { applyMapLayerVisibility } from './mapLayerVisibility';
 import {
   MAP_OSM_STOP_CANDIDATE_LAYER_IDS,
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
   MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS,
+  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
   MAP_DEMAND_GAP_OVERLAY_LAYER_IDS,
   MAP_DEMAND_GAP_OD_CONTEXT_LAYER_IDS,
   MAP_SELECTED_DEMAND_NODE_SERVICE_COVERAGE_LAYER_IDS
@@ -25,6 +27,7 @@ describe('applyMapLayerVisibility', () => {
       expect(mockGetLayer).toHaveBeenCalledWith(layerId);
       expect(mockSetLayoutProperty).toHaveBeenCalledWith(layerId, 'visibility', 'visible');
     }
+    expect(MAP_OSM_STOP_CANDIDATE_LAYER_IDS).toContain(MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER);
   });
 
   it('sets hidden state to every OSM candidate layer', () => {
@@ -57,6 +60,7 @@ describe('applyMapLayerVisibility', () => {
       expect(mockGetLayer).toHaveBeenCalledWith(layerId);
       expect(mockSetLayoutProperty).toHaveBeenCalledWith(layerId, 'visibility', 'visible');
     }
+    expect(MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS).toContain(MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER);
   });
 
   it('sets hidden state to every demand preview layer', () => {

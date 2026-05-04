@@ -27,7 +27,6 @@ import {
 } from './mapWorkspaceInteractions';
 import { resolveStreetLayerIdsFromStyle } from './mapWorkspaceStreetSnap';
 import { StopHoverTooltip } from './StopHoverTooltip';
-import { OsmStopCandidateHoverTooltip } from './OsmStopCandidateHoverTooltip';
 import { LineCompletionDialog } from './LineCompletionDialog';
 import {
   buildLineModeUiFeedback,
@@ -45,8 +44,6 @@ import { applyMapLayerVisibility } from './mapLayerVisibility';
 import { applyBasemapSemanticReadabilityOverrides } from './mapBaseStyleOverrides';
 import type { MapLibreMap } from './maplibreGlobal';
 import {
-  isStaleOsmStopCandidateHover,
-  type ResolvedOsmStopCandidateHoverPayload,
   type OsmStopCandidateAnchorResolutionCache
 } from './mapWorkspaceOsmCandidateHover';
 import { applyMapWorkspaceFocusIntent, applyMapMaxBounds } from './mapWorkspaceFocus';
@@ -160,7 +157,6 @@ export function MapWorkspaceSurface({
   });
   const [placementAttemptResult, setPlacementAttemptResult] = useState<PlacementAttemptResult>('none');
   const [hoveredStop, setHoveredStop] = useState<{ stopId: StopId; x: number; y: number } | null>(null);
-  const [hoveredOsmCandidate, setHoveredOsmCandidate] = useState<ResolvedOsmStopCandidateHoverPayload | null>(null);
   const [draftLineState, setDraftLineState] = useState<DraftLineState>(INITIAL_DRAFT_LINE_STATE);
   const [featureDiagnostics, setFeatureDiagnostics] = useState<MapWorkspaceFeatureDiagnostics>(
     INITIAL_MAP_WORKSPACE_FEATURE_DIAGNOSTICS
@@ -199,12 +195,6 @@ export function MapWorkspaceSurface({
   useEffect(() => {
     anchorResolutionCacheRef.current.clear();
   }, [osmStopCandidateGroups]);
-
-  useEffect(() => {
-    if (isStaleOsmStopCandidateHover(hoveredOsmCandidate, osmStopCandidateGroups)) {
-      setHoveredOsmCandidate(null);
-    }
-  }, [osmStopCandidateGroups, hoveredOsmCandidate]);
 
   useEffect(() => {
     if (hoveredStop && !placedStops.some(s => s.id === hoveredStop.stopId)) {
@@ -341,10 +331,6 @@ export function MapWorkspaceSurface({
   }, [draftLineState.stopIds, onLineBuildSelectionChange]);
 
   useEffect(() => {
-    if (activeToolMode !== 'inspect') {
-      setHoveredOsmCandidate(null);
-    }
-
     if (activeToolMode === 'build-line') {
       setDraftLineState(INITIAL_DRAFT_LINE_STATE);
     }
@@ -362,7 +348,6 @@ export function MapWorkspaceSurface({
     setInteractionState,
     setPlacementAttemptResult,
     setHoveredStop,
-    setHoveredOsmCandidate,
     setDraftLineState,
     onPlacedStopsChange,
     onStopSelectionChange,
@@ -417,7 +402,7 @@ export function MapWorkspaceSurface({
       draftMetadata: draftLineState.metadata,
       lastPlacedStopLabel,
       osmStopCandidateGroupCount: osmStopCandidateGroups.length,
-      hoveredOsmCandidateAnchorResolution: hoveredOsmCandidate?.anchorResolution,
+      hoveredOsmCandidateAnchorResolution: null,
       osmStopCandidateStreetLayerCount: mapInstanceRef.current ? resolveStreetLayerIdsFromStyle(mapInstanceRef.current).length : undefined
     });
     const snapshotString = JSON.stringify(nextSnapshot);
@@ -435,7 +420,6 @@ export function MapWorkspaceSurface({
     draftLineState.metadata,
     lastPlacedStopLabel,
     osmStopCandidateGroups.length,
-    hoveredOsmCandidate?.anchorResolution,
     onDebugSnapshotChange
   ]);
 
@@ -574,19 +558,6 @@ export function MapWorkspaceSurface({
           y={hoveredStop.y}
           sessionLines={sessionLines}
           selectedLineId={selectedLineId}
-        />
-      )}
-
-      {hoveredOsmCandidate && (
-        <OsmStopCandidateHoverTooltip
-          candidateGroupId={hoveredOsmCandidate.candidateGroupId}
-          label={hoveredOsmCandidate.label}
-          memberCount={hoveredOsmCandidate.memberCount}
-          memberKinds={hoveredOsmCandidate.memberKinds}
-          berthCountHint={hoveredOsmCandidate.berthCountHint}
-          x={hoveredOsmCandidate.x}
-          y={hoveredOsmCandidate.y}
-          anchorResolution={hoveredOsmCandidate.anchorResolution}
         />
       )}
 

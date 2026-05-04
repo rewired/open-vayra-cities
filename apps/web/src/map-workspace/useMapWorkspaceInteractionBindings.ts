@@ -7,8 +7,7 @@ import type { MapLibreMap } from './maplibreGlobal';
 import type { MapSurfaceInteractionState, PlacementAttemptResult, StopSelectionState } from './mapWorkspaceInteractions';
 import type { DraftLineState } from './mapWorkspaceDraftState';
 import type {
-  OsmStopCandidateAnchorResolutionCache,
-  ResolvedOsmStopCandidateHoverPayload
+  OsmStopCandidateAnchorResolutionCache
 } from './mapWorkspaceOsmCandidateHover';
 
 import {
@@ -29,10 +28,7 @@ import {
   decodeDemandGapIdFromFeatureProperties
 } from './demandGapFeatureInteraction';
 
-import {
-  resolveOsmStopCandidateHover,
-  resolveCachedOsmStopCandidateStreetAnchor
-} from './mapWorkspaceOsmCandidateHover';
+import { resolveCachedOsmStopCandidateStreetAnchor } from './mapWorkspaceOsmCandidateHover';
 import { 
   decodeDemandNodeIdFromFeatureProperties 
 } from './demandNodeFeatureInteraction';
@@ -50,7 +46,6 @@ export interface UseMapWorkspaceInteractionBindingsInput {
   readonly setInteractionState: Dispatch<SetStateAction<MapSurfaceInteractionState>>;
   readonly setPlacementAttemptResult: Dispatch<SetStateAction<PlacementAttemptResult>>;
   readonly setHoveredStop: Dispatch<SetStateAction<{ readonly stopId: StopId; readonly x: number; readonly y: number } | null>>;
-  readonly setHoveredOsmCandidate: Dispatch<SetStateAction<ResolvedOsmStopCandidateHoverPayload | null>>;
   readonly setDraftLineState: Dispatch<SetStateAction<DraftLineState>>;
   readonly onPlacedStopsChange: (updater: (currentStops: readonly Stop[]) => readonly Stop[]) => void;
   readonly onStopSelectionChange: (nextSelection: StopSelectionState | null) => void;
@@ -100,15 +95,6 @@ export function useMapWorkspaceInteractionBindings(input: UseMapWorkspaceInterac
           input.onOsmCandidateAnchorResolved(null);
         }
       },
-      onOsmCandidateHoverChange: (nextHover) => {
-        const resolved = resolveOsmStopCandidateHover({
-          map: mapInstance,
-          hover: nextHover,
-          groups: input.osmStopCandidateGroups,
-          cache: input.anchorResolutionCacheRef.current
-        });
-        input.setHoveredOsmCandidate(resolved);
-      },
       onValidPlacement: (lng, lat, labelCandidate) => {
         let createdStop!: Stop;
         input.onPlacedStopsChange((currentStops) => {
@@ -143,7 +129,6 @@ export function useMapWorkspaceInteractionBindings(input: UseMapWorkspaceInterac
       }
 
       input.onOsmCandidateSelectionChange(groupId);
-      input.setHoveredOsmCandidate(null);
 
       const group = input.osmStopCandidateGroups.find((g) => g.id === groupId);
       if (group) {

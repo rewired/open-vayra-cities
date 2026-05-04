@@ -189,9 +189,9 @@ export interface MapLibreGeoJsonFeatureCollection<
 }
 
 /**
- * Expression-like paint/layout value supported by this minimal layer typing.
+ * Expression-like paint, layout, and filter value supported by this minimal MapLibre typing.
  */
-type MapLibreExpressionValue = string | number | boolean | readonly unknown[];
+export type MapLibreExpressionValue = string | number | boolean | readonly unknown[];
 
 /**
  * Minimal map source specification for GeoJSON-backed source registration.
@@ -224,7 +224,7 @@ export interface MapLibreLayerSpecification {
   readonly source: string;
   readonly paint?: Readonly<Record<string, MapLibreExpressionValue>>;
   readonly layout?: Readonly<Record<string, MapLibreExpressionValue>>;
-  readonly filter?: readonly unknown[];
+  readonly filter?: MapLibreExpressionValue;
 }
 
 /**
@@ -285,6 +285,8 @@ export interface MapLibreMap {
   fitBounds(bounds: [MapLibreLngLatTuple, MapLibreLngLatTuple], options?: { padding?: number | { top: number; bottom: number; left: number; right: number } }): void;
   /** Updates a paint property for an existing style layer. */
   setPaintProperty(layerId: string, name: string, value: MapLibreExpressionValue): void;
+  /** Updates the feature filter for an existing style layer. */
+  setFilter(layerId: string, filter: MapLibreExpressionValue): void;
   /** Updates a layout property for an existing style layer. */
   setLayoutProperty(layerId: string, name: string, value: MapLibreExpressionValue): void;
   /** Applies scenario-level max-bounds to the map workspace instance to prevent out-of-coverage drift. */

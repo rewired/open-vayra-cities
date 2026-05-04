@@ -14,7 +14,9 @@ import {
   MAP_LAYER_ID_STOPS_CIRCLE, 
   MAP_LAYER_ID_COMPLETED_LINES,
   MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
-  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
+  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
+  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER
 } from './mapRenderConstants';
 import { 
   bindSafeLayerInteraction, 
@@ -42,7 +44,7 @@ const createMapMock = (
 
 interface SetupInteractionMapMock extends MapWorkspaceInteractionRuntimeMap {
   readonly canvas: { readonly style: { cursor: string } };
-  readonly setPaintProperty: ReturnType<typeof vi.fn>;
+  readonly setFilter: ReturnType<typeof vi.fn>;
   readonly getCapturedLayerListener: (
     eventType: 'mouseenter' | 'mousemove' | 'mouseleave' | 'click',
     layerId: string
@@ -83,7 +85,7 @@ const createSetupInteractionMapMock = (presentLayerIds: readonly string[]): Setu
     project: () => ({ x: 0, y: 0 }),
     querySourceFeatures: () => [],
     getCanvas: () => canvas,
-    setPaintProperty: vi.fn()
+    setFilter: vi.fn()
   };
 
   return map;
@@ -200,7 +202,11 @@ describe('mapWorkspaceInteractions', () => {
 
     it('does not call demand node selection callbacks on demand node hover', () => {
       const onDemandNodeSelectionChange = vi.fn();
-      const map = createSetupInteractionMapMock([MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE]);
+      const map = createSetupInteractionMapMock([
+        MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
+        MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
+        MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER
+      ]);
 
       const binding = setupMapWorkspaceInteractions({
         map,
@@ -228,6 +234,7 @@ describe('mapWorkspaceInteractions', () => {
 
       expect(onDemandNodeSelectionChange).not.toHaveBeenCalled();
       expect(map.canvas.style.cursor).toBe('pointer');
+      expect(map.setFilter).toHaveBeenCalledTimes(3);
 
       binding.dispose();
     });
@@ -236,7 +243,11 @@ describe('mapWorkspaceInteractions', () => {
       const onStopSelectionChange = vi.fn();
       const onDemandNodeSelectionChange = vi.fn();
       const onOsmCandidateHoverChange = vi.fn();
-      const map = createSetupInteractionMapMock([MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE]);
+      const map = createSetupInteractionMapMock([
+        MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+        MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
+        MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER
+      ]);
 
       const binding = setupMapWorkspaceInteractions({
         map,
@@ -276,14 +287,106 @@ describe('mapWorkspaceInteractions', () => {
         })
       );
       expect(map.canvas.style.cursor).toBe('pointer');
+      expect(map.setFilter).toHaveBeenCalledTimes(3);
 
       binding.dispose();
       expect(map.canvas.style.cursor).toBe('');
     });
 
+    it('does not repeatedly mutate hover filters while moving within the same demand node', () => {
+      const map = createSetupInteractionMapMock([
+        MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
+        MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
+        MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER
+      ]);
+
+      const binding = setupMapWorkspaceInteractions({
+        map,
+        ...baseInteractionContracts
+      });
+
+      const listener = map.getCapturedLayerListener('mousemove', MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE);
+      if (!listener) {
+        throw new Error('Expected demand node mousemove listener to be captured.');
+      }
+
+      const event: MapLibreInteractionEvent = {
+        point: { x: 12, y: 14 },
+        features: [
+          {
+            layer: { id: MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE },
+            properties: {
+              entityId: 'node-1',
+              entityKind: 'node'
+            }
+          }
+        ]
+      };
+
+      listener(event);
+      listener(event);
+
+      expect(map.setFilter).toHaveBeenCalledTimes(3);
+
+      binding.dispose();
+    });
+
+    it('updates hover filters exactly once when moving to a different OSM candidate', () => {
+      const map = createSetupInteractionMapMock([
+        MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+        MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
+        MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER
+      ]);
+
+      const binding = setupMapWorkspaceInteractions({
+        map,
+        ...baseInteractionContracts
+      });
+
+      const listener = map.getCapturedLayerListener('mousemove', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE);
+      if (!listener) {
+        throw new Error('Expected OSM candidate mousemove listener to be captured.');
+      }
+
+      listener({
+        point: { x: 12, y: 14 },
+        features: [
+          {
+            layer: { id: MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE },
+            properties: {
+              candidateGroupId: 'osm-group:1',
+              label: 'Candidate 1',
+              memberCount: 2
+            }
+          }
+        ]
+      });
+      listener({
+        point: { x: 12, y: 14 },
+        features: [
+          {
+            layer: { id: MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE },
+            properties: {
+              candidateGroupId: 'osm-group:2',
+              label: 'Candidate 2',
+              memberCount: 2
+            }
+          }
+        ]
+      });
+
+      expect(map.setFilter).toHaveBeenCalledTimes(6);
+
+      binding.dispose();
+    });
+
     it('does not show clickable hover affordance outside inspect mode', () => {
       const onOsmCandidateHoverChange = vi.fn();
-      const map = createSetupInteractionMapMock([MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE]);
+      const map = createSetupInteractionMapMock([
+        MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+        MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
+        MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER
+      ]);
 
       const binding = setupMapWorkspaceInteractions({
         map,
@@ -313,6 +416,7 @@ describe('mapWorkspaceInteractions', () => {
 
       expect(onOsmCandidateHoverChange).not.toHaveBeenCalled();
       expect(map.canvas.style.cursor).toBe('');
+      expect(map.setFilter).not.toHaveBeenCalled();
 
       binding.dispose();
     });

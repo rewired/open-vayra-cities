@@ -1,12 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createOsmStopCandidateGroupId } from '../domain/types/osmStopCandidate';
 import {
-  MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
-  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
+  MAP_ENTITY_HOVER_EMPTY_FILTER,
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
+  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
   MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT,
   MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT
 } from './mapRenderConstants';
 import {
+  createMapEntityHoverAffordanceController,
   decodeMapEntityHoverTargetFromFeatureProperties,
   syncMapEntityHoverAffordance,
   type MapEntityHoverAffordanceMap
@@ -15,10 +17,10 @@ import type { MapLibreLayerSpecification } from './maplibreGlobal';
 
 const createAffordanceMap = (
   presentLayerIds: readonly string[] = [
-    MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
-    MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE
+    MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
+    MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER
   ]
-): MapEntityHoverAffordanceMap & { readonly canvas: { readonly style: { cursor: string } }; readonly setPaintProperty: ReturnType<typeof vi.fn> } => {
+): MapEntityHoverAffordanceMap & { readonly canvas: { readonly style: { cursor: string } }; readonly setFilter: ReturnType<typeof vi.fn> } => {
   const layerIds = new Set(presentLayerIds);
   const canvas = { style: { cursor: '' } };
 
@@ -33,7 +35,7 @@ const createAffordanceMap = (
             source: 'test-source'
           }
         : undefined,
-    setPaintProperty: vi.fn()
+    setFilter: vi.fn()
   };
 };
 
@@ -72,7 +74,7 @@ describe('decodeMapEntityHoverTargetFromFeatureProperties', () => {
 });
 
 describe('syncMapEntityHoverAffordance', () => {
-  it('applies pointer cursor and demand node paint emphasis for demand node hover', () => {
+  it('applies pointer cursor and demand node hover filter without mutating base paint constants', () => {
     const map = createAffordanceMap();
 
     syncMapEntityHoverAffordance(map, {
@@ -81,19 +83,23 @@ describe('syncMapEntityHoverAffordance', () => {
     });
 
     expect(map.canvas.style.cursor).toBe('pointer');
-    expect(map.setPaintProperty).toHaveBeenCalledWith(
-      MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
-      'circle-radius',
-      expect.arrayContaining(['case'])
+    expect(map.setFilter).toHaveBeenCalledWith(
+      MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
+      ['==', ['get', 'entityId'], 'node-1']
     );
-    expect(map.setPaintProperty).toHaveBeenCalledWith(
-      MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
-      'circle-radius',
-      MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT['circle-radius']
+    expect(map.setFilter).toHaveBeenCalledWith(
+      MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
+      MAP_ENTITY_HOVER_EMPTY_FILTER
     );
+    expect(MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT['circle-radius']).toEqual([
+      'case',
+      ['==', ['get', 'entityKind'], 'node'], 4,
+      ['==', ['get', 'entityKind'], 'attractor'], 6,
+      8
+    ]);
   });
 
-  it('applies pointer cursor and OSM candidate paint emphasis for OSM candidate hover', () => {
+  it('applies pointer cursor and OSM candidate hover filter without mutating base paint constants', () => {
     const map = createAffordanceMap();
 
     syncMapEntityHoverAffordance(map, {
@@ -102,33 +108,38 @@ describe('syncMapEntityHoverAffordance', () => {
     });
 
     expect(map.canvas.style.cursor).toBe('pointer');
-    expect(map.setPaintProperty).toHaveBeenCalledWith(
-      MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
-      'circle-radius',
-      expect.arrayContaining(['case'])
+    expect(map.setFilter).toHaveBeenCalledWith(
+      MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
+      ['==', ['get', 'candidateGroupId'], 'osm-group:1']
     );
-    expect(map.setPaintProperty).toHaveBeenCalledWith(
-      MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
-      'circle-radius',
-      MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT['circle-radius']
+    expect(map.setFilter).toHaveBeenCalledWith(
+      MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
+      MAP_ENTITY_HOVER_EMPTY_FILTER
     );
+    expect(MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT['circle-radius']).toEqual([
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      12,
+      4,
+      14,
+      8
+    ]);
   });
 
-  it('clears cursor and restores base paint deterministically', () => {
+  it('clears cursor and restores idle hover filters deterministically', () => {
     const map = createAffordanceMap();
 
     syncMapEntityHoverAffordance(map, null);
 
     expect(map.canvas.style.cursor).toBe('');
-    expect(map.setPaintProperty).toHaveBeenCalledWith(
-      MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
-      'circle-radius',
-      MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT['circle-radius']
+    expect(map.setFilter).toHaveBeenCalledWith(
+      MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
+      MAP_ENTITY_HOVER_EMPTY_FILTER
     );
-    expect(map.setPaintProperty).toHaveBeenCalledWith(
-      MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
-      'circle-radius',
-      MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT['circle-radius']
+    expect(map.setFilter).toHaveBeenCalledWith(
+      MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER,
+      MAP_ENTITY_HOVER_EMPTY_FILTER
     );
   });
 
@@ -143,6 +154,44 @@ describe('syncMapEntityHoverAffordance', () => {
     }).not.toThrow();
 
     expect(map.canvas.style.cursor).toBe('pointer');
-    expect(map.setPaintProperty).not.toHaveBeenCalled();
+    expect(map.setFilter).not.toHaveBeenCalled();
+  });
+});
+
+describe('createMapEntityHoverAffordanceController', () => {
+  it('does not repeatedly mutate filters for the same hover target', () => {
+    const map = createAffordanceMap();
+    const controller = createMapEntityHoverAffordanceController(map);
+
+    controller.sync({ kind: 'demand-node', id: 'node-1' });
+    controller.sync({ kind: 'demand-node', id: 'node-1' });
+
+    expect(map.setFilter).toHaveBeenCalledTimes(3);
+  });
+
+  it('updates filters when the hover target changes', () => {
+    const map = createAffordanceMap();
+    const controller = createMapEntityHoverAffordanceController(map);
+
+    controller.sync({ kind: 'demand-node', id: 'node-1' });
+    controller.sync({ kind: 'demand-node', id: 'node-2' });
+
+    expect(map.setFilter).toHaveBeenCalledWith(
+      MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER,
+      ['==', ['get', 'entityId'], 'node-2']
+    );
+    expect(map.setFilter).toHaveBeenCalledTimes(6);
+  });
+
+  it('clears hover filters once and skips repeated clears', () => {
+    const map = createAffordanceMap();
+    const controller = createMapEntityHoverAffordanceController(map);
+
+    controller.sync({ kind: 'osm-stop-candidate', id: createOsmStopCandidateGroupId('osm-group:1') });
+    controller.clear();
+    controller.clear();
+
+    expect(map.canvas.style.cursor).toBe('');
+    expect(map.setFilter).toHaveBeenCalledTimes(5);
   });
 });

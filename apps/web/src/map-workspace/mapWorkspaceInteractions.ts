@@ -33,7 +33,7 @@ import {
 } from './mapWorkspaceStreetSnap';
 import {
   decodeMapEntityHoverTargetFromFeatureProperties,
-  syncMapEntityHoverAffordance,
+  createMapEntityHoverAffordanceController,
   type MapEntityHoverAffordanceMap
 } from './mapEntityHoverTarget';
 
@@ -105,7 +105,7 @@ export interface MapWorkspaceSurfaceInteractionsContracts {
 export type MapWorkspaceInteractionRuntimeMap = RenderedFeatureLayerQueryMap &
   LayerInteractionBindingMap &
   StreetSnapQueryMap &
-  Pick<MapEntityHoverAffordanceMap, 'getCanvas' | 'setPaintProperty'>;
+  Pick<MapEntityHoverAffordanceMap, 'getCanvas' | 'setFilter'>;
 
 
 /** Context contract for resolving stop-feature clicks across inspect and build-line modes. */
@@ -278,6 +278,7 @@ export const setupMapWorkspaceInteractions = ({
   routingCoverage
 }: MapWorkspaceSurfaceInteractionsContracts): MapWorkspaceInteractionBinding => {
   const neutralTelemetryHandlers = createNeutralMapTelemetryHandlers({ setInteractionState });
+  const hoverAffordanceController = createMapEntityHoverAffordanceController(map);
 
   const onMapClick = (event: MapLibreInteractionEvent): void => {
     neutralTelemetryHandlers.onMapClick(event);
@@ -297,7 +298,7 @@ export const setupMapWorkspaceInteractions = ({
 
   const onOsmCandidateMouseMove = (event: MapLibreInteractionEvent): void => {
     if (activeToolMode !== 'inspect') {
-      syncMapEntityHoverAffordance(map, null);
+      hoverAffordanceController.clear();
       return;
     }
 
@@ -313,7 +314,7 @@ export const setupMapWorkspaceInteractions = ({
       return;
     }
 
-    syncMapEntityHoverAffordance(map, {
+    hoverAffordanceController.sync({
       kind: 'osm-stop-candidate',
       id: groupId
     });
@@ -361,13 +362,13 @@ export const setupMapWorkspaceInteractions = ({
   };
 
   const onOsmCandidateMouseLeave = (): void => {
-    syncMapEntityHoverAffordance(map, null);
+    hoverAffordanceController.clear();
     onOsmCandidateHoverChange?.(null);
   };
 
   const onDemandNodeMouseMove = (event: MapLibreInteractionEvent): void => {
     if (activeToolMode !== 'inspect') {
-      syncMapEntityHoverAffordance(map, null);
+      hoverAffordanceController.clear();
       return;
     }
 
@@ -377,11 +378,11 @@ export const setupMapWorkspaceInteractions = ({
       return;
     }
 
-    syncMapEntityHoverAffordance(map, target);
+    hoverAffordanceController.sync(target);
   };
 
   const onDemandNodeMouseLeave = (): void => {
-    syncMapEntityHoverAffordance(map, null);
+    hoverAffordanceController.clear();
   };
   
   const onPointerInteractiveMouseEnter = (): void => {
@@ -414,7 +415,7 @@ export const setupMapWorkspaceInteractions = ({
       onOsmCandidateHoverChange(null);
     }
     if (!isOverStop && !isOverOsm && !isOverDemandNode) {
-      syncMapEntityHoverAffordance(map, null);
+      hoverAffordanceController.clear();
     }
   };
 
@@ -439,19 +440,13 @@ export const setupMapWorkspaceInteractions = ({
   const demandNodeMouseMoveBinding = bindSafeLayerInteraction(map, 'mousemove', MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE, onDemandNodeMouseMove);
   const demandNodeMouseLeaveBinding = bindSafeLayerInteraction(map, 'mouseleave', MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE, onDemandNodeMouseLeave);
 
-  let osmMouseEnterBinding: MapWorkspaceInteractionBinding | null = null;
-  let osmMouseMoveBinding: MapWorkspaceInteractionBinding | null = null;
-  let osmMouseLeaveBinding: MapWorkspaceInteractionBinding | null = null;
-
-  if (onOsmCandidateHoverChange) {
-    osmMouseEnterBinding = bindSafeLayerInteraction(map, 'mouseenter', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, (e) => {
-      onOsmCandidateMouseEnter(e);
-    });
-    osmMouseMoveBinding = bindSafeLayerInteraction(map, 'mousemove', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseMove);
-    osmMouseLeaveBinding = bindSafeLayerInteraction(map, 'mouseleave', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, () => {
-      onOsmCandidateMouseLeave();
-    });
-  }
+  const osmMouseEnterBinding = bindSafeLayerInteraction(map, 'mouseenter', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, (e) => {
+    onOsmCandidateMouseEnter(e);
+  });
+  const osmMouseMoveBinding = bindSafeLayerInteraction(map, 'mousemove', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, onOsmCandidateMouseMove);
+  const osmMouseLeaveBinding = bindSafeLayerInteraction(map, 'mouseleave', MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE, () => {
+    onOsmCandidateMouseLeave();
+  });
 
   return {
     dispose: () => {
@@ -470,10 +465,10 @@ export const setupMapWorkspaceInteractions = ({
       demandNodeMouseMoveBinding.dispose();
       demandNodeMouseLeaveBinding.dispose();
 
-      osmMouseEnterBinding?.dispose();
-      osmMouseMoveBinding?.dispose();
-      osmMouseLeaveBinding?.dispose();
-      syncMapEntityHoverAffordance(map, null);
+      osmMouseEnterBinding.dispose();
+      osmMouseMoveBinding.dispose();
+      osmMouseLeaveBinding.dispose();
+      hoverAffordanceController.clear();
     }
   };
 };

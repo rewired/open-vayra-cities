@@ -186,9 +186,22 @@ export const MAP_SOURCE_ID_OSM_STOP_CANDIDATES = 'osm-stop-candidates';
 export const MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE = 'osm-stop-candidates-circle';
 
 /**
+ * Canonical circle layer id for OSM stop candidate hover-only highlight rendering.
+ */
+export const MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER = 'osm-stop-candidates-hover';
+
+/**
+ * Filter that intentionally matches no hover highlight feature.
+ */
+export const MAP_ENTITY_HOVER_EMPTY_FILTER = ['==', ['get', '__hoverTarget'], '__none'] as const;
+
+/**
  * Canonical style layer ids for OSM stop candidate rendering in deterministic order.
  */
-export const MAP_OSM_STOP_CANDIDATE_LAYER_IDS = [MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE] as const;
+export const MAP_OSM_STOP_CANDIDATE_LAYER_IDS = [
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_CIRCLE,
+  MAP_LAYER_ID_OSM_STOP_CANDIDATES_HOVER
+] as const;
 
 /**
  * Minimum zoom level at which OSM stop candidates begin to fade in.
@@ -238,19 +251,30 @@ export const MAP_OSM_STOP_CANDIDATE_CIRCLE_LAYER_PAINT = {
 } as const;
 
 /**
- * UI-only circle radius used while an OSM stop candidate map entity is hovered.
+ * UI-only circle radius for the OSM stop candidate hover highlight layer.
  */
 export const MAP_OSM_STOP_CANDIDATE_HOVER_CIRCLE_RADIUS = 11;
 
 /**
- * UI-only stroke width used while an OSM stop candidate map entity is hovered.
+ * UI-only stroke width for the OSM stop candidate hover highlight layer.
  */
 export const MAP_OSM_STOP_CANDIDATE_HOVER_STROKE_WIDTH = 3;
 
 /**
- * UI-only stroke color used while an OSM stop candidate map entity is hovered.
+ * UI-only stroke color for the OSM stop candidate hover highlight layer.
  */
 export const MAP_OSM_STOP_CANDIDATE_HOVER_STROKE_COLOR = '#f8fafc';
+
+/**
+ * Display-only ring paint for hovered OSM stop candidates.
+ */
+export const MAP_OSM_STOP_CANDIDATE_HOVER_CIRCLE_LAYER_PAINT = {
+  'circle-radius': MAP_OSM_STOP_CANDIDATE_HOVER_CIRCLE_RADIUS,
+  'circle-color': 'transparent',
+  'circle-stroke-width': MAP_OSM_STOP_CANDIDATE_HOVER_STROKE_WIDTH,
+  'circle-stroke-color': MAP_OSM_STOP_CANDIDATE_HOVER_STROKE_COLOR,
+  'circle-stroke-opacity': 0.95
+} as const;
 
 /**
  * Canonical GeoJSON source id for all scenario demand preview features.
@@ -263,9 +287,18 @@ export const MAP_SOURCE_ID_SCENARIO_DEMAND_PREVIEW = 'openvayra-cities-scenario-
 export const MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE = 'openvayra-cities-scenario-demand-preview-circle';
 
 /**
+ * Canonical circle layer id for scenario demand preview hover-only highlight rendering.
+ */
+export const MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER =
+  'openvayra-cities-scenario-demand-preview-hover';
+
+/**
  * Canonical style layer ids for scenario demand preview rendering in order.
  */
-export const MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS = [MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE] as const;
+export const MAP_SCENARIO_DEMAND_PREVIEW_LAYER_IDS = [
+  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_CIRCLE,
+  MAP_LAYER_ID_SCENARIO_DEMAND_PREVIEW_HOVER
+] as const;
 
 /**
  * Data-driven circle layer paint style for distinct demand preview categorization.
@@ -290,19 +323,30 @@ export const MAP_SCENARIO_DEMAND_PREVIEW_CIRCLE_LAYER_PAINT = {
 } as const;
 
 /**
- * UI-only circle radius used while a scenario demand node map entity is hovered.
+ * UI-only circle radius for the scenario demand node hover highlight layer.
  */
 export const MAP_SCENARIO_DEMAND_PREVIEW_HOVER_CIRCLE_RADIUS = 9;
 
 /**
- * UI-only stroke width used while a scenario demand node map entity is hovered.
+ * UI-only stroke width for the scenario demand node hover highlight layer.
  */
 export const MAP_SCENARIO_DEMAND_PREVIEW_HOVER_STROKE_WIDTH = 3;
 
 /**
- * UI-only stroke color used while a scenario demand node map entity is hovered.
+ * UI-only stroke color for the scenario demand node hover highlight layer.
  */
 export const MAP_SCENARIO_DEMAND_PREVIEW_HOVER_STROKE_COLOR = '#f8fafc';
+
+/**
+ * Display-only ring paint for hovered scenario demand nodes.
+ */
+export const MAP_SCENARIO_DEMAND_PREVIEW_HOVER_CIRCLE_LAYER_PAINT = {
+  'circle-radius': MAP_SCENARIO_DEMAND_PREVIEW_HOVER_CIRCLE_RADIUS,
+  'circle-color': 'transparent',
+  'circle-stroke-width': MAP_SCENARIO_DEMAND_PREVIEW_HOVER_STROKE_WIDTH,
+  'circle-stroke-color': MAP_SCENARIO_DEMAND_PREVIEW_HOVER_STROKE_COLOR,
+  'circle-stroke-opacity': 0.95
+} as const;
 
 /**
  * Maximum number of point features to render for the scenario demand preview overlay.
