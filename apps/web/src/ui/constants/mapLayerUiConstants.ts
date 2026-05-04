@@ -66,8 +66,8 @@ export const INITIAL_REGISTERED_MAP_LAYERS: readonly MapLayerControlItem[] = [
   },
   {
     id: 'demand-gap-od-context',
-    label: 'Demand gap hints',
-    description: 'Show straight planning hints from a focused demand gap to likely OD candidates.'
+    label: 'Demand context hints',
+    description: 'Show straight planning hints from focused demand context to likely candidates.'
   }
 ];
 

@@ -158,7 +158,9 @@ const MOCK_INSPECTION_READY: DemandNodeInspectionProjection = {
       distanceLabel: '500m',
       position: { lng: 0.1, lat: 0.1 }
     }
-  ]
+  ],
+  selectedNodePosition: { lng: 0, lat: 0 },
+  selectedNodeRole: 'origin'
 };
 
 const MOCK_INSPECTION_UNAVAILABLE: DemandNodeInspectionProjection = {
@@ -173,7 +175,9 @@ const MOCK_INSPECTION_UNAVAILABLE: DemandNodeInspectionProjection = {
   primaryAction: null,
   caveat: null,
   evidence: [],
-  contextCandidates: []
+  contextCandidates: [],
+  selectedNodePosition: null,
+  selectedNodeRole: null
 };
 
 interface RenderResult {

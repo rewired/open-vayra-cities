@@ -53,6 +53,7 @@ export interface UseMapWorkspaceSourceSyncInput {
   readonly demandGapRankingProjection: import('../domain/projection/demandGapProjection').DemandGapRankingProjection;
   readonly focusedDemandGapId: string | null;
   readonly demandGapOdContextProjection: import('../domain/projection/demandGapOdContextProjection').DemandGapOdContextProjection | null;
+  readonly demandNodeInspectionProjection: import('../domain/projection/demandNodeInspectionProjection').DemandNodeInspectionProjection | null;
   readonly isMapStyleReady: boolean;
 }
 
@@ -80,6 +81,7 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
     demandGapRankingProjection,
     focusedDemandGapId,
     demandGapOdContextProjection,
+    demandNodeInspectionProjection,
     isMapStyleReady
   } = input;
 
@@ -400,23 +402,25 @@ export function useMapWorkspaceSourceSync(input: UseMapWorkspaceSourceSyncInput)
 
     const sourceSyncDiagnostics = syncExistingMapWorkspaceSourceData({
       map: mapInstance,
-      demandGapOdContextProjection
+      demandGapOdContextProjection,
+      demandNodeInspectionProjection
     });
-
+    
     if (sourceSyncDiagnostics) {
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
       return;
     }
-
+    
     return runWhenMapStyleReady(mapInstance, () => {
       applyBasemapSemanticReadabilityOverrides(mapInstance);
       syncAllMapWorkspaceSources({
         map: mapInstance,
-        demandGapOdContextProjection
+        demandGapOdContextProjection,
+        demandNodeInspectionProjection
       });
       applyMapLayerVisibility(mapInstance, layerVisibilityRef.current);
     });
-  }, [demandGapOdContextProjection, isMapStyleReady]);
+  }, [demandGapOdContextProjection, demandNodeInspectionProjection, isMapStyleReady]);
 
 
 

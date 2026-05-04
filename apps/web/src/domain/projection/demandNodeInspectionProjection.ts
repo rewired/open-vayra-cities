@@ -1,5 +1,6 @@
 import type { TimeBandId } from '../types/timeBand';
 import type { ScenarioDemandArtifact, ScenarioDemandNode } from '../types/scenarioDemand';
+import type { ScenarioDemandNodeRole } from '../constants/scenarioDemand';
 import type { ScenarioDemandCaptureProjection } from './scenarioDemandCaptureProjection';
 import type { ServedDemandProjection } from './servedDemandProjection';
 import { calculateGreatCircleDistanceMeters } from '../../lib/geometry';
@@ -51,6 +52,8 @@ export interface DemandNodeInspectionProjection {
   readonly caveat: string | null;
   readonly evidence: readonly FocusedDemandGapPlanningEvidenceItem[];
   readonly contextCandidates: readonly DemandNodeInspectionContextCandidate[];
+  readonly selectedNodePosition: { readonly lng: number; readonly lat: number } | null;
+  readonly selectedNodeRole: ScenarioDemandNodeRole | null;
 }
 
 interface ProjectDemandNodeInspectionInput {
@@ -78,7 +81,9 @@ const createUnavailableProjection = (
   primaryAction: null,
   caveat: null,
   evidence: [],
-  contextCandidates: []
+  contextCandidates: [],
+  selectedNodePosition: null,
+  selectedNodeRole: null
 });
 
 /**
@@ -231,6 +236,8 @@ export function projectDemandNodeInspection(
     primaryAction,
     caveat: 'Context candidates are planning hints from generated scenario demand, not exact passenger flows.',
     evidence,
-    contextCandidates
+    contextCandidates,
+    selectedNodePosition: selectedNode.position,
+    selectedNodeRole: selectedNode.role
   };
 }

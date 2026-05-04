@@ -23,8 +23,9 @@ We will implement a map-first demand node inspection workflow:
     *   Capture and service problem status.
     *   Likely context candidates (workplaces for origins, residential for destinations).
 5.  **Non-Authoritative Framing**: All context candidates and guidance are explicitly labeled as planning hints derived from the scenario model, not as exact passenger flow truth.
-6.  **Visibility Repair**: The shell controls the active Inspector tab. Selecting a demand node (or focusing a demand gap) automatically requests the 'Demand' tab to ensure the context is immediately visible.
-7.  **Safe Feature Decoding**: Map interaction bindings decode entity IDs from safe feature properties using narrowed helpers, avoiding broad unchecked casts.
+6.  **Map Rendering of Context Hints**: Selected demand node context candidates are rendered as straight planning hints on the map, using the same visual style as demand gap OD hints. Node context hints take priority over demand gap hints if both are ready, as they represent the active inspection focus.
+7.  **Visibility Repair**: The shell controls the active Inspector tab. Selecting a demand node (or focusing a demand gap) automatically requests the 'Demand' tab to ensure the context is immediately visible.
+8.  **Safe Feature Decoding**: Map interaction bindings decode entity IDs from safe feature properties using narrowed helpers, avoiding broad unchecked casts.
 
 ## Consequences
 

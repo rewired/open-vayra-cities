@@ -169,7 +169,9 @@ const mockDemandNodeInspectionProjection: import('../domain/projection/demandNod
   primaryAction: null,
   caveat: null,
   evidence: [],
-  contextCandidates: []
+  contextCandidates: [],
+  selectedNodePosition: null,
+  selectedNodeRole: null
 };
 
 const mockLineFrequencyInput: LineFrequencyInputByTimeBand = {

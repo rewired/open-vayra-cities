@@ -25,7 +25,7 @@ describe('decodeDemandNodeIdFromFeatureProperties', () => {
       label: 'Node 123'
     };
 
-    expect(decodeDemandNodeIdFromFeatureProperties(properties as any)).toBeNull();
+    expect(decodeDemandNodeIdFromFeatureProperties(properties as Record<string, unknown>)).toBeNull();
   });
 
   it('returns null for non-string entityId', () => {
@@ -34,7 +34,7 @@ describe('decodeDemandNodeIdFromFeatureProperties', () => {
       entityKind: 'node'
     };
 
-    expect(decodeDemandNodeIdFromFeatureProperties(properties as any)).toBeNull();
+    expect(decodeDemandNodeIdFromFeatureProperties(properties as Record<string, unknown>)).toBeNull();
   });
 
   it('returns null for empty entityId', () => {
@@ -53,7 +53,7 @@ describe('decodeDemandNodeIdFromFeature', () => {
   });
 
   it('returns null for feature without properties', () => {
-    expect(decodeDemandNodeIdFromFeature({ type: 'Feature' } as any)).toBeNull();
+    expect(decodeDemandNodeIdFromFeature({ type: 'Feature' } as unknown as import('./maplibreGlobal').MapLibreGeoJsonFeature<import('./scenarioDemandPreviewGeoJson').ScenarioDemandPreviewFeatureProperties>)).toBeNull();
   });
 
   it('returns entityId for valid scenario demand node feature', () => {

@@ -112,6 +112,8 @@ describe('projectDemandNodeInspection', () => {
     expect(result.problemStatus).toBe('captured-and-served');
     expect(result.contextCandidates.length).toBe(1);
     expect(result.contextCandidates[0]!.candidateId).toBe('node-work-1');
+    expect(result.selectedNodePosition).toEqual(mockNode1.position);
+    expect(result.selectedNodeRole).toBe('origin');
   });
 
   it('returns workplace inspection context for a destination node', () => {
@@ -121,6 +123,8 @@ describe('projectDemandNodeInspection', () => {
     expect(result.title).toBe('Workplace demand node');
     expect(result.contextCandidates.length).toBe(1);
     expect(result.contextCandidates[0]!.candidateId).toBe('node-res-1');
+    expect(result.selectedNodePosition).toEqual(mockNode2.position);
+    expect(result.selectedNodeRole).toBe('destination');
   });
 
   it('derives accurate problem status (not-captured)', () => {

@@ -44,7 +44,7 @@ export function DemandMapLegend({
       {isOdHintVisible && (
         <section className="demand-gap-legend__section" aria-label="OD hints">
           <header className="demand-gap-legend__header">
-            <h4>OD Hints</h4>
+            <h4>Context hints</h4>
           </header>
           <ul className="demand-gap-legend__list">
             <li className="demand-gap-legend__item">

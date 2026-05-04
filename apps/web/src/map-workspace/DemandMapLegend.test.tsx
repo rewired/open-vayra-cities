@@ -9,7 +9,7 @@ describe('DemandMapLegend', () => {
     );
 
     expect(markup).toContain('Demand Gap Pressure');
-    expect(markup).not.toContain('OD Hints');
+    expect(markup).not.toContain('Context hints');
     expect(markup).toContain('Generated scenario demand');
     
     // Verify categories
@@ -24,7 +24,7 @@ describe('DemandMapLegend', () => {
     );
 
     expect(markup).not.toContain('Demand Gap Pressure');
-    expect(markup).toContain('OD Hints');
+    expect(markup).toContain('Context hints');
     expect(markup).toContain('Generated scenario demand');
     
     // Verify OD hint explanation
@@ -37,7 +37,7 @@ describe('DemandMapLegend', () => {
     );
 
     expect(markup).toContain('Demand Gap Pressure');
-    expect(markup).toContain('OD Hints');
+    expect(markup).toContain('Context hints');
     
     // Caveat should be present
     expect(markup).toContain('Generated scenario demand');

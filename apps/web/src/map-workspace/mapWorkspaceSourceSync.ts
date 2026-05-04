@@ -50,6 +50,7 @@ import { buildOsmStopCandidateFeatureCollection } from './osmStopCandidateGeoJso
 import { buildScenarioRoutingCoverageMaskFeatureCollection } from './scenarioRoutingCoverageGeoJson';
 import { buildDemandGapOverlayFeatureCollection } from './demandGapOverlayGeoJson';
 import { buildDemandGapOdContextFeatureCollection } from './demandGapOdContextGeoJson';
+import { buildDemandNodeContextHintFeatureCollection } from './demandNodeContextHintGeoJson';
 
 
 /**
@@ -106,6 +107,7 @@ import type { ScenarioDemandArtifact } from '../domain/types/scenarioDemand';
 import type { ScenarioRoutingCoverage } from '../domain/scenario/scenarioRegistry';
 import type { DemandGapRankingProjection } from '../domain/projection/demandGapProjection';
 import type { DemandGapOdContextProjection } from '../domain/projection/demandGapOdContextProjection';
+import type { DemandNodeInspectionProjection } from '../domain/projection/demandNodeInspectionProjection';
 
 /**
  * Inputs for one lifecycle-safe source/layer synchronization pass.
@@ -121,6 +123,7 @@ export interface SyncAllMapWorkspaceSourcesInput {
   readonly demandGapRankingProjection?: DemandGapRankingProjection | null;
   readonly focusedDemandGapId?: string | null;
   readonly demandGapOdContextProjection?: DemandGapOdContextProjection | null;
+  readonly demandNodeInspectionProjection?: DemandNodeInspectionProjection | null;
 }
 
 /**
@@ -433,7 +436,8 @@ const syncMapWorkspaceSourceData = ({
   routingCoverage,
   demandGapRankingProjection,
   focusedDemandGapId,
-  demandGapOdContextProjection
+  demandGapOdContextProjection,
+  demandNodeInspectionProjection
 }: SyncAllMapWorkspaceSourcesInput): MapWorkspaceSourceSyncDiagnostics => {
 
   let stopBuilderFeatureCount: number | undefined;
@@ -514,8 +518,18 @@ const syncMapWorkspaceSourceData = ({
     demandGapSource?.setData(demandGapFeatureCollection);
   }
 
-  if (demandGapOdContextProjection !== undefined) {
-    const odContextFeatureCollection = buildDemandGapOdContextFeatureCollection(demandGapOdContextProjection);
+  if (demandGapOdContextProjection !== undefined || demandNodeInspectionProjection !== undefined) {
+    let odContextFeatureCollection;
+
+    // Priority: selected demand node context hints > focused demand gap OD hints
+    if (demandNodeInspectionProjection?.status === 'ready' && demandNodeInspectionProjection.contextCandidates.length > 0) {
+      odContextFeatureCollection = buildDemandNodeContextHintFeatureCollection(demandNodeInspectionProjection);
+    } else if (demandGapOdContextProjection) {
+      odContextFeatureCollection = buildDemandGapOdContextFeatureCollection(demandGapOdContextProjection);
+    } else {
+      odContextFeatureCollection = { type: 'FeatureCollection' as const, features: [] };
+    }
+
     const odContextSource = map.getSource(MAP_SOURCE_ID_DEMAND_GAP_OD_CONTEXT);
     odContextSource?.setData(odContextFeatureCollection);
   }
