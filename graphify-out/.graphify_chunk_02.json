@@ -1,0 +1,1888 @@
+{
+  "nodes": [
+    {
+      "id": "adr0009_workspace_tool_mode_gating",
+      "label": "ADR 0009: Explicit Workspace Tool Mode State for Map Click Gating",
+      "file_type": "document",
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0010_place_stop_click_validation_split",
+      "label": "ADR 0010: Split Neutral Click Telemetry from Stop-Placement Click Validation",
+      "file_type": "document",
+      "source_file": "docs/adr/0010-place-stop-click-validation-split.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0011_local_stop_state_and_marker_rendering",
+      "label": "ADR 0011: Keep Placed Stops in Local Map State with Canonical Minimal Stop Type",
+      "file_type": "document",
+      "source_file": "docs/adr/0011-local-stop-state-and-marker-rendering.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0012_maplibre_feature_query_contract",
+      "label": "ADR 0012: Keep Stop-Placement Feature Queries on Narrow Typed MapLibre Contract",
+      "file_type": "document",
+      "source_file": "docs/adr/0012-maplibre-feature-query-contract-for-stop-placement.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0013_stop_placement_slice_008_boundaries",
+      "label": "ADR 0013: Consolidate Stop-Placement Slice 008 Boundaries and Non-Goals",
+      "file_type": "document",
+      "source_file": "docs/adr/0013-stop-placement-slice-008-boundaries.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0014_stop_only_local_selection_state",
+      "label": "ADR 0014: Keep Map Workspace Selection Local and Stop-Only (Superseded)",
+      "file_type": "document",
+      "source_file": "docs/adr/0014-stop-only-local-selection-state.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0015_stop_selection_projection_to_shell_inspector",
+      "label": "ADR 0015: Project Selected Stop Details from Map Workspace to Shell Inspector",
+      "file_type": "document",
+      "source_file": "docs/adr/0015-stop-selection-projection-to-shell-inspector.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0016_stop_selection_transition_rules",
+      "label": "ADR 0016: Define Explicit Stop Selection Transitions with Minimal Inspector Contract",
+      "file_type": "document",
+      "source_file": "docs/adr/0016-stop-selection-transition-rules-and-minimal-inspector-contract.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0017_placement_feedback_ui_contract",
+      "label": "ADR 0017: Clarify Stop Placement Feedback with Typed UI Contract",
+      "file_type": "document",
+      "source_file": "docs/adr/0017-placement-feedback-ui-contract.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0018_hamburg_map_bootstrap",
+      "label": "ADR 0018: Set Hamburg-Focused Map Bootstrap Baseline for Desktop Stop Placement",
+      "file_type": "document",
+      "source_file": "docs/adr/0018-hamburg-map-bootstrap-baseline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0019_hamburg_street_legible_baseline",
+      "label": "ADR 0019: Adopt Hamburg-Centered Street-Legible Map Baseline as Playable Bootstrap Reference",
+      "file_type": "document",
+      "source_file": "docs/adr/0019-hamburg-street-legible-baseline-rationale.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0020_explicit_workspace_modes_build_line",
+      "label": "ADR 0020: Use Explicit Workspace Mode Buttons and Reserve Build-Line Mode",
+      "file_type": "document",
+      "source_file": "docs/adr/0020-explicit-workspace-modes-and-build-line-placeholder.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0021_build_line_local_draft_session_commit",
+      "label": "ADR 0021: Keep Build-Line Drafting Local to Map Workspace with Cancel/Complete Controls",
+      "file_type": "document",
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0022_line_building_constants_inspector_selection",
+      "label": "ADR 0022: Centralize Line-Building Constants and Expose Minimal Selected-Line Inspector Data",
+      "file_type": "document",
+      "source_file": "docs/adr/0022-line-building-constants-and-minimal-line-inspector-selection.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0023_first_ordered_stop_line_building",
+      "label": "ADR 0023: First Ordered Stop-Based Line-Building Mode",
+      "file_type": "document",
+      "source_file": "docs/adr/0023-first-ordered-stop-line-building-mode.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0024_font_loading_material_icon_baseline",
+      "label": "ADR 0024: Font Loading and Material Icon Baseline",
+      "file_type": "document",
+      "source_file": "docs/adr/0024-font-loading-and-material-icon-baseline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0025_line_overlay_pointer_event_contract",
+      "label": "ADR 0025: Line Overlay Pointer-Event Contract for Completed-Line Selection",
+      "file_type": "document",
+      "source_file": "docs/adr/0025-line-overlay-pointer-event-contract.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0026_mutual_exclusivity_stop_line_selection",
+      "label": "ADR 0026: Enforce Mutual Exclusivity Between Stop and Completed-Line Selection",
+      "file_type": "document",
+      "source_file": "docs/adr/0026-mutual-exclusivity-between-stop-and-completed-line-selection.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0027_inspector_selection_priority_state_machine",
+      "label": "ADR 0027: Add Explicit Inspector Selection-Priority State Machine",
+      "file_type": "document",
+      "source_file": "docs/adr/0027-inspector-selection-priority-state-machine.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0028_canonical_time_band_domain_module",
+      "label": "ADR 0028: Add Canonical Time-Band Domain Module",
+      "file_type": "document",
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0029_completed_line_frequency_configuration",
+      "label": "ADR 0029: Add Completed-Line Frequency Configuration Baseline",
+      "file_type": "document",
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0030_line_selected_frequency_editing_session_lift",
+      "label": "ADR 0030: Add Line-Selected Frequency Editing with Shell-Owned Session Line State",
+      "file_type": "document",
+      "source_file": "docs/adr/0030-line-selected-frequency-editing-and-session-line-lift.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0031_slice_013_frequency_boundaries",
+      "label": "ADR 0031: Slice 013 Completed-Line Frequency Configuration Boundaries",
+      "file_type": "document",
+      "source_file": "docs/adr/0031-slice-013-completed-line-frequency-configuration-boundaries.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0032_slice_014_static_network_kpis",
+      "label": "ADR 0032: Slice 014 Static Network Summary KPIs from Planning Structure Only",
+      "file_type": "document",
+      "source_file": "docs/adr/0032-slice-014-static-network-summary-kpis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "adr0033_explicit_user_triggered_build_line_completion",
+      "label": "ADR 0033: Explicit User-Triggered Build-Line Completion Only",
+      "file_type": "document",
+      "source_file": "docs/adr/0033-explicit-user-triggered-build-line-completion.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_workspace_tool_mode",
+      "label": "Workspace Tool Mode",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_stop_placement_validation",
+      "label": "Stop Placement Validation",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0010-place-stop-click-validation-split.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_local_stop_state_model",
+      "label": "Local Stop State Model",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0011-local-stop-state-and-marker-rendering.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_maplibre_feature_query_contract",
+      "label": "MapLibre Feature Query Contract",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0012-maplibre-feature-query-contract-for-stop-placement.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_selection_projection",
+      "label": "Selection Projection to Shell Inspector",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0015-stop-selection-projection-to-shell-inspector.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_placement_feedback_ui",
+      "label": "Placement Feedback UI Contract",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0017-placement-feedback-ui-contract.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_hamburg_map_bootstrap",
+      "label": "Hamburg Map Bootstrap Baseline",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0018-hamburg-map-bootstrap-baseline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_build_line_drafting",
+      "label": "Build-Line Drafting Lifecycle",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_mode_separation",
+      "label": "Mode Separation (Inspect/Place-Stop/Build-Line)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0023-first-ordered-stop-line-building-mode.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_mutual_exclusivity_selection",
+      "label": "Mutual Exclusivity Between Stop and Line Selection",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0026-mutual-exclusivity-between-stop-and-completed-line-selection.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_inspector_priority_state_machine",
+      "label": "Inspector Selection-Priority State Machine",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0027-inspector-selection-priority-state-machine.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_time_band_domain",
+      "label": "Canonical Time-Band Domain Module",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_line_frequency_configuration",
+      "label": "Line Frequency Configuration by Time Band",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_static_network_kpis",
+      "label": "Static Network Summary KPIs",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0032-slice-014-static-network-summary-kpis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "concept_explicit_line_completion",
+      "label": "Explicit User-Triggered Build-Line Completion",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0033-explicit-user-triggered-build-line-completion.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "component_map_workspace_surface",
+      "label": "MapWorkspaceSurface Component",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "component_app_shell",
+      "label": "App Shell (App.tsx)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "component_inspector_panel",
+      "label": "Right-Panel Inspector",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0015-stop-selection-projection-to-shell-inspector.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "module_maplibre_global_contract",
+      "label": "MapLibre Global Contract (maplibreGlobal.ts)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0012-maplibre-feature-query-contract-for-stop-placement.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "module_map_bootstrap_config",
+      "label": "Map Bootstrap Config (mapBootstrapConfig.ts)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0018-hamburg-map-bootstrap-baseline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "module_line_building_constants",
+      "label": "Line Building Constants (domain/constants/lineBuilding.ts)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0022-line-building-constants-and-minimal-line-inspector-selection.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "module_time_band_types",
+      "label": "Time Band Types (domain/types/timeBand.ts)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "module_time_band_constants",
+      "label": "Time Band Constants (domain/constants/timeBands.ts)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "module_line_types",
+      "label": "Line Types (domain/types/line.ts)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "type_workspace_tool_mode_union",
+      "label": "WorkspaceToolMode Union (inspect|place-stop|build-line)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "type_stop_id",
+      "label": "StopId Branded Type",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0011-local-stop-state-and-marker-rendering.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "type_stop",
+      "label": "Stop Canonical Domain Type",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0011-local-stop-state-and-marker-rendering.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "type_line_frequency_minutes",
+      "label": "LineFrequencyMinutes Branded Type",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "type_line_frequency_by_time_band",
+      "label": "LineFrequencyByTimeBand Mapping",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "type_time_band_id",
+      "label": "TimeBandId Union Type",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "constant_minimum_stops_per_line",
+      "label": "MINIMUM_STOPS_REQUIRED_TO_COMPLETE_LINE",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "constant_line_placeholder_prefix",
+      "label": "LINE_BUILD_PLACEHOLDER_LABEL_PREFIX",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0022-line-building-constants-and-minimal-line-inspector-selection.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "constant_mvp_time_band_ids",
+      "label": "MVP_TIME_BAND_IDS",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "constant_time_band_display_labels",
+      "label": "TIME_BAND_DISPLAY_LABELS",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "state_draft_line_state",
+      "label": "Draft Line State (draftLineState)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "state_session_lines",
+      "label": "Session Lines (sessionLines)",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "state_selected_stop_id",
+      "label": "Selected Stop ID State",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0016-stop-selection-transition-rules-and-minimal-inspector-contract.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "state_selected_line_id",
+      "label": "Selected Line ID State",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0026-mutual-exclusivity-between-stop-and-completed-line-selection.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "slice_008_stop_placement",
+      "label": "Slice 008: Stop Placement",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0013-stop-placement-slice-008-boundaries.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "slice_013_frequency_config",
+      "label": "Slice 013: Completed-Line Frequency Configuration",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0031-slice-013-completed-line-frequency-configuration-boundaries.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "slice_014_static_kpis",
+      "label": "Slice 014: Static Network Summary KPIs",
+      "file_type": "rationale",
+      "source_file": "docs/adr/0032-slice-014-static-network-summary-kpis.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "adr0009_workspace_tool_mode_gating",
+      "target": "concept_workspace_tool_mode",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0009_workspace_tool_mode_gating",
+      "target": "type_workspace_tool_mode_union",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0009_workspace_tool_mode_gating",
+      "target": "component_map_workspace_surface",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0009_workspace_tool_mode_gating",
+      "target": "component_app_shell",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0010_place_stop_click_validation_split",
+      "target": "concept_stop_placement_validation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0010-place-stop-click-validation-split.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0010_place_stop_click_validation_split",
+      "target": "component_map_workspace_surface",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0010-place-stop-click-validation-split.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0010_place_stop_click_validation_split",
+      "target": "concept_workspace_tool_mode",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0010-place-stop-click-validation-split.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0011_local_stop_state_and_marker_rendering",
+      "target": "concept_local_stop_state_model",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0011-local-stop-state-and-marker-rendering.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0011_local_stop_state_and_marker_rendering",
+      "target": "type_stop_id",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0011-local-stop-state-and-marker-rendering.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0011_local_stop_state_and_marker_rendering",
+      "target": "type_stop",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0011-local-stop-state-and-marker-rendering.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0011_local_stop_state_and_marker_rendering",
+      "target": "component_map_workspace_surface",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0011-local-stop-state-and-marker-rendering.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0012_maplibre_feature_query_contract",
+      "target": "concept_maplibre_feature_query_contract",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0012-maplibre-feature-query-contract-for-stop-placement.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0012_maplibre_feature_query_contract",
+      "target": "module_maplibre_global_contract",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0012-maplibre-feature-query-contract-for-stop-placement.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0012_maplibre_feature_query_contract",
+      "target": "concept_stop_placement_validation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0012-maplibre-feature-query-contract-for-stop-placement.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0013_stop_placement_slice_008_boundaries",
+      "target": "slice_008_stop_placement",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0013-stop-placement-slice-008-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0013_stop_placement_slice_008_boundaries",
+      "target": "adr0009_workspace_tool_mode_gating",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0013-stop-placement-slice-008-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0013_stop_placement_slice_008_boundaries",
+      "target": "adr0010_place_stop_click_validation_split",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0013-stop-placement-slice-008-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0013_stop_placement_slice_008_boundaries",
+      "target": "adr0011_local_stop_state_and_marker_rendering",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0013-stop-placement-slice-008-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0014_stop_only_local_selection_state",
+      "target": "concept_selection_projection",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/adr/0014-stop-only-local-selection-state.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0015_stop_selection_projection_to_shell_inspector",
+      "target": "concept_selection_projection",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0015-stop-selection-projection-to-shell-inspector.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0015_stop_selection_projection_to_shell_inspector",
+      "target": "component_app_shell",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0015-stop-selection-projection-to-shell-inspector.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0015_stop_selection_projection_to_shell_inspector",
+      "target": "component_inspector_panel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0015-stop-selection-projection-to-shell-inspector.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0015_stop_selection_projection_to_shell_inspector",
+      "target": "adr0014_stop_only_local_selection_state",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0015-stop-selection-projection-to-shell-inspector.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0016_stop_selection_transition_rules",
+      "target": "state_selected_stop_id",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0016-stop-selection-transition-rules-and-minimal-inspector-contract.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0016_stop_selection_transition_rules",
+      "target": "concept_selection_projection",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0016-stop-selection-transition-rules-and-minimal-inspector-contract.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0016_stop_selection_transition_rules",
+      "target": "component_inspector_panel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0016-stop-selection-transition-rules-and-minimal-inspector-contract.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0017_placement_feedback_ui_contract",
+      "target": "concept_placement_feedback_ui",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0017-placement-feedback-ui-contract.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0017_placement_feedback_ui_contract",
+      "target": "concept_workspace_tool_mode",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0017-placement-feedback-ui-contract.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0018_hamburg_map_bootstrap",
+      "target": "concept_hamburg_map_bootstrap",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0018-hamburg-map-bootstrap-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0018_hamburg_map_bootstrap",
+      "target": "module_map_bootstrap_config",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0018-hamburg-map-bootstrap-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0019_hamburg_street_legible_baseline",
+      "target": "concept_hamburg_map_bootstrap",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0019-hamburg-street-legible-baseline-rationale.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0019_hamburg_street_legible_baseline",
+      "target": "adr0018_hamburg_map_bootstrap",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0019-hamburg-street-legible-baseline-rationale.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0020_explicit_workspace_modes_build_line",
+      "target": "type_workspace_tool_mode_union",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0020-explicit-workspace-modes-and-build-line-placeholder.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0020_explicit_workspace_modes_build_line",
+      "target": "concept_workspace_tool_mode",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0020-explicit-workspace-modes-and-build-line-placeholder.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0020_explicit_workspace_modes_build_line",
+      "target": "concept_mode_separation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0020-explicit-workspace-modes-and-build-line-placeholder.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0021_build_line_local_draft_session_commit",
+      "target": "concept_build_line_drafting",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0021_build_line_local_draft_session_commit",
+      "target": "state_draft_line_state",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0021_build_line_local_draft_session_commit",
+      "target": "state_session_lines",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0021_build_line_local_draft_session_commit",
+      "target": "constant_minimum_stops_per_line",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0021_build_line_local_draft_session_commit",
+      "target": "concept_mode_separation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0022_line_building_constants_inspector_selection",
+      "target": "module_line_building_constants",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0022-line-building-constants-and-minimal-line-inspector-selection.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0022_line_building_constants_inspector_selection",
+      "target": "constant_minimum_stops_per_line",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0022-line-building-constants-and-minimal-line-inspector-selection.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0022_line_building_constants_inspector_selection",
+      "target": "constant_line_placeholder_prefix",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0022-line-building-constants-and-minimal-line-inspector-selection.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0022_line_building_constants_inspector_selection",
+      "target": "concept_selection_projection",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0022-line-building-constants-and-minimal-line-inspector-selection.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0023_first_ordered_stop_line_building",
+      "target": "concept_mode_separation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0023-first-ordered-stop-line-building-mode.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0023_first_ordered_stop_line_building",
+      "target": "concept_build_line_drafting",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0023-first-ordered-stop-line-building-mode.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0025_line_overlay_pointer_event_contract",
+      "target": "state_selected_line_id",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0025-line-overlay-pointer-event-contract.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0026_mutual_exclusivity_stop_line_selection",
+      "target": "concept_mutual_exclusivity_selection",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0026-mutual-exclusivity-between-stop-and-completed-line-selection.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0026_mutual_exclusivity_stop_line_selection",
+      "target": "state_selected_stop_id",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0026-mutual-exclusivity-between-stop-and-completed-line-selection.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0026_mutual_exclusivity_stop_line_selection",
+      "target": "state_selected_line_id",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0026-mutual-exclusivity-between-stop-and-completed-line-selection.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0026_mutual_exclusivity_stop_line_selection",
+      "target": "state_draft_line_state",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0026-mutual-exclusivity-between-stop-and-completed-line-selection.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0027_inspector_selection_priority_state_machine",
+      "target": "concept_inspector_priority_state_machine",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0027-inspector-selection-priority-state-machine.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0027_inspector_selection_priority_state_machine",
+      "target": "component_inspector_panel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0027-inspector-selection-priority-state-machine.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0027_inspector_selection_priority_state_machine",
+      "target": "component_app_shell",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0027-inspector-selection-priority-state-machine.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0028_canonical_time_band_domain_module",
+      "target": "concept_time_band_domain",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0028_canonical_time_band_domain_module",
+      "target": "module_time_band_types",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0028_canonical_time_band_domain_module",
+      "target": "module_time_band_constants",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0028_canonical_time_band_domain_module",
+      "target": "type_time_band_id",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0028_canonical_time_band_domain_module",
+      "target": "constant_mvp_time_band_ids",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0028_canonical_time_band_domain_module",
+      "target": "constant_time_band_display_labels",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0029_completed_line_frequency_configuration",
+      "target": "concept_line_frequency_configuration",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0029_completed_line_frequency_configuration",
+      "target": "module_line_types",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0029_completed_line_frequency_configuration",
+      "target": "type_line_frequency_minutes",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0029_completed_line_frequency_configuration",
+      "target": "type_line_frequency_by_time_band",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0029_completed_line_frequency_configuration",
+      "target": "concept_time_band_domain",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0029_completed_line_frequency_configuration",
+      "target": "state_session_lines",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0030_line_selected_frequency_editing_session_lift",
+      "target": "concept_line_frequency_configuration",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0030-line-selected-frequency-editing-and-session-line-lift.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0030_line_selected_frequency_editing_session_lift",
+      "target": "component_app_shell",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0030-line-selected-frequency-editing-and-session-line-lift.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0030_line_selected_frequency_editing_session_lift",
+      "target": "component_inspector_panel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0030-line-selected-frequency-editing-and-session-line-lift.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0030_line_selected_frequency_editing_session_lift",
+      "target": "state_session_lines",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0030-line-selected-frequency-editing-and-session-line-lift.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0030_line_selected_frequency_editing_session_lift",
+      "target": "state_selected_line_id",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0030-line-selected-frequency-editing-and-session-line-lift.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0031_slice_013_frequency_boundaries",
+      "target": "slice_013_frequency_config",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0031-slice-013-completed-line-frequency-configuration-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0031_slice_013_frequency_boundaries",
+      "target": "concept_line_frequency_configuration",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0031-slice-013-completed-line-frequency-configuration-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0031_slice_013_frequency_boundaries",
+      "target": "concept_time_band_domain",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0031-slice-013-completed-line-frequency-configuration-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0032_slice_014_static_network_kpis",
+      "target": "slice_014_static_kpis",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0032-slice-014-static-network-summary-kpis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0032_slice_014_static_network_kpis",
+      "target": "concept_static_network_kpis",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0032-slice-014-static-network-summary-kpis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0032_slice_014_static_network_kpis",
+      "target": "component_inspector_panel",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0032-slice-014-static-network-summary-kpis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0033_explicit_user_triggered_build_line_completion",
+      "target": "concept_explicit_line_completion",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0033-explicit-user-triggered-build-line-completion.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0033_explicit_user_triggered_build_line_completion",
+      "target": "constant_minimum_stops_per_line",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0033-explicit-user-triggered-build-line-completion.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0033_explicit_user_triggered_build_line_completion",
+      "target": "state_draft_line_state",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0033-explicit-user-triggered-build-line-completion.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0033_explicit_user_triggered_build_line_completion",
+      "target": "state_session_lines",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0033-explicit-user-triggered-build-line-completion.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_workspace_tool_mode",
+      "target": "type_workspace_tool_mode_union",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_stop_placement_validation",
+      "target": "concept_maplibre_feature_query_contract",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0012-maplibre-feature-query-contract-for-stop-placement.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_local_stop_state_model",
+      "target": "type_stop",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0011-local-stop-state-and-marker-rendering.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_local_stop_state_model",
+      "target": "type_stop_id",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0011-local-stop-state-and-marker-rendering.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_selection_projection",
+      "target": "state_selected_stop_id",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0015-stop-selection-projection-to-shell-inspector.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_mutual_exclusivity_selection",
+      "target": "concept_inspector_priority_state_machine",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/adr/0027-inspector-selection-priority-state-machine.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_time_band_domain",
+      "target": "concept_line_frequency_configuration",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "concept_build_line_drafting",
+      "target": "concept_explicit_line_completion",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "type_line_frequency_by_time_band",
+      "target": "type_time_band_id",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "type_line_frequency_by_time_band",
+      "target": "type_line_frequency_minutes",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0029-completed-line-frequency-configuration-baseline.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "constant_mvp_time_band_ids",
+      "target": "type_time_band_id",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0028-canonical-time-band-domain-module.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "slice_008_stop_placement",
+      "target": "concept_stop_placement_validation",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/adr/0013-stop-placement-slice-008-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "slice_008_stop_placement",
+      "target": "concept_local_stop_state_model",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/adr/0013-stop-placement-slice-008-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "slice_008_stop_placement",
+      "target": "concept_workspace_tool_mode",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/adr/0013-stop-placement-slice-008-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "slice_013_frequency_config",
+      "target": "concept_line_frequency_configuration",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0031-slice-013-completed-line-frequency-configuration-boundaries.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "slice_014_static_kpis",
+      "target": "concept_static_network_kpis",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0032-slice-014-static-network-summary-kpis.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "component_map_workspace_surface",
+      "target": "component_app_shell",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0009-workspace-tool-mode-gating.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "component_app_shell",
+      "target": "component_inspector_panel",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "docs/adr/0015-stop-selection-projection-to-shell-inspector.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "state_session_lines",
+      "target": "state_draft_line_state",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "docs/adr/0026-mutual-exclusivity-between-stop-and-completed-line-selection.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0014_stop_only_local_selection_state",
+      "target": "adr0015_stop_selection_projection_to_shell_inspector",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0014-stop-only-local-selection-state.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0022_line_building_constants_inspector_selection",
+      "target": "constant_line_placeholder_prefix",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0022-line-building-constants-and-minimal-line-inspector-selection.md",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "adr0019_hamburg_street_legible_baseline",
+      "target": "module_map_bootstrap_config",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/adr/0019-hamburg-street-legible-baseline-rationale.md",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "stop_placement_slice_008",
+      "label": "Stop Placement Slice 008 Components",
+      "nodes": [
+        "adr0009_workspace_tool_mode_gating",
+        "adr0010_place_stop_click_validation_split",
+        "adr0011_local_stop_state_and_marker_rendering",
+        "adr0012_maplibre_feature_query_contract",
+        "adr0013_stop_placement_slice_008_boundaries",
+        "slice_008_stop_placement"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0013-stop-placement-slice-008-boundaries.md"
+    },
+    {
+      "id": "stop_selection_inspector_flow",
+      "label": "Stop Selection to Inspector Projection Flow",
+      "nodes": [
+        "adr0014_stop_only_local_selection_state",
+        "adr0015_stop_selection_projection_to_shell_inspector",
+        "adr0016_stop_selection_transition_rules",
+        "concept_selection_projection",
+        "state_selected_stop_id"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0016-stop-selection-transition-rules-and-minimal-inspector-contract.md"
+    },
+    {
+      "id": "build_line_drafting_flow",
+      "label": "Build-Line Drafting and Completion Flow",
+      "nodes": [
+        "adr0020_explicit_workspace_modes_build_line",
+        "adr0021_build_line_local_draft_session_commit",
+        "adr0023_first_ordered_stop_line_building",
+        "adr0033_explicit_user_triggered_build_line_completion",
+        "concept_build_line_drafting",
+        "concept_explicit_line_completion"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0021-build-line-local-draft-and-session-line-commit.md"
+    },
+    {
+      "id": "line_frequency_configuration_flow",
+      "label": "Line Frequency Configuration Flow",
+      "nodes": [
+        "adr0028_canonical_time_band_domain_module",
+        "adr0029_completed_line_frequency_configuration",
+        "adr0030_line_selected_frequency_editing_session_lift",
+        "adr0031_slice_013_frequency_boundaries",
+        "concept_line_frequency_configuration",
+        "concept_time_band_domain",
+        "slice_013_frequency_config"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0031-slice-013-completed-line-frequency-configuration-boundaries.md"
+    },
+    {
+      "id": "inspector_selection_state_machine",
+      "label": "Inspector Selection State Machine",
+      "nodes": [
+        "adr0026_mutual_exclusivity_stop_line_selection",
+        "adr0027_inspector_selection_priority_state_machine",
+        "concept_mutual_exclusivity_selection",
+        "concept_inspector_priority_state_machine",
+        "component_inspector_panel"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0027-inspector-selection-priority-state-machine.md"
+    },
+    {
+      "id": "hamburg_map_baseline",
+      "label": "Hamburg Map Bootstrap Baseline",
+      "nodes": [
+        "adr0018_hamburg_map_bootstrap",
+        "adr0019_hamburg_street_legible_baseline",
+        "concept_hamburg_map_bootstrap",
+        "module_map_bootstrap_config"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0018-hamburg-map-bootstrap-baseline.md"
+    },
+    {
+      "id": "mode_separation_enforcement",
+      "label": "Workspace Mode Separation",
+      "nodes": [
+        "adr0009_workspace_tool_mode_gating",
+        "adr0020_explicit_workspace_modes_build_line",
+        "adr0023_first_ordered_stop_line_building",
+        "concept_mode_separation",
+        "type_workspace_tool_mode_union"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0023-first-ordered-stop-line-building-mode.md"
+    },
+    {
+      "id": "static_network_kpis_slice_014",
+      "label": "Static Network KPIs Slice 014",
+      "nodes": [
+        "adr0032_slice_014_static_network_kpis",
+        "slice_014_static_kpis",
+        "concept_static_network_kpis",
+        "component_inspector_panel"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/adr/0032-slice-014-static-network-summary-kpis.md"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

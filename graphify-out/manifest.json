@@ -1,0 +1,1898 @@
+{
+  "D:\\__DEV\\open-vayra-cities\\eslint.config.js": {
+    "mtime": 1777440456.1668186,
+    "hash": "facf6840ef83afc9cc34b679f6c9288c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\vite.config.ts": {
+    "mtime": 1776868382.6818209,
+    "hash": "70cdf79b2023aa971ff54b7969258444"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\App.tsx": {
+    "mtime": 1777894523.6132717,
+    "hash": "464c277c3adc661608585107ca8ccfce"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\AppShell.test.tsx": {
+    "mtime": 1777323099.462009,
+    "hash": "53339e36d90c8962f8d5c825260ab0c2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\AppShell.tsx": {
+    "mtime": 1777323062.1930072,
+    "hash": "8690be6c4b3cae3d344e4005d5093924"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\main.tsx": {
+    "mtime": 1777894989.510772,
+    "hash": "c1bd54acf8b2cd7133ee747ac37cd3c4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\app\\focusedDemandGapPlanningContext.test.ts": {
+    "mtime": 1777808792.650164,
+    "hash": "4032a2243f7df23f73128b69cace0455"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\app\\focusedDemandGapPlanningContext.ts": {
+    "mtime": 1777808731.852748,
+    "hash": "647a200f3ef653dc265d77a6f53ada9e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\app\\focusedDemandGapPlanningEntrypoint.test.ts": {
+    "mtime": 1777808815.823844,
+    "hash": "b43c88d53a667e307ec45089d5e7bfad"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\app\\focusedDemandGapPlanningEntrypoint.ts": {
+    "mtime": 1777808748.5786226,
+    "hash": "84b7d6ba4e069ca3c96a8d73b8983721"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\constants\\lineBuilding.ts": {
+    "mtime": 1776884339.2652302,
+    "hash": "edbb52bf4f5edf9a932b9c602db49459"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\constants\\lineService.ts": {
+    "mtime": 1777606522.479054,
+    "hash": "14618da52e2429b8b82e424939bc2617"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\constants\\lineServiceReadiness.ts": {
+    "mtime": 1777050382.2755754,
+    "hash": "e9ad62a87ae5f31a3dee6e8c5f5b9f57"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\constants\\routing.ts": {
+    "mtime": 1777146369.1152036,
+    "hash": "4f4a8d5f3cebe7ab6a7714dd77116ddd"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\constants\\scenarioDemand.ts": {
+    "mtime": 1777885629.2097707,
+    "hash": "b97d9eb34d4f9084058ba85cb9d5cc92"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\constants\\scenarioSourceMaterial.ts": {
+    "mtime": 1777481930.9567108,
+    "hash": "c51e91f9145898f9c9046c1a9a677e0a"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\constants\\selectedLineExportValidation.ts": {
+    "mtime": 1777208338.9607267,
+    "hash": "3588ebb53516c7e182f236728b728ea4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\constants\\simulationClock.ts": {
+    "mtime": 1777190567.5572271,
+    "hash": "619c9c8a07cdd9eba75572835ec7ac99"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\constants\\timeBands.test.ts": {
+    "mtime": 1777105783.768743,
+    "hash": "cae8de67b56fdaa90a5d62a4d43bfd14"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\constants\\timeBands.ts": {
+    "mtime": 1777105420.3577201,
+    "hash": "0874581a39e24e1907b6d6085b0d9ef0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\export\\selectedLineExportFileLoader.test.ts": {
+    "mtime": 1777472352.706067,
+    "hash": "034bc4f280e38ea41363c652a644cdb0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\export\\selectedLineExportFileLoader.ts": {
+    "mtime": 1777472452.1330686,
+    "hash": "47b14363b86a7f401811b712c3c5c19b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\export\\selectedLineExportRoundTrip.test.ts": {
+    "mtime": 1777191590.6992297,
+    "hash": "766bdb3ea7e76202be9915b8e1b8d1db"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\export\\selectedLineExportSessionLoader.test.ts": {
+    "mtime": 1777472452.1295688,
+    "hash": "5085601d8c5b1df018d85877c77a02fc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\export\\selectedLineExportSessionLoader.ts": {
+    "mtime": 1777198977.064757,
+    "hash": "c9299128c66f3c9e34b7e16e9bebb177"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\export\\selectedLineExportValidation.test.ts": {
+    "mtime": 1777472452.1295688,
+    "hash": "8a15e769473987079a778c0e6ce11771"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\export\\selectedLineExportValidation.ts": {
+    "mtime": 1777472452.1295688,
+    "hash": "ee6966dec6c1dc3a72019bff607bf0b9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\line\\lineLabeling.test.ts": {
+    "mtime": 1777210449.780728,
+    "hash": "1af239cfe78ca9a4c451de664d60b320"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\line\\lineLabeling.ts": {
+    "mtime": 1777210449.7812293,
+    "hash": "c9e27a98aa13bb6f798a33c4ee47b445"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\line\\lineTopologySegments.ts": {
+    "mtime": 1777183688.9067276,
+    "hash": "029c1f4beea4065fcb5e03c22d200ddf"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\osm\\osmStopCandidateAdoption.test.ts": {
+    "mtime": 1777325620.5145326,
+    "hash": "272afb3a933974abd959ef06abdacac5"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\osm\\osmStopCandidateAdoption.ts": {
+    "mtime": 1777472452.1380682,
+    "hash": "3ce4ffe5c5d0fbf9e39e68067341c79b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\osm\\osmStopCandidateAnchorConstants.ts": {
+    "mtime": 1777472452.1380682,
+    "hash": "2fa29b2dc1791b2a5971727cee95d6b3"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\osm\\osmStopCandidateAnchorTypes.ts": {
+    "mtime": 1777472452.1450684,
+    "hash": "4f8a03d743a39c3b4060f9904f9e1c2a"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\osm\\osmStopCandidateConsolidation.test.ts": {
+    "mtime": 1777314379.7945092,
+    "hash": "5a0791c437c76ab9f4bc68bfa6350e0c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\osm\\osmStopCandidateConsolidation.ts": {
+    "mtime": 1777314455.3890347,
+    "hash": "68fcc0369a550139525647b6fe6aa336"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\osm\\osmStopCandidateSource.ts": {
+    "mtime": 1777311247.5900092,
+    "hash": "3b02b0a06a70657601156f4e1e71cbad"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\osm\\osmStopCandidateStreetAnchor.test.ts": {
+    "mtime": 1777323742.1690073,
+    "hash": "4e9d83f95ba8da6e5645c401c517194f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\osm\\osmStopCandidateStreetAnchor.ts": {
+    "mtime": 1777323675.4725072,
+    "hash": "8ad1ba58e10bff285f9fe66bbc03b796"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\demandGapOdCandidateListProjection.test.ts": {
+    "mtime": 1777792569.971989,
+    "hash": "fbc98d5ffbe7a3263c0475835aa03c47"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\demandGapOdCandidateListProjection.ts": {
+    "mtime": 1777792548.724375,
+    "hash": "520c2de0a4d57213811dc45f8894ff8e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\demandGapOdContextProjection.test.ts": {
+    "mtime": 1777778292.1834152,
+    "hash": "33c310d94ea88b994db283fbdad8d3e4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\demandGapOdContextProjection.ts": {
+    "mtime": 1777778259.3839166,
+    "hash": "952033d9fc4b15d064ee90e49ff76c70"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\demandGapProjection.test.ts": {
+    "mtime": 1777606739.3560572,
+    "hash": "d45cb5fa87a4120210eb96679b8b55e8"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\demandGapProjection.ts": {
+    "mtime": 1777605619.318055,
+    "hash": "895a6b98e0626f8dbeae54a713b56aa1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\demandNodeInspectionProjection.test.ts": {
+    "mtime": 1777883586.1356177,
+    "hash": "f26733e66ddecf829585756201910a6c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\demandNodeInspectionProjection.ts": {
+    "mtime": 1777883562.979421,
+    "hash": "4b08538e9d87aeaddeb3d64bc7ad9861"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\demandWeight.test.ts": {
+    "mtime": 1777614597.0565577,
+    "hash": "01781159c58959535c77b901819ba86c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\demandWeight.ts": {
+    "mtime": 1777603971.7620547,
+    "hash": "b4b6c2e9ce732db8f80f85aeb6d9e90f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\focusedDemandGapLifecycleProjection.test.ts": {
+    "mtime": 1777816053.8274038,
+    "hash": "7505c0c9e523700998a696d14f03f217"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\focusedDemandGapLifecycleProjection.ts": {
+    "mtime": 1777816034.894728,
+    "hash": "9c21c26b4116594deac2514f1f1a7fbb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\focusedDemandGapPlanningProjection.test.ts": {
+    "mtime": 1777791468.9440167,
+    "hash": "402c0e46b62729dba1acba010feeaee6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\focusedDemandGapPlanningProjection.ts": {
+    "mtime": 1777791385.3727367,
+    "hash": "0f087d90580c32adcc4f354cb9fe3ce0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\lineDepartureScheduleProjection.test.ts": {
+    "mtime": 1777324255.3920085,
+    "hash": "967c79c6ef9572bd4e7359eecb62a376"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\lineDepartureScheduleProjection.ts": {
+    "mtime": 1777112549.6897197,
+    "hash": "40db11378ddb1d7b73204e0d5424ee1c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\lineDepartureTimetableProjection.test.ts": {
+    "mtime": 1777195149.3372276,
+    "hash": "778906e217c9c4fe65842cdd87ad62d4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\lineDepartureTimetableProjection.ts": {
+    "mtime": 1777151357.0521913,
+    "hash": "c10089daa9ccb319bc04f043ec7607ae"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\linePlanningVehicleProjection.test.ts": {
+    "mtime": 1777149645.0521772,
+    "hash": "88329aff5e39df266bc1a25dcf7c5fa0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\linePlanningVehicleProjection.ts": {
+    "mtime": 1777149404.9122088,
+    "hash": "6400ed7b27fd96d9ba9b5ad4bd8f8ba7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\lineServicePlanProjection.test.ts": {
+    "mtime": 1777149653.7227058,
+    "hash": "8e2bde0659736a7dfc9fc0e66052b185"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\lineServicePlanProjection.ts": {
+    "mtime": 1777194278.1077297,
+    "hash": "5720071ae239fa79a254746ff333813e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\lineVehicleProjection.test.ts": {
+    "mtime": 1777185006.5197518,
+    "hash": "37937eeeedb2cac5a708958b00303fa5"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\lineVehicleProjection.ts": {
+    "mtime": 1777184965.8972297,
+    "hash": "bdd50a65bfe57bf2f963c7fa24b91978"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\osmStopCandidateInspectionProjection.test.ts": {
+    "mtime": 1777894575.9748015,
+    "hash": "ea8f2cecf9037b6d8b50cc1eca83c3d6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\osmStopCandidateInspectionProjection.ts": {
+    "mtime": 1777894441.1237733,
+    "hash": "e1a15fc4fe3bc7588a56e12cf9031e60"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\routeBaselineProjection.test.ts": {
+    "mtime": 1777149619.3411763,
+    "hash": "518dd2f51f7990391cf7086b775fd15b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\routeBaselineProjection.ts": {
+    "mtime": 1777149399.7297082,
+    "hash": "aa3a93a5979a1de56ad31d0a31cd2dfc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\routeGeometryInterpolation.test.ts": {
+    "mtime": 1777054425.3415766,
+    "hash": "0a545bbd7d10e0ae6426912a51857f90"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\routeGeometryInterpolation.ts": {
+    "mtime": 1777054425.3420768,
+    "hash": "734e2860f2c80e9e3ec0d26a2a74fa0a"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\scenarioDemandCaptureProjection.test.ts": {
+    "mtime": 1777606584.807084,
+    "hash": "c7da0ccec2e2dde4b8635b8131a3138c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\scenarioDemandCaptureProjection.ts": {
+    "mtime": 1777861921.928043,
+    "hash": "c1f408a69cd6988cdbcf4eddfebefadb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\scenarioDemandProvenanceProjection.test.ts": {
+    "mtime": 1777821833.7590654,
+    "hash": "d59b73a0b0b6d40c77859142db412bbc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\scenarioDemandProvenanceProjection.ts": {
+    "mtime": 1777821815.9842842,
+    "hash": "23bb38a0ce7224af47181d66d99d3475"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\selectedDemandNodeServiceCoverageProjection.test.ts": {
+    "mtime": 1777886762.661272,
+    "hash": "87a3b368801223d8df4dd980e0bb9a1f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\selectedDemandNodeServiceCoverageProjection.ts": {
+    "mtime": 1777886756.3642735,
+    "hash": "49f0a604028581c551dd40c83a1f5023"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\selectedLineDemandContributionProjection.test.ts": {
+    "mtime": 1777606808.4465573,
+    "hash": "d7d77075d8fe20b9bab41e3facc9c143"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\selectedLineDemandContributionProjection.ts": {
+    "mtime": 1777604916.199053,
+    "hash": "2b76120f3d770d8be08249fffeb94349"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\servedDemandProjection.test.ts": {
+    "mtime": 1777875111.5305178,
+    "hash": "c3f180494d87fa5efbe6f2ba84c0f8e4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\servedDemandProjection.ts": {
+    "mtime": 1777875103.229772,
+    "hash": "ceb63b48ae732b9d80e816e282e9f05e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\servicePressureProjection.test.ts": {
+    "mtime": 1777875191.960646,
+    "hash": "cb4cf2895ab4d58bdcc0edff5f86f77d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\servicePressureProjection.ts": {
+    "mtime": 1777606526.8655565,
+    "hash": "381e917bb5c2060a6ac8c1942b8bdb56"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\testFixtures.ts": {
+    "mtime": 1777614566.0790577,
+    "hash": "f4a270f85b200ba1156e42099b3c2cb1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\useNetworkPlanningProjections.test.ts": {
+    "mtime": 1777885988.5837708,
+    "hash": "f7494d26086034e588a25cb358181066"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\projection\\useNetworkPlanningProjections.ts": {
+    "mtime": 1777885738.3947706,
+    "hash": "ee248cf60a137913685cf9b514e8c1d7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\readiness\\lineServiceReadiness.test.ts": {
+    "mtime": 1777324248.3215091,
+    "hash": "499dabf43e0bf7e555ac6ffead4cb6b2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\readiness\\lineServiceReadiness.ts": {
+    "mtime": 1777154238.4986756,
+    "hash": "763d6bdb978ba4de24c38f2f76acb78a"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\buildRoutedLineRouteSegments.test.ts": {
+    "mtime": 1777147023.6451788,
+    "hash": "2b252706bfe48bbac6f978a658c6a54c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\buildRoutedLineRouteSegments.ts": {
+    "mtime": 1777147001.6936786,
+    "hash": "f62dcf5c5bd4e9d36d95a92aba40a209"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\completeLineRouting.test.ts": {
+    "mtime": 1777149547.386201,
+    "hash": "5472089eafaf32744de85cf98e1c0398"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\completeLineRouting.ts": {
+    "mtime": 1777149517.6096766,
+    "hash": "a0dd4eee96f13493638818e70da262b4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\defaultRoutingAdapter.ts": {
+    "mtime": 1777146373.6566756,
+    "hash": "3821387c3180fe78471b9adf38a104e6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\fallbackLineRouting.test.ts": {
+    "mtime": 1777009044.989576,
+    "hash": "8facd3ae96678b95d8fd298827fdc012"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\fallbackLineRouting.ts": {
+    "mtime": 1777146030.1146762,
+    "hash": "2728334169bf2e01bac88b568e5aebcb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\lineRouteGeometryMapping.ts": {
+    "mtime": 1777146987.6976762,
+    "hash": "f9823b540764072c4d36a8d5fe2205ef"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\OsrmAdapter.test.ts": {
+    "mtime": 1777145833.1086755,
+    "hash": "1d05388001d33b78783e2b7883aebac3"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\OsrmAdapter.ts": {
+    "mtime": 1777145813.0166762,
+    "hash": "2664e7c514f3d291af8bab1f1468d7c4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\routing\\RoutingAdapter.ts": {
+    "mtime": 1777144084.3496783,
+    "hash": "93bf7fca7ed204b3b5404529c39c2921"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\scenario\\loadScenarioDemandArtifact.test.ts": {
+    "mtime": 1777486649.3531747,
+    "hash": "8f0ef7ba81083d42616d51bd13feae87"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\scenario\\loadScenarioDemandArtifact.ts": {
+    "mtime": 1777486649.3536508,
+    "hash": "925fe52bba54702bf0b7cd4468769f5d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\scenario\\loadScenarioRegistry.ts": {
+    "mtime": 1777329999.2920084,
+    "hash": "c27623a1eba165fb3d4f086ec89fae71"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\scenario\\scenarioDemandArtifact.test.ts": {
+    "mtime": 1777476573.9401548,
+    "hash": "e62a797927db278c07f7f5ba7a767d64"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\scenario\\scenarioDemandArtifact.ts": {
+    "mtime": 1777476631.7546854,
+    "hash": "e18c94f77498dae032ddaa46dd81c6c9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\scenario\\scenarioRegistry.test.ts": {
+    "mtime": 1777618916.4500573,
+    "hash": "90d1c170718f8999cf591a590dc5e707"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\scenario\\scenarioRegistry.ts": {
+    "mtime": 1777618759.4380865,
+    "hash": "1d7c2f1d4a12afd19b05312fee7b5675"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\scenario\\scenarioSourceMaterialManifest.test.ts": {
+    "mtime": 1777481917.4128413,
+    "hash": "96d34ab0cf39e39777e4b2a639cee791"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\scenario\\scenarioSourceMaterialManifest.ts": {
+    "mtime": 1777478559.3132386,
+    "hash": "2b4b056c73ad4cf768b8a8009e234163"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\simulation\\simulationClock.test.ts": {
+    "mtime": 1777190582.4697573,
+    "hash": "0b5f4ed051111824cd6bf398a2ebf9fc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\simulation\\simulationClock.ts": {
+    "mtime": 1777194101.0832517,
+    "hash": "3abef141cf41dfc1856ba40aedf767a7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\stop\\stopLabeling.test.ts": {
+    "mtime": 1777156420.8191762,
+    "hash": "48092bc0c389332d7eb9594de516ac71"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\stop\\stopLabeling.ts": {
+    "mtime": 1777156286.7691772,
+    "hash": "70b641edbe4a67dcce326df9827664bb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\line.ts": {
+    "mtime": 1777149452.0576763,
+    "hash": "c425c26294376f89d6a36607c094dcee"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\lineDepartureScheduleProjection.ts": {
+    "mtime": 1777114685.336679,
+    "hash": "c87d980fc2e8ee3d913c495fab240f18"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\lineDepartureTimetableProjection.ts": {
+    "mtime": 1777114221.4256957,
+    "hash": "eaed0f706432d290c62f4b656a14b1c9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\linePlanningVehicleProjection.ts": {
+    "mtime": 1777120453.474808,
+    "hash": "e324375610e2dc27e6352f433e578014"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\lineRoute.ts": {
+    "mtime": 1777040699.9185731,
+    "hash": "47a941b77084d1546a1039ccd459cb0f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\lineServicePlanProjection.ts": {
+    "mtime": 1777194270.0137298,
+    "hash": "66ff691d4bd69ba3a5d300cec8726fad"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\lineServiceReadiness.ts": {
+    "mtime": 1777105420.370219,
+    "hash": "e0f2e78a24aea82ac494cc79cad1e5cf"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\lineVehicleProjection.ts": {
+    "mtime": 1777185972.7727273,
+    "hash": "7f55b662539df3e72636dac1cc8002c0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\networkSave.ts": {
+    "mtime": 1777472452.140069,
+    "hash": "e51d3617c46fe869b3bf2d4c930489ab"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\osmStopCandidate.ts": {
+    "mtime": 1777472452.1450684,
+    "hash": "187c57f2959573b6d2800007f13c9e02"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\routeBaseline.ts": {
+    "mtime": 1777149590.9201765,
+    "hash": "34ad6ae486f66f6159053c6938df49e5"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\scenarioDemand.ts": {
+    "mtime": 1777476540.4030766,
+    "hash": "05694eaff99eaf4cd6c566938f010bac"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\scenarioSourceMaterial.ts": {
+    "mtime": 1777481906.414494,
+    "hash": "10a9bb42670ac7223fd8931c1f4efdef"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\selectedLineExport.test.ts": {
+    "mtime": 1777472452.1390672,
+    "hash": "1353ceff299816f8464df4e91e2aea50"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\selectedLineExport.ts": {
+    "mtime": 1777472452.1375673,
+    "hash": "7600dd05c889d24756b9712419584442"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\simulationClock.ts": {
+    "mtime": 1777190548.2807517,
+    "hash": "2ea15f61bc851288266c31505abeed67"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\stop.ts": {
+    "mtime": 1776878813.6878211,
+    "hash": "bc3a1035c266ee7625fb4025aee87c78"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\domain\\types\\timeBand.ts": {
+    "mtime": 1777105420.371749,
+    "hash": "1dff45d7d636f80fe432174ccec69ac9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\DeparturesDialog.test.tsx": {
+    "mtime": 1777149472.142676,
+    "hash": "f795224f14d2980d0bb68a8bbedeed3e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\DeparturesDialog.tsx": {
+    "mtime": 1777190689.3572288,
+    "hash": "77007d933bbeb31e4be7afec33b75527"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\EmptyInspector.tsx": {
+    "mtime": 1777061524.6585734,
+    "hash": "cb203fc5d11da39f31b8d12d392ef230"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\FrequencyEditorDialog.test.tsx": {
+    "mtime": 1777112549.6967194,
+    "hash": "869f81eb07117f744a965c13c2cef9db"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\FrequencyEditorDialog.tsx": {
+    "mtime": 1777190684.3892276,
+    "hash": "3a0dbf4227d132e9a4857f5f453ca77e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InlineRenameField.test.tsx": {
+    "mtime": 1777213516.1962273,
+    "hash": "edc0241bee1f689778ee8c43e5951384"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InlineRenameField.tsx": {
+    "mtime": 1777212957.3513184,
+    "hash": "ef13f86b96e1bf37ac57ae071be7f2eb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InspectorDemandTab.test.tsx": {
+    "mtime": 1777886783.049275,
+    "hash": "fae4b0d8bbcac33e2aa303addb2a3967"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InspectorDemandTab.tsx": {
+    "mtime": 1777885784.5312722,
+    "hash": "cb1bd17ffd6892529acdc0bb7e9bb176"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InspectorLinesTab.tsx": {
+    "mtime": 1777622181.762554,
+    "hash": "b7413aae15ecc3e1216fda96c9046ed8"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InspectorOverviewTab.tsx": {
+    "mtime": 1777622152.5460534,
+    "hash": "be3864ae2980fc0b990dc9754e551aec"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InspectorPanel.test.tsx": {
+    "mtime": 1777885798.8037722,
+    "hash": "cb08eb9260f41c580e75d30cab0588aa"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InspectorPanel.tsx": {
+    "mtime": 1777894696.443273,
+    "hash": "a7b7c519fc48d11718b4e97589a1087f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InspectorScrollArea.tsx": {
+    "mtime": 1777622138.7965531,
+    "hash": "1e84bd366703b484505e1dab19b6d70d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InspectorServiceTab.tsx": {
+    "mtime": 1777622171.0085568,
+    "hash": "71e2bf3b754065098019c1de92045279"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\InspectorTabBar.tsx": {
+    "mtime": 1777622144.7530541,
+    "hash": "00ceb2510bcedd5b95a6763978eb92c7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\inspectorTabs.ts": {
+    "mtime": 1777621133.7470756,
+    "hash": "b692a0e90e317155e13de6ed5f380bc1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\NetworkInventory.tsx": {
+    "mtime": 1777212957.3527524,
+    "hash": "3bc24ab164b7935a1228b637ea1b5578"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\OsmStopCandidateInspector.test.tsx": {
+    "mtime": 1777894661.275773,
+    "hash": "94754cdc5ac1fa36e30234153bcd5965"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\OsmStopCandidateInspector.tsx": {
+    "mtime": 1777894479.9552746,
+    "hash": "4559a16b526187b926cbcd8853cf4e36"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\ProjectedVehiclesDialog.tsx": {
+    "mtime": 1777190671.982227,
+    "hash": "5b28829e1e87e29e982cba0aa44f82b2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\SelectedLineInspector.test.tsx": {
+    "mtime": 1777606612.7525842,
+    "hash": "a9f41a4dc175ca065cfc9a5b821b2e8c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\SelectedLineInspector.tsx": {
+    "mtime": 1777620414.8725538,
+    "hash": "aa8ec1279549a74b80ce9c43613a948d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\SelectedStopInspector.tsx": {
+    "mtime": 1777157535.1986756,
+    "hash": "f90455c8540a5e6b3aa9053bd9c20065"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\ServicePlanDialog.tsx": {
+    "mtime": 1777190664.882727,
+    "hash": "4fd39f972bbea5033f88b8c8570a3bf2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\inspector\\types.ts": {
+    "mtime": 1777325396.3805072,
+    "hash": "54264a5bd6f852b06b2e475633fdfba2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\lib\\geometry.test.ts": {
+    "mtime": 1777143155.065205,
+    "hash": "3e6dff1396e826e5f3fcda48916271a9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\lib\\geometry.ts": {
+    "mtime": 1777143153.0602062,
+    "hash": "dccdaf998735f8ecb439b564e26f6d0e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\demandGapFeatureInteraction.test.ts": {
+    "mtime": 1777860485.3168128,
+    "hash": "800d399ca61980d75dd6a5a7ded026b0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\demandGapFeatureInteraction.ts": {
+    "mtime": 1777860344.3341842,
+    "hash": "c7a3156d9ad6aa6fdda52e214f13d5b5"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\demandGapOdContextGeoJson.test.ts": {
+    "mtime": 1777781365.3900692,
+    "hash": "67df2c93afa78e00c488aa0180ba0f8b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\demandGapOdContextGeoJson.ts": {
+    "mtime": 1777780709.0454178,
+    "hash": "e8ba78f33615e1cc3289e0d40828ceb3"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\demandGapOverlayGeoJson.test.ts": {
+    "mtime": 1777638724.0890532,
+    "hash": "0714b1a7acef2577ab965f85d0dd93da"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\demandGapOverlayGeoJson.ts": {
+    "mtime": 1777638049.3305535,
+    "hash": "9b5742a5e833a119fbb7cdb601f76ef0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\DemandMapLegend.test.tsx": {
+    "mtime": 1777877042.2950678,
+    "hash": "8dd4119a9f3447ee46cb5d4efe6a29a9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\DemandMapLegend.tsx": {
+    "mtime": 1777876848.9191456,
+    "hash": "7ca480a226d982a817e0ac11c7468706"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\demandNodeContextHintGeoJson.test.ts": {
+    "mtime": 1777876809.0396056,
+    "hash": "679ca5a7d270b6d0bb4c059f66e82581"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\demandNodeContextHintGeoJson.ts": {
+    "mtime": 1777877013.2774487,
+    "hash": "5917742cc093b68aeeeda045186e5945"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\demandNodeFeatureInteraction.test.ts": {
+    "mtime": 1777903565.3297741,
+    "hash": "58f426fd83f2d4026739b25d5b6beedb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\demandNodeFeatureInteraction.ts": {
+    "mtime": 1777904392.5777705,
+    "hash": "fce24ea11a92e644336868541d0c0cdd"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\LineCompletionDialog.tsx": {
+    "mtime": 1777190650.2767293,
+    "hash": "8cf7682a8597bc3bebb652d403fbd365"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\lineGeoJson.test.ts": {
+    "mtime": 1777324225.9715083,
+    "hash": "42a72b7d9860c2c337cf6f39872ca289"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\lineGeoJson.ts": {
+    "mtime": 1777183416.905729,
+    "hash": "47413dba8e7af1c8571d5a254ec83bcd"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapBaseStyleOverrides.ts": {
+    "mtime": 1777325135.239509,
+    "hash": "223dd874d618288c1e596a203e83908e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapBootstrapConfig.ts": {
+    "mtime": 1777618832.0460577,
+    "hash": "732d60167f921e4d78f0b17edf528bf1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapEntityHoverTarget.test.ts": {
+    "mtime": 1777913365.5962715,
+    "hash": "c6504a280819c2471c5dc0d7ddca8654"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapEntityHoverTarget.ts": {
+    "mtime": 1777913366.2292733,
+    "hash": "dabfaa77dd89b0508e039a6b022a6825"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\MapLayerFlyout.test.tsx": {
+    "mtime": 1777905297.018771,
+    "hash": "881597973cb61dfb687c336e1382c18d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\MapLayerFlyout.tsx": {
+    "mtime": 1777905271.5347707,
+    "hash": "42164427bab8fbc5783808cf4fb9743e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapLayerVisibility.test.ts": {
+    "mtime": 1777905930.0347724,
+    "hash": "2f0ce1df5851810b916564b34e36f78f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapLayerVisibility.ts": {
+    "mtime": 1777886940.636772,
+    "hash": "3d8b9917168ec708a593a8ee56205e97"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\maplibreGlobal.ts": {
+    "mtime": 1777913366.4537718,
+    "hash": "0e6bd796b76e279c55c8862a8a7928dc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapRenderConstants.ts": {
+    "mtime": 1777913363.4772718,
+    "hash": "82b24d17340c6d2952cf3ead37dc9c7b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceDebugSnapshot.test.ts": {
+    "mtime": 1777335455.0365102,
+    "hash": "4604ecf77276866c59c7159b15bdb8ea"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceDebugSnapshot.ts": {
+    "mtime": 1777335375.047508,
+    "hash": "9a44d42120b8d1836900ceb843bc82fb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceDraftState.ts": {
+    "mtime": 1777338211.1940107,
+    "hash": "f548c9ffba8680c21bd17eb16e6609a6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceFocus.test.ts": {
+    "mtime": 1777335051.7010336,
+    "hash": "2e7f7aa834c9e54e80c5fca57e2a5057"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceFocus.ts": {
+    "mtime": 1777618815.5685534,
+    "hash": "46c992252c49902861b1db00ff92c390"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceInteractions.test.ts": {
+    "mtime": 1777913365.3867707,
+    "hash": "21905f5be22810e7144f38f174fbc420"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceInteractions.ts": {
+    "mtime": 1777913366.015272,
+    "hash": "b190fae76005c3c9363838344ff78256"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceLifecycle.ts": {
+    "mtime": 1777615582.229557,
+    "hash": "99bc86381f34492665484053c2a234a0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceLineCompletion.test.ts": {
+    "mtime": 1777336449.7230072,
+    "hash": "bb881e09edbcb9edcfea1989d1f40bd6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceLineCompletion.ts": {
+    "mtime": 1777335719.4620109,
+    "hash": "716a7ec51b44c1bc77843810c68e1ce2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceNearbyLabel.test.ts": {
+    "mtime": 1777776374.0129848,
+    "hash": "4fbd95501948f93c0b7e18a3ad9a76e0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceOsmCandidateHover.test.ts": {
+    "mtime": 1777336939.4835105,
+    "hash": "3e77cef081cc2c5559ccfdc51adc1f83"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceOsmCandidateHover.ts": {
+    "mtime": 1777336870.69901,
+    "hash": "5847835af9a81341029ccaf03fb82e66"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspacePlacementConstants.ts": {
+    "mtime": 1777326489.2635076,
+    "hash": "a9d8fcbc826617d54fc3641c7b76d6ca"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceRenderedFeatureQuery.test.ts": {
+    "mtime": 1777617754.2700531,
+    "hash": "e7bd5092e535dfc80e5d1fb5092d6c99"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceRenderedFeatureQuery.ts": {
+    "mtime": 1777776344.6731627,
+    "hash": "7774c6e090aa0f40c75861e9e166ef7b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceSourceSync.test.ts": {
+    "mtime": 1777913360.5647714,
+    "hash": "0ededb22086f1151de14fbd306c50004"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceSourceSync.ts": {
+    "mtime": 1777913360.7707717,
+    "hash": "1b3effa3c1410bf4bd235da8a4ec1131"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceStreetSnap.test.ts": {
+    "mtime": 1777776382.221547,
+    "hash": "b065204887c2656fbcaad8d7502ab039"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceStreetSnap.ts": {
+    "mtime": 1777776355.998198,
+    "hash": "01722b9bc2d2d1d59889dc5af4af7ba7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\MapWorkspaceSurface.tsx": {
+    "mtime": 1777913359.0022717,
+    "hash": "c903a81066c73b28aad0fac685ced866"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\mapWorkspaceUiFeedback.ts": {
+    "mtime": 1777061524.6625743,
+    "hash": "4cc2a6f0f5b72ff91fe2b3e0308bb4a5"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\osmStopCandidateGeoJson.test.ts": {
+    "mtime": 1777314423.390008,
+    "hash": "bc971fbd7063c669162d8e2cc610481f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\osmStopCandidateGeoJson.ts": {
+    "mtime": 1777314302.6860106,
+    "hash": "21884b94082364c51980348b7dcf5890"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\OsmStopCandidateHoverTooltip.tsx": {
+    "mtime": 1777913358.2122724,
+    "hash": "acd8f14c97b676452efcabe5d6c44b8f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\osmStopCandidateStreetAnchorResolution.test.ts": {
+    "mtime": 1777776393.8300135,
+    "hash": "2dcf08dab3806fa2b961310edcdd8a9f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\osmStopCandidateStreetAnchorResolution.ts": {
+    "mtime": 1777776362.3139052,
+    "hash": "34c64bf6f3ab7c07d76416a3adee4047"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\scenarioDemandPreviewGeoJson.test.ts": {
+    "mtime": 1777504413.2702138,
+    "hash": "04e3b62d4a69af3b8b0c45e1cbd3dc35"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\scenarioDemandPreviewGeoJson.ts": {
+    "mtime": 1777876139.1974607,
+    "hash": "e135ed769fc023d48baffef25e9aab21"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\scenarioRoutingCoverageGeoJson.test.ts": {
+    "mtime": 1777776884.4261172,
+    "hash": "a1034bfc865b6a25d02c745698c2ce46"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\scenarioRoutingCoverageGeoJson.ts": {
+    "mtime": 1777618780.7720575,
+    "hash": "5b43b6c84783850b531368fd8b5b4a28"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\selectedDemandNodeServiceCoverageGeoJson.test.ts": {
+    "mtime": 1777886868.720271,
+    "hash": "8414a067441f5c57ff329896ad3b188a"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\selectedDemandNodeServiceCoverageGeoJson.ts": {
+    "mtime": 1777886820.2232716,
+    "hash": "e95cae076023d1d3bbb0976d3f03b3cd"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\stopGeoJson.ts": {
+    "mtime": 1777115034.2982013,
+    "hash": "d048bbef58993faf6f1c372484c0379e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\StopHoverTooltip.tsx": {
+    "mtime": 1777913358.359272,
+    "hash": "2a55e8d974d08b9277139ffbd02aa8b4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\streetFeatureLabel.test.ts": {
+    "mtime": 1777157592.1256776,
+    "hash": "166acebf78fc14277bfe9b1ce43709e0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\streetFeatureLabel.ts": {
+    "mtime": 1777157440.3831763,
+    "hash": "9b48cb0ed476bb812585d95e8a76c880"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\useMapWorkspaceInteractionBindings.ts": {
+    "mtime": 1777913359.2187715,
+    "hash": "ee1b3f94dada42c16c455ffd226167c5"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\useMapWorkspaceSourceSync.ts": {
+    "mtime": 1777886953.5902715,
+    "hash": "5b1df569d05b1c5e35de5098ec4b821c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\vehicleGeoJson.test.ts": {
+    "mtime": 1777324240.612034,
+    "hash": "7755638274799dd34753c145daa6e779"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\map-workspace\\vehicleGeoJson.ts": {
+    "mtime": 1777054425.3450983,
+    "hash": "fb1ea9a53b95498237b3137084c33bad"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\scenario\\ScenarioSelectionScreen.tsx": {
+    "mtime": 1777894989.5122716,
+    "hash": "f51cb008763efada6806b766370f7613"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\session\\lineFrequencyEditorState.test.ts": {
+    "mtime": 1777112549.6997213,
+    "hash": "25e906a43544c0638c14a0797fb8dbbb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\session\\lineFrequencyEditorState.ts": {
+    "mtime": 1777112549.7002196,
+    "hash": "119878fefd1ceca632e8fb39d3ed4987"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\session\\SessionActions.tsx": {
+    "mtime": 1777188919.1737504,
+    "hash": "a1365342eaf61080578b00d6d094a128"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\session\\sessionTypes.ts": {
+    "mtime": 1777605625.9315562,
+    "hash": "0b692311f5e4413867a34bd58fa8632f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\session\\useNetworkSessionState.ts": {
+    "mtime": 1777325369.3460076,
+    "hash": "bff17537bc7f2f673c70c154391eeecd"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\simulation\\SimulationControlBar.tsx": {
+    "mtime": 1777894997.0692723,
+    "hash": "7954b6aa64142d46958ee1cc6f9d17e7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\simulation\\useSimulationClockController.ts": {
+    "mtime": 1777184973.6227267,
+    "hash": "58da8638bdea862f72b10c797a0821e7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\DebugDisclosure.tsx": {
+    "mtime": 1777064317.9340744,
+    "hash": "3d4844130189625f5591a3e5f33cda25"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\DebugModal.tsx": {
+    "mtime": 1777498029.4376745,
+    "hash": "8c5495dce03e5185188f3fde38558b31"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\InspectorDisclosure.tsx": {
+    "mtime": 1777620370.1815534,
+    "hash": "19cc3bca5a063dfef05e3387fa3892e8"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\PlanningContextBanner.test.tsx": {
+    "mtime": 1777808852.0212667,
+    "hash": "d078d2cad01f45463652b9be3a9de6db"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\PlanningContextBanner.tsx": {
+    "mtime": 1777808765.2103038,
+    "hash": "65cc92bb20cca63c01bc636b5428fed2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\constants\\mapLayerUiConstants.ts": {
+    "mtime": 1777905271.5342708,
+    "hash": "5089f650f0b15ff71225b9a5bbde857c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\data-operation\\BlockingDataOperationModal.test.tsx": {
+    "mtime": 1777322163.099507,
+    "hash": "89a8da27aeef58a8fc9613c35a916445"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\data-operation\\BlockingDataOperationModal.tsx": {
+    "mtime": 1777322110.0140092,
+    "hash": "8d7faa2b4440ce02a478f191dce7365c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\data-operation\\types.ts": {
+    "mtime": 1777322069.1325073,
+    "hash": "5ba322a9aa98a07ef327710832131e30"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\icons\\MaterialIcon.tsx": {
+    "mtime": 1777472452.1455672,
+    "hash": "26d0157a04336eaeaa8037da98f91801"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\icons\\materialIcons.ts": {
+    "mtime": 1777621126.7075536,
+    "hash": "80afe7bb676edb418abbe856573566d9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\icons\\transportModeIcons.test.ts": {
+    "mtime": 1777198270.5527303,
+    "hash": "b09723a2cfa303428469ceb497bacad2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\icons\\transportModeIcons.ts": {
+    "mtime": 1777198240.5692272,
+    "hash": "5e4735b4121c924fbd809387c453c64b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\toast\\Toast.test.tsx": {
+    "mtime": 1777189005.5127568,
+    "hash": "ff89b4707c500a9d51315710e30224e7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\toast\\Toast.tsx": {
+    "mtime": 1777188880.8752291,
+    "hash": "f4156101a145646ad18959b3721df6a9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\toast\\ToastHost.tsx": {
+    "mtime": 1777188886.0602298,
+    "hash": "9c9a487c1aa4772f1c974e3c6cf34de4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\toast\\ToastProvider.tsx": {
+    "mtime": 1777188862.057227,
+    "hash": "f3b842f7e9067282bf074e35403c9b56"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\src\\ui\\toast\\toastTypes.ts": {
+    "mtime": 1777188855.432228,
+    "hash": "8e980abbb7d62b04583df8c3c06777c0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\local-assets\\prepare-local-assets.mjs": {
+    "mtime": 1777331678.1855104,
+    "hash": "7f7404a3fcea448151fa6f2772330b59"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\osm\\build-stop-candidates.ps1": {
+    "mtime": 1777501735.1411388,
+    "hash": "67d693cb1e62f7b50e2932cf7c2312fc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\osm\\normalize-stop-candidates.mjs": {
+    "mtime": 1777313065.859011,
+    "hash": "2eb13c8806deb433e9c92cb61fcbcb06"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\osm\\normalize-stop-candidates.test.mjs": {
+    "mtime": 1777313085.574538,
+    "hash": "0d163322d91670e6a0dae322517259c2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\osm\\setup-osmium-tooling.ps1": {
+    "mtime": 1777501713.3303638,
+    "hash": "03d65ecdd5003544a48a8f204989870f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\osm\\start-stop-candidate-generation.ps1": {
+    "mtime": 1777501725.8948655,
+    "hash": "0b4d1991db33b614b0fc25d9e40a483b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\routing\\prepare-osrm.ps1": {
+    "mtime": 1777330578.7740104,
+    "hash": "2de17fdbb10a099dae296e788b0b1a04"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\routing\\smoke-test-osrm.ts": {
+    "mtime": 1777144107.8967025,
+    "hash": "c6e40e5ba4e878f6e17b6c9d1e548f33"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\routing\\start-osrm.mjs": {
+    "mtime": 1777387316.4587202,
+    "hash": "41b46739d80b5e59c7f99bbb6a5d46ba"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\routing\\start-osrm.ps1": {
+    "mtime": 1777330585.3920088,
+    "hash": "95f2ddcb2cd3343430a3842697917a07"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\build-scenario-demand.mjs": {
+    "mtime": 1777505887.3982115,
+    "hash": "b77f0a3d1ab72dba62ea306b49c61c94"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\build-scenario-demand.test.mjs": {
+    "mtime": 1777505960.6417117,
+    "hash": "052189638f26b7cdd57e04d8e37a2465"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\constants.mjs": {
+    "mtime": 1777505876.821213,
+    "hash": "3d66cdb79268ab73f3eedd27f008695b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\ensure-osmium-tooling-image.ps1": {
+    "mtime": 1777502376.3347113,
+    "hash": "2077afef77ff8cca40375a194fbf223f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\prepare-census-grid-source.mjs": {
+    "mtime": 1777499524.737081,
+    "hash": "71e439ea1709b76cb7b88bb46d2a4766"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\prepare-census-grid-source.test.mjs": {
+    "mtime": 1777499545.61764,
+    "hash": "2d12124ef9021b8e656d55c0c44ee63d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\prepare-osm-attractors-source.mjs": {
+    "mtime": 1777506056.35924,
+    "hash": "149d4dc4baba1d4c41d1bc50974402b5"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\prepare-osm-attractors-source.ps1": {
+    "mtime": 1777502384.5802116,
+    "hash": "5ce8e3e07ddbd9abdf3db5d95013d6be"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\prepare-osm-attractors-source.test.mjs": {
+    "mtime": 1777506010.1792123,
+    "hash": "0b3f5d03c56c5d71ca2547e9f61c2c83"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\prepare-osm-attractors-wrapper.test.mjs": {
+    "mtime": 1777502400.320244,
+    "hash": "afebe957e3c5aa275ff928dba87de3b2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\source-adapters\\census-grid-csv.mjs": {
+    "mtime": 1777478151.4117587,
+    "hash": "e251a8b1670abd8d68792c7d8be728c1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\source-adapters\\census-grid-csv.test.mjs": {
+    "mtime": 1777478195.8047369,
+    "hash": "9d76f554fc9f95158fff78db4c80176b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\source-adapters\\geojson-representative-point.mjs": {
+    "mtime": 1777482193.38063,
+    "hash": "c5b972e30ab8d62574f9a59cda66e500"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\source-adapters\\geojson-representative-point.test.mjs": {
+    "mtime": 1777482205.0416012,
+    "hash": "011b64c7d59e4869962536a19a65a2b7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\source-adapters\\workplace-attractor-geojson.mjs": {
+    "mtime": 1777503093.7147458,
+    "hash": "7fc989340edb842e7070d8047a4c31af"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenario-demand\\source-adapters\\workplace-attractor-geojson.test.mjs": {
+    "mtime": 1777481362.510578,
+    "hash": "46bd54eee9be9ecb59139786fa342894"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenarios\\build-scenario-registry.mjs": {
+    "mtime": 1777398122.5362208,
+    "hash": "e0a892d0cf332fb04d17558615a6c6fc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\scripts\\scenarios\\setup-scenario.mjs": {
+    "mtime": 1777482655.3937502,
+    "hash": "a9fec054253b05eb2f8e48ae1532d0b1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\AGENTS.md": {
+    "mtime": 1777617495.6805553,
+    "hash": "79fd5e5f02b93ba3d71dc788f24c6193"
+  },
+  "D:\\__DEV\\open-vayra-cities\\CHANGELOG.md": {
+    "mtime": 1777876113.014832,
+    "hash": "7c61abf0a25dd216cbd478d449e692a1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\DD.md": {
+    "mtime": 1777471848.3390672,
+    "hash": "1d5fe19f4d68cd40b119b8dc38386aa3"
+  },
+  "D:\\__DEV\\open-vayra-cities\\DESIGN.md": {
+    "mtime": 1777471848.3405669,
+    "hash": "8f7fe9adb73576b09b6ae3ae1c5dec53"
+  },
+  "D:\\__DEV\\open-vayra-cities\\FOUNDATION.md": {
+    "mtime": 1777471848.344067,
+    "hash": "680e91abfac74f365cc560d2b530d1f4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\GEMINI.md": {
+    "mtime": 1777617500.231553,
+    "hash": "ab6702e094d4d0c942566529e488a86b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\pnpm-workspace.yaml": {
+    "mtime": 1776868411.4383209,
+    "hash": "96c8c2208163ef58229a6e93ebd47133"
+  },
+  "D:\\__DEV\\open-vayra-cities\\PRODUCT_DEFINITION.md": {
+    "mtime": 1777471848.3420672,
+    "hash": "773b8f2de1e159c2bd2d47c2f3fac2d3"
+  },
+  "D:\\__DEV\\open-vayra-cities\\README.md": {
+    "mtime": 1777471848.3405669,
+    "hash": "0ace51a555f38ee6ec4063087c911960"
+  },
+  "D:\\__DEV\\open-vayra-cities\\SEC.md": {
+    "mtime": 1777471848.3450668,
+    "hash": "ce82e1bcd3e492153699d298fce208db"
+  },
+  "D:\\__DEV\\open-vayra-cities\\TDD.md": {
+    "mtime": 1777471848.3420672,
+    "hash": "2ba1ea485c09fd018fd5a5ca3aaa839f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\VISION_SCOPE.md": {
+    "mtime": 1777471848.342567,
+    "hash": "e0bcb60647395fbdf55d3c1cc0631cba"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\index.html": {
+    "mtime": 1777472452.119068,
+    "hash": "5d8186404b84b6da379f5dea9c0fd93f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\data\\generated\\download-helpers\\hvv-mvp-bbbike-download.html": {
+    "mtime": 1777482756.6342018,
+    "hash": "f158fabd22abd28668bdb1c12a007e7f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\data\\generated\\osm\\download-helpers\\hvv-mvp-bbbike-download.html": {
+    "mtime": 1777333347.5160103,
+    "hash": "f158fabd22abd28668bdb1c12a007e7f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docker\\routing\\osrm\\docker-compose.yml": {
+    "mtime": 1777501942.6427712,
+    "hash": "2ef516356c54044ce5890e367ec000de"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\agent-skills.md": {
+    "mtime": 1777617480.353056,
+    "hash": "ebc345fe2e4fa94793e494226eb8a3fb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0001-workspace-bootstrap.md": {
+    "mtime": 1777471848.3450668,
+    "hash": "359eb645c828b1486a30a7da36aab61d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0002-documentation-governance-and-adr-location.md": {
+    "mtime": 1776868539.2233238,
+    "hash": "ecffc77a5df142391ab02d560892bbc5"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0003-initial-desktop-shell-layout.md": {
+    "mtime": 1777471848.3450668,
+    "hash": "ee3416017d75f9e0ac90ecde6198bd35"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0004-map-workspace-surface-scaffold.md": {
+    "mtime": 1777471848.3455682,
+    "hash": "72d5ddf1a108724d528cf54e2ea50197"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0005-maplibre-workspace-baseline.md": {
+    "mtime": 1777471848.3450668,
+    "hash": "f5c58ccf4d58169582babcf9d1d890cc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0006-map-workspace-neutral-interaction-plumbing.md": {
+    "mtime": 1776878813.690822,
+    "hash": "14658d4e11e919076d04b24850808eff"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0007-map-workspace-explicit-resize-handling.md": {
+    "mtime": 1776878813.690822,
+    "hash": "77322eec54c3557e7a54d0057e158b88"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0008-map-workspace-internal-lifecycle-separation.md": {
+    "mtime": 1776878813.691321,
+    "hash": "9734cd1e454fa5bd9e65bdcd7e33fc06"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0009-workspace-tool-mode-gating.md": {
+    "mtime": 1776878813.6918209,
+    "hash": "ccf15de0e0e0f9626400e194c1e77e49"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0010-place-stop-click-validation-split.md": {
+    "mtime": 1776878813.6918209,
+    "hash": "5801924db156a7b25df9fd823dca99b7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0011-local-stop-state-and-marker-rendering.md": {
+    "mtime": 1776878813.6923208,
+    "hash": "e99d3fa15d6f0d6c330305b5b417df71"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0012-maplibre-feature-query-contract-for-stop-placement.md": {
+    "mtime": 1776878813.6923208,
+    "hash": "43afe7356d34e797971dbf747c1d0320"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0013-stop-placement-slice-008-boundaries.md": {
+    "mtime": 1776878813.692822,
+    "hash": "68e3cdf81ab490501f23117a77146469"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0014-stop-only-local-selection-state.md": {
+    "mtime": 1776880698.889321,
+    "hash": "59667c4e5887bdd25fcbc3621affe166"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0015-stop-selection-projection-to-shell-inspector.md": {
+    "mtime": 1776880698.8898208,
+    "hash": "7e558f33e539005387ed1dfc8d923b65"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0016-stop-selection-transition-rules-and-minimal-inspector-contract.md": {
+    "mtime": 1776880698.8903208,
+    "hash": "1b9baac71dc7f6f0b3e066f0241ad549"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0017-placement-feedback-ui-contract.md": {
+    "mtime": 1776881809.9868207,
+    "hash": "09f6f167b82ffce4f5246f0d53a9f1d6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0018-hamburg-map-bootstrap-baseline.md": {
+    "mtime": 1776882001.1953256,
+    "hash": "c9876b1a4a371da134f704a2445fac9e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0019-hamburg-street-legible-baseline-rationale.md": {
+    "mtime": 1776882247.5173237,
+    "hash": "d4c37cc370a260c340e784d66dd60d5d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0020-explicit-workspace-modes-and-build-line-placeholder.md": {
+    "mtime": 1776884339.2692547,
+    "hash": "47e032567c26ba8663e3cfd834dc73c6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0021-build-line-local-draft-and-session-line-commit.md": {
+    "mtime": 1776884339.2697544,
+    "hash": "4d7e042db6fd60e5c3dffdc021af58a8"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0022-line-building-constants-and-minimal-line-inspector-selection.md": {
+    "mtime": 1776884339.2702296,
+    "hash": "9197510d29c7c8757cd8d3c703d80834"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0023-first-ordered-stop-line-building-mode.md": {
+    "mtime": 1776884339.2722595,
+    "hash": "a186f385e4a017eca9adbe7d31ca8c53"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0024-font-loading-and-material-icon-baseline.md": {
+    "mtime": 1776884339.272765,
+    "hash": "ae2479f3664fee465afb3f035c9d24ce"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0025-line-overlay-pointer-event-contract.md": {
+    "mtime": 1776890084.2912302,
+    "hash": "cc1d5a1cb627fdcbd16e6089ef0a01dd"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0026-mutual-exclusivity-between-stop-and-completed-line-selection.md": {
+    "mtime": 1776890538.85423,
+    "hash": "03f9a3bfae259b768d8b8992263180fe"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0027-inspector-selection-priority-state-machine.md": {
+    "mtime": 1776921349.6948402,
+    "hash": "1e22d2c69e9fc00afbae37aca4bc2824"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0028-canonical-time-band-domain-module.md": {
+    "mtime": 1776921349.6953397,
+    "hash": "627a4727f64a14f2264debd2d23734b7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0029-completed-line-frequency-configuration-baseline.md": {
+    "mtime": 1776921349.6958394,
+    "hash": "c5b5792c29586bc26de000764c26c3a3"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0030-line-selected-frequency-editing-and-session-line-lift.md": {
+    "mtime": 1776921349.6963394,
+    "hash": "f46178072e1ab3dea33f16ace658aed1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0031-slice-013-completed-line-frequency-configuration-boundaries.md": {
+    "mtime": 1776921349.6968393,
+    "hash": "7dbc76edb126762e0033876e7e46d648"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0032-slice-014-static-network-summary-kpis.md": {
+    "mtime": 1776921349.6978395,
+    "hash": "bae39d0c30dcd8e5421a214cdca23a06"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0033-explicit-user-triggered-build-line-completion.md": {
+    "mtime": 1776946547.7902257,
+    "hash": "ca43685498d9f6aee7ba414398bf3128"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0034-stop-marker-interaction-affordance-and-draft-membership-state.md": {
+    "mtime": 1776948498.5832245,
+    "hash": "c239aeacd1c599126f5747f2268c6598"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0035-stale-marker-mode-click-selection-and-material-icons-rendering-fix.md": {
+    "mtime": 1776949693.7082243,
+    "hash": "63f5d39539ccf5f02c48a3aea60fb4a3"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0036-material-symbols-ligature-rendering-contract-alignment.md": {
+    "mtime": 1776952035.5718052,
+    "hash": "82296a16b6aea60f5370320a9ec86d10"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0037-street-stop-placement-eligibility-and-snap-resolution.md": {
+    "mtime": 1776953601.453842,
+    "hash": "770606bc8710401985211853f5d85a04"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0038-map-overlay-refresh-lifecycle-and-schematic-copy-clarification.md": {
+    "mtime": 1776953601.4543045,
+    "hash": "8e85123f9c3cf5eead737746a0327914"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0039-stop-marker-anchor-offset-typing-and-visual-center-alignment.md": {
+    "mtime": 1776953601.4548044,
+    "hash": "b0b2098e2966023c7d1bb573d12e830d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0040-render-lifecycle-projection-refresh-binding.md": {
+    "mtime": 1776954754.2133043,
+    "hash": "6cf6c9d05ce093f0c526b11567e7918b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0041-stop-geojson-source-layer-rendering-and-feature-click-interactions.md": {
+    "mtime": 1776967268.0538049,
+    "hash": "72b3a42286583de0cb033e34b2f33d8f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0042-map-native-line-geojson-rendering-and-feature-selection.md": {
+    "mtime": 1776967268.0543053,
+    "hash": "b94b7fbcf4611a297c22af3807b7e2a6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0043-feature-first-map-interaction-entry-and-inspect-empty-click-clearing.md": {
+    "mtime": 1776967268.0553043,
+    "hash": "f2f3d9c273888d3d41fdbaffa4e25020"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0044-map-style-readiness-guard-for-source-layer-sync.md": {
+    "mtime": 1776967684.5708375,
+    "hash": "3d66de577d253bef8aa4e8c5bcf86fea"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0045-deterministic-street-snap-candidate-ranking.md": {
+    "mtime": 1776974741.2203064,
+    "hash": "f6f3b5096e42276cdbb1a56c4bacb67d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0046-strict-secondary-street-snap-fallback-gating.md": {
+    "mtime": 1776974741.2213047,
+    "hash": "d92dde4ae939041ed0538654591ced07"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0047-canonical-line-route-segment-domain-types.md": {
+    "mtime": 1777009044.9945772,
+    "hash": "fed0ea06dfb0b592a572cf8e7489127d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0048-canonical-routing-baseline-constants.md": {
+    "mtime": 1777009044.9950762,
+    "hash": "28515dcda36543267d5b2196dc353761"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0049-fallback-line-route-segment-generation-on-complete.md": {
+    "mtime": 1777009044.996076,
+    "hash": "f98bd91a4bb51b56a3b21e58cb19f607"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0050-route-segment-first-completed-line-geojson.md": {
+    "mtime": 1777009044.9965763,
+    "hash": "32dcd75b0e8ba64959abf3b9c0ca1001"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0051-line-selected-route-baseline-structural-debug.md": {
+    "mtime": 1777009044.9970763,
+    "hash": "022df5befaa255e020bf46c586c28e95"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0052-fallback-routing-unit-test-runner-baseline.md": {
+    "mtime": 1777009044.997576,
+    "hash": "1cf18920d273176a7936a538a230ef70"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0053-routing-support-boundary-and-fallback-truth-contract.md": {
+    "mtime": 1777009119.5570765,
+    "hash": "72b9bc712cec4100262c77de7ded979b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0054-canonical-shell-owned-stop-session-state.md": {
+    "mtime": 1777038529.0553527,
+    "hash": "2c658f44b7d9699888504e75e5ea2c0e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0055-selected-line-export-schema-typing.md": {
+    "mtime": 1777471848.3455682,
+    "hash": "e1667cc21aa4ebfb0f09a73411b66b09"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0056-selected-line-in-memory-export-boundary.md": {
+    "mtime": 1777038529.056352,
+    "hash": "67ea644ced285d3a5e271f0ea05c5b96"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0057-selected-line-export-payload-validation-boundary.md": {
+    "mtime": 1777040699.9190762,
+    "hash": "f7dcdd4fecc214d3d8c28f25097f7d6d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0058-selected-line-export-fixture-validation-boundary.md": {
+    "mtime": 1777040699.9195747,
+    "hash": "cc282fe21f23dad86592c44c870a5f6e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0059-line-service-readiness-evaluator-boundary.md": {
+    "mtime": 1777050382.2805734,
+    "hash": "46e5ec5b6904222f7c44eb155826af1c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0060-line-service-readiness-diagnostic-code-constant-ownership.md": {
+    "mtime": 1777050382.2810733,
+    "hash": "c430a3375d5001fe43db9387f6cd42d7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0061-selected-line-readiness-inspector-projection-boundary.md": {
+    "mtime": 1777050382.2815735,
+    "hash": "c137f2a6e6bfca955a79ae0832e10031"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0062-line-service-readiness-diagnostics.md": {
+    "mtime": 1777050382.2820742,
+    "hash": "f18ef32416e42483be104654eb4ec900"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0063-slice-019-simulation-clock-and-pause-speed-controls-baseline.md": {
+    "mtime": 1777471848.3455682,
+    "hash": "d51321f8494305a75f058a343373a97e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0064-line-service-plan-projection-status-and-summary-boundary.md": {
+    "mtime": 1777051930.2580726,
+    "hash": "ff83946e396412a698bc21a533187a39"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0065-line-selected-service-inspector-projection-consumption.md": {
+    "mtime": 1777051930.2585726,
+    "hash": "184bfe2cff65b9a7b3f925a71bdef932"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0066-active-service-network-summary-projection-consumption.md": {
+    "mtime": 1777051930.2590728,
+    "hash": "80a1146bb2dc17defd26d2a42480a789"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0067-current-time-band-departure-schedule-projection.md": {
+    "mtime": 1777052734.455577,
+    "hash": "7a1003b09d92544bb2654cd004dc7cd6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0068-current-minute-line-vehicle-projection-boundary.md": {
+    "mtime": 1777054425.3455744,
+    "hash": "af4a828941d58ace1a6171c795d5dfee"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0069-route-geometry-distance-walk-interpolation-helper.md": {
+    "mtime": 1777054425.3460746,
+    "hash": "848194c0a16b0e75c19cebcbc8f2b3ba"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0070-map-vehicle-render-contracts-from-derived-projections.md": {
+    "mtime": 1777054425.3465981,
+    "hash": "e20451f592dd56ebcafb359069c911db"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0071-shell-vehicle-projection-summary-and-selected-line-inspector.md": {
+    "mtime": 1777054425.3471098,
+    "hash": "fbf96960e2089ad9b3037789a654e7fc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0072-derived-vehicle-projection-from-departure-schedule.md": {
+    "mtime": 1777054425.3476071,
+    "hash": "2ad193247e796d51248078bb69901ddb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0073-vehicle-circle-layer-rendering-contract.md": {
+    "mtime": 1777055733.9015734,
+    "hash": "062fe6fbc8362e2715ff718debb8ad84"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0074-vehicle-circle-layer-semantics-and-geojson-boundary.md": {
+    "mtime": 1777055733.9020734,
+    "hash": "6319554ca13d7214629f7f126271260c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0075-validated-selected-line-export-session-loader.md": {
+    "mtime": 1777471848.3455682,
+    "hash": "3e6e3dc3e907954cb3163c937194d780"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0076-loaded-session-map-source-synchronization-fix.md": {
+    "mtime": 1777057152.6001003,
+    "hash": "52070f59122b9a049a087f3d5c74ce16"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0077-map-workspace-unified-source-sync-helper.md": {
+    "mtime": 1777058936.405104,
+    "hash": "0387865ac3d5fb80eba25252e609b981"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0078-style-readiness-limited-to-source-layer-creation.md": {
+    "mtime": 1777059892.475073,
+    "hash": "061270b1a27e65198e28f26f8414e34f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0079-unified-completed-line-foreground-layer.md": {
+    "mtime": 1777059892.4755733,
+    "hash": "e70dda798db11395d101e9710b2ed164"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0080-deterministic-custom-layer-order-reapplication.md": {
+    "mtime": 1777471848.3455682,
+    "hash": "45dbfbdc5e3139d1e36fb8308a948f69"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0081-slice-023b-map-diagnostics-and-layer-order-hardening.md": {
+    "mtime": 1777059892.4760737,
+    "hash": "df4d9c6ae033cc69b53f19a155bfe2b5"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0082-slice-024-map-workspace-surface-boundary-refactor.md": {
+    "mtime": 1777060825.2305734,
+    "hash": "31ffa3b2d4aef30bd6a3c962e651084b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0083-slice-025-app-shell-session-and-projection-boundary-refactor.md": {
+    "mtime": 1777061524.6655734,
+    "hash": "2efd791c57f1b17e10b4995cb126a649"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0084-slice-026-dev-ui-control-bar-and-inspector-declutter.md": {
+    "mtime": 1777062556.196073,
+    "hash": "4efbd16f1c6047c617e35d8dc0f3ece9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0085-map-workspace-debug-disclosure-compaction.md": {
+    "mtime": 1777064317.9350743,
+    "hash": "04f57e19b9a0a1ba17233814ccf55710"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0085-slice-027-dev-ui-density-and-debug-disclosure.md": {
+    "mtime": 1777064317.9370742,
+    "hash": "3945c3aedaf37277f06a410f6eb21f46"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0086-tool-mode-control-compaction-and-icon-first-accessibility.md": {
+    "mtime": 1777064317.9375737,
+    "hash": "58cf31f39434ec6b99acd787901e11c3"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0087-selected-line-inspector-disclosure-compaction.md": {
+    "mtime": 1777064317.938074,
+    "hash": "298cc7ddd77aab8a3eb77e77c8562621"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0088-static-network-summary-debug-disclosure-compaction.md": {
+    "mtime": 1777064317.9385748,
+    "hash": "1da7681a891857f3332d85bb8feb22e0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0089-unified-top-bar-simulation-and-session-actions.md": {
+    "mtime": 1777471848.3470702,
+    "hash": "c4a11f14a40b2e0b4bececbe680b8c14"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0090-dark-matter-map-bootstrap-style.md": {
+    "mtime": 1777066666.1095738,
+    "hash": "1180a5b48bddfa4b184c89c9959dca8a"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0091-selected-line-context-tray-at-map-bottom.md": {
+    "mtime": 1777066666.110075,
+    "hash": "b508e285288457bbaf7b468d8c92ff17"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0092-product-style-map-centric-shell-rationale.md": {
+    "mtime": 1777066666.1106026,
+    "hash": "66dc103076593b6c1cd22b4e09bb2d7a"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0093-inspector-tab-state-network-lines-debug.md": {
+    "mtime": 1777101110.6162434,
+    "hash": "ecf4008c6c239e01120df8666ca99a32"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0094-selected-line-inspector-compact-header-and-dialog-actions.md": {
+    "mtime": 1777101110.616743,
+    "hash": "8d727f997667c820347b6da71471d081"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0095-canonical-time-band-definitions-and-minute-resolver.md": {
+    "mtime": 1777105420.3762188,
+    "hash": "f1caa9bab94cd7ea1ef479f51b6aa9eb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0096-active-band-service-plan-semantics-for-no-service.md": {
+    "mtime": 1777105420.3767192,
+    "hash": "55af653211e722fcacf5f83c9f93afdb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0097-explicit-frequency-editor-mode-controls.md": {
+    "mtime": 1777105420.3772197,
+    "hash": "0f3ecf2491fb363f54d58aeec965eea3"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0098-compact-service-plan-editor-ui.md": {
+    "mtime": 1777108907.11722,
+    "hash": "683c61c391e1fe70fb97338307d02feb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0099-shell-owned-map-debug-modal-state.md": {
+    "mtime": 1777111348.91572,
+    "hash": "a754f6e650215d8793d86e36af77e328"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0100-single-global-debug-entrypoint.md": {
+    "mtime": 1777111348.91572,
+    "hash": "82510f256163e4c572ab5f7a78baf269"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0101-tabbed-debug-modal-diagnostics-routing.md": {
+    "mtime": 1777111348.91622,
+    "hash": "0c91aab5c35d8a481d1928ef3bb76fc4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0102-inspector-dialog-size-modifiers.md": {
+    "mtime": 1777111348.916719,
+    "hash": "f7fee87e41802253116c07ef4fe63a0e"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0103-inspector-compact-table-value-alignment.md": {
+    "mtime": 1777111348.9172199,
+    "hash": "98a616610c57738357499ed48842b50b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0104-service-plan-three-column-editor.md": {
+    "mtime": 1777111348.9172199,
+    "hash": "f5dadae124d907a21e5e26918aa3930b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0105-service-plan-dialog-player-facing-prioritization.md": {
+    "mtime": 1777111348.9177194,
+    "hash": "85f7186a36342d910e66fe8c67268151"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0106-selected-line-stop-chip-and-route-summary-cards.md": {
+    "mtime": 1777111348.9182193,
+    "hash": "f3c7c9fbd7afe93dd52f5e562e11020c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0107-no-unset-service-state-and-compact-service-plan-editor.md": {
+    "mtime": 1777112549.7017183,
+    "hash": "d6a326329b2a640e1e49128147674f77"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0108-departures-timetable-matrix-and-route-baseline-integration.md": {
+    "mtime": 1777113243.3352215,
+    "hash": "f83af1e8fe8e415f13d4b1723de23bf1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0109-local-dockerized-osrm-routing.md": {
+    "mtime": 1777471848.3490703,
+    "hash": "90ef4aafdf952efea1bb3fa45127d000"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0110-hardened-osrm-adapter-response-boundary.md": {
+    "mtime": 1777145860.796683,
+    "hash": "bf8060e6a6fc2e7e405f667984c37c26"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0111-routing-adapter-results-to-canonical-line-segments.md": {
+    "mtime": 1777471848.3490703,
+    "hash": "fc3917780aa2fbb01f6e37702f3e8de4"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0112-completed-line-creation-uses-best-available-routed-segments.md": {
+    "mtime": 1777471848.3490703,
+    "hash": "05a0e9027a4c5129ad9110b627fd4016"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0113-deterministic-mvp-demand-scenario.md": {
+    "mtime": 1777471848.35357,
+    "hash": "e67380218e463b79ee8227ece8955f59"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0114-explicit-line-topology-and-service-pattern-semantics.md": {
+    "mtime": 1777471848.3470702,
+    "hash": "ff79e3b6b10dadcfe109773291e7aebc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0115-selected-line-export-intent-cache-contract.md": {
+    "mtime": 1777153535.5831764,
+    "hash": "4ddaaf2be884767e7757425eba6d447b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0116-street-derived-stop-labels-as-placement-display-hints.md": {
+    "mtime": 1777183339.4892282,
+    "hash": "a8da1c95405bf73da9b7ba6f455eccb6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0117-deterministic-line-labeling-and-bidirectional-rendering.md": {
+    "mtime": 1777158954.372676,
+    "hash": "5b443f1c18dee1a72c43264c0d0911b5"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0118-vehicle-projection-continuity-and-smooth-movement.md": {
+    "mtime": 1777185083.9202273,
+    "hash": "0dc20b1fc78dcdf2a7ceef455feaf327"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0119-inline-inspector-rename-for-stops-and-lines.md": {
+    "mtime": 1777210449.785228,
+    "hash": "a9eacde8ca577238727f3e7972c62f48"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0120-selected-line-inspector-compact-header-summary.md": {
+    "mtime": 1777212153.2967281,
+    "hash": "ca31d7622f991a9ee6032a9ed0040892"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0121-lines-tab-list-primary-badge-selection-and-compact-inline-rename.md": {
+    "mtime": 1777212957.353229,
+    "hash": "fc763a559e96bacf85446763d37064d1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0122-network-inventory-summary-first-and-compact-stop-selection.md": {
+    "mtime": 1777212957.354229,
+    "hash": "ad023073bd966998658c20380524a2b1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0123-slice-070b-line-scoped-stop-rename-and-inspector-density-cleanup.md": {
+    "mtime": 1777213516.1977284,
+    "hash": "5022d1635bbef99a21712b58ce8c9415"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0124-slice-070c-inspector-flattening-route-sequence-interaction-fix.md": {
+    "mtime": 1777216175.8587575,
+    "hash": "4843500238c1089f4efe9b17fc12371f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0125-osm-stop-candidate-overlay-and-manual-placement-freeze.md": {
+    "mtime": 1777471848.35357,
+    "hash": "83f0eda8b695b48a73d992a61321263c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0126-osm-stop-candidate-source-corrective-slice-100b.md": {
+    "mtime": 1777310329.2535102,
+    "hash": "ed6d40a46338a03a8f74091513d5d1c7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0127-osmium-tooling-container-and-workflow.md": {
+    "mtime": 1777471848.35357,
+    "hash": "75a9d94b5c81a56cc2c86cc896290cdb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0128-osm-stop-candidate-consolidation-before-adoption.md": {
+    "mtime": 1777471848.35357,
+    "hash": "1096b50e5e88590a41fd34a1564e67be"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0129-blocking-data-operation-modal.md": {
+    "mtime": 1777471848.35357,
+    "hash": "0c82f535082b3a45747ea6b8031312e7"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0130-blocking-modal-blur-correction.md": {
+    "mtime": 1777323119.6520104,
+    "hash": "ece62db1fcdd949c20a57569fe390224"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0131-osm-candidate-street-anchor-resolution.md": {
+    "mtime": 1777471848.3555665,
+    "hash": "7eff1eb5359a052490239ad19f282635"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0132-osm-stop-candidate-adoption.md": {
+    "mtime": 1777471848.35607,
+    "hash": "8dbb0b4ac96854c84cee08fb6264eec2"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0133-scenario-json-and-browser-registry-baseline.md": {
+    "mtime": 1777471848.3590703,
+    "hash": "5b69fe630c64c205a210bf55c20e01b1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0134-scenario-registry-loading-and-selection.md": {
+    "mtime": 1777471848.3590703,
+    "hash": "43b42465eb5efa3b7af2fb13c3e390a3"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0135-area-aware-osrm-preparation-and-local-asset-orchestration.md": {
+    "mtime": 1777330541.7385383,
+    "hash": "d0ddb8fe55a429f623a550e69335eb13"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0136-area-aware-stop-candidates-and-complete-local-asset-pipeline.md": {
+    "mtime": 1777331685.7230098,
+    "hash": "423ccc29f961316c53f762a9e67b045d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0137-scenario-setup-bootstrap-and-bbbike-helper.md": {
+    "mtime": 1777332447.590038,
+    "hash": "2abd5fdbf18785caa57c2042f3604189"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0138-readme-scenario-workflow-and-hamburg-cleanup.md": {
+    "mtime": 1777333184.2365081,
+    "hash": "8f1316d5e784b4ca0f6f7aeb35777d71"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0139-pnpm-task-for-local-osrm-routing.md": {
+    "mtime": 1777387350.001719,
+    "hash": "43dad4863506c33e41a7e9958215843b"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0140-scenario-bound-demand-overlay-skeleton.md": {
+    "mtime": 1777440074.8051767,
+    "hash": "36f80f49e34e1e57d53fc7680a4b3b14"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0141-demand-capture-preview-overlay.md": {
+    "mtime": 1777440769.2640305,
+    "hash": "25636f5fe93a5764973d269349c3a12a"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0142-legacy-demo-demand-purge-before-scenario-import.md": {
+    "mtime": 1777475371.02014,
+    "hash": "9738e0cb3621c282376bcfc083d884af"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0143-scenario-owned-demand-contracts.md": {
+    "mtime": 1777476059.5046513,
+    "hash": "0f10feb7547f68da975ff40dcdd36fac"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0144-scenario-demand-parser-type-hygiene.md": {
+    "mtime": 1777476601.488798,
+    "hash": "e86536097ed7083f22c8478a67929726"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0145-generic-scenario-demand-generator-skeleton.md": {
+    "mtime": 1777477005.8081744,
+    "hash": "7be39311ac1280a45de3efb317ea27b9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0146-generic-scenario-source-material-manifest.md": {
+    "mtime": 1777477311.334608,
+    "hash": "a73f019c86dd76a1ee99a530e49a8e36"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0147-manifest-driven-scenario-demand-generation.md": {
+    "mtime": 1777477786.0582895,
+    "hash": "5d515cccddae16848de0ee314bdf6823"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0148-generic-census-grid-csv-source-adapter.md": {
+    "mtime": 1777478230.5897365,
+    "hash": "5056572f88b713550328a34d871f80ef"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0149-census-grid-adapter-generator-integration.md": {
+    "mtime": 1777478679.326238,
+    "hash": "d1a7942cc136fedac7b072cb7ad6b8fb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0150-generic-workplace-attractor-geojson-source-adapter.md": {
+    "mtime": 1777481446.6811242,
+    "hash": "89b71a26fc5095ebc243d35df96b1c32"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0151-repository-local-agent-skill-playbooks.md": {
+    "mtime": 1777617469.3855531,
+    "hash": "a942953689b198a940402767aaf68b33"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0152-scenario-demand-artifact-runtime-loader-baseline.md": {
+    "mtime": 1777486649.357152,
+    "hash": "f27630968cd08d0029e3c3bb343f16c1"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0167-scenario-routing-coverage-and-pan-guardrails.md": {
+    "mtime": 1777618871.012056,
+    "hash": "664a42ecfee8206fe177b19859380b99"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0168-inspector-information-architecture.md": {
+    "mtime": 1777620425.4200535,
+    "hash": "816a1540df083d6922bb01ecde310aa8"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0169-icon-tab-inspector-information-architecture.md": {
+    "mtime": 1777621212.9275534,
+    "hash": "286581ca06664800292486d3f481ec9a"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0170-demand-gap-map-overlay.md": {
+    "mtime": 1777624909.025053,
+    "hash": "2d489bf95bcf14cba235ce07ec2b76cb"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0170-shell-scrollbar-governance-and-inspector-decomposition.md": {
+    "mtime": 1777622207.8545535,
+    "hash": "dd1d3777ad921903d1c8eaddd461804f"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0170c-demand-gap-overlay-tuning.md": {
+    "mtime": 1777632167.8975537,
+    "hash": "af4dc47964aca128749afe448bc59c4d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0171-shell-panel-spacing-and-inspector-disclosure-polish.md": {
+    "mtime": 1777623059.776556,
+    "hash": "237ada74dec9fca750728b65059a8c40"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0172-demand-gap-focus-and-planning-guidance.md": {
+    "mtime": 1777638168.2355564,
+    "hash": "e2ac7a64b8d3282bd6e6afdaec087f81"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0173-demand-gap-od-context-projection.md": {
+    "mtime": 1777779979.5374172,
+    "hash": "d4bb84a8327dd8a74194af105cd2793d"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0174-demand-gap-od-desire-hint-map-context.md": {
+    "mtime": 1777779338.123916,
+    "hash": "02daccc29d4449e87426333b33494ff8"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0175-focused-demand-gap-planning-summary-projection.md": {
+    "mtime": 1777782540.579724,
+    "hash": "9f4524320c2e7d4337970798baa309f8"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0176-demand-gap-od-candidate-focus-and-readability.md": {
+    "mtime": 1777792070.3841388,
+    "hash": "f4398a358607593aa4e4af6cce914f72"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0177-focused-demand-gap-planning-action-entrypoints.md": {
+    "mtime": 1777799007.3739135,
+    "hash": "4d9601103ea2ca17a0f3494ad454af54"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0178-demand-gap-planning-entrypoint-context-banner.md": {
+    "mtime": 1777808723.4071171,
+    "hash": "ed346075accacced5ca865462d3e9dfd"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0179-focused-demand-gap-lifecycle-feedback.md": {
+    "mtime": 1777816120.8386753,
+    "hash": "06dc3b5c8b789611ed6caddc012d22b6"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0180-scenario-demand-provenance-and-model-caveat.md": {
+    "mtime": 1777820453.252392,
+    "hash": "22e7141357a399cb45990e69cb1108c9"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0181-demand-map-legend-model-caveat-alignment.md": {
+    "mtime": 1777836231.246389,
+    "hash": "01946de009f6004c452aa7b5b421e3dc"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0182-demand-gap-overlay-visual-softening.md": {
+    "mtime": 1777859847.913173,
+    "hash": "2d349e3d4f9c7402186550255571480a"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0183-demand-node-focus-and-time-band-inspection.md": {
+    "mtime": 1777876860.2448735,
+    "hash": "ff7b4372ff38c85541b5d52083ac393c"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0184-demand-node-context-candidate-locality.md": {
+    "mtime": 1777883571.6197455,
+    "hash": "c7629c6b2c154c8ac07ce9b651cc1094"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0185-selected-demand-node-service-coverage-projection.md": {
+    "mtime": 1777886021.5472715,
+    "hash": "c50b07aa92e0420840a18b7aa90a4243"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0186-selected-demand-node-service-coverage-map-highlights.md": {
+    "mtime": 1777887198.4382746,
+    "hash": "a3dbfb21db5e261ca3d9c857e5363b93"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\adr\\0187-osm-stop-candidate-inspection-and-adoption-readiness.md": {
+    "mtime": 1777894679.0977716,
+    "hash": "03d37ba8790a2d69fa880f7d7f62a039"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\data\\census-grid-source-material.md": {
+    "mtime": 1777500526.9529066,
+    "hash": "791d801a4c72bc618e4507110162b454"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\data\\osm-attractor-source-material.md": {
+    "mtime": 1777502391.249712,
+    "hash": "1052834852ebc997b1bcb9a1cf5a2abf"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\routing\\local-osm-stop-candidates.md": {
+    "mtime": 1777471848.3450668,
+    "hash": "167e736a4cdaca012aff61adabc8ffb0"
+  },
+  "D:\\__DEV\\open-vayra-cities\\docs\\routing\\local-osrm-routing.md": {
+    "mtime": 1777471848.3450668,
+    "hash": "1721c21c948b785669f78c6690b954dd"
+  },
+  "D:\\__DEV\\open-vayra-cities\\apps\\web\\public\\images\\open-vayra-cities-splash.png": {
+    "mtime": 1777474645.0910685,
+    "hash": "81c765bec207c416eb1a4b5c17e452c1"
+  }
+}
